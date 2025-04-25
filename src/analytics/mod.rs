@@ -6,19 +6,19 @@ use nanoid::nanoid;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AnalyticsEvent {
     /// Site identifier
-    site_id: String,
+    pub site_id: String,
     /// Unique visitor identifier (anonymously generated client-sided)
-    visitor_id: String,
+    pub visitor_id: String,
     /// Page URL
-    url: String,
+    pub url: String,
     /// Referrer URL
-    referrer: Option<String>,
+    pub referrer: Option<String>,
     /// User agent
-    user_agent: String,
+    pub user_agent: String,
     /// Screen resolution
-    screen_resolution: String,
+    pub screen_resolution: String,
     /// Timestamp of the event
-    timestamp: u64,
+    pub timestamp: u64,
 }
 
 impl AnalyticsEvent {
