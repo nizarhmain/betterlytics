@@ -1,11 +1,17 @@
 use anyhow::Result;
-use clickhouse::Client;
+use clickhouse::{Client, inserter::Inserter};
 use std::env;
+use std::time::Duration;
 use chrono::{DateTime, Utc};
+use tokio::sync::Mutex;
+use std::sync::Arc;
 
 pub struct Database {
     client: Client,
+    inserter: Option<Inserter<String>>,
 }
+
+pub type SharedDatabase = Arc<Mutex<Database>>;
 
 impl Database {
     pub async fn new() -> Result<Self> {
@@ -19,7 +25,17 @@ impl Database {
             .with_password(password)
             .with_database("analytics");
 
-        Ok(Self { client })
+        // Initialize inserter with appropriate settings for analytics
+        let inserter = client.inserter("analytics.events")?
+            .with_timeouts(Some(Duration::from_secs(5)), Some(Duration::from_secs(20)))
+            .with_max_bytes(50_000_000)
+            .with_max_rows(100_000)
+            .with_period(Some(Duration::from_secs(10)));
+
+        Ok(Self { 
+            client,
+            inserter: Some(inserter),
+        })
     }
 
     pub async fn init_schema(&self) -> Result<()> {
@@ -54,6 +70,54 @@ impl Database {
         Ok(())
     }
 
+    pub async fn insert_event(&mut self, event: &crate::analytics::AnalyticsEvent) -> Result<()> {
+        let inserter = self.inserter.as_mut().ok_or_else(|| anyhow::anyhow!("Inserter not initialized"))?;
+        
+        inserter.write(&event.site_id)?;
+        inserter.write(&event.visitor_id)?;
+        inserter.write(&event.url)?;
+        
+        match &event.referrer {
+            Some(referrer) => inserter.write(referrer)?,
+            None => inserter.write(&String::new())?,
+        }
+        
+        inserter.write(&event.user_agent)?;
+        inserter.write(&event.screen_resolution)?;
+        
+        let timestamp_str = DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0)
+            .ok_or_else(|| anyhow::anyhow!("Invalid timestamp"))?
+            .format("%Y-%m-%d %H:%M:%S")
+            .to_string();
+        inserter.write(&timestamp_str)?;
+
+        Ok(())
+    }
+
+    pub async fn commit_batch(&mut self) -> Result<()> {
+        if let Some(inserter) = &mut self.inserter {
+            let stats = inserter.commit().await?;
+            if stats.rows > 0 {
+                tracing::info!(
+                    "Inserted batch: {} bytes, {} rows, {} transactions",
+                    stats.bytes, stats.rows, stats.transactions
+                );
+            }
+        }
+        Ok(())
+    }
+
+    pub async fn finalize(&mut self) -> Result<()> {
+        if let Some(inserter) = self.inserter.take() {
+            let stats = inserter.end().await?;
+            tracing::info!(
+                "Final batch inserted: {} bytes, {} rows, {} transactions",
+                stats.bytes, stats.rows, stats.transactions
+            );
+        }
+        Ok(())
+    }
+
     async fn materialize_views(&self) -> Result<()> {
         // Create materialized view for daily page views
         self.client.query(r#"
@@ -83,32 +147,6 @@ impl Database {
             FROM analytics.events
             GROUP BY site_id, date
         "#).execute().await?;
-
-        Ok(())
-    }
-
-    pub async fn insert_event(&self, event: &crate::analytics::AnalyticsEvent) -> Result<()> {
-        let mut insert = self.client.insert("analytics.events")?;
-        
-        insert.write(&event.site_id).await?;
-        insert.write(&event.visitor_id).await?;
-        insert.write(&event.url).await?;
-        
-        match &event.referrer {
-            Some(referrer) => insert.write(referrer).await?,
-            None => insert.write(&String::new()).await?,
-        }
-        
-        insert.write(&event.user_agent).await?;
-        insert.write(&event.screen_resolution).await?;
-        
-        let timestamp_str = DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0)
-            .ok_or_else(|| anyhow::anyhow!("Invalid timestamp"))?
-            .format("%Y-%m-%d %H:%M:%S")
-            .to_string();
-        insert.write(&timestamp_str).await?;
-        
-        insert.end().await?;
 
         Ok(())
     }
