@@ -8,6 +8,9 @@
         return console.error("Better Analytics: data-site-id attribute missing");
     }
 
+    // Track current path for SPA navigation
+    var currentPath = window.location.pathname;
+
     function trackEvent() {
         var url = window.location.href;
         var referrer = document.referrer || null;
@@ -55,4 +58,25 @@
             trackEvent();
         }
     });
+
+    // Track SPA navigation
+    if (window.history.pushState) {
+        // Override pushState to track navigation
+        var originalPushState = history.pushState;
+        history.pushState = function() {
+            originalPushState.apply(this, arguments);
+            if (currentPath !== window.location.pathname) {
+                currentPath = window.location.pathname;
+                trackEvent();
+            }
+        };
+
+        // Track popstate (back/forward navigation)
+        window.addEventListener("popstate", function() {
+            if (currentPath !== window.location.pathname) {
+                currentPath = window.location.pathname;
+                trackEvent();
+            }
+        });
+    }
 })();
