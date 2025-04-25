@@ -1,2 +1,58 @@
 // Better Analytics - Privacy-focused, cookieless analytics
-!function(){var e=document.currentScript||document.querySelector('script[src*="analytics.js"]'),t=e.getAttribute("data-site-id");if(!t)return console.error("Better Analytics: data-site-id attribute missing");var n=function(){var e=window.location.href,n=document.referrer||null,r=navigator.userAgent,i=window.screen.width+"x"+window.screen.height,o=function(e){for(var n=0,r=0;r<e.length;r++){var i=e.charCodeAt(r);n=(n<<5)-n+i,n=n&n}return Math.abs(n).toString(16)}(r+i);fetch("http://localhost:3001/track",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({site_id:t,url:e,referrer:n,user_agent:r,screen_resolution:i,visitor_id:o,timestamp: Math.floor(Date.now() / 1000)})}).catch(function(e){console.error("Analytics tracking failed:",e)})};n(),document.addEventListener("visibilitychange",function(){document.visibilityState==="visible"&&n()})}(); 
+(function() {
+    // Get the script element and required site ID
+    var script = document.currentScript || document.querySelector('script[src*="analytics.js"]');
+    var siteId = script.getAttribute("data-site-id");
+    
+    if (!siteId) {
+        return console.error("Better Analytics: data-site-id attribute missing");
+    }
+
+    function trackEvent() {
+        var url = window.location.href;
+        var referrer = document.referrer || null;
+        var userAgent = navigator.userAgent;
+        var screenResolution = window.screen.width + "x" + window.screen.height;
+        
+        // Generate visitor ID from browser fingerprint
+        var visitorId = (function(fingerprint) {
+            var hash = 0;
+            for (var i = 0; i < fingerprint.length; i++) {
+                var char = fingerprint.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16);
+        })(userAgent + screenResolution);
+
+        // Send tracking data
+        fetch("http://localhost:3001/track", {
+            method: "POST",
+            keepalive: true,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                site_id: siteId,
+                url: url,
+                referrer: referrer,
+                user_agent: userAgent,
+                screen_resolution: screenResolution,
+                visitor_id: visitorId,
+                timestamp: Math.floor(Date.now() / 1000)
+            })
+        }).catch(function(error) {
+            console.error("Analytics tracking failed:", error);
+        });
+    }
+
+    // Track initial page view
+    trackEvent();
+
+    // Track page visibility changes
+    document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === "visible") {
+            trackEvent();
+        }
+    });
+})();
