@@ -1,0 +1,24 @@
+[package]
+name = "better-analytics"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Framework
+axum = "0.8.3"
+tokio = { version = "1.44.2", features = ["full"] }
+tower = "0.5.2"
+tower-http = { version = "0.6.2", features = ["trace"] }
+
+# Configuration
+config = "0.15.11"
+dotenv = "0.15.0"
+
+# Error handling
+thiserror = "2.0.12"
+anyhow = "1.0.98"
+
+# Logging
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+
