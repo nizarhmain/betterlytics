@@ -7,6 +7,9 @@ use std::sync::Arc;
 use tokio::sync::mpsc;
 use crate::analytics::AnalyticsEvent;
 
+mod models;
+pub use models::EventRow;
+
 const NUM_INSERTER_WORKERS: usize = 4;
 
 pub struct Database {
@@ -173,24 +176,21 @@ impl Database {
     }
 }
 
-async fn process_event(inserter: &mut Inserter<String>, event: &AnalyticsEvent) -> Result<()> {
-    inserter.write(&event.site_id)?;
-    inserter.write(&event.visitor_id)?;
-    inserter.write(&event.url)?;
+async fn process_event(inserter: &mut Inserter<EventRow>, event: &AnalyticsEvent) -> Result<()> {
+    let timestamp = DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0)
+        .ok_or_else(|| anyhow::anyhow!("Invalid timestamp"))?;
     
-    match &event.referrer {
-        Some(referrer) => inserter.write(referrer)?,
-        None => inserter.write(&String::new())?,
-    }
-    
-    inserter.write(&event.user_agent)?;
-    inserter.write(&event.screen_resolution)?;
-    
-    let timestamp_str = DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0)
-        .ok_or_else(|| anyhow::anyhow!("Invalid timestamp"))?
-        .format("%Y-%m-%d %H:%M:%S")
-        .to_string();
-    inserter.write(&timestamp_str)?;
+    let row = EventRow {
+        site_id: event.site_id.clone(),
+        visitor_id: event.visitor_id.clone(),
+        url: event.url.clone(),
+        referrer: event.referrer.clone(),
+        user_agent: event.user_agent.clone(),
+        screen_resolution: event.screen_resolution.clone(),
+        timestamp,
+        date: timestamp.date_naive(),
+    };
 
+    inserter.write(&row)?;
     Ok(())
 } 

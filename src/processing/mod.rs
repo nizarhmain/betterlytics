@@ -2,7 +2,7 @@ use anyhow::Result;
 use tokio::sync::mpsc;
 use crate::analytics::AnalyticsEvent;
 use crate::db::SharedDatabase;
-use tracing::{info, error};
+use tracing::{error, debug};
 
 #[derive(Debug, Clone)]
 pub struct ProcessedEvent {
@@ -59,12 +59,14 @@ impl EventProcessor {
             error!("Failed to send processed event: {}", e);
         }
 
+        debug!("Processed event finished!");
+
         Ok(())
     }
 
     /// Anonymize IP address by removing last octet
     async fn anonymize_ip(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        info!("Anonymizing IP address!");
+        debug!("Anonymizing IP address!");
         // TODO: Implement IP anonymization
         processed.anonymized_ip = None;
         Ok(())
@@ -72,7 +74,7 @@ impl EventProcessor {
 
     /// Detect if the request is from a bot
     async fn detect_bot(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        info!("Detecting bot!");
+        debug!("Detecting bot!");
         // TODO: Implement bot detection
         processed.is_bot = false;
         Ok(())
@@ -80,7 +82,7 @@ impl EventProcessor {
 
     /// Parse user agent to extract browser and OS information
     async fn parse_user_agent(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        info!("Parsing user agent: {:?}", processed.event.user_agent);
+        debug!("Parsing user agent: {:?}", processed.event.user_agent);
         // TODO: Implement user agent parsing
         processed.browser = None;
         processed.browser_version = None;
@@ -91,9 +93,9 @@ impl EventProcessor {
 
     /// Update real-time metrics in ClickHouse
     async fn update_real_time_metrics(&self, processed: &ProcessedEvent) -> Result<()> {
-        info!("Updating real-time metrics!");
+        debug!("Updating real-time metrics!");
         // TODO: Implement real-time metrics update
-        info!("Processed event: {:?}", processed);
+        debug!("Processed event: {:?}", processed);
         Ok(())
     }
 } 
