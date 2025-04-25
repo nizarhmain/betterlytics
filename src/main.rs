@@ -9,16 +9,17 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
-use std::collections::HashMap;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod config;
 mod analytics;
 mod db;
+mod processing;
 
 use analytics::{AnalyticsEvent, generate_site_id};
 use db::{Database, SharedDatabase};
+use processing::EventProcessor;
 
 #[tokio::main]
 async fn main() {
@@ -37,11 +38,23 @@ async fn main() {
     db.init_schema().await.expect("Failed to initialize database schema");
     let db = Arc::new(db);
 
+    let (processor, mut processed_rx) = EventProcessor::new(db.clone());
+    let processor = Arc::new(processor);
+
+    let db_clone = db.clone();
+    tokio::spawn(async move {
+        while let Some(processed) = processed_rx.recv().await {
+            if let Err(e) = db_clone.insert_event(processed.event).await {
+                tracing::error!("Failed to insert processed event: {}", e);
+            }
+        }
+    });
+
     let app = Router::new()
         .route("/health", get(health_check))
         .route("/track", post(track_event))
         .route("/site-id", get(generate_site_id_handler))
-        .with_state(db)
+        .with_state((db, processor))
         .layer(CorsLayer::permissive());
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
@@ -54,10 +67,10 @@ async fn health_check() -> &'static str {
 }
 
 async fn track_event(
-    State(db): State<SharedDatabase>,
+    State((db, processor)): State<(SharedDatabase, Arc<EventProcessor>)>,
     Json(event): Json<AnalyticsEvent>,
 ) -> Result<StatusCode, (StatusCode, String)> {
-    if let Err(e) = db.insert_event(event).await {
+    if let Err(e) = processor.process_event(event).await {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
     }
     Ok(StatusCode::OK)
