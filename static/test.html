@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics Test Page</title>
+    <script src="http://localhost:3001/analytics.js" data-site-id="test-site-123"></script>
+</head>
+<body>
+    <h1>Analytics Test Page</h1>
+    
+    <div>
+        <h2>Test Events</h2>
+        <button onclick="trackCustomEvent('button_click', {button_id: 'test-button'})">Track Button Click</button>
+        <button onclick="trackCustomEvent('form_submit', {form_name: 'test-form'})">Track Form Submit</button>
+    </div>
+
+    <script>
+        function trackCustomEvent(eventType, eventData) {
+            fetch('http://localhost:3001/track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    site_id: 'test-site-123',
+                    event_type: eventType,
+                    event_data: eventData,
+                    url: window.location.href,
+                    referrer: document.referrer,
+                    user_agent: navigator.userAgent,
+                    screen_resolution: window.screen.width + 'x' + window.screen.height,
+                    timestamp: Math.floor(Date.now() / 1000)
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                console.log('Event tracked successfully:', eventType);
+            })
+            .catch(error => {
+                console.error('Error tracking event:', error);
+            });
+        }
+    </script>
+</body>
+</html> 
