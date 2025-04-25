@@ -8,7 +8,6 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::net::SocketAddr;
-use tokio::sync::Mutex;
 use tower_http::cors::CorsLayer;
 use std::collections::HashMap;
 use tracing::info;
@@ -36,7 +35,7 @@ async fn main() {
 
     let db = Database::new().await.expect("Failed to initialize database");
     db.init_schema().await.expect("Failed to initialize database schema");
-    let db = Arc::new(Mutex::new(db));
+    let db = Arc::new(db);
 
     let app = Router::new()
         .route("/health", get(health_check))
@@ -58,7 +57,7 @@ async fn track_event(
     State(db): State<SharedDatabase>,
     Json(event): Json<AnalyticsEvent>,
 ) -> Result<StatusCode, (StatusCode, String)> {
-    if let Err(e) = db.lock().await.insert_event(&event).await {
+    if let Err(e) = db.insert_event(event).await {
         return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
     }
     Ok(StatusCode::OK)

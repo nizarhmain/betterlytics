@@ -3,39 +3,93 @@ use clickhouse::{Client, inserter::Inserter};
 use std::env;
 use std::time::Duration;
 use chrono::{DateTime, Utc};
-use tokio::sync::Mutex;
 use std::sync::Arc;
+use tokio::sync::mpsc;
+use crate::analytics::AnalyticsEvent;
+
+const NUM_INSERTER_WORKERS: usize = 4;
 
 pub struct Database {
     client: Client,
-    inserter: Option<Inserter<String>>,
+    event_tx: mpsc::Sender<AnalyticsEvent>,
 }
 
-pub type SharedDatabase = Arc<Mutex<Database>>;
+pub type SharedDatabase = Arc<Database>;
 
 impl Database {
     pub async fn new() -> Result<Self> {
+        let client = Self::create_client()?;
+        let (event_tx, event_rx) = Self::create_channels();
+        let worker_senders = Self::spawn_workers(client.clone());
+        Self::spawn_dispatcher(event_rx, worker_senders);
+
+        Ok(Self { 
+            client,
+            event_tx,
+        })
+    }
+
+    fn create_client() -> Result<Client> {
         let database_url = env::var("CLICKHOUSE_URL").unwrap_or_else(|_| "http://localhost:8123".to_string());
         let user = env::var("CLICKHOUSE_USER").unwrap_or_else(|_| "default".to_string());
         let password = env::var("CLICKHOUSE_PASSWORD").unwrap_or_else(|_| "password".to_string());
 
-        let client = Client::default()
+        Ok(Client::default()
             .with_url(database_url)
             .with_user(user)
             .with_password(password)
-            .with_database("analytics");
+            .with_database("analytics"))
+    }
 
-        // Initialize inserter with appropriate settings for analytics
-        let inserter = client.inserter("analytics.events")?
-            .with_timeouts(Some(Duration::from_secs(5)), Some(Duration::from_secs(20)))
-            .with_max_bytes(50_000_000)
-            .with_max_rows(100_000)
-            .with_period(Some(Duration::from_secs(10)));
+    fn create_channels() -> (mpsc::Sender<AnalyticsEvent>, mpsc::Receiver<AnalyticsEvent>) {
+        mpsc::channel(100_000)
+    }
 
-        Ok(Self { 
-            client,
-            inserter: Some(inserter),
-        })
+    // Creates per-worker internal channels and starts them
+    fn spawn_workers(client: Client) -> Vec<mpsc::Sender<AnalyticsEvent>> {
+        let mut worker_senders = Vec::new();
+
+        for _ in 0..NUM_INSERTER_WORKERS {
+            let (worker_tx, mut worker_rx) = mpsc::channel(10_000);
+            worker_senders.push(worker_tx);
+
+            let client = client.clone();
+
+            tokio::spawn(async move {
+                let mut inserter = client
+                    .inserter("analytics.events")
+                    .expect("Failed to create inserter")
+                    .with_timeouts(Some(Duration::from_secs(5)), Some(Duration::from_secs(20)))
+                    .with_max_bytes(50_000_000)
+                    .with_max_rows(100_000)
+                    .with_period(Some(Duration::from_secs(10)));
+
+                while let Some(event) = worker_rx.recv().await {
+                    if let Err(e) = process_event(&mut inserter, &event).await {
+                        tracing::error!("Failed to process event: {}", e);
+                    }
+                }
+
+                if let Err(e) = inserter.end().await {
+                    tracing::error!("Failed to finalize inserter: {}", e);
+                }
+            });
+        }
+
+        worker_senders
+    }
+
+    // Dispatcher task: pull from main rx and send to workers in round-robin fashion
+    fn spawn_dispatcher(mut event_rx: mpsc::Receiver<AnalyticsEvent>, worker_senders: Vec<mpsc::Sender<AnalyticsEvent>>) {
+        tokio::spawn(async move {
+            let mut i = 0;
+            while let Some(event) = event_rx.recv().await {
+                if let Err(e) = worker_senders[i % NUM_INSERTER_WORKERS].send(event).await {
+                    tracing::error!("Failed to dispatch event to worker: {}", e);
+                }
+                i += 1;
+            }
+        });
     }
 
     pub async fn init_schema(&self) -> Result<()> {
@@ -70,51 +124,8 @@ impl Database {
         Ok(())
     }
 
-    pub async fn insert_event(&mut self, event: &crate::analytics::AnalyticsEvent) -> Result<()> {
-        let inserter = self.inserter.as_mut().ok_or_else(|| anyhow::anyhow!("Inserter not initialized"))?;
-        
-        inserter.write(&event.site_id)?;
-        inserter.write(&event.visitor_id)?;
-        inserter.write(&event.url)?;
-        
-        match &event.referrer {
-            Some(referrer) => inserter.write(referrer)?,
-            None => inserter.write(&String::new())?,
-        }
-        
-        inserter.write(&event.user_agent)?;
-        inserter.write(&event.screen_resolution)?;
-        
-        let timestamp_str = DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0)
-            .ok_or_else(|| anyhow::anyhow!("Invalid timestamp"))?
-            .format("%Y-%m-%d %H:%M:%S")
-            .to_string();
-        inserter.write(&timestamp_str)?;
-
-        Ok(())
-    }
-
-    pub async fn commit_batch(&mut self) -> Result<()> {
-        if let Some(inserter) = &mut self.inserter {
-            let stats = inserter.commit().await?;
-            if stats.rows > 0 {
-                tracing::info!(
-                    "Inserted batch: {} bytes, {} rows, {} transactions",
-                    stats.bytes, stats.rows, stats.transactions
-                );
-            }
-        }
-        Ok(())
-    }
-
-    pub async fn finalize(&mut self) -> Result<()> {
-        if let Some(inserter) = self.inserter.take() {
-            let stats = inserter.end().await?;
-            tracing::info!(
-                "Final batch inserted: {} bytes, {} rows, {} transactions",
-                stats.bytes, stats.rows, stats.transactions
-            );
-        }
+    pub async fn insert_event(&self, event: AnalyticsEvent) -> Result<()> {
+        self.event_tx.send(event).await?;
         Ok(())
     }
 
@@ -150,4 +161,26 @@ impl Database {
 
         Ok(())
     }
+}
+
+async fn process_event(inserter: &mut Inserter<String>, event: &AnalyticsEvent) -> Result<()> {
+    inserter.write(&event.site_id)?;
+    inserter.write(&event.visitor_id)?;
+    inserter.write(&event.url)?;
+    
+    match &event.referrer {
+        Some(referrer) => inserter.write(referrer)?,
+        None => inserter.write(&String::new())?,
+    }
+    
+    inserter.write(&event.user_agent)?;
+    inserter.write(&event.screen_resolution)?;
+    
+    let timestamp_str = DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0)
+        .ok_or_else(|| anyhow::anyhow!("Invalid timestamp"))?
+        .format("%Y-%m-%d %H:%M:%S")
+        .to_string();
+    inserter.write(&timestamp_str)?;
+
+    Ok(())
 } 

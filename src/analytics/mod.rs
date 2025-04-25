@@ -3,7 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use md5::{Md5, Digest};
 use nanoid::nanoid;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AnalyticsEvent {
     /// Site identifier
     pub site_id: String,
