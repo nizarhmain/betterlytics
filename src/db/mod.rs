@@ -18,7 +18,7 @@ pub type SharedDatabase = Arc<Database>;
 
 impl Database {
     pub async fn new() -> Result<Self> {
-        let client = Self::create_client()?;
+        let client = Self::create_client().await?;
         let (event_tx, event_rx) = Self::create_channels();
         let worker_senders = Self::spawn_workers(client.clone());
         Self::spawn_dispatcher(event_rx, worker_senders);
@@ -29,16 +29,16 @@ impl Database {
         })
     }
 
-    fn create_client() -> Result<Client> {
+    async fn create_client() -> Result<Client> {
         let database_url = env::var("CLICKHOUSE_URL").unwrap_or_else(|_| "http://localhost:8123".to_string());
-        let user = env::var("CLICKHOUSE_USER").unwrap_or_else(|_| "default".to_string());
-        let password = env::var("CLICKHOUSE_PASSWORD").unwrap_or_else(|_| "password".to_string());
+        
+        tracing::debug!("Creating ClickHouse client with URL: {}", database_url);
+        
+        let client = Client::default()
+            .with_url(&database_url);
 
-        Ok(Client::default()
-            .with_url(database_url)
-            .with_user(user)
-            .with_password(password)
-            .with_database("analytics"))
+        tracing::debug!("ClickHouse client created successfully");
+        Ok(client)
     }
 
     fn create_channels() -> (mpsc::Sender<AnalyticsEvent>, mpsc::Receiver<AnalyticsEvent>) {
@@ -47,7 +47,7 @@ impl Database {
 
     // Creates per-worker internal channels and starts them
     fn spawn_workers(client: Client) -> Vec<mpsc::Sender<AnalyticsEvent>> {
-        let mut worker_senders = Vec::new();
+        let mut worker_senders: Vec<mpsc::Sender<AnalyticsEvent>> = Vec::new();
 
         for _ in 0..NUM_INSERTER_WORKERS {
             let (worker_tx, mut worker_rx) = mpsc::channel(10_000);
@@ -93,9 +93,17 @@ impl Database {
     }
 
     pub async fn init_schema(&self) -> Result<()> {
+        tracing::debug!("Initializing database schema");
+        
+        // Test connection with a simple query
+        tracing::debug!("Testing connection with a simple query");
+        self.client.query("SELECT 1").execute().await?;
+        
         // Create analytics database if it doesn't exist
+        tracing::debug!("Creating analytics database if it doesn't exist");
         self.client.query("CREATE DATABASE IF NOT EXISTS analytics").execute().await?;
         
+        tracing::debug!("Creating events table");
         // Create events table
         self.client.query(r#"
             CREATE TABLE IF NOT EXISTS analytics.events (
@@ -119,8 +127,10 @@ impl Database {
                      min_rows_for_wide_part = 0
         "#).execute().await?;
 
+        tracing::debug!("Creating materialized views");
         self.materialize_views().await?;
         
+        tracing::debug!("Database schema initialized successfully");
         Ok(())
     }
 
