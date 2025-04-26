@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import SummaryCard from "@/components/SummaryCard"
+import PageviewsChart from "@/components/PageviewsChart"
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -39,7 +40,9 @@ export default async function DashboardPage() {
             changeColor="text-green-600"
           />
         </div>
-
+        <div className="mb-8">
+          <PageviewsChart siteId="default-site" />
+        </div>
         <div className="border-t border-gray-200 pt-4">
           <p className="text-gray-600">
             Welcome, {session.user?.name || "User"}! You are logged in as an {session.user?.role || "user"}.
