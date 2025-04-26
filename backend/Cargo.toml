@@ -8,7 +8,7 @@ edition = "2024"
 axum = "0.8.3"
 tokio = { version = "1.44.2", features = ["full"] }
 tower = "0.5.2"
-tower-http = { version = "0.6.2", features = ["trace", "fs", "cors"] }
+tower-http = { version = "0.6.2", features = ["trace", "fs", "cors", "limit"] }
 
 # Configuration
 config = "0.15.11"
