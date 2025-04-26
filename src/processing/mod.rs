@@ -36,7 +36,6 @@ impl EventProcessor {
         (Self { db, event_tx }, event_rx)
     }
 
-    /// Process an event through the pipeline
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
         let mut processed = ProcessedEvent {
             event,
@@ -50,17 +49,27 @@ impl EventProcessor {
             device_type: None,
         };
 
-        self.anonymize_ip(&mut processed).await?;
-        self.detect_bot(&mut processed).await?;
-        self.parse_user_agent(&mut processed).await?;
-        self.update_real_time_metrics(&processed).await?;
+        if let Err(e) = self.anonymize_ip(&mut processed).await {
+            error!("Failed to anonymize IP: {}", e);
+        }
+        
+        if let Err(e) = self.detect_bot(&mut processed).await {
+            error!("Failed to detect bot: {}", e);
+        }
+        
+        if let Err(e) = self.parse_user_agent(&mut processed).await {
+            error!("Failed to parse user agent: {}", e);
+        }
+        
+        if let Err(e) = self.update_real_time_metrics(&processed).await {
+            error!("Failed to update real-time metrics: {}", e);
+        }
 
         if let Err(e) = self.event_tx.send(processed).await {
             error!("Failed to send processed event: {}", e);
         }
 
         debug!("Processed event finished!");
-
         Ok(())
     }
 
