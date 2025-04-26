@@ -8,6 +8,8 @@
   },
   "packageManager": "pnpm@10.9.0",
   "dependencies": {
-    "lucide-react": "^0.503.0"
+    "clickhouse": "^2.6.0",
+    "lucide-react": "^0.503.0",
+    "zod": "^3.24.3"
   }
 }

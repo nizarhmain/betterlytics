@@ -2,6 +2,7 @@ import type { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { JWT } from "next-auth/jwt"
 import { Session } from "next-auth"
+import { env } from "./env"
 
 interface User {
   id: string
@@ -30,8 +31,8 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials): Promise<User | null> {
         // For now, we'll use a single admin user from environment variables
-        const adminUsername = process.env.ADMIN_USERNAME
-        const adminPassword = process.env.ADMIN_PASSWORD
+        const adminUsername = env.ADMIN_USERNAME
+        const adminPassword = env.ADMIN_PASSWORD
 
         if (!adminUsername || !adminPassword) {
           throw new Error("Admin credentials not configured")
