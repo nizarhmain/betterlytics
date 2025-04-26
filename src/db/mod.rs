@@ -174,6 +174,16 @@ impl Database {
 
         Ok(())
     }
+
+    /// Check if the database connection is alive
+    pub async fn check_connection(&self) -> Result<()> {
+        tracing::debug!("Checking database connection");
+        
+        self.client.query("SELECT 1").execute().await?;
+        
+        tracing::debug!("Database connection check successful");
+        Ok(())
+    }
 }
 
 async fn process_event(inserter: &mut Inserter<EventRow>, event: &AnalyticsEvent) -> Result<()> {

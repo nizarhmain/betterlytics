@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
-use tracing::info;
+use tracing::{info, error};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod config;
@@ -71,8 +71,19 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn health_check() -> &'static str {
-    "OK"
+async fn health_check(
+    State((db, _)): State<(SharedDatabase, Arc<EventProcessor>)>,
+) -> Result<impl IntoResponse, String> {
+    match db.check_connection().await {
+        Ok(_) => Ok(Json(serde_json::json!({
+            "status": "ok",
+            "database": "connected"
+        }))),
+        Err(e) => {
+            error!("Database health check failed: {}", e);
+            Err(format!("Database connection failed: {}", e))
+        }
+    }
 }
 
 async fn track_event(
