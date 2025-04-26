@@ -1,0 +1,10 @@
+{
+  "name": "better-analytics",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter better-analytics-dashboard dev",
+    "build": "pnpm --filter better-analytics-dashboard build",
+    "start": "pnpm --filter better-analytics-dashboard start"
+  },
+  "packageManager": "pnpm@10.9.0"
+}
