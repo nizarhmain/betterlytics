@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
-import SignOutButton from "@/components/SignOutButton"
 import SummaryCard from "@/components/SummaryCard"
 
 export default async function DashboardPage() {
@@ -14,11 +13,6 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <SignOutButton />
-        </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <SummaryCard
             title="Unique Visitors"
