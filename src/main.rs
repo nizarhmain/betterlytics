@@ -90,9 +90,21 @@ async fn track_event(
     State((db, processor)): State<(SharedDatabase, Arc<EventProcessor>)>,
     Json(event): Json<AnalyticsEvent>,
 ) -> Result<StatusCode, (StatusCode, String)> {
-    if let Err(e) = processor.process_event(event).await {
-        return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
+    if event.site_id.is_empty() {
+        return Err((StatusCode::BAD_REQUEST, "site_id is required".to_string()));
     }
+    if event.url.is_empty() {
+        return Err((StatusCode::BAD_REQUEST, "url is required".to_string()));
+    }
+    if event.visitor_id.is_empty() {
+        return Err((StatusCode::BAD_REQUEST, "visitor_id is required".to_string()));
+    }
+
+    if let Err(e) = processor.process_event(event).await {
+        error!("Failed to process event: {}", e);
+        return Ok(StatusCode::OK);
+    }
+
     Ok(StatusCode::OK)
 }
 
