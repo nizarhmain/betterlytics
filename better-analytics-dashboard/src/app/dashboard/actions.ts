@@ -1,6 +1,6 @@
 "use server";
 
-import { getPageViewsForSite, getUniqueVisitorsForSite, getSummaryStatsForSite } from '@/services/pageviews';
+import { getPageViewsForSite, getUniqueVisitorsForSite, getSummaryStatsForSite, getTopPagesForSite, getDeviceTypeBreakdownForSite } from '@/services/pageviews';
 import { DailyPageViewRow, DailyUniqueVisitorsRow } from '@/entities/pageviews';
 import { TimeGrouping } from '@/utils/timeRanges';
 
@@ -14,4 +14,12 @@ export async function fetchUniqueVisitorsAction(siteId: string, startDate: strin
 
 export async function fetchSummaryStatsAction(siteId: string, startDate: string, endDate: string) {
   return getSummaryStatsForSite(siteId, startDate, endDate);
+}
+
+export async function fetchTopPagesAction(siteId: string, startDate: string, endDate: string, limit = 5) {
+  return getTopPagesForSite(siteId, startDate, endDate, limit);
+}
+
+export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: string, endDate: string) {
+  return getDeviceTypeBreakdownForSite(siteId, startDate, endDate);
 } 

@@ -2,10 +2,12 @@
 import SummaryCard from "@/components/SummaryCard";
 import PageviewsChart from "@/components/PageviewsChart";
 import VisitorsChart from "@/components/VisitorsChart";
+import TopPagesTable from '@/components/TopPagesTable';
+import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import { useState } from "react";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
 import { useQuery } from '@tanstack/react-query';
-import { fetchSummaryStatsAction } from './actions';
+import { fetchSummaryStatsAction, fetchTopPagesAction, fetchDeviceTypeBreakdownAction } from './actions';
 
 export default function DashboardPageClient({ session }: { session: any }) {
   const [range, setRange] = useState<TimeRangeValue>("7d");
@@ -14,6 +16,16 @@ export default function DashboardPageClient({ session }: { session: any }) {
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['summaryStats', 'default-site', startDate, endDate],
     queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate),
+  });
+
+  const { data: topPages, isLoading: topPagesLoading } = useQuery({
+    queryKey: ['topPages', 'default-site', startDate, endDate],
+    queryFn: () => fetchTopPagesAction('default-site', startDate, endDate, 5),
+  });
+
+  const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
+    queryKey: ['deviceTypeBreakdown', 'default-site', startDate, endDate],
+    queryFn: () => fetchDeviceTypeBreakdownAction('default-site', startDate, endDate),
   });
 
   return (
@@ -61,6 +73,14 @@ export default function DashboardPageClient({ session }: { session: any }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} />
           <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div>
+            {topPagesLoading ? <div>Loading...</div> : <TopPagesTable pages={topPages ?? []} />}
+          </div>
+          <div>
+            {deviceBreakdownLoading ? <div>Loading...</div> : <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />}
+          </div>
         </div>
         <div className="border-t border-gray-200 pt-4">
           <p className="text-gray-600">

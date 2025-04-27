@@ -165,4 +165,37 @@ export async function getTotalUniqueVisitors(siteId: string, startDate: string, 
     params: { site_id: siteId, start: toDateTimeString(startDate), end: toDateTimeString(endDate) },
   }).toPromise() as any[];
   return Number(result[0]?.unique_visitors ?? 0);
+}
+
+export async function getTopPages(siteId: string, startDate: string, endDate: string, limit = 5): Promise<{ url: string, visitors: number }[]> {
+  const query = `
+    SELECT url, uniqExact(visitor_id) as visitors
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND timestamp >= {start:DateTime}
+      AND timestamp <= {end:DateTime}
+    GROUP BY url
+    ORDER BY visitors DESC
+    LIMIT {limit:UInt32}
+  `;
+  const result = await clickhouse.query(query, {
+    params: { site_id: siteId, start: toDateTimeString(startDate), end: toDateTimeString(endDate), limit },
+  }).toPromise() as any[];
+  return result.map(row => ({ url: row.url, visitors: Number(row.visitors) }));
+}
+
+export async function getDeviceTypeBreakdown(siteId: string, startDate: string, endDate: string): Promise<{ device_type: string, visitors: number }[]> {
+  const query = `
+    SELECT device_type, uniqExact(visitor_id) as visitors
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND timestamp >= {start:DateTime}
+      AND timestamp <= {end:DateTime}
+    GROUP BY device_type
+    ORDER BY visitors DESC
+  `;
+  const result = await clickhouse.query(query, {
+    params: { site_id: siteId, start: toDateTimeString(startDate), end: toDateTimeString(endDate) },
+  }).toPromise() as any[];
+  return result.map(row => ({ device_type: row.device_type, visitors: Number(row.visitors) }));
 } 
