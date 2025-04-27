@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc, NaiveDate};
 use serde::Serialize;
 
-#[derive(clickhouse::Row, Serialize)]
+#[derive(clickhouse::Row, Serialize, Debug)]
 pub struct EventRow {
     pub site_id: String,
     pub visitor_id: String,

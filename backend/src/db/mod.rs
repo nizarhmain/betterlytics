@@ -2,7 +2,7 @@ use anyhow::Result;
 use clickhouse::{Client, inserter::Inserter};
 use std::env;
 use std::time::Duration;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Utc, NaiveDate};
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use crate::analytics::AnalyticsEvent;
@@ -10,7 +10,7 @@ use crate::analytics::AnalyticsEvent;
 mod models;
 pub use models::EventRow;
 
-const NUM_INSERTER_WORKERS: usize = 4;
+const NUM_INSERT_WORKERS: usize = 1;
 
 pub struct Database {
     client: Client,
@@ -23,7 +23,7 @@ impl Database {
     pub async fn new() -> Result<Self> {
         let client = Self::create_client().await?;
         let (event_tx, event_rx) = Self::create_channels();
-        let worker_senders = Self::spawn_workers(client.clone());
+        let worker_senders = Self::spawn_async_insert_workers(client.clone());
         Self::spawn_dispatcher(event_rx, worker_senders);
 
         Ok(Self { 
@@ -35,12 +35,12 @@ impl Database {
     async fn create_client() -> Result<Client> {
         let database_url = env::var("CLICKHOUSE_URL").unwrap_or_else(|_| "http://localhost:8123".to_string());
         
-        tracing::debug!("Creating ClickHouse client with URL: {}", database_url);
+        println!("Creating ClickHouse client with URL: {}", database_url);
         
         let client = Client::default()
             .with_url(&database_url);
 
-        tracing::debug!("ClickHouse client created successfully");
+        println!("ClickHouse client created successfully");
         Ok(client)
     }
 
@@ -48,33 +48,20 @@ impl Database {
         mpsc::channel(100_000)
     }
 
-    // Creates per-worker internal channels and starts them
-    fn spawn_workers(client: Client) -> Vec<mpsc::Sender<AnalyticsEvent>> {
+    fn spawn_async_insert_workers(client: Client) -> Vec<mpsc::Sender<AnalyticsEvent>> {
         let mut worker_senders: Vec<mpsc::Sender<AnalyticsEvent>> = Vec::new();
 
-        for _ in 0..NUM_INSERTER_WORKERS {
+        for i in 0..NUM_INSERT_WORKERS {
             let (worker_tx, mut worker_rx) = mpsc::channel(10_000);
             worker_senders.push(worker_tx);
 
             let client = client.clone();
 
             tokio::spawn(async move {
-                let mut inserter = client
-                    .inserter("analytics.events")
-                    .expect("Failed to create inserter")
-                    .with_timeouts(Some(Duration::from_secs(5)), Some(Duration::from_secs(20)))
-                    .with_max_bytes(50_000_000)
-                    .with_max_rows(100_000)
-                    .with_period(Some(Duration::from_secs(10)));
-
                 while let Some(event) = worker_rx.recv().await {
-                    if let Err(e) = process_event(&mut inserter, &event).await {
-                        tracing::error!("Failed to process event: {}", e);
+                    if let Err(e) = insert_single_event_async(&client, &event).await {
+                        eprintln!("Worker {}: Failed async insert: {}. Event: {:?}", i, e, event);
                     }
-                }
-
-                if let Err(e) = inserter.end().await {
-                    tracing::error!("Failed to finalize inserter: {}", e);
                 }
             });
         }
@@ -82,32 +69,27 @@ impl Database {
         worker_senders
     }
 
-    // Dispatcher task: pull from main rx and send to workers in round-robin fashion
     fn spawn_dispatcher(mut event_rx: mpsc::Receiver<AnalyticsEvent>, worker_senders: Vec<mpsc::Sender<AnalyticsEvent>>) {
         tokio::spawn(async move {
             let mut i = 0;
             while let Some(event) = event_rx.recv().await {
-                if let Err(e) = worker_senders[i % NUM_INSERTER_WORKERS].send(event).await {
-                    tracing::error!("Failed to dispatch event to worker: {}", e);
+                if let Err(e) = worker_senders[i % NUM_INSERT_WORKERS].send(event).await {
+                    eprintln!("Dispatcher failed to send event to worker: {}", e);
                 }
-                i += 1;
+                i = (i + 1) % NUM_INSERT_WORKERS;
             }
         });
     }
 
     pub async fn init_schema(&self) -> Result<()> {
-        tracing::debug!("Initializing database schema");
+        println!("Initializing database schema");
         
-        // Test connection with a simple query
-        tracing::debug!("Testing connection with a simple query");
-        self.client.query("SELECT 1").execute().await?;
+        self.check_connection().await?;
         
-        // Create analytics database if it doesn't exist
-        tracing::debug!("Creating analytics database if it doesn't exist");
+        println!("Creating analytics database if it doesn't exist");
         self.client.query("CREATE DATABASE IF NOT EXISTS analytics").execute().await?;
         
-        tracing::debug!("Creating events table");
-        // Create events table
+        println!("Creating events table");
         self.client.query(r#"
             CREATE TABLE IF NOT EXISTS analytics.events (
                 site_id String,
@@ -126,14 +108,14 @@ impl Database {
             ORDER BY (site_id, timestamp, visitor_id)
             -- Add compression settings
             SETTINGS index_granularity = 8192,
-                     min_bytes_for_wide_part = 0,
-                     min_rows_for_wide_part = 0
+                min_bytes_for_wide_part = 0,
+                min_rows_for_wide_part = 0
         "#).execute().await?;
 
-        tracing::debug!("Creating materialized views");
+        println!("Creating materialized views");
         self.materialize_views().await?;
         
-        tracing::debug!("Database schema initialized successfully");
+        println!("Database schema initialized successfully");
         Ok(())
     }
 
@@ -175,20 +157,19 @@ impl Database {
         Ok(())
     }
 
-    /// Check if the database connection is alive
     pub async fn check_connection(&self) -> Result<()> {
-        tracing::debug!("Checking database connection");
+        println!("Checking database connection");
         
         self.client.query("SELECT 1").execute().await?;
         
-        tracing::debug!("Database connection check successful");
+        println!("Database connection check successful");
         Ok(())
     }
 }
 
-async fn process_event(inserter: &mut Inserter<EventRow>, event: &AnalyticsEvent) -> Result<()> {
+async fn insert_single_event_async(client: &Client, event: &AnalyticsEvent) -> Result<()> {
     let timestamp = DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0)
-        .ok_or_else(|| anyhow::anyhow!("Invalid timestamp"))?;
+        .ok_or_else(|| anyhow::anyhow!("Invalid timestamp: {}", event.timestamp))?;
     
     let row = EventRow {
         site_id: event.site_id.clone(),
@@ -201,6 +182,23 @@ async fn process_event(inserter: &mut Inserter<EventRow>, event: &AnalyticsEvent
         date: timestamp.date_naive(),
     };
 
-    inserter.write(&row)?;
+    let query = format!(
+        "INSERT INTO analytics.events (site_id, visitor_id, url, referrer, user_agent, screen_resolution, timestamp, date) SETTINGS async_insert=1, wait_for_async_insert=1 VALUES ('{}', '{}', '{}', {}, '{}', '{}', '{}', '{}')",
+        escape_sql_string(&row.site_id),
+        escape_sql_string(&row.visitor_id),
+        escape_sql_string(&row.url),
+        row.referrer.as_ref().map_or_else(|| "NULL".to_string(), |s| format!("'{}'", escape_sql_string(s))),
+        escape_sql_string(&row.user_agent),
+        escape_sql_string(&row.screen_resolution),
+        row.timestamp.format("%Y-%m-%d %H:%M:%S").to_string(),
+        row.date.format("%Y-%m-%d").to_string()
+    );
+
+    client.query(&query).execute().await?;
+
     Ok(())
+}
+
+fn escape_sql_string(s: &str) -> String {
+    s.replace('\'', "\\'")
 } 
