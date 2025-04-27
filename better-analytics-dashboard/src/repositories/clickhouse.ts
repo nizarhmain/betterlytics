@@ -23,15 +23,18 @@ export async function getDailyPageViews(siteId: string, startDate: string, endDa
   return result.map(row => DailyPageViewRowSchema.parse(row));
 }
 
-export async function getTotalPageviews(siteId: string): Promise<number> {
+export async function getTotalPageviews(siteId: string, startDate: string, endDate: string): Promise<number> {
   const query = `
-    SELECT sum(views) as total
-    FROM analytics.daily_page_views
+    SELECT count() as pageviews
+    FROM analytics.events
     WHERE site_id = {site_id:String}
+      AND timestamp >= {start:DateTime}
+      AND timestamp <= {end:DateTime}
   `;
-  const result = await clickhouse.query(query, { params: { site_id: siteId } }).toPromise() as unknown[];
-  const row = PageviewsCountRowSchema.parse(result[0]);
-  return row.total;
+  const result = await clickhouse.query(query, {
+    params: { site_id: siteId, start: toDateTimeString(startDate), end: toDateTimeString(endDate) },
+  }).toPromise() as any[];
+  return Number(result[0]?.pageviews ?? 0);
 }
 
 export async function getDailyUniqueVisitors(siteId: string, startDate: string, endDate: string): Promise<DailyUniqueVisitorsRow[]> {
@@ -148,4 +151,18 @@ export async function getMinuteUniqueVisitors(siteId: string, startDate: string,
       unique_visitors: Number(r.unique_visitors),
     };
   });
+}
+
+export async function getTotalUniqueVisitors(siteId: string, startDate: string, endDate: string): Promise<number> {
+  const query = `
+    SELECT uniqExact(visitor_id) as unique_visitors
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND timestamp >= {start:DateTime}
+      AND timestamp <= {end:DateTime}
+  `;
+  const result = await clickhouse.query(query, {
+    params: { site_id: siteId, start: toDateTimeString(startDate), end: toDateTimeString(endDate) },
+  }).toPromise() as any[];
+  return Number(result[0]?.unique_visitors ?? 0);
 } 

@@ -4,10 +4,17 @@ import PageviewsChart from "@/components/PageviewsChart";
 import VisitorsChart from "@/components/VisitorsChart";
 import { useState } from "react";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
+import { useQuery } from '@tanstack/react-query';
+import { fetchSummaryStatsAction } from './actions';
 
 export default function DashboardPageClient({ session }: { session: any }) {
   const [range, setRange] = useState<TimeRangeValue>("7d");
   const { startDate, endDate } = getRangeForValue(range);
+
+  const { data: summary, isLoading: summaryLoading } = useQuery({
+    queryKey: ['summaryStats', 'default-site', startDate, endDate],
+    queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate),
+  });
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -28,26 +35,26 @@ export default function DashboardPageClient({ session }: { session: any }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <SummaryCard
             title="Unique Visitors"
-            value="24,589"
-            changeText="↑ 12.5% vs. previous period"
+            value={summaryLoading ? '...' : summary?.uniqueVisitors?.toLocaleString() ?? '0'}
+            changeText=""
             changeColor="text-green-600"
           />
           <SummaryCard
             title="Total Pageviews"
-            value="78,245"
-            changeText="↓ 2.3% vs. previous period"
+            value={summaryLoading ? '...' : summary?.pageviews?.toLocaleString() ?? '0'}
+            changeText=""
             changeColor="text-red-600"
           />
           <SummaryCard
             title="Bounce Rate"
-            value="42.3%"
-            changeText="↓ 5.1% vs. previous period"
+            value={summaryLoading ? '...' : summary?.bounceRate !== undefined ? `${summary.bounceRate}%` : '0%'}
+            changeText=""
             changeColor="text-green-600"
           />
           <SummaryCard
             title="Avg. Visit Duration"
-            value="2m 13s"
-            changeText="↑ 8.7% vs. previous period"
+            value={summaryLoading ? '...' : summary?.avgVisitDuration !== undefined ? `${summary.avgVisitDuration}s` : '0s'}
+            changeText=""
             changeColor="text-green-600"
           />
         </div>
