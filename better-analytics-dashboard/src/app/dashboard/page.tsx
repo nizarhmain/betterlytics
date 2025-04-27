@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import SummaryCard from "@/components/SummaryCard"
 import PageviewsChart from "@/components/PageviewsChart"
+import VisitorsChart from "@/components/VisitorsChart"
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -40,7 +41,8 @@ export default async function DashboardPage() {
             changeColor="text-green-600"
           />
         </div>
-        <div className="mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <VisitorsChart siteId="default-site" />
           <PageviewsChart siteId="default-site" />
         </div>
         <div className="border-t border-gray-200 pt-4">

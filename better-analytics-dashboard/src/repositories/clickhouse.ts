@@ -1,5 +1,6 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyPageViewRowSchema, DailyPageViewRow, PageviewsCountRowSchema } from '@/entities/pageviews';
+import { DailyUniqueVisitorsRowSchema, DailyUniqueVisitorsRow } from '@/entities/pageviews';
 
 export async function getDailyPageViews(siteId: string): Promise<DailyPageViewRow[]> {
   const query = `
@@ -22,4 +23,19 @@ export async function getTotalPageviews(siteId: string): Promise<number> {
   const result = await clickhouse.query(query, { params: { site_id: siteId } }).toPromise() as unknown[];
   const row = PageviewsCountRowSchema.parse(result[0]);
   return row.total;
+}
+
+export async function getDailyUniqueVisitors(siteId: string): Promise<DailyUniqueVisitorsRow[]> {
+  const query = `
+    SELECT date, uniqMerge(unique_visitors) as unique_visitors
+    FROM analytics.daily_unique_visitors FINAL
+    WHERE site_id = {site_id:String}
+    GROUP BY date
+    ORDER BY date DESC
+    LIMIT 100
+  `;
+  const result = await clickhouse.query(query, { params: { site_id: siteId } }).toPromise() as unknown[];
+  console.log(result);
+
+  return result.map(row => DailyUniqueVisitorsRowSchema.parse(row));
 } 
