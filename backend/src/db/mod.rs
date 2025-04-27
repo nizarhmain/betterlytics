@@ -1,16 +1,25 @@
 use anyhow::Result;
-use clickhouse::{Client, inserter::Inserter};
+use clickhouse::{error::Error as ClickHouseError, inserter::Inserter, Client};
 use std::env;
-use std::time::Duration;
-use chrono::{DateTime, Utc, NaiveDate};
 use std::sync::Arc;
-use tokio::sync::mpsc;
+use std::time::Duration;
+
+use chrono::{DateTime, Utc};
+use tokio::sync::mpsc::{self, error::TryRecvError, Receiver};
+use tokio::time::timeout;
+
 use crate::analytics::AnalyticsEvent;
 
 mod models;
 pub use models::EventRow;
 
 const NUM_INSERT_WORKERS: usize = 1;
+const EVENT_CHANNEL_CAPACITY: usize = 100_000;
+const WORKER_CHANNEL_CAPACITY: usize = 10_000;
+const INSERTER_TIMEOUT_SECS: u64 = 5;
+const INSERTER_PERIOD_SECS: u64 = 10;
+const INSERTER_MAX_ROWS: u64 = 100_000;
+const INSERTER_MAX_BYTES: u64 = 50 * 1024 * 1024;
 
 pub struct Database {
     client: Client,
@@ -23,74 +32,74 @@ impl Database {
     pub async fn new() -> Result<Self> {
         let client = Self::create_client().await?;
         let (event_tx, event_rx) = Self::create_channels();
-        let worker_senders = Self::spawn_async_insert_workers(client.clone());
+        let worker_senders = Self::spawn_inserter_workers(client.clone());
         Self::spawn_dispatcher(event_rx, worker_senders);
 
-        Ok(Self { 
-            client,
-            event_tx,
-        })
+        Ok(Self { client, event_tx })
     }
 
     async fn create_client() -> Result<Client> {
         let database_url = env::var("CLICKHOUSE_URL").unwrap_or_else(|_| "http://localhost:8123".to_string());
-        
         println!("Creating ClickHouse client with URL: {}", database_url);
-        
-        let client = Client::default()
-            .with_url(&database_url);
-
+        let client = Client::default().with_url(&database_url);
         println!("ClickHouse client created successfully");
         Ok(client)
     }
 
     fn create_channels() -> (mpsc::Sender<AnalyticsEvent>, mpsc::Receiver<AnalyticsEvent>) {
-        mpsc::channel(100_000)
+        mpsc::channel(EVENT_CHANNEL_CAPACITY)
     }
 
-    fn spawn_async_insert_workers(client: Client) -> Vec<mpsc::Sender<AnalyticsEvent>> {
-        let mut worker_senders: Vec<mpsc::Sender<AnalyticsEvent>> = Vec::new();
+    fn spawn_inserter_workers(client: Client) -> Vec<mpsc::Sender<AnalyticsEvent>> {
+        let mut worker_senders = Vec::with_capacity(NUM_INSERT_WORKERS);
 
         for i in 0..NUM_INSERT_WORKERS {
-            let (worker_tx, mut worker_rx) = mpsc::channel(10_000);
+            let (worker_tx, worker_rx) = mpsc::channel(WORKER_CHANNEL_CAPACITY);
             worker_senders.push(worker_tx);
-
-            let client = client.clone();
-
+            let client_clone = client.clone();
             tokio::spawn(async move {
-                while let Some(event) = worker_rx.recv().await {
-                    if let Err(e) = insert_single_event_async(&client, &event).await {
-                        eprintln!("Worker {}: Failed async insert: {}. Event: {:?}", i, e, event);
-                    }
+                if let Err(e) = run_inserter_worker(i, client_clone, worker_rx).await {
+                    eprintln!("Worker {}: Error - {}", i, e);
                 }
             });
         }
-
         worker_senders
     }
 
-    fn spawn_dispatcher(mut event_rx: mpsc::Receiver<AnalyticsEvent>, worker_senders: Vec<mpsc::Sender<AnalyticsEvent>>) {
+    fn spawn_dispatcher(
+        mut event_rx: mpsc::Receiver<AnalyticsEvent>,
+        worker_senders: Vec<mpsc::Sender<AnalyticsEvent>>,
+    ) {
         tokio::spawn(async move {
-            let mut i = 0;
+            let mut worker_index = 0;
             while let Some(event) = event_rx.recv().await {
-                if let Err(e) = worker_senders[i % NUM_INSERT_WORKERS].send(event).await {
-                    eprintln!("Dispatcher failed to send event to worker: {}", e);
+                if let Err(e) = worker_senders[worker_index].send(event).await {
+                    eprintln!(
+                        "Dispatcher failed to send event to worker {}: {}",
+                        worker_index, e
+                    );
+                    // TODO: Add logic to handle potentially dead worker (e.g., skip, retry with backoff, remove worker from rotation).
                 }
-                i = (i + 1) % NUM_INSERT_WORKERS;
+                worker_index = (worker_index + 1) % NUM_INSERT_WORKERS;
             }
+            println!("Dispatcher: Event channel closed. Shutting down.");
         });
     }
 
     pub async fn init_schema(&self) -> Result<()> {
         println!("Initializing database schema");
-        
         self.check_connection().await?;
-        
+
         println!("Creating analytics database if it doesn't exist");
-        self.client.query("CREATE DATABASE IF NOT EXISTS analytics").execute().await?;
-        
+        self.client
+            .query("CREATE DATABASE IF NOT EXISTS analytics")
+            .execute()
+            .await?;
+
         println!("Creating events table");
-        self.client.query(r#"
+        self.client
+            .query(
+                r#"
             CREATE TABLE IF NOT EXISTS analytics.events (
                 site_id String,
                 visitor_id String,
@@ -110,11 +119,14 @@ impl Database {
             SETTINGS index_granularity = 8192,
                 min_bytes_for_wide_part = 0,
                 min_rows_for_wide_part = 0
-        "#).execute().await?;
+        "#,
+            )
+            .execute()
+            .await?;
 
         println!("Creating materialized views");
         self.materialize_views().await?;
-        
+
         println!("Database schema initialized successfully");
         Ok(())
     }
@@ -126,7 +138,9 @@ impl Database {
 
     async fn materialize_views(&self) -> Result<()> {
         // Create materialized view for daily page views
-        self.client.query(r#"
+        self.client
+            .query(
+                r#"
             CREATE MATERIALIZED VIEW IF NOT EXISTS analytics.daily_page_views
             ENGINE = SummingMergeTree()
             PARTITION BY toYYYYMM(date)
@@ -138,10 +152,15 @@ impl Database {
                 count() as views
             FROM analytics.events
             GROUP BY site_id, date, url
-        "#).execute().await?;
+        "#,
+            )
+            .execute()
+            .await?;
 
         // Create materialized view for daily unique visitors
-        self.client.query(r#"
+        self.client
+            .query(
+                r#"
             CREATE MATERIALIZED VIEW IF NOT EXISTS analytics.daily_unique_visitors
             ENGINE = AggregatingMergeTree()
             PARTITION BY toYYYYMM(date)
@@ -152,53 +171,122 @@ impl Database {
                 uniqState(visitor_id) as unique_visitors
             FROM analytics.events
             GROUP BY site_id, date
-        "#).execute().await?;
+        "#,
+            )
+            .execute()
+            .await?;
 
         Ok(())
     }
 
     pub async fn check_connection(&self) -> Result<()> {
         println!("Checking database connection");
-        
         self.client.query("SELECT 1").execute().await?;
-        
         println!("Database connection check successful");
         Ok(())
     }
 }
 
-async fn insert_single_event_async(client: &Client, event: &AnalyticsEvent) -> Result<()> {
-    let timestamp = DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0)
-        .ok_or_else(|| anyhow::anyhow!("Invalid timestamp: {}", event.timestamp))?;
-    
-    let row = EventRow {
-        site_id: event.site_id.clone(),
-        visitor_id: event.visitor_id.clone(),
-        url: event.url.clone(),
-        referrer: event.referrer.clone(),
-        user_agent: event.user_agent.clone(),
-        screen_resolution: event.screen_resolution.clone(),
-        timestamp,
-        date: timestamp.date_naive(),
-    };
-
-    let query = format!(
-        "INSERT INTO analytics.events (site_id, visitor_id, url, referrer, user_agent, screen_resolution, timestamp, date) SETTINGS async_insert=1, wait_for_async_insert=1 VALUES ('{}', '{}', '{}', {}, '{}', '{}', '{}', '{}')",
-        escape_sql_string(&row.site_id),
-        escape_sql_string(&row.visitor_id),
-        escape_sql_string(&row.url),
-        row.referrer.as_ref().map_or_else(|| "NULL".to_string(), |s| format!("'{}'", escape_sql_string(s))),
-        escape_sql_string(&row.user_agent),
-        escape_sql_string(&row.screen_resolution),
-        row.timestamp.format("%Y-%m-%d %H:%M:%S").to_string(),
-        row.date.format("%Y-%m-%d").to_string()
+async fn run_inserter_worker(
+    worker_id: usize,
+    client: Client,
+    mut rx: Receiver<AnalyticsEvent>,
+) -> Result<(), ClickHouseError> {
+    println!(
+        "Worker {}: Starting (Inserter Sparse Stream Mode).",
+        worker_id
     );
 
-    client.query(&query).execute().await?;
+    let mut inserter = client
+        .inserter("analytics.events")?
+        .with_timeouts(
+            Some(Duration::from_secs(INSERTER_TIMEOUT_SECS)),
+            None,
+        )
+        .with_period(Some(Duration::from_secs(INSERTER_PERIOD_SECS)))
+        .with_max_rows(INSERTER_MAX_ROWS)
+        .with_max_bytes(INSERTER_MAX_BYTES);
 
+    println!("Worker {}: Inserter configured.", worker_id);
+
+    loop {
+        let event = match rx.try_recv() {
+            Ok(received_event) => received_event,
+            Err(TryRecvError::Empty) => {
+                // Channel empty, wait for the next event or until the inserter period ends.
+                let time_left = inserter
+                    .time_left()
+                    .unwrap_or_else(|| Duration::from_secs(INSERTER_PERIOD_SECS));
+
+                match timeout(time_left, rx.recv()).await {
+                    Ok(Some(received_event)) => received_event,
+                    Ok(None) => {
+                        println!(
+                            "Worker {}: Channel closed during timeout wait. Committing final batch.",
+                            worker_id
+                        );
+                        inserter.commit().await?;
+                        break;
+                    }
+                    Err(_) => {
+                        println!(
+                            "Worker {}: Idle timeout reached. Committing potentially buffered data.",
+                            worker_id
+                        );
+                        inserter.commit().await?;
+                        continue;
+                    }
+                }
+            }
+            Err(TryRecvError::Disconnected) => {
+                println!(
+                    "Worker {}: Channel disconnected. Committing final batch.",
+                    worker_id
+                );
+                break;
+            }
+        };
+
+        let timestamp = match DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0) {
+            Some(ts) => ts,
+            None => {
+                eprintln!(
+                    "Worker {}: Invalid timestamp format for event {:?}. Skipping.",
+                    worker_id, event
+                );
+                // TODO: Consider sending invalid events to a dead-letter queue instead of just skipping?
+                continue;
+            }
+        };
+
+        let row = EventRow {
+            site_id: event.site_id,
+            visitor_id: event.visitor_id,
+            url: event.url,
+            referrer: event.referrer,
+            user_agent: event.user_agent,
+            screen_resolution: event.screen_resolution,
+            timestamp,
+        };
+
+        if let Err(e) = inserter.write(&row) {
+            eprintln!(
+                "Worker {}: Failed to write row to inserter buffer: {}. Row: {:?}",
+                worker_id, e, row
+            );
+            // TODO: Implement retry logic or dead-letter queue for inserter write failures.
+            continue;
+        }
+    }
+
+    println!(
+        "Worker {}: Exiting loop. Finalizing inserter.",
+        worker_id
+    );
+    let stats = inserter.end().await?;
+    println!(
+        "Worker {}: Shutdown complete. Final stats: {:?}",
+        worker_id, stats
+    );
     Ok(())
-}
-
-fn escape_sql_string(s: &str) -> String {
-    s.replace('\'', "\\'")
 } 

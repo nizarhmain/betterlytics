@@ -4,7 +4,7 @@ import { DailyPageViewRowSchema, DailyPageViewRow, PageviewsCountRowSchema } fro
 export async function getDailyPageViews(siteId: string): Promise<DailyPageViewRow[]> {
   const query = `
     SELECT date, url, views
-    FROM analytics.daily_page_views
+    FROM analytics.daily_page_views FINAL
     WHERE site_id = {site_id:String}
     ORDER BY date DESC, views DESC
     LIMIT 100
