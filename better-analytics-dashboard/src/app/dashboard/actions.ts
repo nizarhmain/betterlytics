@@ -1,14 +1,13 @@
 "use server";
 
-import { getDailyPageViewsForSite } from '@/services/pageviews';
-import { DailyPageViewRow } from '@/entities/pageviews';
-import { getDailyUniqueVisitorsForSite } from '@/services/pageviews';
-import { DailyUniqueVisitorsRow } from '@/entities/pageviews';
+import { getPageViewsForSite, getUniqueVisitorsForSite } from '@/services/pageviews';
+import { DailyPageViewRow, DailyUniqueVisitorsRow } from '@/entities/pageviews';
+import { TimeGrouping } from '@/utils/timeRanges';
 
-export async function fetchDailyPageViewsAction(siteId: string): Promise<DailyPageViewRow[]> {
-  return getDailyPageViewsForSite(siteId);
+export async function fetchPageViewsAction(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyPageViewRow[]> {
+  return getPageViewsForSite(siteId, startDate, endDate, groupBy);
 }
 
-export async function fetchDailyUniqueVisitorsAction(siteId: string): Promise<DailyUniqueVisitorsRow[]> {
-  return getDailyUniqueVisitorsForSite(siteId);
+export async function fetchUniqueVisitorsAction(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyUniqueVisitorsRow[]> {
+  return getUniqueVisitorsForSite(siteId, startDate, endDate, groupBy);
 } 

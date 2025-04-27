@@ -1,20 +1,23 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
-import { fetchDailyPageViewsAction } from '@/app/dashboard/actions';
+import { fetchPageViewsAction } from '@/app/dashboard/actions';
 import { DailyPageViewRow } from "@/entities/pageviews";
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { getGroupingForRange, TimeGrouping } from '@/utils/timeRanges';
 
 interface PageviewsChartProps {
   siteId: string;
+  startDate: string;
+  endDate: string;
 }
 
-export default function PageviewsChart({ siteId }: PageviewsChartProps) {
+export default function PageviewsChart({ siteId, startDate, endDate }: PageviewsChartProps) {
+  const groupBy: TimeGrouping = getGroupingForRange(startDate, endDate);
   const { data = [], isLoading } = useQuery<DailyPageViewRow[]>({
-    queryKey: ['dailyPageViews', siteId],
-    queryFn: () => fetchDailyPageViewsAction(siteId),
+    queryKey: ['pageViews', siteId, startDate, endDate, groupBy],
+    queryFn: () => fetchPageViewsAction(siteId, startDate, endDate, groupBy),
   });
 
-  // Group data by date, then by url
   const grouped: Record<string, Record<string, number>> = {};
   data.forEach(row => {
     if (!grouped[row.date]) grouped[row.date] = {};

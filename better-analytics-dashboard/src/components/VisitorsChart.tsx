@@ -1,17 +1,21 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
-import { fetchDailyUniqueVisitorsAction } from '@/app/dashboard/actions';
+import { fetchUniqueVisitorsAction } from '@/app/dashboard/actions';
 import { DailyUniqueVisitorsRow } from "@/entities/pageviews";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { getGroupingForRange, TimeGrouping } from '@/utils/timeRanges';
 
 interface VisitorsChartProps {
   siteId: string;
+  startDate: string;
+  endDate: string;
 }
 
-export default function VisitorsChart({ siteId }: VisitorsChartProps) {
+export default function VisitorsChart({ siteId, startDate, endDate }: VisitorsChartProps) {
+  const groupBy: TimeGrouping = getGroupingForRange(startDate, endDate);
   const { data = [], isLoading } = useQuery<DailyUniqueVisitorsRow[]>({
-    queryKey: ['dailyUniqueVisitors', siteId],
-    queryFn: () => fetchDailyUniqueVisitorsAction(siteId),
+    queryKey: ['uniqueVisitors', siteId, startDate, endDate, groupBy],
+    queryFn: () => fetchUniqueVisitorsAction(siteId, startDate, endDate, groupBy),
   });
 
   const chartData = data.map(row => ({ date: row.date, unique_visitors: row.unique_visitors }));

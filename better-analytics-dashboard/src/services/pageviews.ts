@@ -1,13 +1,24 @@
 'server-only';
 
-import { getDailyPageViews } from '@/repositories/clickhouse';
+import {
+  getDailyPageViews,
+  getHourlyPageViews,
+  getMinutePageViews,
+  getDailyUniqueVisitors,
+  getHourlyUniqueVisitors,
+  getMinuteUniqueVisitors,
+} from '@/repositories/clickhouse';
 import { DailyPageViewRow } from '@/entities/pageviews';
-import { getDailyUniqueVisitors } from '@/repositories/clickhouse';
+import { toDateString, toDateTimeString, TimeGrouping } from '@/utils/timeRanges';
 
-export async function getDailyPageViewsForSite(siteId: string): Promise<DailyPageViewRow[]> {
-  return getDailyPageViews(siteId);
+export async function getPageViewsForSite(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyPageViewRow[]> {
+  if (groupBy === 'day') return getDailyPageViews(siteId, toDateString(startDate), toDateString(endDate));
+  if (groupBy === 'hour') return getHourlyPageViews(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+  return getMinutePageViews(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
 }
 
-export async function getDailyUniqueVisitorsForSite(siteId: string) {
-  return getDailyUniqueVisitors(siteId);
+export async function getUniqueVisitorsForSite(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping) {
+  if (groupBy === 'day') return getDailyUniqueVisitors(siteId, toDateString(startDate), toDateString(endDate));
+  if (groupBy === 'hour') return getHourlyUniqueVisitors(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+  return getMinuteUniqueVisitors(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
 } 

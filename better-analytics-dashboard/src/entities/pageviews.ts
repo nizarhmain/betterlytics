@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const DailyPageViewRowSchema = z.object({
-  date: z.string(), // ISO date string from ClickHouse
+  date: z.string(),
   url: z.string(),
   views: z.number(),
 });
