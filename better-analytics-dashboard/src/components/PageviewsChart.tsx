@@ -27,18 +27,23 @@ export default function PageviewsChart({ siteId }: PageviewsChartProps) {
   if (data.length === 0) return <div>No data available.</div>;
 
   return (
-    <div className="w-full h-96">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ top: 16, right: 32, left: 0, bottom: 0 }}>
-          <XAxis dataKey="date" />
-          <YAxis allowDecimals={false} />
-          <Tooltip />
-          <Legend />
-          {urls.map((url, idx) => (
-            <Line key={url} type="monotone" dataKey={url} stroke={`hsl(${(idx * 60) % 360}, 70%, 50%)`} dot={false} />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
+    <div className="bg-white rounded-lg shadow p-6">
+      <div className="mb-2">
+        <h2 className="text-lg font-bold text-gray-900">Pageviews</h2>
+        <p className="text-sm text-gray-500">Total pageviews over time</p>
+      </div>
+      <div className="w-full h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+            <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+            <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} width={48} />
+            <Tooltip />
+            {urls.map((url, idx) => (
+              <Line key={url} type="monotone" dataKey={url} stroke={`#a78bfa`} strokeWidth={3} dot={false} />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 } 
