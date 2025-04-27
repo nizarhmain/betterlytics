@@ -4,14 +4,14 @@ import PageviewsChart from "@/components/PageviewsChart";
 import VisitorsChart from "@/components/VisitorsChart";
 import TopPagesTable from '@/components/TopPagesTable';
 import DeviceTypePieChart from '@/components/DeviceTypePieChart';
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
 import { useQuery } from '@tanstack/react-query';
 import { fetchSummaryStatsAction, fetchTopPagesAction, fetchDeviceTypeBreakdownAction } from './actions';
 
 export default function DashboardPageClient({ session }: { session: any }) {
   const [range, setRange] = useState<TimeRangeValue>("7d");
-  const { startDate, endDate } = getRangeForValue(range);
+  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['summaryStats', 'default-site', startDate, endDate],
