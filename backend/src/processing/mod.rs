@@ -21,7 +21,7 @@ pub struct ProcessedEvent {
     /// Operating system - Parsed from user_agent string
     pub os: Option<String>,
     /// Device type (mobile, desktop, tablet) - Parsed from user_agent string
-    pub device_type: Option<String>,
+    pub device_type: String,
 }
 
 /// Event processor that handles real-time processing
@@ -46,7 +46,7 @@ impl EventProcessor {
             browser: None,
             browser_version: None,
             os: None,
-            device_type: None,
+            device_type: "unknown".to_string(),
         };
 
         if let Err(e) = self.anonymize_ip(&mut processed).await {
@@ -55,6 +55,10 @@ impl EventProcessor {
         
         if let Err(e) = self.detect_bot(&mut processed).await {
             error!("Failed to detect bot: {}", e);
+        }
+
+        if let Err(e) = self.detect_device_type_from_resolution(&mut processed).await {
+            error!("Failed to detect device type from resolution: {}", e);
         }
         
         if let Err(e) = self.parse_user_agent(&mut processed).await {
@@ -96,9 +100,27 @@ impl EventProcessor {
         processed.browser = None;
         processed.browser_version = None;
         processed.os = None;
-        processed.device_type = None;
         Ok(())
     }
+    
+    async fn detect_device_type_from_resolution(&self, processed: &mut ProcessedEvent) -> Result<()> {
+        if let Some((w, _h)) = processed.event.screen_resolution.split_once('x') {
+            if let Ok(width) = w.trim().parse::<u32>() {
+                match width {
+                    0..=575 => processed.device_type = "mobile".to_string(),
+                    576..=991 => processed.device_type = "tablet".to_string(),
+                    992..=1439 => processed.device_type = "laptop".to_string(),
+                    _ => processed.device_type = "desktop".to_string(),
+                }
+            } else {
+                processed.device_type = "unknown".to_string();
+            }
+        } else {
+            processed.device_type = "unknown".to_string();
+        }
+
+        Ok(())
+    } 
 
     /// Update real-time metrics in ClickHouse
     async fn update_real_time_metrics(&self, processed: &ProcessedEvent) -> Result<()> {
@@ -107,4 +129,4 @@ impl EventProcessor {
         debug!("Processed event: {:?}", processed);
         Ok(())
     }
-} 
+}

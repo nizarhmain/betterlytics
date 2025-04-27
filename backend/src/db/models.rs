@@ -8,7 +8,7 @@ pub struct EventRow {
     pub url: String,
     pub referrer: Option<String>,
     pub user_agent: String,
-    pub screen_resolution: String,
+    pub device_type: String,
     #[serde(with = "clickhouse::serde::chrono::datetime")] // this is required for clickhouse-rs to work with DateTime<Utc> https://github.com/ClickHouse/clickhouse-rs/issues/109#issuecomment-2207355587
     pub timestamp: DateTime<Utc>, 
 } 

@@ -6,7 +6,6 @@ use axum::{
     Json, Router,
     response::Html,
 };
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
@@ -45,7 +44,7 @@ async fn main() {
     let db_clone = db.clone();
     tokio::spawn(async move {
         while let Some(processed) = processed_rx.recv().await {
-            if let Err(e) = db_clone.insert_event(processed.event).await {
+            if let Err(e) = db_clone.insert_event(processed).await {
                 tracing::error!("Failed to insert processed event: {}", e);
             }
         }

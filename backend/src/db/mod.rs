@@ -8,8 +8,7 @@ use chrono::{DateTime, Utc};
 use tokio::sync::mpsc::{self, error::TryRecvError, Receiver};
 use tokio::time::timeout;
 
-use crate::analytics::AnalyticsEvent;
-
+use crate::processing::ProcessedEvent;
 mod models;
 pub use models::EventRow;
 
@@ -23,7 +22,7 @@ const INSERTER_MAX_BYTES: u64 = 50 * 1024 * 1024;
 
 pub struct Database {
     client: Client,
-    event_tx: mpsc::Sender<AnalyticsEvent>,
+    event_tx: mpsc::Sender<ProcessedEvent>,
 }
 
 pub type SharedDatabase = Arc<Database>;
@@ -46,11 +45,11 @@ impl Database {
         Ok(client)
     }
 
-    fn create_channels() -> (mpsc::Sender<AnalyticsEvent>, mpsc::Receiver<AnalyticsEvent>) {
+    fn create_channels() -> (mpsc::Sender<ProcessedEvent>, mpsc::Receiver<ProcessedEvent>) {
         mpsc::channel(EVENT_CHANNEL_CAPACITY)
     }
 
-    fn spawn_inserter_workers(client: Client) -> Vec<mpsc::Sender<AnalyticsEvent>> {
+    fn spawn_inserter_workers(client: Client) -> Vec<mpsc::Sender<ProcessedEvent>> {
         let mut worker_senders = Vec::with_capacity(NUM_INSERT_WORKERS);
 
         for i in 0..NUM_INSERT_WORKERS {
@@ -67,8 +66,8 @@ impl Database {
     }
 
     fn spawn_dispatcher(
-        mut event_rx: mpsc::Receiver<AnalyticsEvent>,
-        worker_senders: Vec<mpsc::Sender<AnalyticsEvent>>,
+        mut event_rx: mpsc::Receiver<ProcessedEvent>,
+        worker_senders: Vec<mpsc::Sender<ProcessedEvent>>,
     ) {
         tokio::spawn(async move {
             let mut worker_index = 0;
@@ -106,7 +105,7 @@ impl Database {
                 url String,
                 referrer Nullable(String),
                 user_agent String,
-                screen_resolution String,
+                device_type String,
                 timestamp DateTime,
                 -- Add date column for partitioning
                 date Date DEFAULT toDate(timestamp)
@@ -131,7 +130,7 @@ impl Database {
         Ok(())
     }
 
-    pub async fn insert_event(&self, event: AnalyticsEvent) -> Result<()> {
+    pub async fn insert_event(&self, event: ProcessedEvent) -> Result<()> {
         self.event_tx.send(event).await?;
         Ok(())
     }
@@ -190,7 +189,7 @@ impl Database {
 async fn run_inserter_worker(
     worker_id: usize,
     client: Client,
-    mut rx: Receiver<AnalyticsEvent>,
+    mut rx: Receiver<ProcessedEvent>,
 ) -> Result<(), ClickHouseError> {
     println!(
         "Worker {}: Starting (Inserter Sparse Stream Mode).",
@@ -247,7 +246,7 @@ async fn run_inserter_worker(
             }
         };
 
-        let timestamp = match DateTime::<Utc>::from_timestamp(event.timestamp as i64, 0) {
+        let timestamp = match DateTime::<Utc>::from_timestamp(event.event.timestamp as i64, 0) {
             Some(ts) => ts,
             None => {
                 eprintln!(
@@ -260,12 +259,12 @@ async fn run_inserter_worker(
         };
 
         let row = EventRow {
-            site_id: event.site_id,
-            visitor_id: event.visitor_id,
-            url: event.url,
-            referrer: event.referrer,
-            user_agent: event.user_agent,
-            screen_resolution: event.screen_resolution,
+            site_id: event.event.site_id,
+            visitor_id: event.event.visitor_id,
+            url: event.event.url,
+            referrer: event.event.referrer,
+            user_agent: event.event.user_agent,
+            device_type: event.device_type,
             timestamp,
         };
 
