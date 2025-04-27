@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Analytics Test Page</title>
-    <script src="http://localhost:3001/analytics.js" data-site-id="test-site-123"></script>
+    <script src="http://localhost:3001/analytics.js" data-site-id="default-site"></script>
 </head>
 <body>
     <h1>Analytics Test Page</h1>
@@ -21,7 +21,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    site_id: 'test-site-123',
+                    site_id: 'default-site',
                     event_type: eventType,
                     event_data: eventData,
                     url: window.location.href,
