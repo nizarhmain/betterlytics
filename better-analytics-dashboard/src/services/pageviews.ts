@@ -29,8 +29,8 @@ export async function getUniqueVisitorsForSite(siteId: string, startDate: string
 
 export async function getSummaryStatsForSite(siteId: string, startDate: string, endDate: string) {
   const [uniqueVisitors, pageviews] = await Promise.all([
-    getTotalUniqueVisitors(siteId, startDate, endDate),
-    getTotalPageviews(siteId, startDate, endDate),
+    getTotalUniqueVisitors(siteId, toDateTimeString(startDate), toDateTimeString(endDate)),
+    getTotalPageviews(siteId, toDateTimeString(startDate), toDateTimeString(endDate)),
   ]);
 
   return {
@@ -42,9 +42,9 @@ export async function getSummaryStatsForSite(siteId: string, startDate: string, 
 }
 
 export async function getTopPagesForSite(siteId: string, startDate: string, endDate: string, limit = 5) {
-  return getTopPages(siteId, startDate, endDate, limit);
+  return getTopPages(siteId, toDateTimeString(startDate), toDateTimeString(endDate), limit);
 }
 
 export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: string, endDate: string) {
-  return getDeviceTypeBreakdown(siteId, startDate, endDate);
+  return getDeviceTypeBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
 } 

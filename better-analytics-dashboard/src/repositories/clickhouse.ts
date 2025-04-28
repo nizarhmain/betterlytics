@@ -1,7 +1,7 @@
 import { clickhouse } from '@/lib/clickhouse';
-import { DailyPageViewRowSchema, DailyPageViewRow, PageviewsCountRowSchema } from '@/entities/pageviews';
+import { DailyPageViewRowSchema, DailyPageViewRow } from '@/entities/pageviews';
 import { DailyUniqueVisitorsRowSchema, DailyUniqueVisitorsRow } from '@/entities/pageviews';
-import { toDateTimeString, toDateString } from '@/utils/timeRanges';
+import { toDateTimeString } from '@/utils/timeRanges';
 
 export async function getDailyPageViews(siteId: string, startDate: string, endDate: string): Promise<DailyPageViewRow[]> {
   const query = `
@@ -16,8 +16,8 @@ export async function getDailyPageViews(siteId: string, startDate: string, endDa
   const result = await clickhouse.query(query, {
     params: {
       site_id: siteId,
-      start_date: toDateString(startDate),
-      end_date: toDateString(endDate),
+      start_date: startDate,
+      end_date: endDate,
     },
   }).toPromise() as unknown[];
   return result.map(row => DailyPageViewRowSchema.parse(row));
@@ -51,16 +51,14 @@ export async function getDailyUniqueVisitors(siteId: string, startDate: string, 
   const result = await clickhouse.query(query, {
     params: {
       site_id: siteId,
-      start_date: toDateString(startDate),
-      end_date: toDateString(endDate),
+      start_date: startDate,
+      end_date: endDate,
     },
   }).toPromise() as unknown[];
   return result.map(row => DailyUniqueVisitorsRowSchema.parse(row));
 }
 
 export async function getHourlyPageViews(siteId: string, startDate: string, endDate: string): Promise<DailyPageViewRow[]> {
-  const start = toDateTimeString(startDate);
-  const end = toDateTimeString(endDate);
   const query = `
     SELECT toStartOfHour(timestamp) as date, url, count() as views
     FROM analytics.events
@@ -71,7 +69,7 @@ export async function getHourlyPageViews(siteId: string, startDate: string, endD
     ORDER BY date DESC, views DESC
     LIMIT 100
   `;
-  const result = await clickhouse.query(query, { params: { site_id: siteId, start, end } }).toPromise() as unknown[];
+  const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
   
   return result.map(row => {
     const r = row as any;
@@ -84,8 +82,6 @@ export async function getHourlyPageViews(siteId: string, startDate: string, endD
 }
 
 export async function getMinutePageViews(siteId: string, startDate: string, endDate: string): Promise<DailyPageViewRow[]> {
-  const start = toDateTimeString(startDate);
-  const end = toDateTimeString(endDate);
   const query = `
     SELECT toStartOfMinute(timestamp) as date, url, count() as views
     FROM analytics.events
@@ -96,7 +92,7 @@ export async function getMinutePageViews(siteId: string, startDate: string, endD
     ORDER BY date DESC, views DESC
     LIMIT 100
   `;
-  const result = await clickhouse.query(query, { params: { site_id: siteId, start, end } }).toPromise() as unknown[];
+  const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
   return result.map(row => {
     const r = row as any;
     return {
@@ -108,8 +104,6 @@ export async function getMinutePageViews(siteId: string, startDate: string, endD
 }
 
 export async function getHourlyUniqueVisitors(siteId: string, startDate: string, endDate: string): Promise<DailyUniqueVisitorsRow[]> {
-  const start = toDateTimeString(startDate);
-  const end = toDateTimeString(endDate);
   const query = `
     SELECT toStartOfHour(timestamp) as date, uniqExact(visitor_id) as unique_visitors
     FROM analytics.events
@@ -120,7 +114,7 @@ export async function getHourlyUniqueVisitors(siteId: string, startDate: string,
     ORDER BY date DESC
     LIMIT 100
   `;
-  const result = await clickhouse.query(query, { params: { site_id: siteId, start, end } }).toPromise() as unknown[];
+  const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
   return result.map(row => {
     const r = row as any;
     return {
@@ -131,8 +125,6 @@ export async function getHourlyUniqueVisitors(siteId: string, startDate: string,
 }
 
 export async function getMinuteUniqueVisitors(siteId: string, startDate: string, endDate: string): Promise<DailyUniqueVisitorsRow[]> {
-  const start = toDateTimeString(startDate);
-  const end = toDateTimeString(endDate);
   const query = `
     SELECT toStartOfMinute(timestamp) as date, uniqExact(visitor_id) as unique_visitors
     FROM analytics.events
@@ -143,7 +135,7 @@ export async function getMinuteUniqueVisitors(siteId: string, startDate: string,
     ORDER BY date DESC
     LIMIT 100
   `;
-  const result = await clickhouse.query(query, { params: { site_id: siteId, start, end } }).toPromise() as unknown[];
+  const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
   return result.map(row => {
     const r = row as any;
     return {
@@ -162,7 +154,7 @@ export async function getTotalUniqueVisitors(siteId: string, startDate: string, 
       AND timestamp <= {end:DateTime}
   `;
   const result = await clickhouse.query(query, {
-    params: { site_id: siteId, start: toDateTimeString(startDate), end: toDateTimeString(endDate) },
+    params: { site_id: siteId, start: startDate, end: endDate },
   }).toPromise() as any[];
   return Number(result[0]?.unique_visitors ?? 0);
 }
@@ -179,7 +171,7 @@ export async function getTopPages(siteId: string, startDate: string, endDate: st
     LIMIT {limit:UInt32}
   `;
   const result = await clickhouse.query(query, {
-    params: { site_id: siteId, start: toDateTimeString(startDate), end: toDateTimeString(endDate), limit },
+    params: { site_id: siteId, start: startDate, end: endDate, limit },
   }).toPromise() as any[];
   return result.map(row => ({ url: row.url, visitors: Number(row.visitors) }));
 }
@@ -195,7 +187,7 @@ export async function getDeviceTypeBreakdown(siteId: string, startDate: string, 
     ORDER BY visitors DESC
   `;
   const result = await clickhouse.query(query, {
-    params: { site_id: siteId, start: toDateTimeString(startDate), end: toDateTimeString(endDate) },
+    params: { site_id: siteId, start: startDate, end: endDate },
   }).toPromise() as any[];
   return result.map(row => ({ device_type: row.device_type, visitors: Number(row.visitors) }));
-} 
+}
