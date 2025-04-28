@@ -5,7 +5,7 @@ import VisitorsChart from "@/components/VisitorsChart";
 import TopPagesTable from '@/components/TopPagesTable';
 import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import { useMemo, useState } from "react";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
+import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue, formatDuration } from "@/utils/timeRanges";
 import { useQuery } from '@tanstack/react-query';
 import { fetchSummaryStatsAction, fetchTopPagesAction, fetchDeviceTypeBreakdownAction } from './actions';
 
@@ -61,11 +61,10 @@ export default function DashboardPageClient({ session }: { session: any }) {
             title="Bounce Rate"
             value={summaryLoading ? '...' : summary?.bounceRate !== undefined ? `${summary.bounceRate}%` : '0%'}
             changeText=""
-            changeColor="text-green-600"
           />
           <SummaryCard
             title="Avg. Visit Duration"
-            value={summaryLoading ? '...' : summary?.avgVisitDuration !== undefined ? `${summary.avgVisitDuration}s` : '0s'}
+            value={summaryLoading ? '...' : formatDuration(summary?.avgVisitDuration ?? 0)}
             changeText=""
             changeColor="text-green-600"
           />
@@ -90,4 +89,5 @@ export default function DashboardPageClient({ session }: { session: any }) {
       </div>
     </div>
   );
-} 
+}
+

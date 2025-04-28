@@ -69,3 +69,13 @@ export function getGroupingForRange(startDate: string, endDate: string): TimeGro
   if (diff <= 24 * 60 * 60 * 1000) return 'hour';
   return 'day';
 } 
+
+// Helper function to format duration in a user-friendly way
+export function formatDuration(seconds: number): string {
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}m ${remainingSeconds}s`;
+} 

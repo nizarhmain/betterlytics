@@ -1,7 +1,6 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyPageViewRowSchema, DailyPageViewRow } from '@/entities/pageviews';
 import { DailyUniqueVisitorsRowSchema, DailyUniqueVisitorsRow } from '@/entities/pageviews';
-import { toDateTimeString } from '@/utils/timeRanges';
 
 export async function getDailyPageViews(siteId: string, startDate: string, endDate: string): Promise<DailyPageViewRow[]> {
   const query = `
@@ -32,7 +31,7 @@ export async function getTotalPageviews(siteId: string, startDate: string, endDa
       AND timestamp <= {end:DateTime}
   `;
   const result = await clickhouse.query(query, {
-    params: { site_id: siteId, start: toDateTimeString(startDate), end: toDateTimeString(endDate) },
+    params: { site_id: siteId, start: startDate, end: endDate },
   }).toPromise() as any[];
   return Number(result[0]?.pageviews ?? 0);
 }
@@ -191,3 +190,77 @@ export async function getDeviceTypeBreakdown(siteId: string, startDate: string, 
   }).toPromise() as any[];
   return result.map(row => ({ device_type: row.device_type, visitors: Number(row.visitors) }));
 }
+
+/* 
+* This function is used to get the session metrics for a site.
+* It is used to get the total number of sessions, the number of multi-page sessions, the total duration of multi-page sessions, and the number of duration counts.
+* It utilizes the lagInFrame function to detect session boundaries.
+* If the difference between the current timestamp and the previous timestamp is greater than 1800 seconds, then it is considered anew session.
+*/
+export async function getSessionMetrics(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<{
+  total_sessions: number;
+  multi_page_sessions: number;
+  total_duration: number;
+}> {
+  const query = `
+    WITH session_boundaries AS (
+      SELECT 
+        site_id,
+        visitor_id,
+        timestamp,
+        -- Detect session boundaries: 1 if new session, 0 if continuation
+        if(dateDiff('second', lagInFrame(timestamp) OVER (PARTITION BY site_id, visitor_id ORDER BY timestamp), timestamp) > 1800, 1, 0) as is_new_session
+      FROM analytics.events
+      WHERE site_id = {site_id:String}
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+    ),
+    session_groups AS (
+      SELECT 
+        site_id,
+        visitor_id,
+        timestamp,
+        -- Create session IDs by summing the new session markers
+        sum(is_new_session) OVER (PARTITION BY site_id, visitor_id ORDER BY timestamp) as session_id
+      FROM session_boundaries
+    ),
+    session_metrics AS (
+      SELECT 
+        site_id,
+        visitor_id,
+        session_id,
+        count() as page_count,
+        if(count() > 1, 
+           dateDiff('second', min(timestamp), max(timestamp)), 
+           0) as duration
+      FROM session_groups
+      GROUP BY site_id, visitor_id, session_id
+    )
+    SELECT 
+      count() as total_sessions,
+      countIf(page_count > 1) as multi_page_sessions,
+      sumIf(duration, page_count > 1) as total_duration
+    FROM session_metrics
+  `;
+  const result = await clickhouse.query(query, {
+    params: {
+      site_id: siteId,
+      start: startDate,
+      end: endDate
+    }
+  }).toPromise() as Array<{
+    total_sessions: string;
+    multi_page_sessions: string;
+    total_duration: string;
+  }>;
+  
+  const row = result[0];
+  return {
+    total_sessions: Number(row?.total_sessions ?? 0),
+    multi_page_sessions: Number(row?.multi_page_sessions ?? 0),
+    total_duration: Number(row?.total_duration ?? 0)
+  };
+} 

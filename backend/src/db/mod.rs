@@ -106,14 +106,21 @@ impl Database {
                 referrer Nullable(String),
                 user_agent String,
                 device_type String,
+                country Nullable(String),
                 timestamp DateTime,
-                -- Add date column for partitioning
-                date Date DEFAULT toDate(timestamp)
+                date Date DEFAULT toDate(timestamp),
+                -- Indexes for common query patterns
+                INDEX visitor_idx visitor_id TYPE bloom_filter GRANULARITY 3,
+                INDEX site_idx site_id TYPE bloom_filter GRANULARITY 3,
+                INDEX url_idx url TYPE bloom_filter GRANULARITY 3,
+                INDEX country_idx country TYPE bloom_filter GRANULARITY 3,
+                INDEX date_idx date TYPE minmax GRANULARITY 3,
+                INDEX timestamp_idx timestamp TYPE minmax GRANULARITY 3
             ) ENGINE = MergeTree()
             -- Partition by month for better data management
             PARTITION BY toYYYYMM(date)
-            -- Order by site_id and timestamp for faster queries
-            ORDER BY (site_id, timestamp, visitor_id)
+            -- Order by fields we commonly filter/group by
+            ORDER BY (site_id, date, visitor_id, timestamp)
             -- Add compression settings
             SETTINGS index_granularity = 8192,
                 min_bytes_for_wide_part = 0,
@@ -146,7 +153,7 @@ impl Database {
             ORDER BY (site_id, date, url)
             AS SELECT
                 site_id,
-                toDate(timestamp) as date,
+                date,
                 url,
                 count() as views
             FROM analytics.events
@@ -166,7 +173,7 @@ impl Database {
             ORDER BY (site_id, date)
             AS SELECT
                 site_id,
-                toDate(timestamp) as date,
+                date,
                 uniqState(visitor_id) as unique_visitors
             FROM analytics.events
             GROUP BY site_id, date
@@ -246,27 +253,7 @@ async fn run_inserter_worker(
             }
         };
 
-        let timestamp = match DateTime::<Utc>::from_timestamp(event.event.timestamp as i64, 0) {
-            Some(ts) => ts,
-            None => {
-                eprintln!(
-                    "Worker {}: Invalid timestamp format for event {:?}. Skipping.",
-                    worker_id, event
-                );
-                // TODO: Consider sending invalid events to a dead-letter queue instead of just skipping?
-                continue;
-            }
-        };
-
-        let row = EventRow {
-            site_id: event.event.site_id,
-            visitor_id: event.event.visitor_id,
-            url: event.event.url,
-            referrer: event.event.referrer,
-            user_agent: event.event.user_agent,
-            device_type: event.device_type,
-            timestamp,
-        };
+        let row = EventRow::from(event);
 
         if let Err(e) = inserter.write(&row) {
             eprintln!(

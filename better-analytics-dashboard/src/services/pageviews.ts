@@ -11,6 +11,7 @@ import {
   getTotalPageviews,
   getTopPages,
   getDeviceTypeBreakdown,
+  getSessionMetrics,
 } from '@/repositories/clickhouse';
 import { DailyPageViewRow } from '@/entities/pageviews';
 import { toDateString, toDateTimeString, TimeGrouping } from '@/utils/timeRanges';
@@ -28,16 +29,19 @@ export async function getUniqueVisitorsForSite(siteId: string, startDate: string
 }
 
 export async function getSummaryStatsForSite(siteId: string, startDate: string, endDate: string) {
-  const [uniqueVisitors, pageviews] = await Promise.all([
+  const [uniqueVisitors, pageviews, sessionMetrics] = await Promise.all([
     getTotalUniqueVisitors(siteId, toDateTimeString(startDate), toDateTimeString(endDate)),
     getTotalPageviews(siteId, toDateTimeString(startDate), toDateTimeString(endDate)),
+    getSessionMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate))
   ]);
 
   return {
     uniqueVisitors,
     pageviews,
-    bounceRate: 0, // TODO: Implement bounce rate
-    avgVisitDuration: 0, // TODO: Implement avg visit duration
+    bounceRate: sessionMetrics.total_sessions > 0 
+      ? Math.round((sessionMetrics.total_sessions - sessionMetrics.multi_page_sessions) / sessionMetrics.total_sessions * 100)
+      : 0,
+    avgVisitDuration: Math.round(sessionMetrics.total_duration / sessionMetrics.multi_page_sessions)
   };
 }
 
