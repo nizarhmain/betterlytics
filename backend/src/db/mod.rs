@@ -4,11 +4,11 @@ use std::env;
 use std::sync::Arc;
 use std::time::Duration;
 
-use chrono::{DateTime, Utc};
 use tokio::sync::mpsc::{self, error::TryRecvError, Receiver};
 use tokio::time::timeout;
 
 use crate::processing::ProcessedEvent;
+
 mod models;
 pub use models::EventRow;
 
@@ -102,6 +102,7 @@ impl Database {
             CREATE TABLE IF NOT EXISTS analytics.events (
                 site_id String,
                 visitor_id String,
+                session_id String,
                 url String,
                 referrer Nullable(String),
                 user_agent String,
@@ -111,6 +112,7 @@ impl Database {
                 date Date DEFAULT toDate(timestamp),
                 -- Indexes for common query patterns
                 INDEX visitor_idx visitor_id TYPE bloom_filter GRANULARITY 3,
+                INDEX session_idx session_id TYPE bloom_filter GRANULARITY 3,
                 INDEX site_idx site_id TYPE bloom_filter GRANULARITY 3,
                 INDEX url_idx url TYPE bloom_filter GRANULARITY 3,
                 INDEX country_idx country TYPE bloom_filter GRANULARITY 3,
@@ -120,7 +122,7 @@ impl Database {
             -- Partition by month for better data management
             PARTITION BY toYYYYMM(date)
             -- Order by fields we commonly filter/group by
-            ORDER BY (site_id, date, visitor_id, timestamp)
+            ORDER BY (site_id, date, visitor_id, session_id, timestamp)
             -- Add compression settings
             SETTINGS index_granularity = 8192,
                 min_bytes_for_wide_part = 0,
@@ -253,7 +255,9 @@ async fn run_inserter_worker(
             }
         };
 
-        let row = EventRow::from(event);
+        let row = EventRow::from_processed(event);
+
+        tracing::debug!(worker_id = worker_id, site_id = %row.site_id, visitor_id = %row.visitor_id, session_id = %row.session_id, url = %row.url, timestamp = %row.timestamp, "Prepared row for ClickHouse insertion");
 
         if let Err(e) = inserter.write(&row) {
             eprintln!(

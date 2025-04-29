@@ -3,11 +3,17 @@ use tokio::sync::mpsc;
 use crate::analytics::AnalyticsEvent;
 use crate::db::SharedDatabase;
 use tracing::{error, debug};
+use crate::session;
+use r2d2::Pool;
+use redis::Client as RedisClient;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct ProcessedEvent {
     /// Base original event data sent from client through analytics.js script
     pub event: AnalyticsEvent,
+    /// Sessionization - new sessions are created if the user has not generated any events in over 30 minutes
+    pub session_id: String,
     /// Anonymized IP address (last octet removed) - ip is retrieved from the event metadata
     pub anonymized_ip: Option<String>,
     /// Detected bot status
@@ -22,23 +28,39 @@ pub struct ProcessedEvent {
     pub os: Option<String>,
     /// Device type (mobile, desktop, tablet) - Parsed from user_agent string
     pub device_type: String,
+    pub site_id: String,
+    pub visitor_fingerprint: String,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
+    pub url: String,
+    pub referrer: Option<String>,
+    pub user_agent: String,
 }
 
 /// Event processor that handles real-time processing
 pub struct EventProcessor {
     db: SharedDatabase,
     event_tx: mpsc::Sender<ProcessedEvent>,
+    redis_pool: Arc<Pool<RedisClient>>,
 }
 
 impl EventProcessor {
     pub fn new(db: SharedDatabase) -> (Self, mpsc::Receiver<ProcessedEvent>) {
         let (event_tx, event_rx) = mpsc::channel(100_000);
-        (Self { db, event_tx }, event_rx)
+        let redis_pool = session::REDIS_POOL.clone();
+        (Self { db, event_tx, redis_pool }, event_rx)
     }
 
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
+        let site_id = event.site_id.clone();
+        let visitor_fingerprint = event.visitor_id.clone();
+        let timestamp = chrono::DateTime::from_timestamp(event.timestamp as i64, 0).unwrap_or_else(|| chrono::Utc::now());
+        let url = event.url.clone();
+        let referrer = event.referrer.clone();
+        let user_agent = event.user_agent.clone();
+
         let mut processed = ProcessedEvent {
             event,
+            session_id: String::new(),
             anonymized_ip: None,
             is_bot: false,
             country: None,
@@ -47,6 +69,27 @@ impl EventProcessor {
             browser_version: None,
             os: None,
             device_type: "unknown".to_string(),
+            site_id: site_id.clone(),
+            visitor_fingerprint: visitor_fingerprint.clone(),
+            timestamp: timestamp.clone(),
+            url: url.clone(),
+            referrer: referrer.clone(),
+            user_agent: user_agent.clone(),
+        };
+
+        let session_id_result = session::get_or_create_session_id(
+            &self.redis_pool, 
+            &site_id, 
+            &visitor_fingerprint, 
+            &timestamp
+        );
+
+        match session_id_result {
+            Ok(id) => processed.session_id = id,
+            Err(e) => {
+                error!("Failed to get session ID from Redis: {}. Event processing aborted for: {:?}", e, processed.event);
+                return Ok(());
+            }
         };
 
         if let Err(e) = self.anonymize_ip(&mut processed).await {
@@ -95,7 +138,7 @@ impl EventProcessor {
 
     /// Parse user agent to extract browser and OS information
     async fn parse_user_agent(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        debug!("Parsing user agent: {:?}", processed.event.user_agent);
+        debug!("Parsing user agent: {:?}", processed.user_agent);
         // TODO: Implement user agent parsing
         processed.browser = None;
         processed.browser_version = None;
@@ -124,9 +167,8 @@ impl EventProcessor {
 
     /// Update real-time metrics in ClickHouse
     async fn update_real_time_metrics(&self, processed: &ProcessedEvent) -> Result<()> {
-        debug!("Updating real-time metrics!");
+        debug!("Updating real-time metrics using session_id: {}", processed.session_id);
         // TODO: Implement real-time metrics update
-        debug!("Processed event: {:?}", processed);
         Ok(())
     }
 }

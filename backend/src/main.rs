@@ -11,11 +11,13 @@ use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
 use tracing::{info, error};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use dotenv::dotenv;
 
 mod config;
 mod analytics;
 mod db;
 mod processing;
+mod session;
 
 use analytics::{AnalyticsEvent, generate_site_id};
 use db::{Database, SharedDatabase};
@@ -23,10 +25,10 @@ use processing::EventProcessor;
 
 #[tokio::main]
 async fn main() {
+    dotenv().ok();
+
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::new(
-            std::env::var("RUST_LOG").unwrap_or_else(|_| "info".into()),
-        ))
+        .with(tracing_subscriber::EnvFilter::from_default_env())
         .with(tracing_subscriber::fmt::layer())
         .init();
 
@@ -86,7 +88,7 @@ async fn health_check(
 }
 
 async fn track_event(
-    State((db, processor)): State<(SharedDatabase, Arc<EventProcessor>)>,
+    State((_db, processor)): State<(SharedDatabase, Arc<EventProcessor>)>,
     Json(event): Json<AnalyticsEvent>,
 ) -> Result<StatusCode, (StatusCode, String)> {
     if event.site_id.is_empty() {

@@ -5,6 +5,7 @@ use crate::processing::ProcessedEvent;
 #[derive(clickhouse::Row, Serialize, Debug, Deserialize)]
 pub struct EventRow {
     pub site_id: String,
+    pub session_id: String,
     pub visitor_id: String,
     pub url: String,
     pub referrer: Option<String>,
@@ -15,17 +16,19 @@ pub struct EventRow {
     pub timestamp: DateTime<Utc>,
     #[serde(with = "clickhouse::serde::chrono::date")]
     pub date: NaiveDate,
-} 
+}
 
-impl From<ProcessedEvent> for EventRow {
-    fn from(event: ProcessedEvent) -> Self {
-        let timestamp = DateTime::from_timestamp(event.event.timestamp as i64, 0).unwrap();
+impl EventRow {
+    pub fn from_processed(event: ProcessedEvent) -> Self {
+        let timestamp = event.timestamp;
+
         Self {
-            site_id: event.event.site_id,
-            visitor_id: event.event.visitor_id,
-            url: event.event.url,
-            referrer: event.event.referrer,
-            user_agent: event.event.user_agent,
+            site_id: event.site_id,
+            session_id: event.session_id,
+            visitor_id: event.visitor_fingerprint,
+            url: event.url,
+            referrer: event.referrer,
+            user_agent: event.user_agent,
             device_type: event.device_type,
             country: event.country,
             timestamp,
