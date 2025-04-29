@@ -9,8 +9,8 @@ use chrono::DateTime;
 use chrono::Utc;
 use nanoid::nanoid;
 
-pub const REDIS_SESSION_TIMEOUT_SECS: usize = 30;
-pub const REDIS_KEY_TTL_SECS: usize = 35;
+pub const REDIS_SESSION_TIMEOUT_SECS: usize = 30 * 60;
+pub const REDIS_KEY_TTL_SECS: usize = 35 * 60;
 
 lazy_static! {
     pub static ref REDIS_POOL: Arc<Pool<RedisClient>> = {

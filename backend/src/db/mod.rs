@@ -12,7 +12,7 @@ use crate::processing::ProcessedEvent;
 mod models;
 pub use models::EventRow;
 
-const NUM_INSERT_WORKERS: usize = 1;
+const NUM_INSERT_WORKERS: usize = 4;
 const EVENT_CHANNEL_CAPACITY: usize = 100_000;
 const WORKER_CHANNEL_CAPACITY: usize = 10_000;
 const INSERTER_TIMEOUT_SECS: u64 = 5;
