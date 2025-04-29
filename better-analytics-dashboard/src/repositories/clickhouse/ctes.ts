@@ -78,20 +78,9 @@ export function createSessionMetricsCTE(): string {
  * 
  * Dependencies: session_groups, session_metrics
  */
-export function createPageMetricsCTE(): string {
-  return `
-    page_metrics AS (
-      SELECT
-        sg.url as path,
-        uniqExact(sg.visitor_id) as visitors,
-        count() as pageviews,
-        round(100 * countIf(sm.page_count = 1) / count(), 1) as bounce_rate,
-        round(avg(sm.duration), 1) as avg_time
-      FROM session_groups sg
-      LEFT JOIN session_metrics sm ON 
-        sg.visitor_id = sm.visitor_id AND 
-        sg.session_id = sm.session_id
-      GROUP BY sg.url
-    )
-  `;
+export function createPageMetricsCTE(options: SessionOptions = {}): string {
+  const { sessionTimeout = 1800 } = options;
+
+  return "";
+
 }

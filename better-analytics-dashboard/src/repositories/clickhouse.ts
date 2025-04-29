@@ -298,7 +298,7 @@ export async function getPageMetrics(
   const query = new ClickHouseQueryBuilder()
     .withCTEs()
     .addSessionBoundaries({ additionalColumns: ['url'] })
-    .addSessionGroups({ additionalColumns: ['url'] })
+    .addSessionGroups({ additionalColumns: ['url', 'timestamp'] })
     .addSessionMetrics()
     .addPageMetrics()
     .setMainQuery(`
@@ -307,8 +307,8 @@ export async function getPageMetrics(
         visitors,
         pageviews,
         bounce_rate as bounceRate,
-        avg_time as avgTime
-      FROM page_metrics
+        avg_time as avgTime 
+      FROM page_metrics 
     `)
     .build();
 
