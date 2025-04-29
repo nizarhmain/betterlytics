@@ -41,7 +41,9 @@ export async function getSummaryStatsForSite(siteId: string, startDate: string, 
     bounceRate: sessionMetrics.total_sessions > 0 
       ? Math.round((sessionMetrics.total_sessions - sessionMetrics.multi_page_sessions) / sessionMetrics.total_sessions * 100)
       : 0,
-    avgVisitDuration: Math.round(sessionMetrics.total_duration / sessionMetrics.multi_page_sessions)
+    avgVisitDuration: sessionMetrics.multi_page_sessions > 0 
+      ? Math.round(sessionMetrics.total_duration / sessionMetrics.multi_page_sessions)
+      : 0
   };
 }
 
