@@ -5,7 +5,6 @@ export interface PageAnalytics {
   pageviews: number;
   bounceRate: number;
   avgTime: string;
-  conversion: number;
 }
 
 export interface SummaryStats {

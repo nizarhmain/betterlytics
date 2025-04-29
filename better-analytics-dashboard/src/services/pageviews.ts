@@ -25,9 +25,16 @@ export async function getPageViewsForSite(siteId: string, startDate: string, end
 }
 
 export async function getUniqueVisitorsForSite(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping) {
-  if (groupBy === 'day') return getDailyUniqueVisitors(siteId, toDateString(startDate), toDateString(endDate));
-  if (groupBy === 'hour') return getHourlyUniqueVisitors(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
-  return getMinuteUniqueVisitors(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  
+  if (groupBy === 'day') {
+    return getDailyUniqueVisitors(siteId, formattedStart, formattedEnd);
+  }
+  if (groupBy === 'hour') {
+    return getHourlyUniqueVisitors(siteId, formattedStart, formattedEnd);
+  }
+  return getMinuteUniqueVisitors(siteId, formattedStart, formattedEnd);
 }
 
 export async function getSummaryStatsForSite(siteId: string, startDate: string, endDate: string) {

@@ -29,7 +29,6 @@ export default function PagesTable({ data }: PagesTableProps) {
               <TableHead className="text-right">Pageviews</TableHead>
               <TableHead className="text-right">Bounce Rate</TableHead>
               <TableHead className="text-right">Avg. Time</TableHead>
-              <TableHead className="text-right">Conversion</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -42,7 +41,6 @@ export default function PagesTable({ data }: PagesTableProps) {
                 <TableCell className="text-right">{page.pageviews.toLocaleString()}</TableCell>
                 <TableCell className="text-right">{page.bounceRate}%</TableCell>
                 <TableCell className="text-right">{page.avgTime}</TableCell>
-                <TableCell className="text-right">{page.conversion}%</TableCell>
                 <TableCell className="text-right">
                   <Link href={page.path} className="text-gray-400 hover:text-gray-600">
                     <ArrowUpRight size={16} />
