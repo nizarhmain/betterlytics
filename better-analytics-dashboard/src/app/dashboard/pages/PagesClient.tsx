@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
 import PagesTable from "@/components/analytics/PagesTable";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { fetchSummaryStatsAction, fetchPageViewsAction } from '../actions';
+import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from '../actions';
 import { PageAnalytics, SummaryStats } from '@/types/analytics';
 
 export default function PagesClient() {
@@ -17,34 +17,10 @@ export default function PagesClient() {
     queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate),
   });
 
-  const { data: pageViews, isLoading: pageViewsLoading } = useQuery({
-    queryKey: ['pageViews', 'default-site', startDate, endDate],
-    queryFn: () => fetchPageViewsAction('default-site', startDate, endDate, 'day'),
+  const { data: pages = [], isLoading: pagesLoading } = useQuery<PageAnalytics[]>({
+    queryKey: ['pageAnalytics', 'default-site', startDate, endDate],
+    queryFn: () => fetchPageAnalyticsAction('default-site', startDate, endDate),
   });
-
-  const pagesData = useMemo(() => {
-    if (!pageViews) return [];
-    
-    const pageMap = new Map<string, PageAnalytics>();
-    
-    pageViews.forEach(view => {
-      if (!pageMap.has(view.url)) {
-        pageMap.set(view.url, {
-          path: view.url,
-          title: view.url.split('/').pop() || 'Homepage',
-          visitors: 0,
-          pageviews: 0,
-          bounceRate: 0,
-          avgTime: '0s',
-          conversion: 0,
-        });
-      }
-      const page = pageMap.get(view.url)!;
-      page.pageviews += view.views;
-    });
-
-    return Array.from(pageMap.values());
-  }, [pageViews]);
 
   return (
     <div className="p-6 space-y-6">
@@ -69,12 +45,16 @@ export default function PagesClient() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard
           title="Total Pages"
-          value={summaryLoading ? '...' : String(pagesData.length)}
+          value={pagesLoading ? '...' : String(pages.length)}
           changeText=""
         />
         <SummaryCard
           title="Avg. Page Views"
-          value={summaryLoading ? '...' : summary?.pageviews ? Math.round(summary.pageviews / pagesData.length).toLocaleString() : '0'}
+          value={pagesLoading ? '...' : 
+            pages.length > 0 
+              ? Math.round(pages.reduce((sum, p) => sum + p.pageviews, 0) / pages.length).toLocaleString()
+              : '0'
+          }
           changeText=""
         />
         <SummaryCard
@@ -89,7 +69,7 @@ export default function PagesClient() {
         />
       </div>
 
-      <PagesTable data={pagesData} />
+      <PagesTable data={pages} />
     </div>
   );
 } 

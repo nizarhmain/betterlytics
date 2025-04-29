@@ -1,6 +1,7 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyPageViewRowSchema, DailyPageViewRow } from '@/entities/pageviews';
 import { DailyUniqueVisitorsRowSchema, DailyUniqueVisitorsRow } from '@/entities/pageviews';
+import { PageAnalytics } from '@/types/analytics';
 
 export async function getDailyPageViews(siteId: string, startDate: string, endDate: string): Promise<DailyPageViewRow[]> {
   const query = `
@@ -263,4 +264,108 @@ export async function getSessionMetrics(
     multi_page_sessions: Number(row?.multi_page_sessions ?? 0),
     total_duration: Number(row?.total_duration ?? 0)
   };
+}
+
+export async function getPageMetrics(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<PageAnalytics[]> {
+  const query = `
+    WITH 
+    -- First, identify session boundaries for each visitor
+    session_boundaries AS (
+      SELECT 
+        site_id,
+        visitor_id,
+        url,
+        timestamp,
+        if(dateDiff('second', lagInFrame(timestamp) OVER (PARTITION BY site_id, visitor_id ORDER BY timestamp), timestamp) > 1800, 1, 0) as is_new_session
+      FROM analytics.events
+      WHERE site_id = {site_id:String}
+        AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+    ),
+    -- Create session IDs
+    session_groups AS (
+      SELECT 
+        site_id,
+        visitor_id,
+        url,
+        timestamp,
+        sum(is_new_session) OVER (PARTITION BY site_id, visitor_id ORDER BY timestamp) as session_id
+      FROM session_boundaries
+    ),
+    -- Calculate metrics per page
+    page_metrics AS (
+      SELECT
+        url as path,
+        -- Total pageviews
+        count() as pageviews,
+        -- Unique visitors
+        uniqExact(visitor_id) as visitors,
+        -- Bounce rate (sessions with only one page view)
+        round(countIf(pages = 1) / count() * 100, 1) as bounce_rate,
+        -- Average time on page in seconds
+        round(avg(duration), 0) as avg_time_seconds,
+        -- Conversion rate (placeholder - customize based on your conversion definition)
+        round(countIf(converted = 1) / count() * 100, 1) as conversion_rate
+      FROM (
+        SELECT
+          url,
+          visitor_id,
+          session_id,
+          count() OVER (PARTITION BY visitor_id, session_id) as pages,
+          max(if(url LIKE '%checkout%' OR url LIKE '%thank-you%', 1, 0)) OVER (PARTITION BY visitor_id, session_id) as converted,
+          if(pages > 1,
+            dateDiff('second', 
+                    first_value(timestamp) OVER (PARTITION BY url, visitor_id, session_id ORDER BY timestamp),
+                    last_value(timestamp) OVER (PARTITION BY url, visitor_id, session_id ORDER BY timestamp)),
+            0) as duration
+        FROM session_groups
+      )
+      GROUP BY path
+      ORDER BY pageviews DESC
+    )
+    SELECT
+      path,
+      -- Extract the last part of the URL as title, or use 'Homepage' for root
+      if(path = '/', 'Homepage', 
+        if(path = '', 'Homepage',
+            replaceRegexpAll(
+              splitByChar('/', path)[-1],
+              '[^a-zA-Z0-9]+', ' '
+            )
+        )
+      ) as title,
+      visitors,
+      pageviews,
+      bounce_rate as bounceRate,
+      -- Format duration as 'Xm Ys'
+      concat(
+        toString(floor(avg_time_seconds / 60)), 
+        'm ',
+        toString(avg_time_seconds % 60),
+        's'
+      ) as avgTime,
+      conversion_rate as conversion
+    FROM page_metrics
+  `;
+
+  const result = await clickhouse.query(query, {
+    params: {
+      site_id: siteId,
+      start: startDate,
+      end: endDate,
+    },
+  }).toPromise() as any[];
+
+  return result.map(row => ({
+    path: row.path,
+    title: row.title,
+    visitors: Number(row.visitors),
+    pageviews: Number(row.pageviews),
+    bounceRate: Number(row.bounceRate),
+    avgTime: row.avgTime,
+    conversion: Number(row.conversion),
+  }));
 } 

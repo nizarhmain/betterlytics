@@ -12,9 +12,11 @@ import {
   getTopPages,
   getDeviceTypeBreakdown,
   getSessionMetrics,
+  getPageMetrics,
 } from '@/repositories/clickhouse';
 import { DailyPageViewRow } from '@/entities/pageviews';
 import { toDateString, toDateTimeString, TimeGrouping } from '@/utils/timeRanges';
+import { PageAnalytics } from '@/types/analytics';
 
 export async function getPageViewsForSite(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyPageViewRow[]> {
   if (groupBy === 'day') return getDailyPageViews(siteId, toDateString(startDate), toDateString(endDate));
@@ -53,4 +55,8 @@ export async function getTopPagesForSite(siteId: string, startDate: string, endD
 
 export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: string, endDate: string) {
   return getDeviceTypeBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+}
+
+export async function getPageAnalytics(siteId: string, startDate: string, endDate: string): Promise<PageAnalytics[]> {
+  return getPageMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
 } 
