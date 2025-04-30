@@ -27,13 +27,18 @@ use processing::EventProcessor;
 async fn main() {
     dotenv().ok();
 
+    let config = config::Config::new();
+
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::from_default_env())
+        .with(tracing_subscriber::EnvFilter::new(&config.log_level))
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let config = config::Config::new();
-    let addr = SocketAddr::from(([127, 0, 0, 1], config.server_port));
+    let ip_addr = config.server_host.parse::<std::net::IpAddr>()
+        .map_err(|e| format!("Invalid server host IP address '{}': {}", config.server_host, e))
+        .expect("Failed to parse server host IP address");
+    
+    let addr = SocketAddr::from((ip_addr, config.server_port));
     info!("Server starting on {}", addr);
 
     let db = Database::new().await.expect("Failed to initialize database");

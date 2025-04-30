@@ -20,7 +20,6 @@ pub struct ProcessedEvent {
     pub is_bot: bool,
     /// Geolocation data - Planning to use ip-api.com or maxmind to get this data
     pub country: Option<String>,
-    pub city: Option<String>,
     /// Browser information - Parsed from user_agent string
     pub browser: Option<String>,
     pub browser_version: Option<String>,
@@ -64,7 +63,6 @@ impl EventProcessor {
             anonymized_ip: None,
             is_bot: false,
             country: None,
-            city: None,
             browser: None,
             browser_version: None,
             os: None,

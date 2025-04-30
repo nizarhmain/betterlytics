@@ -1,5 +1,5 @@
 use anyhow::Result;
-use clickhouse::{error::Error as ClickHouseError, inserter::Inserter, Client};
+use clickhouse::{error::Error as ClickHouseError, Client};
 use std::env;
 use std::sync::Arc;
 use std::time::Duration;
@@ -86,9 +86,9 @@ impl Database {
     }
 
     pub async fn validate_schema(&self) -> Result<()> {
-        println!("Validating database schema");
         self.check_connection().await?;
-
+        
+        println!("Validating database schema");
         let db_exists: u8 = self.client
             .query("SELECT count() FROM system.databases WHERE name = 'analytics'")
             .fetch_one()
@@ -115,49 +115,6 @@ impl Database {
 
     pub async fn insert_event(&self, event: ProcessedEvent) -> Result<()> {
         self.event_tx.send(event).await?;
-        Ok(())
-    }
-
-    async fn materialize_views(&self) -> Result<()> {
-        // Create materialized view for daily page views
-        self.client
-            .query(
-                r#"
-            CREATE MATERIALIZED VIEW IF NOT EXISTS analytics.daily_page_views
-            ENGINE = SummingMergeTree()
-            PARTITION BY toYYYYMM(date)
-            ORDER BY (site_id, date, url)
-            AS SELECT
-                site_id,
-                date,
-                url,
-                count() as views
-            FROM analytics.events
-            GROUP BY site_id, date, url
-        "#,
-            )
-            .execute()
-            .await?;
-
-        // Create materialized view for daily unique visitors
-        self.client
-            .query(
-                r#"
-            CREATE MATERIALIZED VIEW IF NOT EXISTS analytics.daily_unique_visitors
-            ENGINE = AggregatingMergeTree()
-            PARTITION BY toYYYYMM(date)
-            ORDER BY (site_id, date)
-            AS SELECT
-                site_id,
-                date,
-                uniqState(visitor_id) as unique_visitors
-            FROM analytics.events
-            GROUP BY site_id, date
-        "#,
-            )
-            .execute()
-            .await?;
-
         Ok(())
     }
 
