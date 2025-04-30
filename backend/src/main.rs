@@ -37,7 +37,7 @@ async fn main() {
     info!("Server starting on {}", addr);
 
     let db = Database::new().await.expect("Failed to initialize database");
-    db.init_schema().await.expect("Failed to initialize database schema");
+    db.validate_schema().await.expect("Invalid database schema");
     let db = Arc::new(db);
 
     let (processor, mut processed_rx) = EventProcessor::new(db.clone());

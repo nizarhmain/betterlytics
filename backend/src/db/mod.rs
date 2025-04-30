@@ -12,7 +12,7 @@ use crate::processing::ProcessedEvent;
 mod models;
 pub use models::EventRow;
 
-const NUM_INSERT_WORKERS: usize = 4;
+const NUM_INSERT_WORKERS: usize = 1;
 const EVENT_CHANNEL_CAPACITY: usize = 100_000;
 const WORKER_CHANNEL_CAPACITY: usize = 10_000;
 const INSERTER_TIMEOUT_SECS: u64 = 5;
@@ -85,57 +85,31 @@ impl Database {
         });
     }
 
-    pub async fn init_schema(&self) -> Result<()> {
-        println!("Initializing database schema");
+    pub async fn validate_schema(&self) -> Result<()> {
+        println!("Validating database schema");
         self.check_connection().await?;
 
-        println!("Creating analytics database if it doesn't exist");
-        self.client
-            .query("CREATE DATABASE IF NOT EXISTS analytics")
-            .execute()
+        let db_exists: u8 = self.client
+            .query("SELECT count() FROM system.databases WHERE name = 'analytics'")
+            .fetch_one()
+            .await?;
+        
+        if db_exists == 0 {
+            println!("[WARNING] Analytics database does not exist. Please run migrations.");
+            return Ok(());
+        }
+
+        let table_exists: u8 = self.client
+            .query("SELECT count() FROM system.tables WHERE database = 'analytics' AND name = 'events'")
+            .fetch_one()
             .await?;
 
-        println!("Creating events table");
-        self.client
-            .query(
-                r#"
-            CREATE TABLE IF NOT EXISTS analytics.events (
-                site_id String,
-                visitor_id String,
-                session_id String,
-                url String,
-                referrer Nullable(String),
-                user_agent String,
-                device_type String,
-                country Nullable(String),
-                timestamp DateTime,
-                date Date DEFAULT toDate(timestamp),
-                -- Indexes for common query patterns
-                INDEX visitor_idx visitor_id TYPE bloom_filter GRANULARITY 3,
-                INDEX session_idx session_id TYPE bloom_filter GRANULARITY 3,
-                INDEX site_idx site_id TYPE bloom_filter GRANULARITY 3,
-                INDEX url_idx url TYPE bloom_filter GRANULARITY 3,
-                INDEX country_idx country TYPE bloom_filter GRANULARITY 3,
-                INDEX date_idx date TYPE minmax GRANULARITY 3,
-                INDEX timestamp_idx timestamp TYPE minmax GRANULARITY 3
-            ) ENGINE = MergeTree()
-            -- Partition by month for better data management
-            PARTITION BY toYYYYMM(date)
-            -- Order by fields we commonly filter/group by
-            ORDER BY (site_id, date, visitor_id, session_id, timestamp)
-            -- Add compression settings
-            SETTINGS index_granularity = 8192,
-                min_bytes_for_wide_part = 0,
-                min_rows_for_wide_part = 0
-        "#,
-            )
-            .execute()
-            .await?;
+        if table_exists == 0 {
+            println!("[WARNING] Events table does not exist. Please run migrations.");
+            return Ok(());
+        }
 
-        println!("Creating materialized views");
-        self.materialize_views().await?;
-
-        println!("Database schema initialized successfully");
+        println!("Database schema validation successful");
         Ok(())
     }
 
