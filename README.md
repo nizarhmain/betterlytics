@@ -20,7 +20,11 @@ cd better-analytics
 
 ### 2. Environment Setup
 
-Create a copy of the `.env.example` file and rename it to `.env` and adjust environment variables accordingly - most can be left as is.
+Create a copy of the `.env.example` file in root and rename it to `.env` and adjust environment variables accordingly - most can be left as is.
+
+Then create a copy of the `.env.example` file in `backend` and rename it to `.env` and adjust environment variables accordingly - most can be left as is.
+
+Lastly, create a copy of the `.env.example` file in `better-analytics-dashboard` folder and rename it to `.env.local` and adjust environment variables accordingly - most can be left as is.
 
 ### 3. Start ClickHouse database
 
