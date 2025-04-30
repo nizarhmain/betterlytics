@@ -50,15 +50,14 @@ impl EventProcessor {
     }
 
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
-        let site_id = event.site_id.clone();
-        let visitor_fingerprint = event.visitor_id.clone();
-        let timestamp = chrono::DateTime::from_timestamp(event.timestamp as i64, 0).unwrap_or_else(|| chrono::Utc::now());
-        let url = event.url.clone();
-        let referrer = event.referrer.clone();
-        let user_agent = event.user_agent.clone();
+        let site_id = event.raw.site_id.clone();
+        let timestamp = chrono::DateTime::from_timestamp(event.raw.timestamp as i64, 0).unwrap_or_else(|| chrono::Utc::now());
+        let url = event.raw.url.clone();
+        let referrer = event.raw.referrer.clone();
+        let user_agent = event.raw.user_agent.clone();
 
         let mut processed = ProcessedEvent {
-            event,
+            event: event.clone(),
             session_id: String::new(),
             anonymized_ip: None,
             is_bot: false,
@@ -68,7 +67,7 @@ impl EventProcessor {
             os: None,
             device_type: "unknown".to_string(),
             site_id: site_id.clone(),
-            visitor_fingerprint: visitor_fingerprint.clone(),
+            visitor_fingerprint: event.visitor_fingerprint.clone(),
             timestamp: timestamp.clone(),
             url: url.clone(),
             referrer: referrer.clone(),
@@ -78,7 +77,7 @@ impl EventProcessor {
         let session_id_result = session::get_or_create_session_id(
             &self.redis_pool, 
             &site_id, 
-            &visitor_fingerprint, 
+            &event.visitor_fingerprint, 
             &timestamp
         );
 
@@ -145,7 +144,7 @@ impl EventProcessor {
     }
     
     async fn detect_device_type_from_resolution(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        if let Some((w, _h)) = processed.event.screen_resolution.split_once('x') {
+        if let Some((w, _h)) = processed.event.raw.screen_resolution.split_once('x') {
             if let Ok(width) = w.trim().parse::<u32>() {
                 match width {
                     0..=575 => processed.device_type = "mobile".to_string(),

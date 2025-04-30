@@ -1,14 +1,15 @@
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
-use md5::{Md5, Digest};
 use nanoid::nanoid;
 
+mod fingerprint;
+pub use fingerprint::*;
+
+/// Raw tracking data received from the client
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct AnalyticsEvent {
+pub struct RawTrackingEvent {
     /// Site identifier
     pub site_id: String,
-    /// Unique visitor identifier (anonymously generated client-sided)
-    pub visitor_id: String,
     /// Page URL
     pub url: String,
     /// Referrer URL
@@ -21,7 +22,7 @@ pub struct AnalyticsEvent {
     pub timestamp: u64,
 }
 
-impl AnalyticsEvent {
+impl RawTrackingEvent {
     pub fn new(
         site_id: String,
         url: String,
@@ -29,12 +30,8 @@ impl AnalyticsEvent {
         user_agent: String,
         screen_resolution: String,
     ) -> Self {
-        // Generate anonymous visitor ID based on browser fingerprint
-        let visitor_id = Self::generate_visitor_id(&user_agent, &screen_resolution);
-        
         Self {
             site_id,
-            visitor_id,
             url,
             referrer,
             user_agent,
@@ -45,12 +42,32 @@ impl AnalyticsEvent {
                 .as_secs(),
         }
     }
+}
 
-    /// Generate an anonymous visitor ID based on browser fingerprint
-    fn generate_visitor_id(user_agent: &str, screen_resolution: &str) -> String {
-        let mut hasher = Md5::new();
-        hasher.update(format!("{}{}", user_agent, screen_resolution));
-        format!("{:x}", hasher.finalize())
+/// The main analytics event type that includes server-side data
+#[derive(Debug, Clone)]
+pub struct AnalyticsEvent {
+    /// Raw tracking data from the client
+    pub raw: RawTrackingEvent,
+    /// Client IP address
+    pub ip_address: String,
+    /// Generated visitor fingerprint
+    pub visitor_fingerprint: String,
+}
+
+impl AnalyticsEvent {
+    pub fn new(raw: RawTrackingEvent, ip_address: String) -> Self {
+        let visitor_fingerprint = generate_fingerprint(
+            &ip_address,
+            &raw.screen_resolution,
+            &raw.user_agent,
+        );
+
+        Self {
+            raw,
+            ip_address,
+            visitor_fingerprint,
+        }
     }
 }
 

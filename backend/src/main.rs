@@ -5,6 +5,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
     response::Html,
+    extract::ConnectInfo,
 };
 use std::sync::Arc;
 use std::net::SocketAddr;
@@ -19,7 +20,7 @@ mod db;
 mod processing;
 mod session;
 
-use analytics::{AnalyticsEvent, generate_site_id};
+use analytics::{AnalyticsEvent, RawTrackingEvent, generate_site_id};
 use db::{Database, SharedDatabase};
 use processing::EventProcessor;
 
@@ -94,17 +95,17 @@ async fn health_check(
 
 async fn track_event(
     State((_db, processor)): State<(SharedDatabase, Arc<EventProcessor>)>,
-    Json(event): Json<AnalyticsEvent>,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    Json(raw_event): Json<RawTrackingEvent>,
 ) -> Result<StatusCode, (StatusCode, String)> {
-    if event.site_id.is_empty() {
+    if raw_event.site_id.is_empty() {
         return Err((StatusCode::BAD_REQUEST, "site_id is required".to_string()));
     }
-    if event.url.is_empty() {
+    if raw_event.url.is_empty() {
         return Err((StatusCode::BAD_REQUEST, "url is required".to_string()));
     }
-    if event.visitor_id.is_empty() {
-        return Err((StatusCode::BAD_REQUEST, "visitor_id is required".to_string()));
-    }
+
+    let event = AnalyticsEvent::new(raw_event, addr.ip().to_string());
 
     if let Err(e) = processor.process_event(event).await {
         error!("Failed to process event: {}", e);
