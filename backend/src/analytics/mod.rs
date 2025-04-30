@@ -51,22 +51,13 @@ pub struct AnalyticsEvent {
     pub raw: RawTrackingEvent,
     /// Client IP address
     pub ip_address: String,
-    /// Generated visitor fingerprint
-    pub visitor_fingerprint: String,
 }
 
 impl AnalyticsEvent {
     pub fn new(raw: RawTrackingEvent, ip_address: String) -> Self {
-        let visitor_fingerprint = generate_fingerprint(
-            &ip_address,
-            &raw.screen_resolution,
-            &raw.user_agent,
-        );
-
         Self {
             raw,
             ip_address,
-            visitor_fingerprint,
         }
     }
 }

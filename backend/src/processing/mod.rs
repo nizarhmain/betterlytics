@@ -1,6 +1,6 @@
 use anyhow::Result;
 use tokio::sync::mpsc;
-use crate::analytics::AnalyticsEvent;
+use crate::analytics::{AnalyticsEvent, generate_fingerprint};
 use crate::db::SharedDatabase;
 use tracing::{error, debug};
 use crate::session;
@@ -14,8 +14,6 @@ pub struct ProcessedEvent {
     pub event: AnalyticsEvent,
     /// Sessionization - new sessions are created if the user has not generated any events in over 30 minutes
     pub session_id: String,
-    /// Anonymized IP address (last octet removed) - ip is retrieved from the event metadata
-    pub anonymized_ip: Option<String>,
     /// Detected bot status
     pub is_bot: bool,
     /// Geolocation data - Planning to use ip-api.com or maxmind to get this data
@@ -59,7 +57,6 @@ impl EventProcessor {
         let mut processed = ProcessedEvent {
             event: event.clone(),
             session_id: String::new(),
-            anonymized_ip: None,
             is_bot: false,
             country: None,
             browser: None,
@@ -67,17 +64,31 @@ impl EventProcessor {
             os: None,
             device_type: "unknown".to_string(),
             site_id: site_id.clone(),
-            visitor_fingerprint: event.visitor_fingerprint.clone(),
+            visitor_fingerprint: String::new(),
             timestamp: timestamp.clone(),
             url: url.clone(),
             referrer: referrer.clone(),
             user_agent: user_agent.clone(),
         };
 
+        processed.visitor_fingerprint = generate_fingerprint(
+            &event.ip_address,
+            &event.raw.screen_resolution,
+            &event.raw.user_agent,
+        );
+
+        if let Err(e) = self.detect_bot(&mut processed).await {
+            error!("Failed to detect bot: {}", e);
+        }
+
+        if let Err(e) = self.get_geolocation(&mut processed).await {
+            error!("Failed to get geolocation: {}", e);
+        }
+
         let session_id_result = session::get_or_create_session_id(
             &self.redis_pool, 
             &site_id, 
-            &event.visitor_fingerprint, 
+            &processed.visitor_fingerprint, 
             &timestamp
         );
 
@@ -88,14 +99,6 @@ impl EventProcessor {
                 return Ok(());
             }
         };
-
-        if let Err(e) = self.anonymize_ip(&mut processed).await {
-            error!("Failed to anonymize IP: {}", e);
-        }
-        
-        if let Err(e) = self.detect_bot(&mut processed).await {
-            error!("Failed to detect bot: {}", e);
-        }
 
         if let Err(e) = self.detect_device_type_from_resolution(&mut processed).await {
             error!("Failed to detect device type from resolution: {}", e);
@@ -117,11 +120,11 @@ impl EventProcessor {
         Ok(())
     }
 
-    /// Anonymize IP address by removing last octet
-    async fn anonymize_ip(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        debug!("Anonymizing IP address!");
-        // TODO: Implement IP anonymization
-        processed.anonymized_ip = None;
+    /// Get geolocation data for the IP
+    async fn get_geolocation(&self, processed: &mut ProcessedEvent) -> Result<()> {
+        debug!("Getting geolocation data!");
+        // TODO: Implement geolocation lookup using processed.event.ip_address
+        processed.country = None;
         Ok(())
     }
 
