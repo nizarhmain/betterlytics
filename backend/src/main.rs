@@ -1,11 +1,12 @@
 use axum::{
     extract::State,
-    http::StatusCode,
+    http::{header, StatusCode},
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
     response::Html,
     extract::ConnectInfo,
+    extract::Request,
 };
 use std::sync::Arc;
 use std::net::SocketAddr;
@@ -13,6 +14,7 @@ use tower_http::cors::CorsLayer;
 use tracing::{info, error};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use dotenv::dotenv;
+use chrono::{DateTime, Utc};
 
 mod config;
 mod analytics;
@@ -60,6 +62,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/health", get(health_check))
+        .route("/ping", get(ping))
         .route("/track", post(track_event))
         .route("/site-id", get(generate_site_id_handler))
         .route("/test", get(|| async { 
@@ -113,6 +116,41 @@ async fn track_event(
     }
 
     Ok(StatusCode::OK)
+}
+
+/// Ping server - used to detect unique visitor
+async fn ping(
+    request: Request,
+) -> impl IntoResponse {
+    let if_modified_since =
+        request
+            .headers()
+            .get(header::IF_MODIFIED_SINCE)
+            .and_then(|header| header.to_str().ok())
+            .and_then(|value| DateTime::parse_from_str(value.trim_end_matches(" GMT"), "%a, %d %b %Y %H:%M:%S").ok())
+            .and_then(|value| Some(value.with_timezone(&Utc)));
+
+    let last_modified = Utc::now();
+    
+    // 30 minutes
+    let cache_threshold_minutes: i64 = 30;
+
+    let is_unqiue_visitor = match if_modified_since {
+        Some(last_accessed) => last_modified.signed_duration_since(last_accessed).num_minutes().abs() > cache_threshold_minutes,
+        None => true,
+    };
+
+    let last_modified_header = [
+        (
+            header::LAST_MODIFIED,
+            last_modified.format("%a, %d %b %Y %H:%M:%S GMT").to_string()
+        )
+    ];
+
+    match is_unqiue_visitor {
+        true => (StatusCode::OK, last_modified_header),
+        false => (StatusCode::NOT_MODIFIED, last_modified_header),
+    }
 }
 
 /// Temporary endpoint to generate a site ID
