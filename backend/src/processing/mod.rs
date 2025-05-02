@@ -2,6 +2,8 @@ use anyhow::Result;
 use tokio::sync::mpsc;
 use crate::analytics::{AnalyticsEvent, generate_fingerprint};
 use crate::db::SharedDatabase;
+use crate::config::Config;
+use crate::geoip::GeoIpService;
 use tracing::{error, debug};
 use crate::session;
 use r2d2::Pool;
@@ -17,7 +19,7 @@ pub struct ProcessedEvent {
     /// Detected bot status
     pub is_bot: bool,
     /// Geolocation data - Planning to use ip-api.com or maxmind to get this data
-    pub country: Option<String>,
+    pub country_code: Option<String>,
     /// Browser information - Parsed from user_agent string
     pub browser: Option<String>,
     pub browser_version: Option<String>,
@@ -38,13 +40,14 @@ pub struct EventProcessor {
     db: SharedDatabase,
     event_tx: mpsc::Sender<ProcessedEvent>,
     redis_pool: Arc<Pool<RedisClient>>,
+    geoip_service: GeoIpService,
 }
 
 impl EventProcessor {
-    pub fn new(db: SharedDatabase) -> (Self, mpsc::Receiver<ProcessedEvent>) {
+    pub fn new(db: SharedDatabase, geoip_service: GeoIpService) -> (Self, mpsc::Receiver<ProcessedEvent>) {
         let (event_tx, event_rx) = mpsc::channel(100_000);
         let redis_pool = session::REDIS_POOL.clone();
-        (Self { db, event_tx, redis_pool }, event_rx)
+        (Self { db, event_tx, redis_pool, geoip_service }, event_rx)
     }
 
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
@@ -58,7 +61,7 @@ impl EventProcessor {
             event: event.clone(),
             session_id: String::new(),
             is_bot: false,
-            country: None,
+            country_code: None,
             browser: None,
             browser_version: None,
             os: None,
@@ -71,18 +74,18 @@ impl EventProcessor {
             user_agent: user_agent.clone(),
         };
 
+        if let Err(e) = self.get_geolocation(&mut processed).await {
+            error!("Failed to get geolocation: {}", e);
+        }
+
         processed.visitor_fingerprint = generate_fingerprint(
-            &event.ip_address,
-            &event.raw.screen_resolution,
-            &event.raw.user_agent,
+            &processed.event.ip_address,
+            &processed.event.raw.screen_resolution,
+            &processed.event.raw.user_agent,
         );
 
         if let Err(e) = self.detect_bot(&mut processed).await {
             error!("Failed to detect bot: {}", e);
-        }
-
-        if let Err(e) = self.get_geolocation(&mut processed).await {
-            error!("Failed to get geolocation: {}", e);
         }
 
         let session_id_result = session::get_or_create_session_id(
@@ -122,9 +125,13 @@ impl EventProcessor {
 
     /// Get geolocation data for the IP
     async fn get_geolocation(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        debug!("Getting geolocation data!");
-        // TODO: Implement geolocation lookup using processed.event.ip_address
-        processed.country = None;
+        debug!("Getting geolocation data for IP: {}", processed.event.ip_address);
+        processed.country_code = self.geoip_service.lookup_country_code(&processed.event.ip_address);
+        if processed.country_code.is_some() {
+            debug!("Geolocation successful: {:?}", processed.country_code);
+        } else {
+            debug!("Geolocation lookup returned no country code.");
+        }
         Ok(())
     }
 

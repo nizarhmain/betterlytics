@@ -19,10 +19,12 @@ mod analytics;
 mod db;
 mod processing;
 mod session;
+mod geoip;
 
 use analytics::{AnalyticsEvent, RawTrackingEvent, generate_site_id};
 use db::{Database, SharedDatabase};
 use processing::EventProcessor;
+use geoip::GeoIpService;
 
 #[tokio::main]
 async fn main() {
@@ -42,11 +44,14 @@ async fn main() {
     let addr = SocketAddr::from((ip_addr, config.server_port));
     info!("Server starting on {}", addr);
 
+    let geoip_service = GeoIpService::new(&config)
+        .expect("Failed to initialize GeoIP service");
+
     let db = Database::new().await.expect("Failed to initialize database");
     db.validate_schema().await.expect("Invalid database schema");
     let db = Arc::new(db);
 
-    let (processor, mut processed_rx) = EventProcessor::new(db.clone());
+    let (processor, mut processed_rx) = EventProcessor::new(db.clone(), geoip_service);
     let processor = Arc::new(processor);
 
     let db_clone = db.clone();

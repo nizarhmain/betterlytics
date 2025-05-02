@@ -11,7 +11,7 @@ pub struct EventRow {
     pub referrer: Option<String>,
     pub user_agent: String,
     pub device_type: String,
-    pub country: Option<String>,
+    pub country_code: Option<String>,
     #[serde(with = "clickhouse::serde::chrono::datetime")]
     pub timestamp: DateTime<Utc>,
     #[serde(with = "clickhouse::serde::chrono::date")]
@@ -30,7 +30,7 @@ impl EventRow {
             referrer: event.referrer,
             user_agent: event.user_agent,
             device_type: event.device_type,
-            country: event.country,
+            country_code: event.country_code,
             timestamp,
             date: timestamp.date_naive(),
         }
