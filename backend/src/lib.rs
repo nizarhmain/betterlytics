@@ -4,6 +4,7 @@ pub mod db;
 pub mod processing;
 pub mod session;
 pub mod geoip;
+pub mod geoip_updater;
 
 // Re-export commonly used types
 pub use analytics::{AnalyticsEvent, generate_site_id};

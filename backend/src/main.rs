@@ -20,17 +20,19 @@ mod db;
 mod processing;
 mod session;
 mod geoip;
+mod geoip_updater;
 
 use analytics::{AnalyticsEvent, RawTrackingEvent, generate_site_id};
 use db::{Database, SharedDatabase};
 use processing::EventProcessor;
 use geoip::GeoIpService;
+use geoip_updater::GeoIpUpdater;
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
 
-    let config = config::Config::new();
+    let config = Arc::new(config::Config::new());
 
     tracing_subscriber::registry()
         .with(tracing_subscriber::EnvFilter::new(&config.log_level))
@@ -44,8 +46,14 @@ async fn main() {
     let addr = SocketAddr::from((ip_addr, config.server_port));
     info!("Server starting on {}", addr);
 
-    let geoip_service = GeoIpService::new(&config)
+    let (updater, geoip_watch_rx) = GeoIpUpdater::new(config.clone())
+        .expect("Failed to create GeoIP updater");
+    let updater = Arc::new(updater);
+
+    let geoip_service = GeoIpService::new(config.clone(), geoip_watch_rx)
         .expect("Failed to initialize GeoIP service");
+
+    let _updater_handle = tokio::spawn(Arc::clone(&updater).run());
 
     let db = Database::new().await.expect("Failed to initialize database");
     db.validate_schema().await.expect("Invalid database schema");

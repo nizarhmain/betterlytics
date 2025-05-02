@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 # Framework
 axum = "0.8.3"
-tokio = { version = "1.44.2", features = ["full"] }
+tokio = { version = "1.44.2", features = ["full", "time"] }
 tower = "0.5.2"
 tower-http = { version = "0.6.2", features = ["trace", "fs", "cors", "limit"] }
 
@@ -38,10 +38,14 @@ lazy_static = "1.5.0"
 
 # GeoIP dependencies
 maxminddb = "0.26.0"
+reqwest = { version = "0.12.15", features = ["json", "stream"] }
+flate2 = "1.1.1"
+tar = "0.4.44"
+httpdate = "1.0.3"
+bytes = "1.10.1"
 
 # Regex
 regex = "1.10"
 
 # Hashing
 sha2 = "0.10"
-
