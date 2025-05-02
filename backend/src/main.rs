@@ -123,7 +123,7 @@ async fn ping(
     request: Request,
 ) -> impl IntoResponse {
     let if_modified_since =
-        request
+        request 
             .headers()
             .get(header::IF_MODIFIED_SINCE)
             .and_then(|header| header.to_str().ok())
@@ -144,13 +144,28 @@ async fn ping(
         (
             header::LAST_MODIFIED,
             last_modified.format("%a, %d %b %Y %H:%M:%S GMT").to_string()
-        )
+        ),
+        (
+            header::CACHE_CONTROL,
+            "private, max-age=604800, immutable".to_string()
+        ),
+        (
+            header::AGE,
+            "1".to_string()
+        ),
     ];
 
-    match is_unqiue_visitor {
-        true => (StatusCode::OK, last_modified_header),
-        false => (StatusCode::NOT_MODIFIED, last_modified_header),
-    }
+
+    let response_status_code = match is_unqiue_visitor {
+        true => StatusCode::OK,
+        false => StatusCode::NOT_MODIFIED,
+    };
+
+    return (
+        response_status_code,
+        last_modified_header,
+        Json(generate_site_id()),
+    )
 }
 
 /// Temporary endpoint to generate a site ID
