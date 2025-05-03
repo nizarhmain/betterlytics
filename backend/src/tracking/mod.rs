@@ -4,7 +4,8 @@ use axum::{
 };
 use chrono::{DateTime, Duration, TimeDelta, Utc};
 
-const CACHE_THESHOLD: TimeDelta = Duration::minutes(30);
+const CACHE_THESHOLD: TimeDelta = Duration::minutes(35);
+const CACHE_REVALIDATE: TimeDelta = Duration::minutes(5);
 
 pub fn is_user_request_unique(request: Request) -> bool {
     let if_modified_since =
@@ -23,7 +24,12 @@ pub fn is_user_request_unique(request: Request) -> bool {
     return is_unqiue_visitor
 }
 
-pub fn get_user_tracking_headers() -> HeaderMap {
+pub fn get_user_tracking_headers(is_user_unique: bool) -> HeaderMap {
+
+    let age = match is_user_unique {
+        true => CACHE_THESHOLD + CACHE_REVALIDATE,
+        false => CACHE_THESHOLD - CACHE_REVALIDATE,
+    };
 
     let response_headers = [
         (
@@ -46,6 +52,10 @@ pub fn get_user_tracking_headers() -> HeaderMap {
             header::CACHE_CONTROL,
             format!("private, max-age={}", CACHE_THESHOLD.num_seconds())
         ),
+        (
+            header::AGE,
+            age.num_seconds().to_string()
+        )
     ];
     
     

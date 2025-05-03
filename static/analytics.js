@@ -15,7 +15,7 @@
                 "http://localhost:3001/ping",
                 {
                     method: "GET",
-                    cache: "no-cache",
+                    cache: "default",
                     mode: "cors",
                     keepalive: false
                 }

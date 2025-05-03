@@ -124,9 +124,9 @@ async fn ping(
 
     let mut headers = HeaderMap::new();
 
-    let test = get_user_tracking_headers();
+    let user_tracking_headers = get_user_tracking_headers(is_unqiue_visitor);
 
-    headers.extend(test);
+    headers.extend(user_tracking_headers);
 
     return (
         StatusCode::OK,
