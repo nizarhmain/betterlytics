@@ -17,7 +17,7 @@
                     method: "GET",
                     cache: "no-cache",
                     mode: "cors",
-                    keepalive: true
+                    keepalive: false
                 }
             )
                 .then((res) => {

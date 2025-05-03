@@ -139,12 +139,12 @@ async fn ping(
         None => true,
     };
 
-    match is_unqiue_visitor {
-        true => println!("User is unique!"),
-        false => println!("User NOT NEW!"),
-    }
+    let is_unique_response = match is_unqiue_visitor {
+        true => 1,
+        false => 0,
+    };
 
-    let last_modified_header = [
+    let response_headers = [
         (
             header::ACCESS_CONTROL_ALLOW_ORIGIN,
             "*".to_string()
@@ -163,24 +163,14 @@ async fn ping(
         ),
         (
             header::CACHE_CONTROL,
-            "private, max-age=604800".to_string()
-        ),
-        (
-            header::AGE,
-            "1".to_string()
+            format!("private, max-age={}", cache_threshold_minutes.num_seconds())
         ),
     ];
 
-
-    let response_status_code = match is_unqiue_visitor {
-        true => StatusCode::OK,
-        false => StatusCode::NOT_MODIFIED,
-    };
-
     return (
-        response_status_code,
-        last_modified_header,
-        Json(generate_site_id()),
+        StatusCode::OK,
+        response_headers,
+        Json(is_unique_response),
     )
 }
 
