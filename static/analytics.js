@@ -9,33 +9,24 @@
     }
 
     function ping() {
-        return new Promise((resolve, reject) => {
-            
-            fetch(
-                "http://localhost:3001/ping",
-                {
-                    method: "GET",
-                    cache: "default",
-                    mode: "cors",
-                    keepalive: false
-                }
-            )
-                .then((res) => {
-                    console.log(res);
-                    resolve(true);
-                })
-                .catch((error) => {
-                    console.error("Analytics ping failed:", error)
-                    reject();
-                });
-        })
+        return fetch(
+            "http://localhost:3001/ping",
+            {
+                method: "GET",
+                cache: "default",
+                mode: "cors",
+                keepalive: false
+            }
+        )
+            .then((res) => res.json())
+            .catch((error) => console.error("Analytics ping failed:", error));
     }
 
     // Track current path for SPA navigation
     var currentPath = window.location.pathname;
 
-    function trackEvent() {
-        ping();
+    async function trackEvent() {
+        const isUnique = await ping();
 
         var url = window.location.href;
         var referrer = document.referrer || null;
