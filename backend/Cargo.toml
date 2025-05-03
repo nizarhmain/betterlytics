@@ -49,3 +49,4 @@ regex = "1.10"
 
 # Hashing
 sha2 = "0.10"
+woothee = "0.13.0"

@@ -21,6 +21,7 @@ mod processing;
 mod session;
 mod geoip;
 mod geoip_updater;
+mod bot_detection;
 
 use analytics::{AnalyticsEvent, RawTrackingEvent, generate_site_id};
 use db::{Database, SharedDatabase};
