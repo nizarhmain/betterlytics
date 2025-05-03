@@ -1,12 +1,5 @@
 use axum::{
-    extract::State,
-    http::{header, StatusCode},
-    response::IntoResponse,
-    routing::{get, post},
-    Json, Router,
-    response::Html,
-    extract::ConnectInfo,
-    extract::Request,
+    extract::{ConnectInfo, Request, State}, http::{HeaderMap, StatusCode}, response::{Html, IntoResponse}, routing::{get, post}, Json, Router
 };
 use std::sync::Arc;
 use std::net::SocketAddr;
@@ -14,17 +7,18 @@ use tower_http::cors::CorsLayer;
 use tracing::{info, error};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use dotenv::dotenv;
-use chrono::{DateTime, Duration, Utc};
 
 mod config;
 mod analytics;
 mod db;
 mod processing;
 mod session;
+mod tracking;
 
 use analytics::{AnalyticsEvent, RawTrackingEvent, generate_site_id};
 use db::{Database, SharedDatabase};
 use processing::EventProcessor;
+use tracking::{is_user_request_unique, get_user_tracking_headers};
 
 #[tokio::main]
 async fn main() {
@@ -122,56 +116,23 @@ async fn track_event(
 async fn ping(
     request: Request,
 ) -> impl IntoResponse {
-    let if_modified_since =
-        request 
-            .headers()
-            .get(header::IF_MODIFIED_SINCE)
-            .and_then(|header| header.to_str().ok())
-            .and_then(|value| DateTime::parse_from_rfc2822(value).ok())
-            .and_then(|value| Some(value.with_timezone(&Utc)));
-
-    let last_modified = Utc::now() - Duration::seconds(5);
-    
-    let cache_threshold_minutes = Duration::minutes(30);
-
-    let is_unqiue_visitor = match if_modified_since {
-        Some(last_accessed) => last_modified - last_accessed > cache_threshold_minutes,
-        None => true,
-    };
-
+    let is_unqiue_visitor = is_user_request_unique(request);
     let is_unique_response = match is_unqiue_visitor {
         true => 1,
         false => 0,
     };
 
-    let response_headers = [
-        (
-            header::ACCESS_CONTROL_ALLOW_ORIGIN,
-            "*".to_string()
-        ),
-        (
-            header::ACCESS_CONTROL_ALLOW_HEADERS,
-            "If-Modified-Since".to_string()
-        ),
-        (
-            header::ACCESS_CONTROL_EXPOSE_HEADERS,
-            "Cache-Control, Last-Modified".to_string()
-        ),
-        (
-            header::LAST_MODIFIED,
-            last_modified.format("%a, %d %b %Y %H:%M:%S GMT").to_string()
-        ),
-        (
-            header::CACHE_CONTROL,
-            format!("private, max-age={}", cache_threshold_minutes.num_seconds())
-        ),
-    ];
+    let mut headers = HeaderMap::new();
+
+    let test = get_user_tracking_headers();
+
+    headers.extend(test);
 
     return (
         StatusCode::OK,
-        response_headers,
-        Json(is_unique_response),
-    )
+        headers,
+        Json(is_unique_response)
+    );
 }
 
 /// Temporary endpoint to generate a site ID
