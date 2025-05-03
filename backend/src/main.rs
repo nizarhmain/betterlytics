@@ -14,7 +14,7 @@ use tower_http::cors::CorsLayer;
 use tracing::{info, error};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use dotenv::dotenv;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 
 mod config;
 mod analytics;
@@ -127,27 +127,43 @@ async fn ping(
             .headers()
             .get(header::IF_MODIFIED_SINCE)
             .and_then(|header| header.to_str().ok())
-            .and_then(|value| DateTime::parse_from_str(value.trim_end_matches(" GMT"), "%a, %d %b %Y %H:%M:%S").ok())
+            .and_then(|value| DateTime::parse_from_rfc2822(value).ok())
             .and_then(|value| Some(value.with_timezone(&Utc)));
 
-    let last_modified = Utc::now();
+    let last_modified = Utc::now() - Duration::seconds(5);
     
-    // 30 minutes
-    let cache_threshold_minutes: i64 = 30;
+    let cache_threshold_minutes = Duration::minutes(30);
 
     let is_unqiue_visitor = match if_modified_since {
-        Some(last_accessed) => last_modified.signed_duration_since(last_accessed).num_minutes().abs() > cache_threshold_minutes,
+        Some(last_accessed) => last_modified - last_accessed > cache_threshold_minutes,
         None => true,
     };
 
+    match is_unqiue_visitor {
+        true => println!("User is unique!"),
+        false => println!("User NOT NEW!"),
+    }
+
     let last_modified_header = [
+        (
+            header::ACCESS_CONTROL_ALLOW_ORIGIN,
+            "*".to_string()
+        ),
+        (
+            header::ACCESS_CONTROL_ALLOW_HEADERS,
+            "If-Modified-Since".to_string()
+        ),
+        (
+            header::ACCESS_CONTROL_EXPOSE_HEADERS,
+            "Cache-Control, Last-Modified".to_string()
+        ),
         (
             header::LAST_MODIFIED,
             last_modified.format("%a, %d %b %Y %H:%M:%S GMT").to_string()
         ),
         (
             header::CACHE_CONTROL,
-            "private, max-age=604800, immutable".to_string()
+            "private, max-age=604800".to_string()
         ),
         (
             header::AGE,

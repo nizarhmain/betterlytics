@@ -15,9 +15,9 @@
                 "http://localhost:3001/ping",
                 {
                     method: "GET",
-                    cache: "force-cache",
+                    cache: "no-cache",
                     mode: "cors",
-                    keepalive: true,
+                    keepalive: true
                 }
             )
                 .then((res) => {
