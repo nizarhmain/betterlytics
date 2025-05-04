@@ -1,9 +1,12 @@
-"use server";
+'use server';
 
-import { getPageViewsForSite, getUniqueVisitorsForSite, getSummaryStatsForSite, getTopPagesForSite, getDeviceTypeBreakdownForSite, getPageAnalytics } from '@/services/pageviews';
-import { DailyPageViewRow, DailyUniqueVisitorsRow } from '@/entities/pageviews';
-import { TimeGrouping } from '@/utils/timeRanges';
-import { PageAnalytics } from '@/types/analytics';
+import { DailyUniqueVisitorsRow } from "@/entities/pageviews";
+import { DailyPageViewRow } from "@/entities/pageviews";
+import { getDeviceTypeBreakdownForSite } from "@/services/devices";
+import { getPageViewsForSite, getTopPagesForSite } from "@/services/pages";
+import { getSummaryStatsForSite } from "@/services/visitors";
+import { getUniqueVisitorsForSite } from "@/services/visitors";
+import { TimeGrouping } from "@/utils/timeRanges";
 
 export async function fetchPageViewsAction(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyPageViewRow[]> {
   return getPageViewsForSite(siteId, startDate, endDate, groupBy);
@@ -24,7 +27,4 @@ export async function fetchTopPagesAction(siteId: string, startDate: string, end
 export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: string, endDate: string) {
   return getDeviceTypeBreakdownForSite(siteId, startDate, endDate);
 }
-
-export async function fetchPageAnalyticsAction(siteId: string, startDate: string, endDate: string): Promise<PageAnalytics[]> {
-  return getPageAnalytics(siteId, startDate, endDate);
-} 
+  

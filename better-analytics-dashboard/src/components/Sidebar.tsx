@@ -3,11 +3,11 @@ import { LayoutDashboard, FileText, Link2, Globe, Smartphone, BarChart } from "l
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: <LayoutDashboard size={18} /> },
-  { name: "Realtime", href: "/dashboard/realtime", icon: <BarChart size={18} /> },
+  //{ name: "Realtime", href: "/dashboard/realtime", icon: <BarChart size={18} /> },
   { name: "Pages", href: "/dashboard/pages", icon: <FileText size={18} /> },
-  { name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
-  { name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
-  { name: "Devices", href: "/dashboard/devices", icon: <Smartphone size={18} /> },
+  //{ name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
+  //{ name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
+  //{ name: "Devices", href: "/dashboard/devices", icon: <Smartphone size={18} /> },
 ];
 
 export default function Sidebar() {

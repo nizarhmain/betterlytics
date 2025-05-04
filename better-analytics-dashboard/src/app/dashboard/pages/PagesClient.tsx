@@ -5,8 +5,9 @@ import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
 import PagesTable from "@/components/analytics/PagesTable";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from '../actions';
 import { PageAnalytics, SummaryStats } from '@/types/analytics';
+import { fetchSummaryStatsAction } from "../../actions/overview";
+import { fetchPageAnalyticsAction } from "../../actions/pages";
 
 export default function PagesClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");

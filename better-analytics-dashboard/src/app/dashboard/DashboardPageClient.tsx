@@ -7,7 +7,7 @@ import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import { useMemo, useState } from "react";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue, formatDuration } from "@/utils/timeRanges";
 import { useQuery } from '@tanstack/react-query';
-import { fetchSummaryStatsAction, fetchTopPagesAction, fetchDeviceTypeBreakdownAction } from './actions';
+import { fetchDeviceTypeBreakdownAction, fetchSummaryStatsAction, fetchTopPagesAction } from "../actions/overview";
 
 export default function DashboardPageClient({ session }: { session: any }) {
   const [range, setRange] = useState<TimeRangeValue>("7d");
