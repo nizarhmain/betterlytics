@@ -1,4 +1,6 @@
 use std::env;
+use std::path::PathBuf;
+use std::time::Duration;
 
 #[derive(Debug)]
 pub struct Config {
@@ -8,6 +10,12 @@ pub struct Config {
     pub clickhouse_url: String,
     pub clickhouse_user: String,
     pub clickhouse_password: String,
+    // GeoIP configuration
+    pub enable_geolocation: bool,
+    pub maxmind_account_id: Option<String>,
+    pub maxmind_license_key: Option<String>,
+    pub geoip_db_path: PathBuf,
+    pub geoip_update_interval: Duration,
 }
 
 impl Config {
@@ -29,6 +37,21 @@ impl Config {
                 .unwrap_or_else(|_| "default".to_string()),
             clickhouse_password: env::var("CLICKHOUSE_PASSWORD")
                 .unwrap_or_else(|_| "password".to_string()),
+            // GeoIP configuration
+            enable_geolocation: env::var("ENABLE_GEOLOCATION")
+                .map(|val| val.to_lowercase() == "true")
+                .unwrap_or(false),
+            maxmind_account_id: env::var("MAXMIND_ACCOUNT_ID").ok(),
+            maxmind_license_key: env::var("MAXMIND_LICENSE_KEY").ok(),
+            geoip_db_path: env::var("GEOIP_DB_PATH")
+                .map(PathBuf::from)
+                .unwrap_or_else(|_| PathBuf::from("assets/geoip/GeoLite2-Country.mmdb")),
+            geoip_update_interval: Duration::from_secs(
+                env::var("GEOIP_UPDATE_INTERVAL")
+                    .ok()
+                    .and_then(|val| val.parse().ok())
+                    .unwrap_or( 24 * 60 * 60)
+            ),
         }
     }
 } 
