@@ -6,10 +6,11 @@ export async function getDailyUniqueVisitors(siteId: string, startDate: DateStri
   const query = `
     SELECT
       date,
-      unique_visitors
+      uniqMerge(unique_visitors) as unique_visitors
     FROM analytics.daily_unique_visitors FINAL
     WHERE site_id = {site_id:String}
       AND date BETWEEN toDate({start:Date}) AND toDate({end:Date})
+    GROUP BY date
     ORDER BY date DESC
     LIMIT 100
   `;
