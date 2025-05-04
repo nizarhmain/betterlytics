@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
 import { fetchUniqueVisitorsAction } from '@/app/actions/overview';
-import { DailyUniqueVisitorsRow } from "@/entities/pageviews";
+import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { getGroupingForRange, TimeGrouping } from '@/utils/timeRanges';
 
