@@ -11,7 +11,7 @@ export async function getDailyPageViews(siteId: string, startDate: string, endDa
     WHERE site_id = {site_id:String}
       AND date >= {start_date:Date}
       AND date <= {end_date:Date}
-    ORDER BY date DESC, views DESC
+    ORDER BY date ASC, views DESC
     LIMIT 100
   `;
   const result = await clickhouse.query(query, {
@@ -41,13 +41,14 @@ export async function getTotalPageviews(siteId: string, startDate: string, endDa
 export async function getDailyUniqueVisitors(siteId: string, startDate: string, endDate: string): Promise<DailyUniqueVisitorsRow[]> {
   const query = `
     SELECT
-      toDate(timestamp) as date,
-      uniqExact(session_id) as unique_visitors
-    FROM analytics.events
+      toStartOfDay(timestamp) as date,
+      sum(unique_sessions) as unique_visitors
+    FROM analytics.daily_unique_visitors
     WHERE site_id = {site_id:String}
-      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND date >= {start:DateTime}
+      AND date <= {end:DateTime}
     GROUP BY date
-    ORDER BY date DESC
+    ORDER BY date ASC
     LIMIT 100
   `;
 
@@ -72,7 +73,7 @@ export async function getHourlyPageViews(siteId: string, startDate: string, endD
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
     GROUP BY date, url
-    ORDER BY date DESC, views DESC
+    ORDER BY date ASC, views DESC
     LIMIT 100
   `;
   const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
@@ -95,7 +96,7 @@ export async function getMinutePageViews(siteId: string, startDate: string, endD
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
     GROUP BY date, url
-    ORDER BY date DESC, views DESC
+    ORDER BY date ASC, views DESC
     LIMIT 100
   `;
   const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
@@ -118,7 +119,7 @@ export async function getHourlyUniqueVisitors(siteId: string, startDate: string,
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
     GROUP BY date
-    ORDER BY date DESC
+    ORDER BY date ASC
     LIMIT 100
   `;
 
@@ -144,7 +145,7 @@ export async function getMinuteUniqueVisitors(siteId: string, startDate: string,
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
     GROUP BY date
-    ORDER BY date DESC
+    ORDER BY date ASC
     LIMIT 100
   `;
 
