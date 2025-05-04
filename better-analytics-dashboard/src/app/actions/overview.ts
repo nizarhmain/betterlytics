@@ -1,6 +1,6 @@
 'use server';
 
-import { DailyUniqueVisitorsRow } from "@/entities/pageviews";
+import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { DailyPageViewRow } from "@/entities/pageviews";
 import { getDeviceTypeBreakdownForSite } from "@/services/devices";
 import { getPageViewsForSite, getTopPagesForSite } from "@/services/pages";

@@ -1,5 +1,5 @@
 import { clickhouse } from '@/lib/clickhouse';
-import { DailyUniqueVisitorsRow } from '@/entities/pageviews';
+import { DailyUniqueVisitorsRow } from '@/entities/visitors';
 import { DateString, DateTimeString } from '@/types/dates';
 
 export async function getDailyUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString): Promise<DailyUniqueVisitorsRow[]> {
