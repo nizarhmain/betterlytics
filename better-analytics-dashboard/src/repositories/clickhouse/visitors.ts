@@ -1,14 +1,15 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyUniqueVisitorsRow } from '@/entities/pageviews';
+import { DateString, DateTimeString } from '@/types/dates';
 
-export async function getDailyUniqueVisitors(siteId: string, startDate: string, endDate: string): Promise<DailyUniqueVisitorsRow[]> {
+export async function getDailyUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString): Promise<DailyUniqueVisitorsRow[]> {
   const query = `
     SELECT
       date,
       unique_visitors
     FROM analytics.daily_unique_visitors FINAL
     WHERE site_id = {site_id:String}
-      AND date BETWEEN toDate({start:DateTime}) AND toDate({end:DateTime})
+      AND date BETWEEN toDate({start:Date}) AND toDate({end:Date})
     ORDER BY date DESC
     LIMIT 100
   `;
@@ -26,7 +27,7 @@ export async function getDailyUniqueVisitors(siteId: string, startDate: string, 
   }));
 }
 
-export async function getHourlyUniqueVisitors(siteId: string, startDate: string, endDate: string): Promise<DailyUniqueVisitorsRow[]> {
+export async function getHourlyUniqueVisitors(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyUniqueVisitorsRow[]> {
   const query = `
     SELECT
       toStartOfHour(timestamp) as date,
@@ -52,7 +53,7 @@ export async function getHourlyUniqueVisitors(siteId: string, startDate: string,
   }));
 }
 
-export async function getMinuteUniqueVisitors(siteId: string, startDate: string, endDate: string): Promise<DailyUniqueVisitorsRow[]> {
+export async function getMinuteUniqueVisitors(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyUniqueVisitorsRow[]> {
   const query = `
     SELECT
       toStartOfMinute(timestamp) as date,
@@ -80,14 +81,14 @@ export async function getMinuteUniqueVisitors(siteId: string, startDate: string,
 
 export async function getTotalUniqueVisitors(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: DateString,
+  endDate: DateString
 ): Promise<number> {
   const query = `
     SELECT uniqMerge(unique_visitors) as unique_visitors
     FROM analytics.daily_unique_visitors FINAL
     WHERE site_id = {site_id:String}
-      AND date BETWEEN toDate({start:DateTime}) AND toDate({end:DateTime})
+      AND date BETWEEN toDate({start:Date}) AND toDate({end:Date})
   `;
 
   const result = await clickhouse.query(query, {
@@ -102,8 +103,8 @@ export async function getTotalUniqueVisitors(
 
 export async function getSessionMetrics(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: DateTimeString,
+  endDate: DateTimeString
 ): Promise<{
   total_sessions: number;
   multi_page_sessions: number;

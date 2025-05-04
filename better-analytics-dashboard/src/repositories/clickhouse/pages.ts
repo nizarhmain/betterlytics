@@ -1,9 +1,10 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyPageViewRowSchema, DailyPageViewRow } from '@/entities/pageviews';
 import { PageAnalytics } from '@/types/analytics';
-import { formatDuration } from '@/utils/timeRanges';
+import { formatDuration } from '@/utils/dateFormatters';
+import { DateString, DateTimeString } from '@/types/dates';
 
-export async function getDailyPageViews(siteId: string, startDate: string, endDate: string): Promise<DailyPageViewRow[]> {
+export async function getDailyPageViews(siteId: string, startDate: DateString, endDate: DateString): Promise<DailyPageViewRow[]> {
   const query = `
     SELECT date, url, views
     FROM analytics.daily_page_views FINAL
@@ -23,7 +24,7 @@ export async function getDailyPageViews(siteId: string, startDate: string, endDa
   return result.map(row => DailyPageViewRowSchema.parse(row));
 }
 
-export async function getTotalPageviews(siteId: string, startDate: string, endDate: string): Promise<number> {
+export async function getTotalPageviews(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<number> {
   const query = `
     SELECT count() as pageviews
     FROM analytics.events
@@ -37,7 +38,7 @@ export async function getTotalPageviews(siteId: string, startDate: string, endDa
   return Number(result[0]?.pageviews ?? 0);
 }
 
-export async function getHourlyPageViews(siteId: string, startDate: string, endDate: string): Promise<DailyPageViewRow[]> {
+export async function getHourlyPageViews(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyPageViewRow[]> {
   const query = `
     SELECT toStartOfHour(timestamp) as date, url, count() as views
     FROM analytics.events
@@ -60,7 +61,7 @@ export async function getHourlyPageViews(siteId: string, startDate: string, endD
   });
 }
 
-export async function getMinutePageViews(siteId: string, startDate: string, endDate: string): Promise<DailyPageViewRow[]> {
+export async function getMinutePageViews(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyPageViewRow[]> {
   const query = `
     SELECT toStartOfMinute(timestamp) as date, url, count() as views
     FROM analytics.events
@@ -84,8 +85,8 @@ export async function getMinutePageViews(siteId: string, startDate: string, endD
 
 export async function getTopPages(
   siteId: string,
-  startDate: string,
-  endDate: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString,
   limit = 5
 ): Promise<{ url: string; visitors: number }[]> {
   const query = `
@@ -117,8 +118,8 @@ export async function getTopPages(
 
 export async function getPageMetrics(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: DateTimeString,
+  endDate: DateTimeString
 ): Promise<PageAnalytics[]> {
   const query = `
     WITH 

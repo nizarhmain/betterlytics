@@ -1,6 +1,7 @@
 import { clickhouse } from '@/lib/clickhouse';
+import { DateTimeString } from '@/types/dates';
 
-export async function getDeviceTypeBreakdown(siteId: string, startDate: string, endDate: string): Promise<{ device_type: string, visitors: number }[]> {
+export async function getDeviceTypeBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<{ device_type: string, visitors: number }[]> {
   const query = `
     SELECT device_type, uniqExact(visitor_id) as visitors
     FROM analytics.events

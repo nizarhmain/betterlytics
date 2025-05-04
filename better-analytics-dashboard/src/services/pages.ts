@@ -9,7 +9,8 @@ import {
   getTotalPageviews
 } from '@/repositories/clickhouse';
 import { DailyPageViewRow } from '@/entities/pageviews';
-import { toDateString, toDateTimeString, TimeGrouping } from '@/utils/timeRanges';
+import { toDateString, toDateTimeString } from '@/utils/dateFormatters';
+import { TimeGrouping } from '@/utils/timeRanges';
 import { PageAnalytics } from '@/types/analytics';
 
 export async function getPageViewsForSite(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyPageViewRow[]> {

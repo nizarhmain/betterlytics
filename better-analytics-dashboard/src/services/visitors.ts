@@ -8,15 +8,17 @@ import {
   getTotalPageviews,
   getSessionMetrics
 } from '@/repositories/clickhouse';
-import { toDateTimeString, TimeGrouping } from '@/utils/timeRanges';
+import { toDateTimeString, toDateString } from '@/utils/dateFormatters';
+import { TimeGrouping } from '@/utils/timeRanges';
 
 export async function getUniqueVisitorsForSite(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping) {
+  if (groupBy === 'day') {
+    return getDailyUniqueVisitors(siteId, toDateString(startDate), toDateString(endDate));
+  }
+  
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
   
-  if (groupBy === 'day') {
-    return getDailyUniqueVisitors(siteId, formattedStart, formattedEnd);
-  }
   if (groupBy === 'hour') {
     return getHourlyUniqueVisitors(siteId, formattedStart, formattedEnd);
   }
@@ -25,7 +27,7 @@ export async function getUniqueVisitorsForSite(siteId: string, startDate: string
 
 export async function getSummaryStatsForSite(siteId: string, startDate: string, endDate: string) {
   const [uniqueVisitors, pageviews, sessionMetrics] = await Promise.all([
-    getTotalUniqueVisitors(siteId, toDateTimeString(startDate), toDateTimeString(endDate)),
+    getTotalUniqueVisitors(siteId, toDateString(startDate), toDateString(endDate)),
     getTotalPageviews(siteId, toDateTimeString(startDate), toDateTimeString(endDate)),
     getSessionMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate))
   ]);
