@@ -4,12 +4,11 @@ import { DailyUniqueVisitorsRow } from '@/entities/pageviews';
 export async function getDailyUniqueVisitors(siteId: string, startDate: string, endDate: string): Promise<DailyUniqueVisitorsRow[]> {
   const query = `
     SELECT
-      toDate(timestamp) as date,
-      uniqExact(session_id) as unique_visitors
-    FROM analytics.events
+      date,
+      unique_visitors
+    FROM analytics.daily_unique_visitors FINAL
     WHERE site_id = {site_id:String}
-      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-    GROUP BY date
+      AND date BETWEEN toDate({start:DateTime}) AND toDate({end:DateTime})
     ORDER BY date DESC
     LIMIT 100
   `;
@@ -85,10 +84,10 @@ export async function getTotalUniqueVisitors(
   endDate: string
 ): Promise<number> {
   const query = `
-    SELECT uniqExact(session_id) as unique_visitors
-    FROM analytics.events
+    SELECT uniqMerge(unique_visitors) as unique_visitors
+    FROM analytics.daily_unique_visitors FINAL
     WHERE site_id = {site_id:String}
-      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND date BETWEEN toDate({start:DateTime}) AND toDate({end:DateTime})
   `;
 
   const result = await clickhouse.query(query, {
