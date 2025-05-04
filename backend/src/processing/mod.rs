@@ -2,13 +2,13 @@ use anyhow::Result;
 use tokio::sync::mpsc;
 use crate::analytics::{AnalyticsEvent, generate_fingerprint};
 use crate::db::SharedDatabase;
-use crate::config::Config;
 use crate::geoip::GeoIpService;
 use tracing::{error, debug};
 use crate::session;
 use r2d2::Pool;
 use redis::Client as RedisClient;
 use std::sync::Arc;
+use crate::bot_detection;
 
 #[derive(Debug, Clone)]
 pub struct ProcessedEvent {
@@ -137,9 +137,7 @@ impl EventProcessor {
 
     /// Detect if the request is from a bot
     async fn detect_bot(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        debug!("Detecting bot!");
-        // TODO: Implement bot detection
-        processed.is_bot = false;
+        processed.is_bot = bot_detection::is_bot(&processed.user_agent);
         Ok(())
     }
 
