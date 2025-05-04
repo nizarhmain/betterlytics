@@ -1,7 +1,6 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyPageViewRowSchema, DailyPageViewRow } from '@/entities/pageviews';
-import { PageAnalytics } from '@/types/analytics';
-import { formatDuration } from '@/utils/dateFormatters';
+import { PageAnalytics, PageAnalyticsSchema } from '@/entities/pages';
 import { DateString, DateTimeString } from '@/types/dates';
 
 export async function getDailyPageViews(siteId: string, startDate: DateString, endDate: DateString): Promise<DailyPageViewRow[]> {
@@ -51,7 +50,7 @@ export async function getHourlyPageViews(siteId: string, startDate: DateTimeStri
   `;
   const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
   
-  return result.map(row => {
+  const mappedResults = result.map(row => {
     const r = row as any;
     return {
       date: r.date,
@@ -59,6 +58,8 @@ export async function getHourlyPageViews(siteId: string, startDate: DateTimeStri
       views: Number(r.views),
     };
   });
+  
+  return DailyPageViewRowSchema.array().parse(mappedResults);
 }
 
 export async function getMinutePageViews(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyPageViewRow[]> {
@@ -73,7 +74,8 @@ export async function getMinutePageViews(siteId: string, startDate: DateTimeStri
     LIMIT 100
   `;
   const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
-  return result.map(row => {
+  
+  const mappedResults = result.map(row => {
     const r = row as any;
     return {
       date: r.date,
@@ -81,6 +83,8 @@ export async function getMinutePageViews(siteId: string, startDate: DateTimeStri
       views: Number(r.views),
     };
   });
+  
+  return DailyPageViewRowSchema.array().parse(mappedResults);
 }
 
 export async function getTopPages(
@@ -170,12 +174,14 @@ export async function getPageMetrics(
     format: 'JSONEachRow',
   }).toPromise() as any[];
 
-  return result.map(row => ({
+  const mappedResults = result.map(row => ({
     path: row.path,
     title: row.path,
     visitors: Number(row.visitors),
     pageviews: Number(row.pageviews),
     bounceRate: Number(row.bounceRate ?? 0),
-    avgTime: formatDuration(Number(row.avgTime ?? 0))
+    avgTime: Number(row.avgTime ?? 0)
   }));
+
+  return PageAnalyticsSchema.array().parse(mappedResults);
 } 

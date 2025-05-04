@@ -1,5 +1,5 @@
 import { clickhouse } from '@/lib/clickhouse';
-import { DailyUniqueVisitorsRow } from '@/entities/visitors';
+import { DailyUniqueVisitorsRow, DailyUniqueVisitorsRowSchema } from '@/entities/visitors';
 import { DateString, DateTimeString } from '@/types/dates';
 
 export async function getDailyUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString): Promise<DailyUniqueVisitorsRow[]> {
@@ -48,10 +48,13 @@ export async function getHourlyUniqueVisitors(siteId: string, startDate: DateTim
       end: endDate,
     },
   }).toPromise() as any[];
-  return result.map(row => ({
+  
+  const mappedResults = result.map(row => ({
     date: row.date,
     unique_visitors: Number(row.unique_visitors),
   }));
+  
+  return DailyUniqueVisitorsRowSchema.array().parse(mappedResults);
 }
 
 export async function getMinuteUniqueVisitors(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyUniqueVisitorsRow[]> {
@@ -74,10 +77,13 @@ export async function getMinuteUniqueVisitors(siteId: string, startDate: DateTim
       end: endDate,
     },
   }).toPromise() as any[];
-  return result.map(row => ({
+  
+  const mappedResults = result.map(row => ({
     date: row.date,
     unique_visitors: Number(row.unique_visitors),
   }));
+  
+  return DailyUniqueVisitorsRowSchema.array().parse(mappedResults);
 }
 
 export async function getTotalUniqueVisitors(

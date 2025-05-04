@@ -10,6 +10,7 @@ import {
 } from '@/repositories/clickhouse';
 import { toDateTimeString, toDateString } from '@/utils/dateFormatters';
 import { TimeGrouping } from '@/utils/timeRanges';
+import { SummaryStatsSchema } from '@/entities/stats';
 
 export async function getUniqueVisitorsForSite(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping) {
   if (groupBy === 'day') {
@@ -32,7 +33,7 @@ export async function getSummaryStatsForSite(siteId: string, startDate: string, 
     getSessionMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate))
   ]);
 
-  return {
+  const stats = {
     uniqueVisitors,
     pageviews,
     bounceRate: sessionMetrics.total_sessions > 0 
@@ -42,4 +43,6 @@ export async function getSummaryStatsForSite(siteId: string, startDate: string, 
       ? Math.round(sessionMetrics.total_duration / sessionMetrics.multi_page_sessions)
       : 0
   };
+
+  return SummaryStatsSchema.parse(stats);
 }

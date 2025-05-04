@@ -6,17 +6,20 @@ import {
   getMinutePageViews,
   getTopPages,
   getPageMetrics,
-  getTotalPageviews
 } from '@/repositories/clickhouse';
 import { DailyPageViewRow } from '@/entities/pageviews';
 import { toDateString, toDateTimeString } from '@/utils/dateFormatters';
 import { TimeGrouping } from '@/utils/timeRanges';
-import { PageAnalytics } from '@/types/analytics';
+import { PageAnalytics } from '@/entities/pages';
 
 export async function getPageViewsForSite(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyPageViewRow[]> {
   if (groupBy === 'day') return getDailyPageViews(siteId, toDateString(startDate), toDateString(endDate));
-  if (groupBy === 'hour') return getHourlyPageViews(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
-  return getMinutePageViews(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+  
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  
+  if (groupBy === 'hour') return getHourlyPageViews(siteId, formattedStart, formattedEnd);
+  return getMinutePageViews(siteId, formattedStart, formattedEnd);
 }
 
 export async function getTopPagesForSite(siteId: string, startDate: string, endDate: string, limit = 5) {
