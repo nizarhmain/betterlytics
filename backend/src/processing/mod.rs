@@ -9,6 +9,10 @@ use r2d2::Pool;
 use redis::Client as RedisClient;
 use std::sync::Arc;
 use crate::bot_detection;
+use woothee::parser::Parser;
+use once_cell::sync::Lazy;
+
+static USER_AGENT_PARSER: Lazy<Parser> = Lazy::new(|| Parser::new());
 
 #[derive(Debug, Clone)]
 pub struct ProcessedEvent {
@@ -26,7 +30,7 @@ pub struct ProcessedEvent {
     /// Operating system - Parsed from user_agent string
     pub os: Option<String>,
     /// Device type (mobile, desktop, tablet) - Parsed from user_agent string
-    pub device_type: String,
+    pub device_type: Option<String>,
     pub site_id: String,
     pub visitor_fingerprint: String,
     pub timestamp: chrono::DateTime<chrono::Utc>,
@@ -65,7 +69,7 @@ impl EventProcessor {
             browser: None,
             browser_version: None,
             os: None,
-            device_type: "unknown".to_string(),
+            device_type: None,
             site_id: site_id.clone(),
             visitor_fingerprint: String::new(),
             timestamp: timestamp.clone(),
@@ -144,10 +148,26 @@ impl EventProcessor {
     /// Parse user agent to extract browser and OS information
     async fn parse_user_agent(&self, processed: &mut ProcessedEvent) -> Result<()> {
         debug!("Parsing user agent: {:?}", processed.user_agent);
-        // TODO: Implement user agent parsing
-        processed.browser = None;
-        processed.browser_version = None;
-        processed.os = None;
+        
+        if let Some(result) = USER_AGENT_PARSER.parse(&processed.user_agent) {
+            // Extract browser information
+            processed.browser = Some(result.name.to_string());
+            processed.browser_version = Some(result.version.to_string());
+            
+            // Extract OS information
+            processed.os = Some(result.os.to_string());
+            
+            // Extract device type
+            processed.device_type = Some(result.category.to_string());
+            
+            debug!(
+                "User agent parsed: browser={:?}, version={:?}, os={:?}, device_type={:?}",
+                processed.browser, processed.browser_version, processed.os, processed.device_type
+            );
+        } else {
+            debug!("Failed to parse user agent: {}", processed.user_agent);
+        }
+        
         Ok(())
     }
     
@@ -155,16 +175,16 @@ impl EventProcessor {
         if let Some((w, _h)) = processed.event.raw.screen_resolution.split_once('x') {
             if let Ok(width) = w.trim().parse::<u32>() {
                 match width {
-                    0..=575 => processed.device_type = "mobile".to_string(),
-                    576..=991 => processed.device_type = "tablet".to_string(),
-                    992..=1439 => processed.device_type = "laptop".to_string(),
-                    _ => processed.device_type = "desktop".to_string(),
+                    0..=575 => processed.device_type = Some("mobile".to_string()),
+                    576..=991 => processed.device_type = Some("tablet".to_string()),
+                    992..=1439 => processed.device_type = Some("laptop".to_string()),
+                    _ => processed.device_type = Some("desktop".to_string()),
                 }
             } else {
-                processed.device_type = "unknown".to_string();
+                processed.device_type = Some("unknown".to_string());
             }
         } else {
-            processed.device_type = "unknown".to_string();
+            processed.device_type = Some("unknown".to_string());
         }
 
         Ok(())
