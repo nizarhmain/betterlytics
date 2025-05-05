@@ -5,7 +5,8 @@
     "dev": "pnpm --filter better-analytics-dashboard dev",
     "build": "pnpm --filter better-analytics-dashboard build",
     "start": "pnpm --filter better-analytics-dashboard start",
-    "migrate": "node scripts/run-migration.js"
+    "migrate": "node scripts/run-migration.js",
+    "performance": "k6 run -e TARGET_URL=http://localhost:3001/track -e VUS=100 -e DURATION=15s k6-perf-test.js"
   },
   "packageManager": "pnpm@10.9.0",
   "dependencies": {
