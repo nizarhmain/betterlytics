@@ -52,7 +52,7 @@ export default function DevicesClient() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
         <SummaryCard
           title="Distinct Device Types"
@@ -70,7 +70,16 @@ export default function DevicesClient() {
         />
         <SummaryCard
           title="Most Popular Operating System"
-          value={'Not implemented'}
+          value={deviceSummary?.topOs ? 
+            `${deviceSummary.topOs.name} (${deviceSummary.topOs.percentage}%)` : 
+            'Unknown'}
+          changeText=""
+        />
+        <SummaryCard
+          title="Most Popular Browser"
+          value={deviceSummary?.topBrowser ? 
+            `${deviceSummary.topBrowser.name} (${deviceSummary.topBrowser.percentage}%)` : 
+            'Unknown'}
           changeText=""
         />
       </div>

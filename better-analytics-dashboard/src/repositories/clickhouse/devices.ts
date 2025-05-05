@@ -1,6 +1,10 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DateTimeString } from '@/types/dates';
-import { DeviceType, DeviceTypeSchema, BrowserInfoSchema, BrowserInfo } from '@/entities/devices';
+import { 
+  DeviceType, DeviceTypeSchema, 
+  BrowserInfoSchema, BrowserInfo, 
+  OperatingSystemInfoSchema, OperatingSystemInfo
+} from '@/entities/devices';
 
 export async function getDeviceTypeBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DeviceType[]> {
   const query = `
@@ -26,9 +30,7 @@ export async function getDeviceTypeBreakdown(siteId: string, startDate: DateTime
 
 export async function getBrowserBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<BrowserInfo[]> {
   const query = `
-    SELECT 
-      if(browser = '' OR browser IS NULL, 'unknown', browser) as browser,
-      uniqExact(visitor_id) as visitors
+    SELECT browser, uniqExact(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp >= {start:DateTime}
@@ -47,3 +49,26 @@ export async function getBrowserBreakdown(siteId: string, startDate: DateTimeStr
   
   return BrowserInfoSchema.array().parse(mappedResults);
 } 
+
+export async function getOperatingSystemBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<OperatingSystemInfo[]> {
+  const query = `
+    SELECT os, uniqExact(visitor_id) as visitors
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND timestamp >= {start:DateTime}
+      AND timestamp <= {end:DateTime}
+    GROUP BY os
+    ORDER BY visitors DESC
+  `;
+  
+  const result = await clickhouse.query(query, {
+    params: { site_id: siteId, start: startDate, end: endDate },
+  }).toPromise() as any[];
+  
+  const mappedResults = result.map(row => ({
+    os: row.os,
+    visitors: Number(row.visitors)
+  }));
+  
+  return OperatingSystemInfoSchema.array().parse(mappedResults);
+}

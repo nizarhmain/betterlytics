@@ -10,23 +10,38 @@ export const BrowserInfoSchema = z.object({
   visitors: z.number(),
 });
 
+export const OperatingSystemInfoSchema = z.object({
+  os: z.string(),
+  visitors: z.number(),
+});
+
 export const BrowserStatsSchema = z.object({
-    browser: z.string(),
+  browser: z.string(),
   visitors: z.number(),
   percentage: z.number(),
 });
-
 
 export const DeviceSummarySchema = z.object({
     distinctDeviceCount: z.number(),
     topDevice: z.object({
         name: z.string(),
         visitors: z.number(),
-    percentage: z.number(),
-}),
+        percentage: z.number(),
+    }),
+    topBrowser: z.object({
+        name: z.string(),
+        visitors: z.number(),
+        percentage: z.number(),
+    }),
+    topOs: z.object({
+        name: z.string(),
+        visitors: z.number(),
+        percentage: z.number(),
+    }),
 });
 
 export type BrowserInfo = z.infer<typeof BrowserInfoSchema>;
 export type BrowserStats = z.infer<typeof BrowserStatsSchema>;
+export type OperatingSystemInfo = z.infer<typeof OperatingSystemInfoSchema>;
 export type DeviceType = z.infer<typeof DeviceTypeSchema>;
-export type DeviceSummary = z.infer<typeof DeviceSummarySchema>; 
+export type DeviceSummary = z.infer<typeof DeviceSummarySchema>;

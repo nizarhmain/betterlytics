@@ -1,8 +1,8 @@
 'server-only';
 
-import { getDeviceTypeBreakdown, getBrowserBreakdown } from '@/repositories/clickhouse/devices';
+import { getDeviceTypeBreakdown, getBrowserBreakdown, getOperatingSystemBreakdown } from '@/repositories/clickhouse/devices';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { DeviceType, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema } from '@/entities/devices';
+import { DeviceType, BrowserInfo, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema, OperatingSystemInfo } from '@/entities/devices';
 import { getDeviceLabel } from '@/constants/deviceTypes';
 
 export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: string, endDate: string): Promise<DeviceType[]> {
@@ -10,37 +10,29 @@ export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: s
 }
 
 export async function getDeviceSummaryForSite(siteId: string, startDate: string, endDate: string): Promise<DeviceSummary> {
-  const deviceBreakdown = await getDeviceTypeBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+  const startDateTime = toDateTimeString(startDate);
+  const endDateTime = toDateTimeString(endDate);
+
+  const [deviceBreakdown, browserBreakdown, osBreakdown] = await Promise.all([
+    getDeviceTypeBreakdown(siteId, startDateTime, endDateTime),
+    getBrowserBreakdown(siteId, startDateTime, endDateTime),
+    getOperatingSystemBreakdown(siteId, startDateTime, endDateTime)
+  ]);
+
+  const distinctDeviceCount = deviceBreakdown.length;
   
-  if (deviceBreakdown.length === 0) {
-    return {
-      distinctDeviceCount: 0,
-      topDevice: {
-        name: 'Unknown',
-        visitors: 0,
-        percentage: 0
-      }
-    };
-  }
-  
-  // Calculate total visitors for percentage calculation
-  const totalVisitors = deviceBreakdown.reduce((sum, device) => sum + device.visitors, 0);
-  
-  // Find the top device
-  const topDevice = [...deviceBreakdown].sort((a, b) => b.visitors - a.visitors)[0];
-  
-  // Calculate percentage for top device
-  const percentage = Math.round((topDevice.visitors / totalVisitors) * 100);
-  
+  // Calculate top item for each category
+  const topDevice = calculateTopItem<DeviceType>(deviceBreakdown, 'device_type');
+  const topBrowser = calculateTopItem<BrowserInfo>(browserBreakdown, 'browser');
+  const topOs = calculateTopItem<OperatingSystemInfo>(osBreakdown, 'os');
+
   const summary = {
-    distinctDeviceCount: deviceBreakdown.length,
-    topDevice: {
-      name: getDeviceLabel(topDevice.device_type),
-      visitors: topDevice.visitors,
-      percentage
-    }
+    distinctDeviceCount,
+    topDevice,
+    topBrowser,
+    topOs,
   };
-  
+
   return DeviceSummarySchema.parse(summary);
 }
 
@@ -58,3 +50,29 @@ export async function getBrowserBreakdownForSite(siteId: string, startDate: stri
   
   return BrowserStatsSchema.array().parse(statsWithPercentages);
 }
+
+// Helper to find top item and calculate percentage from a breakdown list
+const calculateTopItem = <T extends { visitors: number }>(breakdown: T[], nameKey: keyof T) => {
+  if (breakdown.length === 0) {
+    return { name: 'None', visitors: 0, percentage: 0 };
+  }
+  
+  const totalVisitorsInCategory = breakdown.reduce((sum, item) => sum + item.visitors, 0);
+  
+  const topItem = breakdown.reduce((max, item) => item.visitors > max.visitors ? item : max, breakdown[0]);
+
+  const percentage = totalVisitorsInCategory > 0 
+      ? Math.round((topItem.visitors / totalVisitorsInCategory) * 100) 
+      : 0;
+
+  let name = String(topItem[nameKey]);
+  if (nameKey === 'device_type') {
+      name = getDeviceLabel(name);
+  }
+
+  return {
+    name: name,
+    visitors: topItem.visitors,
+    percentage,
+  };
+};
