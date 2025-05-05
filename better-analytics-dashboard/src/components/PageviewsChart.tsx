@@ -41,7 +41,7 @@ export default function PageviewsChart({ siteId, startDate, endDate }: Pageviews
             <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
             <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} width={48} />
             <Tooltip />
-            {urls.map((url, idx) => (
+            {urls.map((url) => (
               <Line key={url} type="monotone" dataKey={url} stroke={`#a78bfa`} strokeWidth={3} dot={false} />
             ))}
           </LineChart>

@@ -6,8 +6,8 @@ import SummaryCard from "@/components/SummaryCard";
 import PagesTable from "@/components/analytics/PagesTable";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
 import { SummaryStats } from '@/entities/stats';
-import { fetchSummaryStatsAction } from "../../actions/overview";
-import { fetchPageAnalyticsAction } from "../../actions/pages";
+import { fetchSummaryStatsAction } from "@/app/actions/overview";
+import { fetchPageAnalyticsAction } from "@/app/actions/pages";
 import { PageAnalytics } from "@/entities/pages";
 
 export default function PagesClient() {
