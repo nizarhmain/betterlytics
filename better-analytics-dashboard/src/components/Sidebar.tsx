@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, FileText } from "lucide-react";
+import { LayoutDashboard, FileText, Smartphone } from "lucide-react";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: <LayoutDashboard size={18} /> },
