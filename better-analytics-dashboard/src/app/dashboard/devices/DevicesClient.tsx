@@ -94,8 +94,8 @@ export default function DevicesClient() {
           />
         </div>
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Browsers</h2>
-          <p className="text-sm text-gray-500 mb-4">Visitors by browser</p>
+          <h2 className="text-lg font-bold text-gray-900 mb-1">Top Browsers</h2>
+          <p className="text-sm text-gray-500 mb-4">Most common browsers</p>
           <BrowserTable 
             data={browserStats} 
             isLoading={browserStatsLoading} 
