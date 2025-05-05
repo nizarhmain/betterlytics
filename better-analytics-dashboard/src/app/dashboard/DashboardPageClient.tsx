@@ -5,9 +5,10 @@ import VisitorsChart from "@/components/VisitorsChart";
 import TopPagesTable from '@/components/TopPagesTable';
 import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import { useMemo, useState } from "react";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue, formatDuration } from "@/utils/timeRanges";
+import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
 import { useQuery } from '@tanstack/react-query';
-import { fetchSummaryStatsAction, fetchTopPagesAction, fetchDeviceTypeBreakdownAction } from './actions';
+import { fetchDeviceTypeBreakdownAction, fetchSummaryStatsAction, fetchTopPagesAction } from "../actions/overview";
+import { formatDuration } from "@/utils/dateFormatters";
 
 export default function DashboardPageClient({ session }: { session: any }) {
   const [range, setRange] = useState<TimeRangeValue>("7d");

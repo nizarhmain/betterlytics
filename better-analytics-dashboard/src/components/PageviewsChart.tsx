@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
-import { fetchPageViewsAction } from '@/app/dashboard/actions';
+import { fetchPageViewsAction } from '@/app/actions/overview';
 import { DailyPageViewRow } from "@/entities/pageviews";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { getGroupingForRange, TimeGrouping } from '@/utils/timeRanges';

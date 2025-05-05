@@ -1,30 +1,36 @@
-"use server";
+'use server';
 
-import { getPageViewsForSite, getUniqueVisitorsForSite, getSummaryStatsForSite, getTopPagesForSite, getDeviceTypeBreakdownForSite, getPageAnalytics } from '@/services/pageviews';
-import { DailyPageViewRow, DailyUniqueVisitorsRow } from '@/entities/pageviews';
-import { TimeGrouping } from '@/utils/timeRanges';
-import { PageAnalytics } from '@/types/analytics';
+import { DailyUniqueVisitorsRow } from "@/entities/visitors";
+import { DailyPageViewRow } from "@/entities/pageviews";
+import { getDeviceTypeBreakdownForSite } from "@/services/devices";
+import { getPageViewsForSite, getTopPagesForSite } from "@/services/pages";
+import { getSummaryStatsForSite } from "@/services/visitors";
+import { getUniqueVisitorsForSite } from "@/services/visitors";
+import { TimeGrouping } from "@/utils/timeRanges";
+import { checkAuth } from "@/lib/auth-actions";
 
 export async function fetchPageViewsAction(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyPageViewRow[]> {
+  await checkAuth();
   return getPageViewsForSite(siteId, startDate, endDate, groupBy);
 }
 
 export async function fetchUniqueVisitorsAction(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyUniqueVisitorsRow[]> {
+  await checkAuth();
   return getUniqueVisitorsForSite(siteId, startDate, endDate, groupBy);
 }
 
 export async function fetchSummaryStatsAction(siteId: string, startDate: string, endDate: string) {
+  await checkAuth();
   return getSummaryStatsForSite(siteId, startDate, endDate);
 }
 
 export async function fetchTopPagesAction(siteId: string, startDate: string, endDate: string, limit: number) {
+  await checkAuth();
   return getTopPagesForSite(siteId, startDate, endDate, limit);
 }
 
 export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: string, endDate: string) {
+  await checkAuth();
   return getDeviceTypeBreakdownForSite(siteId, startDate, endDate);
 }
-
-export async function fetchPageAnalyticsAction(siteId: string, startDate: string, endDate: string): Promise<PageAnalytics[]> {
-  return getPageAnalytics(siteId, startDate, endDate);
-} 
+  
