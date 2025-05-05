@@ -10,5 +10,5 @@ export default async function DashboardPage() {
     redirect("/")
   }
 
-  return <DashboardPageClient session={session} />
+  return <DashboardPageClient/>
 } 

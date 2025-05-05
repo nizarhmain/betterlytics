@@ -14,10 +14,15 @@ export function toDateTimeString(date: string | Date): DateTimeString {
 
 // Helper function to format duration in a user-friendly way
 export function formatDuration(seconds: number): string {
-  if (seconds < 60) {
-    return `${seconds}s`;
-  }
-  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
-  return `${minutes}m ${remainingSeconds}s`;
-} 
+
+  const parts: string[] = [];
+
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0 || hours > 0) parts.push(`${minutes}m`);
+  parts.push(`${remainingSeconds}s`);
+
+  return parts.join(' ');
+}
