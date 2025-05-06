@@ -11,6 +11,7 @@ use std::sync::Arc;
 use crate::bot_detection;
 use woothee::parser::Parser;
 use once_cell::sync::Lazy;
+use url::Url;
 
 static USER_AGENT_PARSER: Lazy<Parser> = Lazy::new(|| Parser::new());
 
@@ -57,9 +58,15 @@ impl EventProcessor {
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
         let site_id = event.raw.site_id.clone();
         let timestamp = chrono::DateTime::from_timestamp(event.raw.timestamp as i64, 0).unwrap_or_else(|| chrono::Utc::now());
-        let url = event.raw.url.clone();
+        let raw_url = event.raw.url.clone();
         let referrer = event.raw.referrer.clone();
         let user_agent = event.raw.user_agent.clone();
+
+        let url_path = self.extract_path_from_url(&raw_url);
+        debug!("Extracted path '{}' from URL '{}'", url_path, raw_url);
+
+        let processed_referrer = referrer.as_ref()
+            .and_then(|r| if r.is_empty() { None } else { Some(self.extract_path_from_url(r)) });
 
         let mut processed = ProcessedEvent {
             event: event.clone(),
@@ -73,8 +80,8 @@ impl EventProcessor {
             site_id: site_id.clone(),
             visitor_fingerprint: String::new(),
             timestamp: timestamp.clone(),
-            url: url.clone(),
-            referrer: referrer.clone(),
+            url: url_path,
+            referrer: processed_referrer,
             user_agent: user_agent.clone(),
         };
 
@@ -125,6 +132,28 @@ impl EventProcessor {
 
         debug!("Processed event finished!");
         Ok(())
+    }
+
+    /// Extract just the path component from a URL
+    fn extract_path_from_url(&self, url_str: &str) -> String {
+        match Url::parse(url_str) {
+            Ok(url) => {
+                let path = url.path();
+                if path.is_empty() {
+                    "/".to_string()
+                } else {
+                    path.to_string()
+                }
+            },
+            Err(_) => {
+                // If URL parsing fails, check if it might be just a path
+                if url_str.starts_with('/') {
+                    url_str.to_string()
+                } else {
+                    format!("/{}", url_str)
+                }
+            }
+        }
     }
 
     /// Get geolocation data for the IP
