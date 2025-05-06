@@ -20,9 +20,9 @@ export function formatDuration(seconds: number): string {
 
   const parts: string[] = [];
 
-  if (hours > 0) parts.push(`${hours}h`);
-  if (minutes > 0 || hours > 0) parts.push(`${minutes}m`);
-  parts.push(`${remainingSeconds}s`);
+  if (hours > 0) parts.push(`${Math.floor(hours)}h`);
+  if (minutes > 0 || hours > 0) parts.push(`${Math.floor(minutes)}m`);
+  parts.push(`${Math.floor(remainingSeconds)}s`);
 
   return parts.join(' ');
 }

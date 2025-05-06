@@ -6,6 +6,7 @@ import {
   getMinutePageViews,
   getTopPages,
   getPageMetrics,
+  getPageDetailMetrics,
 } from '@/repositories/clickhouse';
 import { DailyPageViewRow } from '@/entities/pageviews';
 import { toDateString, toDateTimeString } from '@/utils/dateFormatters';
@@ -28,4 +29,10 @@ export async function getTopPagesForSite(siteId: string, startDate: string, endD
 
 export async function getPageAnalytics(siteId: string, startDate: string, endDate: string): Promise<PageAnalytics[]> {
   return getPageMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+}
+
+export async function getPageDetail(siteId: string, path: string, startDate: string, endDate: string): Promise<PageAnalytics | null> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  return getPageDetailMetrics(siteId, path, formattedStart, formattedEnd);
 }

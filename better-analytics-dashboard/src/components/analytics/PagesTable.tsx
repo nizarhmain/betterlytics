@@ -9,12 +9,27 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { PageAnalytics } from "@/entities/pages";
+import { formatDuration } from '@/utils/dateFormatters';
 
 interface PagesTableProps {
   data: PageAnalytics[];
 }
 
 export default function PagesTable({ data }: PagesTableProps) {
+  const encodePath = (path: string): string => {
+    // Handle root path specifically with a prefix that's unlikely to conflict
+    if (path === "/") {
+      return "__index__";
+    }
+    
+    // Remove leading slash if present for routing purposes
+    return path.startsWith('/') ? path.substring(1) : path;
+  };
+
+  const formatPath = (path: string): string => {
+    return path || "/";
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-lg font-bold text-gray-900 mb-1">All Pages</h2>
@@ -33,21 +48,33 @@ export default function PagesTable({ data }: PagesTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((page) => (
-              <TableRow key={page.path}>
-                <TableCell className="font-medium">{page.path}</TableCell>
-                <TableCell className="text-gray-500">{page.title}</TableCell>
-                <TableCell className="text-right">{page.visitors.toLocaleString()}</TableCell>
-                <TableCell className="text-right">{page.pageviews.toLocaleString()}</TableCell>
-                <TableCell className="text-right">{page.bounceRate}%</TableCell>
-                <TableCell className="text-right">{page.avgTime}</TableCell>
-                <TableCell className="text-right">
-                  <Link href={page.path} className="text-gray-400 hover:text-gray-600">
-                    <ArrowUpRight size={16} />
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
+            {data.map((page) => {
+              const encodedPath = encodePath(page.path);
+              
+              return (
+                <TableRow 
+                  key={page.path} 
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => window.location.href = `/dashboard/pages/${encodedPath}`}
+                >
+                  <TableCell className="font-medium">{formatPath(page.path)}</TableCell>
+                  <TableCell className="text-gray-500">{formatPath(page.path)}</TableCell>
+                  <TableCell className="text-right">{page.visitors.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">{page.pageviews.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">{page.bounceRate}%</TableCell>
+                  <TableCell className="text-right">{formatDuration(page.avgTime)}</TableCell>
+                  <TableCell className="text-right">
+                    <Link 
+                      href={`/dashboard/pages/${encodedPath}`} 
+                      className="text-gray-400 hover:text-gray-600"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ArrowUpRight size={16} />
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
