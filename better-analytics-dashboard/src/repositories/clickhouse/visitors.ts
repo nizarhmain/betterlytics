@@ -32,7 +32,7 @@ export async function getHourlyUniqueVisitors(siteId: string, startDate: DateTim
   const query = `
     SELECT
       toStartOfHour(timestamp) as date,
-      uniqExact(session_id) as unique_visitors
+      uniq(session_id) as unique_visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
@@ -61,7 +61,7 @@ export async function getMinuteUniqueVisitors(siteId: string, startDate: DateTim
   const query = `
     SELECT
       toStartOfMinute(timestamp) as date,
-      uniqExact(session_id) as unique_visitors
+      uniq(session_id) as unique_visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}

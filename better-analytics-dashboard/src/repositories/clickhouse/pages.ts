@@ -96,7 +96,7 @@ export async function getTopPages(
   const query = `
     SELECT
       url,
-      uniqExact(session_id) as visitors
+      uniq(session_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
@@ -153,7 +153,7 @@ export async function getPageMetrics(
         GROUP BY session_id
       ),
       page_aggregates AS (
-        SELECT pvd.path, uniqExact(pvd.session_id) as visitors, count() as pageviews,
+        SELECT pvd.path, uniq(pvd.session_id) as visitors, count() as pageviews,
                 avgIf(pvd.duration_seconds, pvd.duration_seconds IS NOT NULL) as avg_time_seconds,
                 countIf(spc.page_count = 1) as single_page_sessions
         FROM page_view_durations pvd JOIN session_page_counts spc ON pvd.session_id = spc.session_id
