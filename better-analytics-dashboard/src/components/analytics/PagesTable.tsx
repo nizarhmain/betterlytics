@@ -8,7 +8,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import { PageAnalytics } from '@/types/analytics';
+import { PageAnalytics } from "@/entities/pages";
 
 interface PagesTableProps {
   data: PageAnalytics[];

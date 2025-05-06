@@ -53,29 +53,9 @@ export function getRangeForValue(value: TimeRangeValue): { startDate: string; en
   return preset ? preset.getRange() : TIME_RANGE_PRESETS[1].getRange();
 }
 
-export function toDateString(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toISOString().slice(0, 10);
-}
-
-export function toDateTimeString(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toISOString().replace('T', ' ').slice(0, 19);
-}
-
 export function getGroupingForRange(startDate: string, endDate: string): TimeGrouping {
   const diff = new Date(endDate).getTime() - new Date(startDate).getTime();
   if (diff <= 60 * 60 * 1000) return 'minute';
   if (diff <= 24 * 60 * 60 * 1000) return 'hour';
   return 'day';
-} 
-
-// Helper function to format duration in a user-friendly way
-export function formatDuration(seconds: number): string {
-  if (seconds < 60) {
-    return `${seconds}s`;
-  }
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}m ${remainingSeconds}s`;
 } 

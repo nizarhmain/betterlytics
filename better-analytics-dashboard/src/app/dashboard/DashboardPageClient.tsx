@@ -5,11 +5,13 @@ import VisitorsChart from "@/components/VisitorsChart";
 import TopPagesTable from '@/components/TopPagesTable';
 import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import { useMemo, useState } from "react";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue, formatDuration } from "@/utils/timeRanges";
+import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
 import { useQuery } from '@tanstack/react-query';
-import { fetchSummaryStatsAction, fetchTopPagesAction, fetchDeviceTypeBreakdownAction } from './actions';
+import { formatDuration } from "@/utils/dateFormatters";
+import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
+import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 
-export default function DashboardPageClient({ session }: { session: any }) {
+export default function DashboardPageClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
   const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
 
@@ -80,11 +82,6 @@ export default function DashboardPageClient({ session }: { session: any }) {
           <div>
             {deviceBreakdownLoading ? <div>Loading...</div> : <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />}
           </div>
-        </div>
-        <div className="border-t border-gray-200 pt-4">
-          <p className="text-gray-600">
-            Welcome, {session.user?.name || "User"}! You are logged in as an {session.user?.role || "user"}.
-          </p>
         </div>
       </div>
     </div>

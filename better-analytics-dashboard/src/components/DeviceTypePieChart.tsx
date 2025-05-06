@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#06b6d4', '#a78bfa', '#fb7185'];
 const DEVICE_LABELS: Record<string, string> = {
@@ -44,11 +44,11 @@ export default function DeviceTypePieChart({ breakdown }: DeviceTypePieChartProp
                 <Cell key={`cell-${idx}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip formatter={(value: any) => value.toLocaleString()} />
+            <Tooltip />
           </PieChart>
         </ResponsiveContainer>
         <div className="flex justify-center gap-4 mt-4">
-          {data.map((entry, idx) => (
+          {data.map((entry) => (
             <div key={entry.device_type} className="flex items-center gap-1 text-sm">
               <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }}></span>
               <span className="font-medium text-gray-700">{entry.label}</span>

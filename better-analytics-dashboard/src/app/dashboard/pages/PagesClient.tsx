@@ -5,8 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
 import PagesTable from "@/components/analytics/PagesTable";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from '../actions';
-import { PageAnalytics, SummaryStats } from '@/types/analytics';
+import { SummaryStats } from '@/entities/stats';
+import { fetchSummaryStatsAction } from "@/app/actions/overview";
+import { fetchPageAnalyticsAction } from "@/app/actions/pages";
+import { PageAnalytics } from "@/entities/pages";
 
 export default function PagesClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
