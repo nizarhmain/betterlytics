@@ -1,22 +1,33 @@
+import { z } from "zod";
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyUniqueVisitorsRow, DailyUniqueVisitorsRowSchema } from '@/entities/visitors';
 import { DateString, DateTimeString } from '@/types/dates';
+import { GranularityRangeValues } from "@/utils/granularityRanges";
 
-export async function getDailyUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString): Promise<DailyUniqueVisitorsRow[]> {
-  console.log(startDate, endDate)
+
+const GranularitySchema = z.enum(["toStartOfDay", "toStartOfHour", "toStartOfMinute"]);
+const granularityMapper = {
+  "day": GranularitySchema.enum.toStartOfDay,
+  "hour": GranularitySchema.enum.toStartOfHour,
+  "minute": GranularitySchema.enum.toStartOfMinute,
+} as const;
+
+export async function getUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<DailyUniqueVisitorsRow[]> {
+  const mappedGranularity = granularityMapper[granularity];
+  const safeGranularity = GranularitySchema.parse(mappedGranularity);
+
   const query = `
     SELECT
-      toDate(timestamp) as date,
+      ${safeGranularity}(timestamp) as date,
       uniq(session_id) as unique_visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND date >= {start:DateTime}
-      AND date <= {end:DateTime}
+      AND date BETWEEN {start:DateTime} AND {end:DateTime}
     GROUP BY date
     ORDER BY date ASC
-    LIMIT 100
+    LIMIT 10080
   `;
-
+  
   const result = await clickhouse.query(query, {
     params: {
       site_id: siteId,
@@ -28,66 +39,6 @@ export async function getDailyUniqueVisitors(siteId: string, startDate: DateStri
     date: row.date,
     unique_visitors: Number(row.unique_visitors),
   }));
-}
-
-export async function getHourlyUniqueVisitors(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyUniqueVisitorsRow[]> {
-  const query = `
-    SELECT
-      toDate(timestamp) as date,
-      uniq(session_id) as unique_visitors
-    FROM analytics.events
-    WHERE site_id = {site_id:String}
-      AND date >= {start:DateTime}
-      AND date <= {end:DateTime}
-    GROUP BY date
-    ORDER BY date ASC
-    LIMIT 100
-  `;
-
-  const result = await clickhouse.query(query, {
-    params: {
-      site_id: siteId,
-      start: startDate,
-      end: endDate,
-    },
-  }).toPromise() as any[];
-  
-  const mappedResults = result.map(row => ({
-    date: row.date,
-    unique_visitors: Number(row.unique_visitors),
-  }));
-  
-  return DailyUniqueVisitorsRowSchema.array().parse(mappedResults);
-}
-
-export async function getMinuteUniqueVisitors(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyUniqueVisitorsRow[]> {
-  const query = `
-    SELECT
-      toDate(timestamp) as date,
-      uniq(session_id) as unique_visitors
-    FROM analytics.events
-    WHERE site_id = {site_id:String}
-      AND date >= {start:DateTime}
-      AND date <= {end:DateTime}
-    GROUP BY date
-    ORDER BY date ASC
-    LIMIT 100
-  `;
-
-  const result = await clickhouse.query(query, {
-    params: {
-      site_id: siteId,
-      start: startDate,
-      end: endDate,
-    },
-  }).toPromise() as any[];
-  
-  const mappedResults = result.map(row => ({
-    date: row.date,
-    unique_visitors: Number(row.unique_visitors),
-  }));
-  
-  return DailyUniqueVisitorsRowSchema.array().parse(mappedResults);
 }
 
 export async function getTotalUniqueVisitors(
@@ -109,7 +60,7 @@ export async function getTotalUniqueVisitors(
       end: endDate,
     },
   }).toPromise() as any[];
-  return Number(result[0]?.unique_visitors ?? 0);
+  return Number(result[0]?.unique_sessions ?? 0);
 }
 
 export async function getSessionMetrics(
