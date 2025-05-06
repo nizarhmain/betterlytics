@@ -10,7 +10,7 @@ export async function getDailyPageViews(siteId: string, startDate: DateString, e
     WHERE site_id = {site_id:String}
       AND date >= {start_date:Date}
       AND date <= {end_date:Date}
-    ORDER BY date DESC, views DESC
+    ORDER BY date ASC, views DESC
     LIMIT 100
   `;
   const result = await clickhouse.query(query, {
@@ -45,7 +45,7 @@ export async function getHourlyPageViews(siteId: string, startDate: DateTimeStri
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
     GROUP BY date, url
-    ORDER BY date DESC, views DESC
+    ORDER BY date ASC, views DESC
     LIMIT 100
   `;
   const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
@@ -70,7 +70,7 @@ export async function getMinutePageViews(siteId: string, startDate: DateTimeStri
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
     GROUP BY date, url
-    ORDER BY date DESC, views DESC
+    ORDER BY date ASC, views DESC
     LIMIT 100
   `;
   const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];

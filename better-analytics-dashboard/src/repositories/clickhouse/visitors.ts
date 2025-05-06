@@ -3,15 +3,17 @@ import { DailyUniqueVisitorsRow, DailyUniqueVisitorsRowSchema } from '@/entities
 import { DateString, DateTimeString } from '@/types/dates';
 
 export async function getDailyUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString): Promise<DailyUniqueVisitorsRow[]> {
+  console.log(startDate, endDate)
   const query = `
     SELECT
-      date,
-      uniqMerge(unique_visitors) as unique_visitors
-    FROM analytics.daily_unique_visitors FINAL
+      toDate(timestamp) as date,
+      uniq(session_id) as unique_visitors
+    FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND date BETWEEN toDate({start:Date}) AND toDate({end:Date})
+      AND date >= {start:DateTime}
+      AND date <= {end:DateTime}
     GROUP BY date
-    ORDER BY date DESC
+    ORDER BY date ASC
     LIMIT 100
   `;
 
@@ -31,13 +33,14 @@ export async function getDailyUniqueVisitors(siteId: string, startDate: DateStri
 export async function getHourlyUniqueVisitors(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyUniqueVisitorsRow[]> {
   const query = `
     SELECT
-      toStartOfHour(timestamp) as date,
+      toDate(timestamp) as date,
       uniq(session_id) as unique_visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND date >= {start:DateTime}
+      AND date <= {end:DateTime}
     GROUP BY date
-    ORDER BY date DESC
+    ORDER BY date ASC
     LIMIT 100
   `;
 
@@ -60,13 +63,14 @@ export async function getHourlyUniqueVisitors(siteId: string, startDate: DateTim
 export async function getMinuteUniqueVisitors(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyUniqueVisitorsRow[]> {
   const query = `
     SELECT
-      toStartOfMinute(timestamp) as date,
+      toDate(timestamp) as date,
       uniq(session_id) as unique_visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND date >= {start:DateTime}
+      AND date <= {end:DateTime}
     GROUP BY date
-    ORDER BY date DESC
+    ORDER BY date ASC
     LIMIT 100
   `;
 
@@ -92,10 +96,10 @@ export async function getTotalUniqueVisitors(
   endDate: DateString
 ): Promise<number> {
   const query = `
-    SELECT uniqMerge(unique_visitors) as unique_visitors
-    FROM analytics.daily_unique_visitors FINAL
+    SELECT uniq(session_id) as unique_sessions
+    FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND date BETWEEN toDate({start:Date}) AND toDate({end:Date})
+      AND timestamp BETWEEN toDate({start:Date}) AND toDate({end:Date})
   `;
 
   const result = await clickhouse.query(query, {
