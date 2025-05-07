@@ -3,18 +3,11 @@ import { clickhouse } from '@/lib/clickhouse';
 import { DailyUniqueVisitorsRow, DailyUniqueVisitorsRowSchema } from '@/entities/visitors';
 import { DateString, DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from "@/utils/granularityRanges";
-
-
-const GranularitySchema = z.enum(["toStartOfDay", "toStartOfHour", "toStartOfMinute"]);
-const granularityMapper = {
-  "day": GranularitySchema.enum.toStartOfDay,
-  "hour": GranularitySchema.enum.toStartOfHour,
-  "minute": GranularitySchema.enum.toStartOfMinute,
-} as const;
+import { BAQuery } from "@/lib/ba-query";
 
 export async function getUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<DailyUniqueVisitorsRow[]> {
-  const mappedGranularity = granularityMapper[granularity];
-  const safeGranularity = GranularitySchema.parse(mappedGranularity);
+  
+  const safeGranularity = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
 
   const query = `
     SELECT
