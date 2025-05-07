@@ -35,10 +35,7 @@ export async function getUniqueVisitors(siteId: string, startDate: DateString, e
       end: endDate,
     },
   }).toPromise() as any[];
-  return result.map(row => ({
-    date: row.date,
-    unique_visitors: Number(row.unique_visitors),
-  }));
+  return result.map(row => DailyUniqueVisitorsRowSchema.parse(row));
 }
 
 export async function getTotalUniqueVisitors(
