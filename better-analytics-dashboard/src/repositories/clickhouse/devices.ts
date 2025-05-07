@@ -8,7 +8,7 @@ import {
 
 export async function getDeviceTypeBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DeviceType[]> {
   const query = `
-    SELECT device_type, uniqExact(visitor_id) as visitors
+    SELECT device_type, uniq(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp >= {start:DateTime}

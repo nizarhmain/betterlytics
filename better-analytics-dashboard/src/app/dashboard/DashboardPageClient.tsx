@@ -10,9 +10,14 @@ import { useQuery } from '@tanstack/react-query';
 import { formatDuration } from "@/utils/dateFormatters";
 import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
+import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
 
 export default function DashboardPageClient() {
-  const [range, setRange] = useState<TimeRangeValue>("7d");
+  const { range, setRange } = useTimeRangeContext();
+
+  const [ granularity, setGranularity ] = useState<GranularityRangeValues>("day");
+
   const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
@@ -33,7 +38,7 @@ export default function DashboardPageClient() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end mb-4 gap-4">
           <div className="relative inline-block text-left">
             <select
               className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -41,6 +46,17 @@ export default function DashboardPageClient() {
               onChange={e => setRange(e.target.value as TimeRangeValue)}
             >
               {TIME_RANGE_PRESETS.map(r => (
+                <option key={r.value} value={r.value}>{r.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="relative inline-block text-left">
+            <select
+              className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={granularity}
+              onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
+            >
+              {GRANULARITY_RANGE_PRESETS.map(r => (
                 <option key={r.value} value={r.value}>{r.label}</option>
               ))}
             </select>
@@ -72,7 +88,7 @@ export default function DashboardPageClient() {
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} />
+          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
           <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">

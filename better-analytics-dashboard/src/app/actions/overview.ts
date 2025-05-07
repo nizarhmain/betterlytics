@@ -8,15 +8,16 @@ import { getSummaryStatsForSite } from "@/services/visitors";
 import { getUniqueVisitorsForSite } from "@/services/visitors";
 import { TimeGrouping } from "@/utils/timeRanges";
 import { checkAuth } from "@/lib/auth-actions";
+import { GranularityRangeValues } from "@/utils/granularityRanges";
 
 export async function fetchPageViewsAction(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyPageViewRow[]> {
   await checkAuth();
   return getPageViewsForSite(siteId, startDate, endDate, groupBy);
 }
 
-export async function fetchUniqueVisitorsAction(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping): Promise<DailyUniqueVisitorsRow[]> {
+export async function fetchUniqueVisitorsAction(siteId: string, startDate: string, endDate: string, granularity: GranularityRangeValues): Promise<DailyUniqueVisitorsRow[]> {
   await checkAuth();
-  return getUniqueVisitorsForSite(siteId, startDate, endDate, groupBy);
+  return getUniqueVisitorsForSite(siteId, startDate, endDate, granularity);
 }
 
 export async function fetchSummaryStatsAction(siteId: string, startDate: string, endDate: string) {
