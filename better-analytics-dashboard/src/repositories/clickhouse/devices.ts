@@ -30,7 +30,7 @@ export async function getDeviceTypeBreakdown(siteId: string, startDate: DateTime
 
 export async function getBrowserBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<BrowserInfo[]> {
   const query = `
-    SELECT browser, uniqExact(visitor_id) as visitors
+    SELECT browser, uniq(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp >= {start:DateTime}
@@ -52,7 +52,7 @@ export async function getBrowserBreakdown(siteId: string, startDate: DateTimeStr
 
 export async function getOperatingSystemBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<OperatingSystemInfo[]> {
   const query = `
-    SELECT os, uniqExact(visitor_id) as visitors
+    SELECT os, uniq(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp >= {start:DateTime}
