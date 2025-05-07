@@ -3,19 +3,19 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchPageViewsAction } from '@/app/actions/overview';
 import { DailyPageViewRow } from "@/entities/pageviews";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { getGroupingForRange, TimeGrouping } from '@/utils/timeRanges';
+import { GranularityRangeValues } from '@/utils/granularityRanges';
 
 interface PageviewsChartProps {
   siteId: string;
   startDate: string;
   endDate: string;
+  granularity: GranularityRangeValues;
 }
 
-export default function PageviewsChart({ siteId, startDate, endDate }: PageviewsChartProps) {
-  const groupBy: TimeGrouping = getGroupingForRange(startDate, endDate);
+export default function PageviewsChart({ siteId, startDate, endDate, granularity }: PageviewsChartProps) {
   const { data = [], isLoading } = useQuery<DailyPageViewRow[]>({
-    queryKey: ['pageViews', siteId, startDate, endDate, groupBy],
-    queryFn: () => fetchPageViewsAction(siteId, startDate, endDate, groupBy),
+    queryKey: ['pageViews', siteId, startDate, endDate, granularity],
+    queryFn: () => fetchPageViewsAction(siteId, startDate, endDate, granularity),
   });
 
   const grouped: Record<string, Record<string, number>> = {};
