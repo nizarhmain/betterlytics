@@ -9,6 +9,7 @@ use r2d2::Pool;
 use redis::Client as RedisClient;
 use std::sync::Arc;
 use crate::bot_detection;
+use crate::referrer::{ReferrerInfo, parse_referrer};
 
 #[derive(Debug, Clone)]
 pub struct ProcessedEvent {
@@ -32,6 +33,8 @@ pub struct ProcessedEvent {
     pub timestamp: chrono::DateTime<chrono::Utc>,
     pub url: String,
     pub referrer: Option<String>,
+    /// Parsed referrer information
+    pub referrer_info: ReferrerInfo,
     pub user_agent: String,
 }
 
@@ -71,8 +74,13 @@ impl EventProcessor {
             timestamp: timestamp.clone(),
             url: url.clone(),
             referrer: referrer.clone(),
+            referrer_info: ReferrerInfo::default(),
             user_agent: user_agent.clone(),
         };
+
+        // Parse referrer information
+        processed.referrer_info = parse_referrer(referrer.as_deref(), Some(&url));
+        debug!("referrer_info: {:?}", processed.referrer_info);
 
         if let Err(e) = self.get_geolocation(&mut processed).await {
             error!("Failed to get geolocation: {}", e);

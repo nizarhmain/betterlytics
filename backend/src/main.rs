@@ -17,6 +17,7 @@ mod tracking;
 mod geoip;
 mod geoip_updater;
 mod bot_detection;
+mod referrer;
 
 use analytics::{AnalyticsEvent, RawTrackingEvent, generate_site_id};
 use db::{Database, SharedDatabase};
