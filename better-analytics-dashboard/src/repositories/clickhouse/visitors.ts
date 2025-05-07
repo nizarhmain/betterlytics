@@ -7,11 +7,11 @@ import { BAQuery } from "@/lib/ba-query";
 
 export async function getUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<DailyUniqueVisitorsRow[]> {
   
-  const safeGranularity = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
 
   const query = `
     SELECT
-      ${safeGranularity}(timestamp) as date,
+      ${granularityFunc}(timestamp) as date,
       uniq(session_id) as unique_visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
