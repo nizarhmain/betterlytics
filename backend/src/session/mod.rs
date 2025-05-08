@@ -4,12 +4,12 @@ use moka::sync::Cache;
 use std::time::Duration;
 use once_cell::sync::Lazy;
 
-const SESSION_EXPIRY: u64 = 30 * 60;
+const SESSION_EXPIRY = Duration::minutes(30);
 
 // Moka cache with time-based eviction (sessions expire after 30 minutes of inactivity)
 static SESSION_CACHE: Lazy<Cache<String, String>> = Lazy::new(|| {
     Cache::builder()
-        .time_to_idle(Duration::from_secs(SESSION_EXPIRY))
+        .time_to_idle(SESSION_EXPIRY)
         .build()
 });
 
