@@ -4,7 +4,7 @@ services:
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     ports:
-      - "8123:8123"  # HTTP interface
+      - "8123:8123"  # HTTP interface - access /play for testing
       - "9000:9000"  # Native interface
     command: ["clickhouse-server", "--", "--listen_host=0.0.0.0"]
     ulimits:
@@ -12,13 +12,5 @@ services:
         soft: 262144
         hard: 262144
 
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-
 volumes:
   clickhouse_data:
-  redis_data: 
