@@ -114,10 +114,6 @@ impl EventProcessor {
         if let Err(e) = self.parse_user_agent(&mut processed).await {
             error!("Failed to parse user agent: {}", e);
         }
-        
-        if let Err(e) = self.update_real_time_metrics(&processed).await {
-            error!("Failed to update real-time metrics: {}", e);
-        }
 
         if let Err(e) = self.event_tx.send(processed).await {
             error!("Failed to send processed event: {}", e);
@@ -189,11 +185,4 @@ impl EventProcessor {
 
         Ok(())
     } 
-
-    /// Update real-time metrics in ClickHouse
-    async fn update_real_time_metrics(&self, processed: &ProcessedEvent) -> Result<()> {
-        debug!("Updating real-time metrics using session_id: {}", processed.session_id);
-        // TODO: Implement real-time metrics update
-        Ok(())
-    }
 }
