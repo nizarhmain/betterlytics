@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useMemo } from 'react'
-import { MapContainer, GeoJSON, ZoomControl } from 'react-leaflet'
+import { MapContainer, GeoJSON, ZoomControl, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { scaleLinear } from 'd3-scale'
 import 'leaflet/dist/leaflet.css'
@@ -28,6 +28,12 @@ const geoJsonOptions = {
 
 // GeoJSON data source
 const WORLD_GEOJSON_URL = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json'
+
+// World bounds - limit how far users can pan
+const MAX_BOUNDS = L.latLngBounds(
+  L.latLng(-100, -220),
+  L.latLng(100, 220)
+)
 
 const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapProps) => {
   const [worldGeoJson, setWorldGeoJson] = useState<any>(null)
@@ -122,6 +128,8 @@ const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapPr
         style={{ height: '100%', width: '100%' }}
         zoom={2} 
         zoomControl={false}
+        maxBounds={MAX_BOUNDS}
+        maxBoundsViscosity={0.5}
         minZoom={1}
         maxZoom={7}
         attributionControl={false}
