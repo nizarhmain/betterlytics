@@ -9,9 +9,8 @@ import dynamic from 'next/dynamic'
 import { Feature, Geometry } from 'geojson'
 
 interface VisitorData {
-  id: string; 
+  country_code: string; 
   visitors: number;
-  name: string;
 }
 
 interface LeafletMapProps {
@@ -78,7 +77,7 @@ const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapPr
     if (!feature) return {}
 
     const featureId = getFeatureId(feature)
-    const visitorEntry = visitorData.find(d => d.id === featureId)
+    const visitorEntry = visitorData.find(d => d.country_code === featureId)
     const visitors = visitorEntry ? visitorEntry.visitors : 0
     
     return {
@@ -95,7 +94,7 @@ const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapPr
     if (!feature.properties) return
     
     const featureId = getFeatureId(feature)
-    const visitorEntry = visitorData.find(d => d.id === featureId)
+    const visitorEntry = visitorData.find(d => d.country_code === featureId)
     const name = feature.properties.name || 
                 feature.properties.NAME || 
                 'Unknown'
