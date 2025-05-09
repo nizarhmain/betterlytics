@@ -11,8 +11,8 @@ export default async function GeographyPage() {
   const visitorData = await fetchVisitorsByGeography();
   
   return (
-    <div className="grid gap-6 w-full h-full">
-      <LeafletMap visitorData={visitorData} />
+    <div className="h-full w-full">
+      <LeafletMap visitorData={visitorData} height="100%" />
     </div>
   );
 } 
