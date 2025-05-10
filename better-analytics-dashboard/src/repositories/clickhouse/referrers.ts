@@ -100,7 +100,7 @@ export async function getReferrerSummary(
     
     SELECT
       count(DISTINCT referrer_source) as totalReferrers,
-      uniq(session_id) as referralTraffic,
+      count() as referralTraffic,
       (
         SELECT count()
         FROM session_view_counts
