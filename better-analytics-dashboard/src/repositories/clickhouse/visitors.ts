@@ -3,22 +3,15 @@ import { clickhouse } from '@/lib/clickhouse';
 import { DailyUniqueVisitorsRow, DailyUniqueVisitorsRowSchema } from '@/entities/visitors';
 import { DateString, DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from "@/utils/granularityRanges";
-
-
-const GranularitySchema = z.enum(["toStartOfDay", "toStartOfHour", "toStartOfMinute"]);
-const granularityMapper = {
-  "day": GranularitySchema.enum.toStartOfDay,
-  "hour": GranularitySchema.enum.toStartOfHour,
-  "minute": GranularitySchema.enum.toStartOfMinute,
-} as const;
+import { BAQuery } from "@/lib/ba-query";
 
 export async function getUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<DailyUniqueVisitorsRow[]> {
-  const mappedGranularity = granularityMapper[granularity];
-  const safeGranularity = GranularitySchema.parse(mappedGranularity);
+  
+  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
 
   const query = `
     SELECT
-      ${safeGranularity}(timestamp) as date,
+      ${granularityFunc}(timestamp) as date,
       uniq(session_id) as unique_visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
@@ -35,10 +28,7 @@ export async function getUniqueVisitors(siteId: string, startDate: DateString, e
       end: endDate,
     },
   }).toPromise() as any[];
-  return result.map(row => ({
-    date: row.date,
-    unique_visitors: Number(row.unique_visitors),
-  }));
+  return result.map(row => DailyUniqueVisitorsRowSchema.parse(row));
 }
 
 export async function getTotalUniqueVisitors(
