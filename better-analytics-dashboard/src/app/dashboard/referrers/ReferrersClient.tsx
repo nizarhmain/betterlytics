@@ -1,8 +1,13 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import SummaryCard from "@/components/SummaryCard";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import ReferrerDistributionChart from '@/components/charts/ReferrerDistributionChart';
+import { fetchReferrerSourceAggregationDataForSite } from "@/app/actions/referrers";
+import { ReferrerSourceAggregation } from "@/entities/referrers";
+import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import { getRangeForValue } from "@/utils/timeRanges";
 
 enum ReferrerTab {
   All = 'all',
@@ -14,6 +19,28 @@ enum ReferrerTab {
 
 export default function ReferrersClient() {
   const [activeTab, setActiveTab] = useState<ReferrerTab>(ReferrerTab.All);
+  const [distributionData, setDistributionData] = useState<ReferrerSourceAggregation[] | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
+  const { range } = useTimeRangeContext();
+  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+
+  const siteId = 'default-site';
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      try {
+        const result = await fetchReferrerSourceAggregationDataForSite(siteId, startDate, endDate);
+        setDistributionData(result.data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadData();
+  }, [startDate, endDate]);
 
   return (
     <div className="p-6 space-y-6">
@@ -45,8 +72,9 @@ export default function ReferrersClient() {
         {/* Charts */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-lg p-4 shadow">
-            <div className="font-medium mb-2">Referrer Distribution</div>
-              Chart placeholder
+            <div className="font-medium mb-2 text-gray-700">Referrer Distribution</div>
+            <p className="text-xs text-gray-500 mb-4">Traffic sources by category</p>
+              <ReferrerDistributionChart data={distributionData} loading={loading} />
           </div>
           <div className="bg-white rounded-lg p-4 shadow">
             <div className="font-medium mb-2">Referral Traffic Trends</div>

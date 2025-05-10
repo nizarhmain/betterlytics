@@ -52,7 +52,7 @@ pub struct ReferrerInfo {
     /// Original referrer URL
     pub url: Option<String>,
     /// Source category (direct, search, social, etc.)
-    pub source: ReferrerSource,
+    pub source_type: ReferrerSource,
     /// Source name (e.g., "Google", "Facebook", etc.)
     pub source_name: Option<String>,
     /// Search term (if available from search engines)
@@ -121,7 +121,7 @@ pub fn parse_referrer(referrer: Option<&str>, current_url: Option<&str>) -> Refe
         _ => {
             return ReferrerInfo {
                 url: None,
-                source: ReferrerSource::Direct,
+                source_type: ReferrerSource::Direct,
                 source_name: None,
                 search_term: None,
             }
@@ -133,7 +133,7 @@ pub fn parse_referrer(referrer: Option<&str>, current_url: Option<&str>) -> Refe
         Err(_) => {
             return ReferrerInfo {
                 url: Some(referrer_str.to_string()),
-                source: ReferrerSource::Other,
+                source_type: ReferrerSource::Other,
                 source_name: None,
                 search_term: None,
             };
@@ -200,7 +200,7 @@ pub fn parse_referrer(referrer: Option<&str>, current_url: Option<&str>) -> Refe
 
     ReferrerInfo {
         url: Some(sanitized_referrer),
-        source: source_type,
+        source_type,
         source_name: referrer_name,
         search_term,
     }
