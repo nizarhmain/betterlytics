@@ -1,0 +1,46 @@
+'use client';
+
+import React from 'react';
+
+interface ReferrerLegendProps {
+  payload?: any[];
+  showPercentage?: boolean;
+}
+
+const capitalizeFirstLetter = (string: string): string => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+// Common legend component that can be used by all referrer charts
+export default function ReferrerLegend({ payload, showPercentage = false }: ReferrerLegendProps) {
+  if (!payload || payload.length === 0) {
+    return null;
+  }
+  
+  return (
+    <ul className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 mt-4 text-xs text-gray-700">
+      {payload.map((entry: any, index: number) => {
+
+        let displayValue: string;
+        
+        // For pie chart entries, we display percentages of the total as well
+        if (showPercentage) {
+          const sourceName = capitalizeFirstLetter(entry.payload?.name || '');
+          displayValue = `${sourceName}: ${entry.payload?.value}%`;
+        } else {
+          displayValue = capitalizeFirstLetter(entry.value);
+        }
+          
+        return (
+          <li key={`item-${index}`} className="flex items-center">
+            <span
+              className="w-3 h-3 rounded-full mr-2"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span>{displayValue}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+} 

@@ -4,10 +4,18 @@ import { useState, useEffect, useMemo } from "react";
 import SummaryCard from "@/components/SummaryCard";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import ReferrerDistributionChart from '@/components/charts/ReferrerDistributionChart';
-import { fetchReferrerSourceAggregationDataForSite } from "@/app/actions/referrers";
-import { ReferrerSourceAggregation } from "@/entities/referrers";
+import ReferrerTrafficTrendChart from '@/components/charts/ReferrerTrafficTrendChart';
+import { 
+  fetchReferrerSourceAggregationDataForSite, 
+  fetchReferrerTrafficTrendBySourceDataForSite
+} from "@/app/actions/referrers";
+import { 
+  ReferrerSourceAggregation, 
+  ReferrerTrafficBySourceRow 
+} from "@/entities/referrers";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { getRangeForValue } from "@/utils/timeRanges";
+import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
+import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
 
 enum ReferrerTab {
   All = 'all',
@@ -20,8 +28,10 @@ enum ReferrerTab {
 export default function ReferrersClient() {
   const [activeTab, setActiveTab] = useState<ReferrerTab>(ReferrerTab.All);
   const [distributionData, setDistributionData] = useState<ReferrerSourceAggregation[] | undefined>(undefined);
+  const [trendBySourceData, setTrendBySourceData] = useState<ReferrerTrafficBySourceRow[] | undefined>(undefined);
   const [loading, setLoading] = useState(true);
-  const { range } = useTimeRangeContext();
+  const { range, setRange } = useTimeRangeContext();
+  const [granularity, setGranularity] = useState<GranularityRangeValues>("day");
   const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
 
   const siteId = 'default-site';
@@ -30,8 +40,13 @@ export default function ReferrersClient() {
     async function loadData() {
       setLoading(true);
       try {
-        const result = await fetchReferrerSourceAggregationDataForSite(siteId, startDate, endDate);
-        setDistributionData(result.data);
+        const [distributionResult, trendBySourceResult] = await Promise.all([
+          fetchReferrerSourceAggregationDataForSite(siteId, startDate, endDate),
+          fetchReferrerTrafficTrendBySourceDataForSite(siteId, startDate, endDate, granularity)
+        ]);
+        
+        setDistributionData(distributionResult.data);
+        setTrendBySourceData(trendBySourceResult.data);
       } catch (e) {
         console.error(e);
       } finally {
@@ -40,14 +55,40 @@ export default function ReferrersClient() {
     }
     
     loadData();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, granularity]);
 
   return (
     <div className="p-6 space-y-6">
       <div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Referrers</h1>
-          <p className="text-sm text-gray-500">Analytics and insights for your website</p>
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Referrers</h1>
+            <p className="text-sm text-gray-500">Analytics and insights for your website</p>
+          </div>
+          <div className="flex gap-4">
+            <div className="relative inline-block text-left">
+              <select
+                className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={range}
+                onChange={e => setRange(e.target.value as TimeRangeValue)}
+              >
+                {TIME_RANGE_PRESETS.map(r => (
+                  <option key={r.value} value={r.value}>{r.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="relative inline-block text-left">
+              <select
+                className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={granularity}
+                onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
+              >
+                {GRANULARITY_RANGE_PRESETS.map(r => (
+                  <option key={r.value} value={r.value}>{r.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
         
         {/* Summary Cards */}
@@ -77,8 +118,9 @@ export default function ReferrersClient() {
               <ReferrerDistributionChart data={distributionData} loading={loading} />
           </div>
           <div className="bg-white rounded-lg p-4 shadow">
-            <div className="font-medium mb-2">Referral Traffic Trends</div>
-              Chart placeholder
+            <div className="font-medium mb-2 text-gray-700">Referral Traffic Trends</div>
+            <p className="text-xs text-gray-500 mb-4">Traffic by source over time</p>
+            <ReferrerTrafficTrendChart data={trendBySourceData} loading={loading} />
           </div>
         </div>
         

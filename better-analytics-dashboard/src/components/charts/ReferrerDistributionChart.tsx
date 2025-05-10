@@ -4,32 +4,12 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { ReferrerSourceAggregation } from '@/entities/referrers';
 import { getReferrerColor } from '@/utils/referrerColors';
 import { useMemo } from 'react';
+import ReferrerLegend from './ReferrerLegend';
 
 interface ReferrerDistributionChartProps {
   data?: ReferrerSourceAggregation[];
   loading?: boolean;
 }
-
-// Custom legend component
-const CustomLegend = (props: any) => {
-  const { payload } = props;
-  if (!payload || payload.length === 0) {
-    return null;
-  }
-  return (
-    <ul className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 mt-4 text-xs text-gray-700">
-      {payload.map((entry: any, index: number) => (
-        <li key={`item-${index}`} className="flex items-center">
-          <span
-            className="w-3 h-3 rounded-full mr-2"
-            style={{ backgroundColor: entry.color }}
-          />
-          <span>{`${entry.payload.name}: ${entry.payload.value}%`}</span>
-        </li>
-      ))}
-    </ul>
-  );
-};
 
 // Custom tooltip
 const CustomTooltip = ({ active, payload }: any) => {
@@ -102,7 +82,11 @@ export default function ReferrerDistributionChart({ data, loading = false }: Ref
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
-          <Legend content={<CustomLegend />} verticalAlign="bottom" wrapperStyle={{ paddingTop: '20px' }}/>
+          <Legend 
+            content={<ReferrerLegend showPercentage={true} />} 
+            verticalAlign="bottom" 
+            wrapperStyle={{ paddingTop: '20px' }}
+          />
         </PieChart>
       </ResponsiveContainer>
     </div>
