@@ -125,7 +125,7 @@ export default function ReferrerTrafficTrendChart({ data, loading = false }: Ref
   return (
     <div className="w-full h-[300px]">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
+        <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
           <XAxis 
             dataKey="date" 
@@ -145,8 +145,7 @@ export default function ReferrerTrafficTrendChart({ data, loading = false }: Ref
           <RechartsTooltip content={<CustomTooltip />} />
           <Legend 
             content={<ReferrerLegend showPercentage={false} />} 
-            verticalAlign="bottom" 
-            wrapperStyle={{ paddingTop: '20px' }} 
+            verticalAlign="bottom"
           />
           
           {referrerSources.map((source) => (
