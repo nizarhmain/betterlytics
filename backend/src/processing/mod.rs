@@ -6,6 +6,7 @@ use crate::db::SharedDatabase;
 use crate::geoip::GeoIpService;
 use crate::session;
 use crate::bot_detection;
+use crate::referrer::{ReferrerInfo, parse_referrer};
 use woothee::parser::Parser;
 use once_cell::sync::Lazy;
 use crate::campaign::{CampaignInfo, parse_campaign_params};
@@ -34,6 +35,8 @@ pub struct ProcessedEvent {
     pub timestamp: chrono::DateTime<chrono::Utc>,
     pub url: String,
     pub referrer: Option<String>,
+    /// Parsed referrer information
+    pub referrer_info: ReferrerInfo,
     /// Parsed campaign parameters
     pub campaign_info: CampaignInfo,
     pub user_agent: String,
@@ -73,10 +76,15 @@ impl EventProcessor {
             timestamp: timestamp.clone(),
             url: url.clone(),
             referrer: referrer.clone(),
+            referrer_info: ReferrerInfo::default(),
             user_agent: user_agent.clone(),
             campaign_info: CampaignInfo::default(),
         };
 
+        // Parse referrer information
+        processed.referrer_info = parse_referrer(referrer.as_deref(), Some(&url));
+        debug!("referrer_info: {:?}", processed.referrer_info);
+        
         // Parse campaign parameters from URL
         processed.campaign_info = parse_campaign_params(&url);
         debug!("campaign_info: {:?}", processed.campaign_info);
