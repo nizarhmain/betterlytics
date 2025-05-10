@@ -77,6 +77,38 @@ fn get_parser() -> &'static RefDb {
     })
 }
 
+/// Sanitize a referrer URL for privacy compliance
+/// - For search engines: keeps only search query parameters
+/// - For all other sites: strips all query parameters
+fn sanitize_referrer_url(referrer_url: &Url, is_search_engine: bool, search_params: &[String]) -> String {
+    if is_search_engine && !search_params.is_empty() {
+        // For search engines, keep only search query parameters
+        let mut clean_url = Url::parse(&format!("{}://{}{}", 
+            referrer_url.scheme(), 
+            referrer_url.host_str().unwrap_or(""), 
+            referrer_url.path()
+        )).unwrap_or_else(|_| referrer_url.clone());
+        
+        // Only copy search parameters that are relevant
+        for param in search_params {
+            if let Some(value) = referrer_url.query_pairs()
+                .find(|(key, _)| key == param)
+                .map(|(_, val)| val.to_string()) 
+            {
+                clean_url.query_pairs_mut().append_pair(param, &value);
+            }
+        }
+        
+        clean_url.to_string()
+    } else {
+        // For all other URLs, strip query parameters and fragments
+        let mut clean_url = referrer_url.clone();
+        clean_url.set_query(None);
+        clean_url.set_fragment(None);
+        clean_url.to_string()
+    }
+}
+
 /// Parse a referrer URL and extract useful information
 pub fn parse_referrer(referrer: Option<&str>, current_url: Option<&str>) -> ReferrerInfo {
     let current_host = current_url.and_then(|url| {
@@ -156,8 +188,18 @@ pub fn parse_referrer(referrer: Option<&str>, current_url: Option<&str>) -> Refe
     
     let referrer_name = referrer_info.as_ref().map(|r| r.source.clone());
 
+    // Determine if this is a search medium and get search parameters
+    let (is_search_engine, search_params) = if let Some(ref_info) = &referrer_info {
+        (ref_info.medium == "search", &ref_info.params[..])
+    } else {
+        (false, &[] as &[String])
+    };
+
+    // Sanitize the referrer URL to ensure privacy compliance to ensure that the referrer url does not contain any sensitive information
+    let sanitized_referrer = sanitize_referrer_url(&referrer_url, is_search_engine, search_params);
+
     ReferrerInfo {
-        url: Some(referrer_str.to_string()),
+        url: Some(sanitized_referrer),
         source: source_type,
         source_name: referrer_name,
         search_term,
