@@ -1,14 +1,18 @@
 use anyhow::Result;
 use tokio::sync::mpsc;
+use r2d2::Pool;
+use redis::Client as RedisClient;
+use std::sync::Arc;
+use tracing::{error, debug};
 use crate::analytics::{AnalyticsEvent, generate_fingerprint};
 use crate::db::SharedDatabase;
 use crate::geoip::GeoIpService;
-use tracing::{error, debug};
 use crate::session;
 use std::sync::Arc;
 use crate::bot_detection;
 use woothee::parser::Parser;
 use once_cell::sync::Lazy;
+use crate::campaign::{CampaignInfo, parse_campaign_params};
 
 static USER_AGENT_PARSER: Lazy<Parser> = Lazy::new(|| Parser::new());
 
@@ -34,6 +38,8 @@ pub struct ProcessedEvent {
     pub timestamp: chrono::DateTime<chrono::Utc>,
     pub url: String,
     pub referrer: Option<String>,
+    /// Parsed campaign parameters
+    pub campaign_info: CampaignInfo,
     pub user_agent: String,
 }
 
@@ -72,7 +78,12 @@ impl EventProcessor {
             url: url.clone(),
             referrer: referrer.clone(),
             user_agent: user_agent.clone(),
+            campaign_info: CampaignInfo::default(),
         };
+
+        // Parse campaign parameters from URL
+        processed.campaign_info = parse_campaign_params(&url);
+        debug!("campaign_info: {:?}", processed.campaign_info);
 
         if let Err(e) = self.get_geolocation(&mut processed).await {
             error!("Failed to get geolocation: {}", e);
@@ -109,10 +120,6 @@ impl EventProcessor {
         
         if let Err(e) = self.parse_user_agent(&mut processed).await {
             error!("Failed to parse user agent: {}", e);
-        }
-        
-        if let Err(e) = self.update_real_time_metrics(&processed).await {
-            error!("Failed to update real-time metrics: {}", e);
         }
 
         if let Err(e) = self.event_tx.send(processed).await {
@@ -185,11 +192,4 @@ impl EventProcessor {
 
         Ok(())
     } 
-
-    /// Update real-time metrics in ClickHouse
-    async fn update_real_time_metrics(&self, processed: &ProcessedEvent) -> Result<()> {
-        debug!("Updating real-time metrics using session_id: {}", processed.session_id);
-        // TODO: Implement real-time metrics update
-        Ok(())
-    }
 }
