@@ -1,14 +1,10 @@
 use anyhow::Result;
 use tokio::sync::mpsc;
-use r2d2::Pool;
-use redis::Client as RedisClient;
-use std::sync::Arc;
 use tracing::{error, debug};
 use crate::analytics::{AnalyticsEvent, generate_fingerprint};
 use crate::db::SharedDatabase;
 use crate::geoip::GeoIpService;
 use crate::session;
-use std::sync::Arc;
 use crate::bot_detection;
 use woothee::parser::Parser;
 use once_cell::sync::Lazy;
