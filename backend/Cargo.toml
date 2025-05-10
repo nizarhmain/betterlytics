@@ -36,7 +36,6 @@ clickhouse = { version = "0.13.2", features = ["inserter", "chrono"] }
 chrono = { version = "0.4.40", features = ["serde"] }
 uuid = { version = "1.16.0", features = ["v4"] }
 lazy_static = "1.5.0"
-once_cell = "1.19.0"
 
 # GeoIP dependencies
 maxminddb = "0.26.0"
