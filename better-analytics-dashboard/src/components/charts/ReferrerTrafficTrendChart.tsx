@@ -23,7 +23,7 @@ const calculateSourceTotals = (data: ReferrerTrafficBySourceRow[]): Record<strin
   }, {} as Record<string, number>);
 };
 
-// Helper function to get unique referrer sources sorted by their total counts (ascending)
+// Helper function to get unique referrer sources sorted by their total counts (descending)
 const getSortedReferrerSources = (
   data: ReferrerTrafficBySourceRow[],
   sourceTotals: Record<string, number>
@@ -32,7 +32,7 @@ const getSortedReferrerSources = (
     return [];
   }
   return Array.from(new Set(data.map(item => item.referrer_source)))
-    .sort((a, b) => (sourceTotals[a] || 0) - (sourceTotals[b] || 0));
+    .sort((a, b) => (sourceTotals[b] || 0) - (sourceTotals[a] || 0));
 };
 
 // Custom tooltip for better display
