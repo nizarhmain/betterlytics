@@ -45,13 +45,6 @@ pub enum EventType {
 impl EventRow {
     pub fn from_processed(event: ProcessedEvent) -> Self {
         let timestamp = event.timestamp;
-        let test: EventType = event.event_type.parse().unwrap();
-
-        // It prints correct value here
-        match test {
-           EventType::Pageview => println!("{}", "1"),
-           EventType::Custom => println!("{}", "2"),
-        }
 
         Self {
             site_id: event.site_id,
