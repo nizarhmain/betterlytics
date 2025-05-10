@@ -8,6 +8,8 @@ import { getWorldMapData } from '@/app/actions/geography';
 import { GeoVisitor } from '@/entities/geography';
 import { alpha2ToAlpha3Code } from '@/utils/countryCodes';
 
+import GeographyChart from "@/components/analytics/GeographyChart";
+
 export default function GeographyClient() {
   const [visitorData, setVisitorData] = useState<GeoVisitor[]>([]);
   const [maxVisitors, setMaxVisitors] = useState<number>(0);
@@ -77,6 +79,14 @@ export default function GeographyClient() {
           </select>
         </div>
       </div>
+
+      {!loading && !error && visitorData.length > 0 && (
+        <GeographyChart
+          data={visitorData}
+          chartType="bar"
+          className="absolute bottom-4 right-4 w-[380px] h-[400px] z-[1002] bg-white bg-opacity-90 shadow-lg rounded-xl p-4"
+        />
+      )}
       
       {loading && (
         <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center z-[1000]">
