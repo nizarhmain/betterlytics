@@ -1,13 +1,18 @@
 'use server';
 
 import { DailyUniqueVisitorsRow } from "@/entities/visitors";
-import { DailyPageViewRow } from "@/entities/pageviews";
+import { DailyPageViewRow, TotalPageViewsRow } from "@/entities/pageviews";
 import { getDeviceTypeBreakdownForSite } from "@/services/devices";
-import { getPageViewsForSite, getTopPagesForSite } from "@/services/pages";
+import { getPageViewsForSite, getTopPagesForSite, getTotalPageViewsForSite } from "@/services/pages";
 import { getSummaryStatsForSite } from "@/services/visitors";
 import { getUniqueVisitorsForSite } from "@/services/visitors";
 import { checkAuth } from "@/lib/auth-actions";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
+
+export async function fetchTotalPageViewsAction(siteId: string, startDate: string, endDate: string, granularity: GranularityRangeValues): Promise<TotalPageViewsRow[]> {
+  await checkAuth();
+  return getTotalPageViewsForSite(siteId, startDate, endDate, granularity);
+}
 
 export async function fetchPageViewsAction(siteId: string, startDate: string, endDate: string, granularity: GranularityRangeValues): Promise<DailyPageViewRow[]> {
   await checkAuth();

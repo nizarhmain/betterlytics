@@ -1,9 +1,35 @@
 import { clickhouse } from '@/lib/clickhouse';
-import { DailyPageViewRowSchema, DailyPageViewRow } from '@/entities/pageviews';
+import { DailyPageViewRowSchema, DailyPageViewRow, TotalPageViewsRow, TotalPageViewRowSchema } from '@/entities/pageviews';
 import { PageAnalytics, PageAnalyticsSchema } from '@/entities/pages';
 import { DateString, DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { BAQuery } from '@/lib/ba-query';
+
+export async function getTotalPageViews(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<TotalPageViewsRow[]> {
+  
+  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  
+  const query = `
+    SELECT
+      ${granularityFunc}(timestamp) as date,
+      count() as views
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
+    GROUP BY date
+    ORDER BY date ASC, views DESC
+    LIMIT 10080
+  `;
+  const result = await clickhouse.query(query, {
+    params: {
+      site_id: siteId,
+      start_date: startDate,
+      end_date: endDate,
+    },
+  }).toPromise() as unknown[];
+  return result.map(row => TotalPageViewRowSchema.parse(row));
+}
+
 
 export async function getPageViews(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<DailyPageViewRow[]> {
   
