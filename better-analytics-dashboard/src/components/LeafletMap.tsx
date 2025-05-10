@@ -7,6 +7,7 @@ import { scaleLinear } from 'd3-scale'
 import 'leaflet/dist/leaflet.css'
 import dynamic from 'next/dynamic'
 import { Feature, Geometry } from 'geojson'
+import { alpha2ToAlpha3Code } from '@/utils/countryCodes'
 
 interface VisitorData {
   country_code: string; 
@@ -77,7 +78,9 @@ const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapPr
     if (!feature) return {}
 
     const featureId = getFeatureId(feature)
-    const visitorEntry = visitorData.find(d => d.country_code === featureId)
+    // Convert alpha-2 to alpha-3 to match the GeoJSON data
+    const alpha3Code = featureId ? alpha2ToAlpha3Code(featureId) : undefined
+    const visitorEntry = visitorData.find(d => d.country_code === alpha3Code)
     const visitors = visitorEntry ? visitorEntry.visitors : 0
     
     return {
@@ -94,7 +97,9 @@ const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapPr
     if (!feature.properties) return
     
     const featureId = getFeatureId(feature)
-    const visitorEntry = visitorData.find(d => d.country_code === featureId)
+    // Convert alpha-2 to alpha-3 to match the GeoJSON data
+    const alpha3Code = featureId ? alpha2ToAlpha3Code(featureId) : undefined
+    const visitorEntry = visitorData.find(d => d.country_code === alpha3Code)
     const name = feature.properties.name || 
                 feature.properties.NAME || 
                 'Unknown'
