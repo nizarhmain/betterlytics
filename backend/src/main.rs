@@ -116,6 +116,9 @@ async fn track_event(
     if raw_event.url.is_empty() {
         return Err((StatusCode::BAD_REQUEST, "url is required".to_string()));
     }
+    if raw_event.event_name.is_empty() {
+        return Err((StatusCode::BAD_REQUEST, "event name is required".to_string()));
+    }
 
     let event = AnalyticsEvent::new(raw_event, addr.ip().to_string());
 

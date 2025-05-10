@@ -40,6 +40,10 @@ pub struct ProcessedEvent {
     /// Parsed campaign parameters
     pub campaign_info: CampaignInfo,
     pub user_agent: String,
+    /// Custom event handling
+    pub event_type: String,
+    pub custom_event_name: String,
+    pub custom_event_json: String,
 }
 
 /// Event processor that handles real-time processing
@@ -66,6 +70,7 @@ impl EventProcessor {
 
         let mut processed = ProcessedEvent {
             event: event.clone(),
+            event_type: String::new(),
             session_id: String::new(),
             is_bot: false,
             country_code: None,
@@ -80,7 +85,14 @@ impl EventProcessor {
             referrer: referrer.clone(),
             user_agent: user_agent.clone(),
             campaign_info: CampaignInfo::default(),
+            custom_event_name: String::new(),
+            custom_event_json: String::new(),
         };
+
+        // Handle event types
+        if let Err(e) = self.handle_event_types(&mut processed).await {
+            error!("Failed to handle event type: {}", e);
+        }
 
         // Parse campaign parameters from URL
         processed.campaign_info = parse_campaign_params(&url);
@@ -128,6 +140,19 @@ impl EventProcessor {
         }
 
         debug!("Processed event finished!");
+        Ok(())
+    }
+
+    /// Handle different event types
+    async fn handle_event_types(&self, processed: &mut ProcessedEvent) -> Result<()> {
+        let event_name = processed.event.raw.event_name.clone();
+        if processed.event.raw.is_custom_event {
+            processed.event_type = "custom".to_string();
+            processed.custom_event_name = event_name;
+            processed.custom_event_json = processed.event.raw.properties.clone();
+        } else {
+            processed.event_type = event_name;
+        }
         Ok(())
     }
 
