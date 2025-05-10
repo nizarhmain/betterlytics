@@ -18,20 +18,20 @@ export default function TopPagesTable({ pages }: TopPagesTableProps) {
       <h2 className="text-lg font-bold text-gray-900 mb-1">Top Pages</h2>
       <p className="text-sm text-gray-500 mb-4">Most visited pages</p>
       <div className="overflow-x-auto">
-        <Table className="min-w-full text-left border-separate border-spacing-y-2">
+        <Table className="w-full">
           <TableHeader>
-            <TableRow>
-              <TableHead className="px-4 py-2 text-gray-700 font-semibold">Page</TableHead>
-              <TableHead className="px-4 py-2 text-gray-700 font-semibold">Visitors</TableHead>
-              <TableHead className="px-4 py-2"></TableHead>
+            <TableRow className="border-b">
+              <TableHead className="py-3 text-gray-700 font-medium">Page</TableHead>
+              <TableHead className="py-3 text-gray-700 font-medium">Visitors</TableHead>
+              <TableHead className="py-3 text-gray-700 font-medium w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pages.map((page) => (
-              <TableRow key={page.url} className="bg-white hover:bg-gray-50">
-                <TableCell className="px-4 py-2 font-mono text-blue-700">{page.url}</TableCell>
-                <TableCell className="px-4 py-2">{page.visitors.toLocaleString()}</TableCell>
-                <TableCell className="px-4 py-2">
+              <TableRow key={page.url} className="border-b last:border-b-0">
+                <TableCell className="py-4 font-mono text-blue-700">{page.url}</TableCell>
+                <TableCell className="py-4">{page.visitors.toLocaleString()}</TableCell>
+                <TableCell className="py-4">
                   <a
                     href={page.url}
                     target="_blank"

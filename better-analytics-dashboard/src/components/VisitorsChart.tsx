@@ -4,21 +4,38 @@ import { fetchUniqueVisitorsAction } from '@/app/actions/overview';
 import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { getGroupingForRange, TimeGrouping } from '@/utils/timeRanges';
+import { GranularityRangeValues } from '@/utils/granularityRanges';
+import { useMemo } from 'react';
+import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragmentedGranularityTimeSeriesLineChart';
+import { timeFormat } from 'd3-time-format';
 
 interface VisitorsChartProps {
   siteId: string;
   startDate: string;
   endDate: string;
+  granularity: GranularityRangeValues;
 }
 
-export default function VisitorsChart({ siteId, startDate, endDate }: VisitorsChartProps) {
-  const groupBy: TimeGrouping = getGroupingForRange(startDate, endDate);
+export default function VisitorsChart({ siteId, startDate, endDate, granularity }: VisitorsChartProps) {
   const { data = [], isLoading } = useQuery<DailyUniqueVisitorsRow[]>({
-    queryKey: ['uniqueVisitors', siteId, startDate, endDate, groupBy],
-    queryFn: () => fetchUniqueVisitorsAction(siteId, startDate, endDate, groupBy),
+    queryKey: ['uniqueVisitors', siteId, startDate, endDate, granularity],
+    queryFn: () => fetchUniqueVisitorsAction(siteId, startDate, endDate, granularity),
   });
 
-  const chartData = data.map(row => ({ date: row.date, unique_visitors: row.unique_visitors }));
+  const timeSeriesProps = useMemo(() => {
+    return {
+      dataKey: 'unique_visitors',
+      data,
+      granularity
+    } as const;
+  }, [data, granularity]);
+
+  const {
+    chartData,
+    tooltipLabelFormatter,
+    scale,
+    ticks
+  } = useFragmentedGranularityTimeSeriesLineChart(timeSeriesProps);
 
   if (isLoading) return <div>Loading chart...</div>;
   if (data.length === 0) return <div>No data available.</div>;
@@ -32,9 +49,21 @@ export default function VisitorsChart({ siteId, startDate, endDate }: VisitorsCh
       <div className="w-full h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-            <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+            <XAxis
+              dataKey="date"
+              type='number'
+              ticks={ticks}
+              domain={["dataMin", "dataMax"]}
+              scale={scale}
+              tick={{ fill: '#64748b', fontSize: 12 }}
+              tickFormatter={timeFormat("%b %d")}
+              axisLine={false} tickLine={false}
+            />
             <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} width={48} />
-            <Tooltip />
+            <Tooltip
+              labelFormatter={tooltipLabelFormatter}
+              formatter={(value) => [value, "Unique visitors"]}
+            />
             <Line type="monotone" dataKey="unique_visitors" stroke="#06b6d4" strokeWidth={3} dot={false} />
           </LineChart>
         </ResponsiveContainer>

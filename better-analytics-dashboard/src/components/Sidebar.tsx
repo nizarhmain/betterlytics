@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, FileText } from "lucide-react";
+import { LayoutDashboard, FileText, Smartphone } from "lucide-react";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: <LayoutDashboard size={18} /> },
@@ -7,7 +7,7 @@ const navItems = [
   { name: "Pages", href: "/dashboard/pages", icon: <FileText size={18} /> },
   //{ name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
   //{ name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
-  //{ name: "Devices", href: "/dashboard/devices", icon: <Smartphone size={18} /> },
+  { name: "Devices", href: "/dashboard/devices", icon: <Smartphone size={18} /> },
 ];
 
 export default function Sidebar() {

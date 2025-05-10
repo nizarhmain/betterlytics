@@ -13,16 +13,15 @@ mod analytics;
 mod db;
 mod processing;
 mod session;
-mod tracking;
 mod geoip;
 mod geoip_updater;
 mod bot_detection;
 mod referrer;
+mod campaign;
 
 use analytics::{AnalyticsEvent, RawTrackingEvent, generate_site_id};
 use db::{Database, SharedDatabase};
 use processing::EventProcessor;
-use tracking::{is_user_request_unique, get_user_tracking_headers};
 use geoip::GeoIpService;
 use geoip_updater::GeoIpUpdater;
 
@@ -71,7 +70,6 @@ async fn main() {
 
     let app = Router::new()
         .route("/health", get(health_check))
-        .route("/ping", get(ping))
         .route("/track", post(track_event))
         .route("/site-id", get(generate_site_id_handler))
         .route("/test", get(|| async { 
@@ -125,29 +123,6 @@ async fn track_event(
     }
 
     Ok(StatusCode::OK)
-}
-
-/// Ping server - used to detect unique visitor
-async fn ping(
-    request: Request,
-) -> impl IntoResponse {
-    let is_unqiue_visitor = is_user_request_unique(request);
-    let is_unique_response = match is_unqiue_visitor {
-        true => 1,
-        false => 0,
-    };
-
-    let mut headers = HeaderMap::new();
-
-    let user_tracking_headers = get_user_tracking_headers(is_unqiue_visitor);
-
-    headers.extend(user_tracking_headers);
-
-    return (
-        StatusCode::OK,
-        headers,
-        Json(is_unique_response)
-    );
 }
 
 /// Temporary endpoint to generate a site ID

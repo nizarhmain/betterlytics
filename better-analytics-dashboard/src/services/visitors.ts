@@ -1,29 +1,19 @@
 'server-only';
 
 import {
-  getDailyUniqueVisitors,
-  getHourlyUniqueVisitors,
-  getMinuteUniqueVisitors,
+  getUniqueVisitors,
   getTotalUniqueVisitors,
   getTotalPageviews,
   getSessionMetrics
 } from '@/repositories/clickhouse';
 import { toDateTimeString, toDateString } from '@/utils/dateFormatters';
-import { TimeGrouping } from '@/utils/timeRanges';
 import { SummaryStatsSchema } from '@/entities/stats';
+import { GranularityRangeValues } from '@/utils/granularityRanges';
 
-export async function getUniqueVisitorsForSite(siteId: string, startDate: string, endDate: string, groupBy: TimeGrouping) {
-  if (groupBy === 'day') {
-    return getDailyUniqueVisitors(siteId, toDateString(startDate), toDateString(endDate));
-  }
-  
+export async function getUniqueVisitorsForSite(siteId: string, startDate: string, endDate: string, granularity: GranularityRangeValues) {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  
-  if (groupBy === 'hour') {
-    return getHourlyUniqueVisitors(siteId, formattedStart, formattedEnd);
-  }
-  return getMinuteUniqueVisitors(siteId, formattedStart, formattedEnd);
+  return getUniqueVisitors(siteId, formattedStart, formattedEnd, granularity);
 }
 
 export async function getSummaryStatsForSite(siteId: string, startDate: string, endDate: string) {

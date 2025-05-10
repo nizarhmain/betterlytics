@@ -1,12 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-
-const COLORS = ['#06b6d4', '#a78bfa', '#fb7185'];
-const DEVICE_LABELS: Record<string, string> = {
-  desktop: 'Desktop',
-  mobile: 'Mobile',
-  tablet: 'Tablet',
-};
+import { getDeviceLabel, getDeviceColor } from "@/constants/deviceTypes";
 
 interface DeviceTypePieChartProps {
   breakdown: { device_type: string; visitors: number }[];
@@ -14,11 +8,11 @@ interface DeviceTypePieChartProps {
 
 export default function DeviceTypePieChart({ breakdown }: DeviceTypePieChartProps) {
   const total = breakdown.reduce((sum, d) => sum + d.visitors, 0);
-  const data = breakdown.map((d, i) => ({
+  const data = breakdown.map((d) => ({
     ...d,
     percent: total ? Math.round((d.visitors / total) * 100) : 0,
-    color: COLORS[i % COLORS.length],
-    label: DEVICE_LABELS[d.device_type] || d.device_type,
+    color: getDeviceColor(d.device_type),
+    label: getDeviceLabel(d.device_type),
   }));
 
   return (

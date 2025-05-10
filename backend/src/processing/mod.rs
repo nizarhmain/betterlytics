@@ -1,15 +1,17 @@
 use anyhow::Result;
 use tokio::sync::mpsc;
+use tracing::{error, debug};
 use crate::analytics::{AnalyticsEvent, generate_fingerprint};
 use crate::db::SharedDatabase;
 use crate::geoip::GeoIpService;
-use tracing::{error, debug};
 use crate::session;
-use r2d2::Pool;
-use redis::Client as RedisClient;
-use std::sync::Arc;
 use crate::bot_detection;
 use crate::referrer::{ReferrerInfo, parse_referrer};
+use woothee::parser::Parser;
+use once_cell::sync::Lazy;
+use crate::campaign::{CampaignInfo, parse_campaign_params};
+
+static USER_AGENT_PARSER: Lazy<Parser> = Lazy::new(|| Parser::new());
 
 #[derive(Debug, Clone)]
 pub struct ProcessedEvent {
@@ -27,7 +29,7 @@ pub struct ProcessedEvent {
     /// Operating system - Parsed from user_agent string
     pub os: Option<String>,
     /// Device type (mobile, desktop, tablet) - Parsed from user_agent string
-    pub device_type: String,
+    pub device_type: Option<String>,
     pub site_id: String,
     pub visitor_fingerprint: String,
     pub timestamp: chrono::DateTime<chrono::Utc>,
@@ -35,6 +37,8 @@ pub struct ProcessedEvent {
     pub referrer: Option<String>,
     /// Parsed referrer information
     pub referrer_info: ReferrerInfo,
+    /// Parsed campaign parameters
+    pub campaign_info: CampaignInfo,
     pub user_agent: String,
 }
 
@@ -42,15 +46,13 @@ pub struct ProcessedEvent {
 pub struct EventProcessor {
     db: SharedDatabase,
     event_tx: mpsc::Sender<ProcessedEvent>,
-    redis_pool: Arc<Pool<RedisClient>>,
     geoip_service: GeoIpService,
 }
 
 impl EventProcessor {
     pub fn new(db: SharedDatabase, geoip_service: GeoIpService) -> (Self, mpsc::Receiver<ProcessedEvent>) {
         let (event_tx, event_rx) = mpsc::channel(100_000);
-        let redis_pool = session::REDIS_POOL.clone();
-        (Self { db, event_tx, redis_pool, geoip_service }, event_rx)
+        (Self { db, event_tx, geoip_service }, event_rx)
     }
 
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
@@ -68,7 +70,7 @@ impl EventProcessor {
             browser: None,
             browser_version: None,
             os: None,
-            device_type: "unknown".to_string(),
+            device_type: None,
             site_id: site_id.clone(),
             visitor_fingerprint: String::new(),
             timestamp: timestamp.clone(),
@@ -76,11 +78,16 @@ impl EventProcessor {
             referrer: referrer.clone(),
             referrer_info: ReferrerInfo::default(),
             user_agent: user_agent.clone(),
+            campaign_info: CampaignInfo::default(),
         };
 
         // Parse referrer information
         processed.referrer_info = parse_referrer(referrer.as_deref(), Some(&url));
         debug!("referrer_info: {:?}", processed.referrer_info);
+        
+        // Parse campaign parameters from URL
+        processed.campaign_info = parse_campaign_params(&url);
+        debug!("campaign_info: {:?}", processed.campaign_info);
 
         if let Err(e) = self.get_geolocation(&mut processed).await {
             error!("Failed to get geolocation: {}", e);
@@ -97,19 +104,19 @@ impl EventProcessor {
         }
 
         let session_id_result = session::get_or_create_session_id(
-            &self.redis_pool, 
             &site_id, 
             &processed.visitor_fingerprint, 
-            &timestamp
         );
 
         match session_id_result {
             Ok(id) => processed.session_id = id,
             Err(e) => {
-                error!("Failed to get session ID from Redis: {}. Event processing aborted for: {:?}", e, processed.event);
+                error!("Failed to get session ID: {}. Event processing aborted for: {:?}", e, processed.event);
                 return Ok(());
             }
         };
+
+        debug!("Session ID: {}", processed.session_id);
 
         if let Err(e) = self.detect_device_type_from_resolution(&mut processed).await {
             error!("Failed to detect device type from resolution: {}", e);
@@ -117,10 +124,6 @@ impl EventProcessor {
         
         if let Err(e) = self.parse_user_agent(&mut processed).await {
             error!("Failed to parse user agent: {}", e);
-        }
-        
-        if let Err(e) = self.update_real_time_metrics(&processed).await {
-            error!("Failed to update real-time metrics: {}", e);
         }
 
         if let Err(e) = self.event_tx.send(processed).await {
@@ -152,10 +155,26 @@ impl EventProcessor {
     /// Parse user agent to extract browser and OS information
     async fn parse_user_agent(&self, processed: &mut ProcessedEvent) -> Result<()> {
         debug!("Parsing user agent: {:?}", processed.user_agent);
-        // TODO: Implement user agent parsing
-        processed.browser = None;
-        processed.browser_version = None;
-        processed.os = None;
+        
+        if let Some(result) = USER_AGENT_PARSER.parse(&processed.user_agent) {
+            // Extract browser information
+            processed.browser = Some(result.name.to_string());
+            processed.browser_version = Some(result.version.to_string());
+            
+            // Extract OS information
+            processed.os = Some(result.os.to_string());
+            
+            // Extract device type
+            processed.device_type = Some(result.category.to_string());
+            
+            debug!(
+                "User agent parsed: browser={:?}, version={:?}, os={:?}, device_type={:?}",
+                processed.browser, processed.browser_version, processed.os, processed.device_type
+            );
+        } else {
+            debug!("Failed to parse user agent: {}", processed.user_agent);
+        }
+        
         Ok(())
     }
     
@@ -163,25 +182,18 @@ impl EventProcessor {
         if let Some((w, _h)) = processed.event.raw.screen_resolution.split_once('x') {
             if let Ok(width) = w.trim().parse::<u32>() {
                 match width {
-                    0..=575 => processed.device_type = "mobile".to_string(),
-                    576..=991 => processed.device_type = "tablet".to_string(),
-                    992..=1439 => processed.device_type = "laptop".to_string(),
-                    _ => processed.device_type = "desktop".to_string(),
+                    0..=575 => processed.device_type = Some("mobile".to_string()),
+                    576..=991 => processed.device_type = Some("tablet".to_string()),
+                    992..=1439 => processed.device_type = Some("laptop".to_string()),
+                    _ => processed.device_type = Some("desktop".to_string()),
                 }
             } else {
-                processed.device_type = "unknown".to_string();
+                processed.device_type = Some("unknown".to_string());
             }
         } else {
-            processed.device_type = "unknown".to_string();
+            processed.device_type = Some("unknown".to_string());
         }
 
         Ok(())
     } 
-
-    /// Update real-time metrics in ClickHouse
-    async fn update_real_time_metrics(&self, processed: &ProcessedEvent) -> Result<()> {
-        debug!("Updating real-time metrics using session_id: {}", processed.session_id);
-        // TODO: Implement real-time metrics update
-        Ok(())
-    }
 }
