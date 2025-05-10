@@ -12,6 +12,14 @@ datasource db {
 
 model Site {
   id String @id @default(cuid())
-  siteId String
+  siteId String @unique
+
+  Funnel Funnel[]
+}
+
+model Funnel {
+  id String @id @default(cuid())
+  site    Site @relation(fields: [siteId], references: [siteId], onDelete: Cascade)
+  siteId  String
 }
 
