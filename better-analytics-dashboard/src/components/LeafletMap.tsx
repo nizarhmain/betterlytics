@@ -14,7 +14,6 @@ interface LeafletMapProps {
   maxVisitors?: number;
 }
 
-// GeoJSON options for performance
 const geoJsonOptions = {
   updateWhenIdle: true,
   buffer: 2
@@ -22,8 +21,8 @@ const geoJsonOptions = {
 
 const WORLD_GEOJSON_URL = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json'
 
-// World bounds - limit how far users can pan
-const MAX_BOUNDS = L.latLngBounds(
+// To limit how far users can pan
+const MAX_WORLD_BOUNDS = L.latLngBounds(
   L.latLng(-100, -220),
   L.latLng(100, 220)
 )
@@ -121,7 +120,7 @@ const LeafletMap = ({ visitorData, maxVisitors }: LeafletMapProps) => {
         style={{ height: '100%', width: '100%' }}
         zoom={2} 
         zoomControl={true}
-        maxBounds={MAX_BOUNDS}
+        maxBounds={MAX_WORLD_BOUNDS}
         maxBoundsViscosity={0.5}
         minZoom={1}
         maxZoom={7}
