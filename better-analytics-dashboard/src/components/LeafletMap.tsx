@@ -136,6 +136,7 @@ const LeafletMap = ({ visitorData, maxVisitors }: LeafletMapProps) => {
         
         {worldGeoJson && (
           <GeoJSON 
+            key={JSON.stringify(visitorData.length)} // Force re-render when data changes
             data={worldGeoJson}
             style={styleGeoJson}
             onEachFeature={onEachFeature}
