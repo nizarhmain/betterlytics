@@ -1,8 +1,8 @@
 'server-only';
 
-import { getReferrerDistribution, getReferrerSummary, getReferrerTrafficTrendBySource } from '@/repositories/clickhouse';
+import { getReferrerDistribution, getReferrerSummary, getReferrerTableData, getReferrerTrafficTrendBySource } from '@/repositories/clickhouse';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { ReferrerSourceAggregation, ReferrerSummary, ReferrerTrafficBySourceRow } from '@/entities/referrers';
+import { ReferrerSourceAggregation, ReferrerSummary, ReferrerTableRow, ReferrerTableRowSchema, ReferrerTrafficBySourceRow } from '@/entities/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 
 /**
@@ -55,4 +55,26 @@ export async function getReferrerSummaryDataForSite(
     ...result,
     avgBounceRate: Number(result.avgBounceRate.toFixed(1))
   };
+}
+
+/**
+ * Gets detailed referrer data for table display
+ */
+export async function getReferrerTableDataForSite(
+  siteId: string,
+  startDate: string,
+  endDate: string,
+  limit = 100
+): Promise<ReferrerTableRow[]> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  
+  const result = await getReferrerTableData(
+    siteId, 
+    formattedStart, 
+    formattedEnd, 
+    limit
+  );
+  
+  return result.map(row => ReferrerTableRowSchema.parse(row));
 }

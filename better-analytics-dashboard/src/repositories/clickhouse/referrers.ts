@@ -134,4 +134,79 @@ export async function getReferrerSummary(
   };
   
   return ReferrerSummarySchema.parse(summary);
+}
+
+/**
+ * Get detailed referrer data for the table display
+ * Including visits, bounce rate, and visit duration by referrer source
+ */
+export async function getReferrerTableData(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString,
+  limit = 100
+): Promise<any[]> {
+  const query = `
+    WITH 
+      -- Calculate sessions with a single page view (bounces)
+      session_pages AS (
+        SELECT 
+          session_id,
+          count() as page_count
+        FROM analytics.events
+        WHERE site_id = {site_id:String}
+          AND timestamp >= {start:DateTime}
+          AND timestamp <= {end:DateTime}
+        GROUP BY session_id
+      ),
+      
+      -- Calculate visit durations
+      visit_durations AS (
+        SELECT
+          referrer_source,
+          session_id,
+          max(timestamp) - min(timestamp) as duration_seconds
+        FROM analytics.events
+        WHERE site_id = {site_id:String}
+          AND timestamp >= {start:DateTime}
+          AND timestamp <= {end:DateTime}
+        GROUP BY referrer_source, session_id
+      )
+
+    SELECT
+      r.referrer_source as source,
+      -- Count unique sessions for this referrer
+      uniq(r.session_id) as visits,
+      -- Calculate bounce rate for this referrer
+      round(
+        countIf(sp.page_count = 1) / uniq(r.session_id) * 100,
+        1
+      ) as bounce_rate,
+      -- Calculate average visit duration
+      round(
+        avg(vd.duration_seconds),
+        1
+      ) as avg_visit_duration
+    FROM analytics.events as r
+    LEFT JOIN session_pages as sp ON r.session_id = sp.session_id
+    LEFT JOIN visit_durations as vd ON r.session_id = vd.session_id
+    WHERE r.site_id = {site_id:String}
+      AND r.timestamp >= {start:DateTime}
+      AND r.timestamp <= {end:DateTime}
+    GROUP BY r.referrer_source
+    ORDER BY visits DESC
+    LIMIT {limit:UInt32}
+  `;
+
+  const result = await clickhouse.query(query, {
+    params: { 
+      site_id: siteId, 
+      start: startDate, 
+      end: endDate,
+      limit: limit
+    },
+    format: 'JSONEachRow'
+  }).toPromise() as any[];
+  
+  return result;
 } 

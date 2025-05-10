@@ -1,6 +1,6 @@
 'use server';
 
-import { getReferrerSourceAggregationDataForSite, getReferrerSummaryDataForSite, getReferrerTrafficTrendBySourceDataForSite } from '@/services/referrers';
+import { getReferrerSourceAggregationDataForSite, getReferrerSummaryDataForSite, getReferrerTableDataForSite, getReferrerTrafficTrendBySourceDataForSite } from '@/services/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 
 /**
@@ -43,6 +43,19 @@ export async function fetchReferrerSummaryDataForSite(siteId: string, startDate:
     return { data };
   } catch (error) {
     console.error('Error fetching referrer summary data:', error);
+    throw error;
+  }
+} 
+
+/**
+ * Fetches detailed referrer data for table display
+ */
+export async function fetchReferrerTableDataForSite(siteId: string, startDate: string, endDate: string, limit = 100) {
+  try {
+    const data = await getReferrerTableDataForSite(siteId, startDate, endDate, limit);
+    return { data };
+  } catch (error) {
+    console.error('Error fetching referrer table data:', error);
     throw error;
   }
 } 

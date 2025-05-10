@@ -2,37 +2,31 @@
 
 import { useState, useEffect, useMemo } from "react";
 import SummaryCard from "@/components/SummaryCard";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import ReferrerDistributionChart from '@/components/charts/ReferrerDistributionChart';
 import ReferrerTrafficTrendChart from '@/components/charts/ReferrerTrafficTrendChart';
+import ReferrerTable from '@/components/charts/ReferrerTable';
 import { 
   fetchReferrerSourceAggregationDataForSite, 
   fetchReferrerSummaryDataForSite,
+  fetchReferrerTableDataForSite,
   fetchReferrerTrafficTrendBySourceDataForSite
 } from "@/app/actions/referrers";
 import { 
   ReferrerSourceAggregation, 
   ReferrerSummary,
+  ReferrerTableRow,
   ReferrerTrafficBySourceRow 
 } from "@/entities/referrers";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
 import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
-import { formatNumber, formatPercentage } from "@/utils/formatters";
-
-enum ReferrerTab {
-  All = 'all',
-  Search = 'search',
-  Social = 'social',
-  Direct = 'direct',
-  Email = 'email'
-}
+import { formatPercentage } from "@/utils/formatters";
 
 export default function ReferrersClient() {
-  const [activeTab, setActiveTab] = useState<ReferrerTab>(ReferrerTab.All);
   const [distributionData, setDistributionData] = useState<ReferrerSourceAggregation[] | undefined>(undefined);
   const [trendBySourceData, setTrendBySourceData] = useState<ReferrerTrafficBySourceRow[] | undefined>(undefined);
   const [summaryData, setSummaryData] = useState<ReferrerSummary | undefined>(undefined);
+  const [tableData, setTableData] = useState<ReferrerTableRow[]>([]);
   const [loading, setLoading] = useState(true);
   const { range, setRange } = useTimeRangeContext();
   const [granularity, setGranularity] = useState<GranularityRangeValues>("day");
@@ -44,15 +38,17 @@ export default function ReferrersClient() {
     async function loadData() {
       setLoading(true);
       try {
-        const [distributionResult, trendBySourceResult, summaryResult] = await Promise.all([
+        const [distributionResult, trendBySourceResult, summaryResult, tableResult] = await Promise.all([
           fetchReferrerSourceAggregationDataForSite(siteId, startDate, endDate),
           fetchReferrerTrafficTrendBySourceDataForSite(siteId, startDate, endDate, granularity),
-          fetchReferrerSummaryDataForSite(siteId, startDate, endDate)
+          fetchReferrerSummaryDataForSite(siteId, startDate, endDate),
+          fetchReferrerTableDataForSite(siteId, startDate, endDate)
         ]);
         
         setDistributionData(distributionResult.data);
         setTrendBySourceData(trendBySourceResult.data);
         setSummaryData(summaryResult.data);
+        setTableData(tableResult.data);
       } catch (e) {
         console.error(e);
       } finally {
@@ -121,7 +117,7 @@ export default function ReferrersClient() {
           <div className="bg-white rounded-lg p-4 shadow">
             <div className="font-medium mb-2 text-gray-700">Referrer Distribution</div>
             <p className="text-xs text-gray-500 mb-4">Traffic sources by category</p>
-              <ReferrerDistributionChart data={distributionData} loading={loading} />
+            <ReferrerDistributionChart data={distributionData} loading={loading} />
           </div>
           <div className="bg-white rounded-lg p-4 shadow">
             <div className="font-medium mb-2 text-gray-700">Referral Traffic Trends</div>
@@ -130,51 +126,11 @@ export default function ReferrersClient() {
           </div>
         </div>
         
-        {/* Table with Tabs */}
+        {/* Referrer Table */}
         <div className="bg-white rounded-lg p-4 shadow">
-          <div className="border-b mb-4">
-            <div className="flex space-x-4">
-              {[
-                { id: ReferrerTab.All, label: 'All' },
-                { id: ReferrerTab.Search, label: 'Search' },
-                { id: ReferrerTab.Social, label: 'Social' },
-                { id: ReferrerTab.Direct, label: 'Direct' },
-                { id: ReferrerTab.Email, label: 'Email' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  className={`px-3 py-2 text-sm font-medium border-b-2 ${
-                    activeTab === tab.id 
-                      ? 'border-gray-800 text-gray-800' 
-                      : 'border-transparent hover:border-gray-300 text-gray-600'
-                  }`}
-                  onClick={() => setActiveTab(tab.id as ReferrerTab)}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          <div className="rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Visits</TableHead>
-                  <TableHead>Bounce Rate</TableHead>
-                  <TableHead>Avg. Visit Duration</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center text-gray-500">
-                    No {activeTab !== ReferrerTab.All ? activeTab : ''} data to display
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
+          <div className="font-medium mb-2 text-gray-700">Referrer Details</div>
+          <p className="text-xs text-gray-500 mb-4">Detailed breakdown of traffic sources</p>
+          <ReferrerTable data={tableData} loading={loading} />
         </div>
       </div>
     </div>
