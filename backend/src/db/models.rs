@@ -1,40 +1,57 @@
 use chrono::{DateTime, Utc, NaiveDate};
 use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
+use strum_macros::EnumString;
 use crate::processing::ProcessedEvent;
 
 #[derive(clickhouse::Row, Serialize, Debug, Deserialize)]
 pub struct EventRow {
     pub site_id: String,
-    pub session_id: String,
     pub visitor_id: String,
+    pub session_id: String,
     pub url: String,
     pub referrer: String,
+    pub user_agent: String,
+    pub device_type: String,
+    pub country_code: Option<String>,
+    #[serde(with = "clickhouse::serde::chrono::datetime")]
+    pub timestamp: DateTime<Utc>,
+    #[serde(with = "clickhouse::serde::chrono::date")]
+    pub date: NaiveDate,
+    pub browser: String,
+    pub os: String,
     pub referrer_source: String,
     pub referrer_source_name: String,
     pub referrer_search_term: String,
     pub referrer_url: String,
-    pub event_type: String,
-    pub custom_event_name: String,
-    pub custom_event_json: String,
     pub utm_source: String,
     pub utm_medium: String,
     pub utm_campaign: String,
     pub utm_term: String,
     pub utm_content: String,
-    pub user_agent: String,
-    pub device_type: String,
-    pub country_code: Option<String>,
-    pub browser: String,
-    pub os: String,
-    #[serde(with = "clickhouse::serde::chrono::datetime")]
-    pub timestamp: DateTime<Utc>,
-    #[serde(with = "clickhouse::serde::chrono::date")]
-    pub date: NaiveDate,
+    pub event_type: EventType,
+    pub custom_event_name: String,
+    pub custom_event_json: String,
+}
+
+#[derive(Debug, EnumString, Serialize_repr, Deserialize_repr)]
+#[strum(serialize_all = "snake_case")]
+#[repr(u8)]
+pub enum EventType {
+    Pageview = 1,
+    Custom = 2,
 }
 
 impl EventRow {
     pub fn from_processed(event: ProcessedEvent) -> Self {
         let timestamp = event.timestamp;
+        let test: EventType = event.event_type.parse().unwrap();
+
+        // It prints correct value here
+        match test {
+           EventType::Pageview => println!("{}", "1"),
+           EventType::Custom => println!("{}", "2"),
+        }
 
         Self {
             site_id: event.site_id,
@@ -46,7 +63,7 @@ impl EventRow {
             referrer_source_name: event.referrer_info.source_name.unwrap_or_default(),
             referrer_search_term: event.referrer_info.search_term.unwrap_or_default(),
             referrer_url: event.referrer_info.url.unwrap_or_default(),
-            event_type: event.event_type,
+            event_type: event.event_type.parse().unwrap(),
             custom_event_name: event.custom_event_name,
             custom_event_json: event.custom_event_json,
             utm_source: event.campaign_info.utm_source.unwrap_or_default(),

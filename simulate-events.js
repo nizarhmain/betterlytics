@@ -2,12 +2,12 @@
  * Parameters
  */
 const TARGET_URL = 'http://localhost:3001/track'
-const NUMBER_OF_EVENTS = 1000;
+const NUMBER_OF_EVENTS = 1;
 const NUMBER_OF_USERS = 500;
 const SIMULATED_DAYS = 7;
 const CUSTOM_EVENTS = [
   { event_name: 'cart-checkout', properties: JSON.stringify({ test_value: 6 }) },
-  { event_name: 'product-clicked', properties: JSON.stringify({ product_id: 'abc123' }) },
+  // { event_name: 'product-clicked', properties: JSON.stringify({ product_id: 'abc123' }) },
 ];
 const CUSTOM_EVENT_FREQUENCY = 1;
 

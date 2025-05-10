@@ -1,5 +1,5 @@
 ALTER TABLE analytics.events
-    ADD COLUMN IF NOT EXISTS event_type Enum('pageview' = 1, 'custom' = 2),
+    ADD COLUMN IF NOT EXISTS event_type Enum8('pageview' = 1, 'custom' = 2),
     ADD COLUMN IF NOT EXISTS custom_event_name String DEFAULT '',
     ADD COLUMN IF NOT EXISTS custom_event_json String DEFAULT '{}';
 
