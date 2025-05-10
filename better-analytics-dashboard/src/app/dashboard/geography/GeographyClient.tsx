@@ -1,25 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import LeafletMap from './LeafletMap';
+import { useEffect, useMemo, useState } from "react";
+import LeafletMap from '@/components/LeafletMap';
+import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
+import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { getWorldMapData } from '@/app/actions/geography';
 import { GeoVisitor } from '@/services/geography';
+import { alpha2ToAlpha3Code } from '@/utils/countryCodes';
 
-interface VisitorMapWrapperProps {
-  siteId: string;
-  startDate: string;
-  endDate: string;
-}
-
-export default function VisitorMapWrapper({
-  siteId,
-  startDate,
-  endDate,
-}: VisitorMapWrapperProps) {
+export default function GeographyClient() {
   const [visitorData, setVisitorData] = useState<GeoVisitor[]>([]);
   const [maxVisitors, setMaxVisitors] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { range, setRange } = useTimeRangeContext();
+  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  
+  const siteId = 'default-site';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,12 +26,26 @@ export default function VisitorMapWrapper({
       
       try {
         const data = await getWorldMapData({ siteId, startDate, endDate });
-        setVisitorData(data.visitorData);
+        
+        // Convert alpha-2 country codes to alpha-3 for map compatibility with the current geojson data format
+        const processedData = data.visitorData.map(visitor => {
+          if (visitor.country_code === 'Localhost') {
+            return visitor;
+          }
+          
+          const alpha3 = alpha2ToAlpha3Code(visitor.country_code);
+          
+          return alpha3 ? {
+            ...visitor,
+            country_code: alpha3
+          } : visitor;
+        });
+        
+        setVisitorData(processedData);
         setMaxVisitors(data.maxVisitors);
       } catch (err) {
         console.error('Error fetching visitor map data:', err);
         setError('Failed to load geographic visitor data');
-        // Keep old data if there's an error
       } finally {
         setLoading(false);
       }
@@ -41,14 +53,30 @@ export default function VisitorMapWrapper({
 
     fetchData();
   }, [siteId, startDate, endDate]);
-
+  
   return (
-    <div className="relative flex-1 w-full h-full">
-      <LeafletMap
-        visitorData={visitorData}
-        maxVisitors={maxVisitors}
-        height="100%"
-      />
+    <div className="h-full w-full flex flex-col relative">
+      <div className="absolute inset-0 w-full h-full">
+        <LeafletMap
+          visitorData={visitorData}
+          maxVisitors={maxVisitors}
+        />
+      </div>
+      
+      <div className="absolute top-4 right-4 z-[1001]">
+        <div className="bg-white shadow-md rounded-md p-2">
+          <select
+            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={range}
+            onChange={e => setRange(e.target.value as TimeRangeValue)}
+            aria-label="Select time range"
+          >
+            {TIME_RANGE_PRESETS.map(r => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
       
       {loading && (
         <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center z-[1000]">

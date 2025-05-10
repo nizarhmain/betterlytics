@@ -17,7 +17,6 @@ interface VisitorData {
 interface LeafletMapProps {
   visitorData: VisitorData[];
   maxVisitors?: number;
-  height?: string;
 }
 
 // GeoJSON options for performance
@@ -35,7 +34,7 @@ const MAX_BOUNDS = L.latLngBounds(
   L.latLng(100, 220)
 )
 
-const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapProps) => {
+const LeafletMap = ({ visitorData, maxVisitors }: LeafletMapProps) => {
   const [worldGeoJson, setWorldGeoJson] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -78,9 +77,7 @@ const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapPr
     if (!feature) return {}
 
     const featureId = getFeatureId(feature)
-    // Convert alpha-2 to alpha-3 to match the GeoJSON data
-    const alpha3Code = featureId ? alpha2ToAlpha3Code(featureId) : undefined
-    const visitorEntry = visitorData.find(d => d.country_code === alpha3Code)
+    const visitorEntry = visitorData.find(d => d.country_code === featureId)
     const visitors = visitorEntry ? visitorEntry.visitors : 0
     
     return {
@@ -97,9 +94,7 @@ const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapPr
     if (!feature.properties) return
     
     const featureId = getFeatureId(feature)
-    // Convert alpha-2 to alpha-3 to match the GeoJSON data
-    const alpha3Code = featureId ? alpha2ToAlpha3Code(featureId) : undefined
-    const visitorEntry = visitorData.find(d => d.country_code === alpha3Code)
+    const visitorEntry = visitorData.find(d => d.country_code === featureId)
     const name = feature.properties.name || 
                 feature.properties.NAME || 
                 'Unknown'
@@ -114,7 +109,7 @@ const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapPr
   }
 
   return (
-    <div style={{ height, width: '100%', position: 'relative' }}>
+    <div style={{ height: '100%', width: '100%', position: 'relative' }}>
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
           <div>Loading map data...</div>
@@ -131,14 +126,13 @@ const LeafletMap = ({ visitorData, maxVisitors, height = '500px' }: LeafletMapPr
         center={[20, 0]} 
         style={{ height: '100%', width: '100%' }}
         zoom={2} 
-        zoomControl={false}
+        zoomControl={true}
         maxBounds={MAX_BOUNDS}
         maxBoundsViscosity={0.5}
         minZoom={1}
         maxZoom={7}
         attributionControl={false}
       >
-        <ZoomControl position="topright" />
         
         {worldGeoJson && (
           <GeoJSON 
