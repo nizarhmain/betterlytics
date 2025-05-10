@@ -8,26 +8,10 @@
         return console.error("Better Analytics: data-site-id attribute missing");
     }
 
-    function ping() {
-        return fetch(
-            "http://localhost:3001/ping",
-            {
-                method: "GET",
-                cache: "default",
-                mode: "cors",
-                keepalive: false
-            }
-        )
-            .then((res) => res.json())
-            .catch((error) => console.error("Analytics ping failed:", error));
-    }
-
     // Track current path for SPA navigation
     var currentPath = window.location.pathname;
 
-    async function trackEvent(eventName, isCustomEvent = false, properties = {}) {
-        const isUnique = await ping();
-
+    function trackEvent(eventName, isCustomEvent = false, properties = {}) {
         var url = window.location.href;
         var referrer = document.referrer || null;
         var userAgent = navigator.userAgent;
