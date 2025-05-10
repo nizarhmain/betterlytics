@@ -20,6 +20,7 @@ export async function getReferrerDistribution(
     WHERE site_id = {site_id:String}
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
+      AND referrer_source != 'internal'
     GROUP BY referrer_source
     ORDER BY visitorCount DESC
   `;
@@ -55,6 +56,7 @@ export async function getReferrerTrafficTrendBySource(
     WHERE site_id = {site_id:String}
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
+      AND referrer_source != 'internal'
     GROUP BY date, referrer_source
     ORDER BY date ASC
   `;
@@ -110,6 +112,7 @@ export async function getReferrerSummary(
               AND timestamp >= {start:DateTime}
               AND timestamp <= {end:DateTime}
               AND referrer_source != 'direct'
+              AND referrer_source != 'internal'
           )
       ) / uniq(session_id) * 100 as avgBounceRate
     FROM analytics.events
@@ -117,6 +120,7 @@ export async function getReferrerSummary(
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
       AND referrer_source != 'direct'
+      AND referrer_source != 'internal'
   `;
 
   const result = await clickhouse.query(query, {
@@ -194,6 +198,7 @@ export async function getReferrerTableData(
     WHERE r.site_id = {site_id:String}
       AND r.timestamp >= {start:DateTime}
       AND r.timestamp <= {end:DateTime}
+      AND r.referrer_source != 'internal'
     GROUP BY r.referrer_source, r.referrer_source_name, r.referrer_url
     ORDER BY visits DESC
     LIMIT {limit:UInt32}

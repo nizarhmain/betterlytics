@@ -5,7 +5,6 @@ export const REFERRER_COLORS: Record<string, string> = {
   'direct': '#10B981', // Emerald
   'email': '#EF4444',  // Red
   'other': '#F59E0B',  // Amber
-  'internal': '#22C55E', // Green
 };
 
 /**
@@ -13,5 +12,5 @@ export const REFERRER_COLORS: Record<string, string> = {
  */
 export function getReferrerColor(referrerType: string): string {
   const type = referrerType.toLowerCase();
-  return REFERRER_COLORS[type];
+  return REFERRER_COLORS[type] || REFERRER_COLORS.other;
 } 
