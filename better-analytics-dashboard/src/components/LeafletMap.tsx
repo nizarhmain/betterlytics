@@ -20,7 +20,6 @@ const geoJsonOptions = {
   buffer: 2
 }
 
-// GeoJSON data source
 const WORLD_GEOJSON_URL = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json'
 
 // World bounds - limit how far users can pan
