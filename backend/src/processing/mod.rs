@@ -1,14 +1,12 @@
 use anyhow::Result;
 use tokio::sync::mpsc;
-use r2d2::Pool;
-use redis::Client as RedisClient;
-use std::sync::Arc;
 use tracing::{error, debug};
 use crate::analytics::{AnalyticsEvent, generate_fingerprint};
 use crate::db::SharedDatabase;
 use crate::geoip::GeoIpService;
 use crate::session;
 use crate::bot_detection;
+use crate::referrer::{ReferrerInfo, parse_referrer};
 use woothee::parser::Parser;
 use once_cell::sync::Lazy;
 use crate::campaign::{CampaignInfo, parse_campaign_params};
@@ -37,6 +35,8 @@ pub struct ProcessedEvent {
     pub timestamp: chrono::DateTime<chrono::Utc>,
     pub url: String,
     pub referrer: Option<String>,
+    /// Parsed referrer information
+    pub referrer_info: ReferrerInfo,
     /// Parsed campaign parameters
     pub campaign_info: CampaignInfo,
     pub user_agent: String,
@@ -46,15 +46,13 @@ pub struct ProcessedEvent {
 pub struct EventProcessor {
     db: SharedDatabase,
     event_tx: mpsc::Sender<ProcessedEvent>,
-    redis_pool: Arc<Pool<RedisClient>>,
     geoip_service: GeoIpService,
 }
 
 impl EventProcessor {
     pub fn new(db: SharedDatabase, geoip_service: GeoIpService) -> (Self, mpsc::Receiver<ProcessedEvent>) {
         let (event_tx, event_rx) = mpsc::channel(100_000);
-        let redis_pool = session::REDIS_POOL.clone();
-        (Self { db, event_tx, redis_pool, geoip_service }, event_rx)
+        (Self { db, event_tx, geoip_service }, event_rx)
     }
 
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
@@ -78,10 +76,15 @@ impl EventProcessor {
             timestamp: timestamp.clone(),
             url: url.clone(),
             referrer: referrer.clone(),
+            referrer_info: ReferrerInfo::default(),
             user_agent: user_agent.clone(),
             campaign_info: CampaignInfo::default(),
         };
 
+        // Parse referrer information
+        processed.referrer_info = parse_referrer(referrer.as_deref(), Some(&url));
+        debug!("referrer_info: {:?}", processed.referrer_info);
+        
         // Parse campaign parameters from URL
         processed.campaign_info = parse_campaign_params(&url);
         debug!("campaign_info: {:?}", processed.campaign_info);
@@ -101,19 +104,19 @@ impl EventProcessor {
         }
 
         let session_id_result = session::get_or_create_session_id(
-            &self.redis_pool, 
             &site_id, 
             &processed.visitor_fingerprint, 
-            &timestamp
         );
 
         match session_id_result {
             Ok(id) => processed.session_id = id,
             Err(e) => {
-                error!("Failed to get session ID from Redis: {}. Event processing aborted for: {:?}", e, processed.event);
+                error!("Failed to get session ID: {}. Event processing aborted for: {:?}", e, processed.event);
                 return Ok(());
             }
         };
+
+        debug!("Session ID: {}", processed.session_id);
 
         if let Err(e) = self.detect_device_type_from_resolution(&mut processed).await {
             error!("Failed to detect device type from resolution: {}", e);

@@ -7,7 +7,6 @@ import {
   getSessionMetrics
 } from '@/repositories/clickhouse';
 import { toDateTimeString, toDateString } from '@/utils/dateFormatters';
-import { TimeGrouping } from '@/utils/timeRanges';
 import { SummaryStatsSchema } from '@/entities/stats';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 
