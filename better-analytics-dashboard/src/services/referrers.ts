@@ -1,8 +1,8 @@
 'server-only';
 
-import { getReferrerDistribution, getReferrerTrafficTrendBySource } from '@/repositories/clickhouse';
+import { getReferrerDistribution, getReferrerSummary, getReferrerTrafficTrendBySource } from '@/repositories/clickhouse';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { ReferrerSourceAggregation, ReferrerTrafficBySourceRow } from '@/entities/referrers';
+import { ReferrerSourceAggregation, ReferrerSummary, ReferrerTrafficBySourceRow } from '@/entities/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 
 /**
@@ -32,4 +32,27 @@ export async function getReferrerTrafficTrendBySourceDataForSite(
   const formattedEnd = toDateTimeString(endDate);
   
   return getReferrerTrafficTrendBySource(siteId, formattedStart, formattedEnd, granularity);
+}
+
+/**
+ * Gets summary data about referrers for a given site and time period
+ */
+export async function getReferrerSummaryDataForSite(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<ReferrerSummary> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  
+  const result = await getReferrerSummary(
+    siteId, 
+    formattedStart, 
+    formattedEnd
+  );
+  
+  return {
+    ...result,
+    avgBounceRate: Number(result.avgBounceRate.toFixed(1))
+  };
 }

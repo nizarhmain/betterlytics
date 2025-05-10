@@ -7,15 +7,18 @@ import ReferrerDistributionChart from '@/components/charts/ReferrerDistributionC
 import ReferrerTrafficTrendChart from '@/components/charts/ReferrerTrafficTrendChart';
 import { 
   fetchReferrerSourceAggregationDataForSite, 
+  fetchReferrerSummaryDataForSite,
   fetchReferrerTrafficTrendBySourceDataForSite
 } from "@/app/actions/referrers";
 import { 
   ReferrerSourceAggregation, 
+  ReferrerSummary,
   ReferrerTrafficBySourceRow 
 } from "@/entities/referrers";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
 import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
+import { formatNumber, formatPercentage } from "@/utils/formatters";
 
 enum ReferrerTab {
   All = 'all',
@@ -29,6 +32,7 @@ export default function ReferrersClient() {
   const [activeTab, setActiveTab] = useState<ReferrerTab>(ReferrerTab.All);
   const [distributionData, setDistributionData] = useState<ReferrerSourceAggregation[] | undefined>(undefined);
   const [trendBySourceData, setTrendBySourceData] = useState<ReferrerTrafficBySourceRow[] | undefined>(undefined);
+  const [summaryData, setSummaryData] = useState<ReferrerSummary | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const { range, setRange } = useTimeRangeContext();
   const [granularity, setGranularity] = useState<GranularityRangeValues>("day");
@@ -40,13 +44,15 @@ export default function ReferrersClient() {
     async function loadData() {
       setLoading(true);
       try {
-        const [distributionResult, trendBySourceResult] = await Promise.all([
+        const [distributionResult, trendBySourceResult, summaryResult] = await Promise.all([
           fetchReferrerSourceAggregationDataForSite(siteId, startDate, endDate),
-          fetchReferrerTrafficTrendBySourceDataForSite(siteId, startDate, endDate, granularity)
+          fetchReferrerTrafficTrendBySourceDataForSite(siteId, startDate, endDate, granularity),
+          fetchReferrerSummaryDataForSite(siteId, startDate, endDate)
         ]);
         
         setDistributionData(distributionResult.data);
         setTrendBySourceData(trendBySourceResult.data);
+        setSummaryData(summaryResult.data);
       } catch (e) {
         console.error(e);
       } finally {
@@ -95,17 +101,17 @@ export default function ReferrersClient() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <SummaryCard
             title="Total Referrers"
-            value="-"
+            value={loading ? "-" : summaryData ? summaryData.totalReferrers.toString() : "-"}
             changeText=""
           />
           <SummaryCard
             title="Referral Traffic"
-            value="-"
+            value={loading ? "-" : summaryData ? summaryData.referralTraffic.toString() : "-"}
             changeText=""
           />
           <SummaryCard
             title="Avg. Bounce Rate"
-            value="-"
+            value={loading ? "-" : summaryData ? formatPercentage(summaryData.avgBounceRate) : "-"}
             changeText=""
           />
         </div>

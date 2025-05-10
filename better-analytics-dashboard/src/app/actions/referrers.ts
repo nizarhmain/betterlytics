@@ -1,6 +1,6 @@
 'use server';
 
-import { getReferrerSourceAggregationDataForSite, getReferrerTrafficTrendBySourceDataForSite } from '@/services/referrers';
+import { getReferrerSourceAggregationDataForSite, getReferrerSummaryDataForSite, getReferrerTrafficTrendBySourceDataForSite } from '@/services/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 
 /**
@@ -30,6 +30,19 @@ export async function fetchReferrerTrafficTrendBySourceDataForSite(
     return { data };
   } catch (error) {
     console.error('Error fetching referrer traffic trend by source:', error);
+    throw error;
+  }
+} 
+
+/**
+ * Fetches the summary data for referrers including total count, traffic and bounce rate
+ */
+export async function fetchReferrerSummaryDataForSite(siteId: string, startDate: string, endDate: string) {
+  try {
+    const data = await getReferrerSummaryDataForSite(siteId, startDate, endDate);
+    return { data };
+  } catch (error) {
+    console.error('Error fetching referrer summary data:', error);
     throw error;
   }
 } 

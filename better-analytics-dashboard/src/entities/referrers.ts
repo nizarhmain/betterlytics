@@ -11,5 +11,12 @@ export const ReferrerTrafficBySourceRowSchema = z.object({
   count: z.number(),
 });
 
+export const ReferrerSummarySchema = z.object({
+  totalReferrers: z.number().int().min(0),
+  referralTraffic: z.number().int().min(0),
+  avgBounceRate: z.number().min(0).max(100),
+});
+
 export type ReferrerSourceAggregation = z.infer<typeof ReferrerSourceAggregationSchema>;
 export type ReferrerTrafficBySourceRow = z.infer<typeof ReferrerTrafficBySourceRowSchema>;
+export type ReferrerSummary = z.infer<typeof ReferrerSummarySchema>;

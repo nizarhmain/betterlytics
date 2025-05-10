@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { formatPercentage } from '@/utils/formatters';
 
 interface ReferrerLegendProps {
   payload?: any[];
@@ -26,7 +27,7 @@ export default function ReferrerLegend({ payload, showPercentage = false }: Refe
         // For pie chart entries, we display percentages of the total as well
         if (showPercentage) {
           const sourceName = capitalizeFirstLetter(entry.payload?.name || '');
-          displayValue = `${sourceName}: ${entry.payload?.value}%`;
+          displayValue = `${sourceName}: ${formatPercentage(entry.payload?.value)}`;
         } else {
           displayValue = capitalizeFirstLetter(entry.value);
         }
