@@ -191,15 +191,14 @@ async fn run_inserter_worker(
         tracing::debug!(
             worker_id = worker_id, 
             site_id = %row.site_id, 
-            visitor_id = %row.visitor_id, 
-            session_id = %row.session_id, 
+            visitor_id = %row.visitor_id,
+            session_id = %row.session_id,
             url = %row.url, 
             timestamp = %row.timestamp, 
             device_type = %row.device_type,
             browser = %row.browser, 
             os = %row.os, 
             "Prepared row for ClickHouse insertion");
-
         if let Err(e) = inserter.write(&row) {
             eprintln!(
                 "Worker {}: Failed to write row to inserter buffer: {}. Row: {:?}",

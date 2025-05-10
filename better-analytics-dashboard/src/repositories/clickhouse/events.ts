@@ -1,16 +1,19 @@
 import { clickhouse } from '@/lib/clickhouse';
-import { DateString } from '@/types/dates';
+import { DateTimeString } from '@/types/dates';
 import { EventTypeRow, EventTypeRowSchema } from '@/entities/events';
 
-export async function getCustomEventsOverview(siteId: string, startDate: DateString, endDate: DateString): Promise<EventTypeRow[]> {
+export async function getCustomEventsOverview(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<EventTypeRow[]> {
   const query = `
     SELECT
       custom_event_name as event_name,
       count() as count
     FROM analytics.events
-    WHERE site_id = {site_id:String}
-      AND timestamp BETWEEN {start_date:Date} AND {end_date:Date}
-    ORDER BY date ASC, views DESC
+    WHERE
+          site_id = {site_id:String}
+      AND event_type = 'custom' 
+      AND timestamp BETWEEN {start_date:DateTime} AND {end_date:DateTime}
+    GROUP BY event_name
+    ORDER BY count DESC
     LIMIT 100
   `;
   const result = await clickhouse.query(query, {

@@ -10,6 +10,9 @@ import { fetchSummaryStatsAction } from "@/app/actions/overview";
 import { fetchPageAnalyticsAction } from "@/app/actions/pages";
 import { PageAnalytics } from "@/entities/pages";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import { EventTypeRow } from "@/entities/events";
+import { fetchCustomEventsOverviewAction } from "@/app/actions/events";
+import EventsTable from "@/components/analytics/EventsTypeTable";
 
 export default function EventsClient() {
   const { range, setRange } = useTimeRangeContext();
@@ -20,9 +23,9 @@ export default function EventsClient() {
     queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate),
   });
 
-  const { data: pages = [], isLoading: pagesLoading } = useQuery<PageAnalytics[]>({
-    queryKey: ['pageAnalytics', 'default-site', startDate, endDate],
-    queryFn: () => fetchPageAnalyticsAction('default-site', startDate, endDate),
+  const { data: events = [], isLoading: eventsLoading } = useQuery<EventTypeRow[]>({
+    queryKey: ['customEvents', 'default-site', startDate, endDate],
+    queryFn: () => fetchCustomEventsOverviewAction('default-site', startDate, endDate),
   });
 
   return (
@@ -47,32 +50,22 @@ export default function EventsClient() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard
-          title="Total Pages"
-          value={pagesLoading ? '...' : String(pages.length)}
+          title="Total Events"
+          value={eventsLoading ? '...' : String(events.length)}
           changeText=""
         />
         <SummaryCard
-          title="Avg. Page Views"
-          value={pagesLoading ? '...' : 
-            pages.length > 0 
-              ? Math.round(pages.reduce((sum, p) => sum + p.pageviews, 0) / pages.length).toLocaleString()
+          title="Avg. Event invokes"
+          value={eventsLoading ? '...' : 
+            events.length > 0 
+              ? Math.round(events.reduce((sum, e) => sum + e.count, 0) / events.length).toLocaleString()
               : '0'
           }
           changeText=""
         />
-        <SummaryCard
-          title="Avg. Time on Page"
-          value={summaryLoading ? '...' : summary?.avgVisitDuration ? `${Math.round(summary.avgVisitDuration / 60)}m ${summary.avgVisitDuration % 60}s` : '0s'}
-          changeText=""
-        />
-        <SummaryCard
-          title="Bounce Rate"
-          value={summaryLoading ? '...' : summary?.bounceRate ? `${summary.bounceRate}%` : '0%'}
-          changeText=""
-        />
       </div>
 
-      <PagesTable data={pages} />
+      <EventsTable data={events} />
     </div>
   );
 } 

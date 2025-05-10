@@ -5,6 +5,11 @@ const TARGET_URL = 'http://localhost:3001/track'
 const NUMBER_OF_EVENTS = 1000;
 const NUMBER_OF_USERS = 500;
 const SIMULATED_DAYS = 7;
+const CUSTOM_EVENTS = [
+  { event_name: 'cart-checkout', properties: JSON.stringify({ test_value: 6 }) },
+  { event_name: 'product-clicked', properties: JSON.stringify({ product_id: 'abc123' }) },
+];
+const CUSTOM_EVENT_FREQUENCY = 1;
 
 const BASE_PAYLOAD = {
   referrer: null,
@@ -46,6 +51,15 @@ const userIds = (
     .map((_) => uuidv4())
 );
 
+function getExtraPayload(payload) {
+  return {
+    ...payload,
+    ...(Math.random() < CUSTOM_EVENT_FREQUENCY)
+      ? { ...CUSTOM_EVENTS[Math.floor(Math.random() * CUSTOM_EVENTS.length)], is_custom_event: true }
+      : {}
+    };
+}
+
 const events = (
  new Array(NUMBER_OF_EVENTS)
     .fill(0)
@@ -54,7 +68,9 @@ const events = (
     .map((stamp) => Math.floor((Date.now() / 1000) - stamp))
     .sort()
     .map((timestamp) => ({ timestamp, visitor_id: userIds[Math.floor(userIds.length * Math.random())] }))
+    .map((payload) => getExtraPayload(payload))
     .map((payload) => ({ ...BASE_PAYLOAD, ...payload }))
+    .map((payload) => (console.log(payload), payload))
 );
 
 console.log("[+] Running...");
