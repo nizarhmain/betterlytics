@@ -1,10 +1,6 @@
-export interface GeoVisitor {
-  country_code: string;
-  visitors: number;
-}
-
 import { getVisitorsByCountry } from '@/repositories/clickhouse/geography';
 import { toDateTimeString } from '@/utils/dateFormatters';
+import { GeoVisitor } from '@/entities/geography';
 
 /**
  * Fetches aggregrated visitor data by country code from the database

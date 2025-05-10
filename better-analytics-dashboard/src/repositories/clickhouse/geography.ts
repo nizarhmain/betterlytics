@@ -1,6 +1,6 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DateTimeString } from '@/types/dates';
-import { GeoVisitor } from '@/services/geography';
+import { GeoVisitor, GeoVisitorSchema } from '@/entities/geography';
 
 /**
  * Retrieves visitor data aggregated by country code
@@ -31,8 +31,10 @@ export async function getVisitorsByCountry(
     },
   }).toPromise() as any[];
 
-  return result.map(row => ({
-    country_code: row.country_code,
-    visitors: Number(row.visitors)
-  }));
+  return result.map(row => 
+    GeoVisitorSchema.parse({
+      country_code: row.country_code,
+      visitors: Number(row.visitors)
+    })
+  );
 }

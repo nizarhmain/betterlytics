@@ -5,7 +5,7 @@ import LeafletMap from '@/components/LeafletMap';
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { getWorldMapData } from '@/app/actions/geography';
-import { GeoVisitor } from '@/services/geography';
+import { GeoVisitor } from '@/entities/geography';
 import { alpha2ToAlpha3Code } from '@/utils/countryCodes';
 
 export default function GeographyClient() {

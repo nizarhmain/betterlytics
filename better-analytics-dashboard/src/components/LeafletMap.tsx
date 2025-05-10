@@ -1,21 +1,16 @@
 'use client'
 
 import React, { useEffect, useState, useMemo } from 'react'
-import { MapContainer, GeoJSON, ZoomControl, useMap } from 'react-leaflet'
+import { MapContainer, GeoJSON } from 'react-leaflet'
 import L from 'leaflet'
 import { scaleLinear } from 'd3-scale'
 import 'leaflet/dist/leaflet.css'
 import dynamic from 'next/dynamic'
 import { Feature, Geometry } from 'geojson'
-import { alpha2ToAlpha3Code } from '@/utils/countryCodes'
-
-interface VisitorData {
-  country_code: string; 
-  visitors: number;
-}
+import { GeoVisitor } from '@/entities/geography'
 
 interface LeafletMapProps {
-  visitorData: VisitorData[];
+  visitorData: GeoVisitor[];
   maxVisitors?: number;
 }
 
