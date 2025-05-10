@@ -25,7 +25,7 @@
     // Track current path for SPA navigation
     var currentPath = window.location.pathname;
 
-    async function trackEvent() {
+    async function trackEvent(eventName, isCustomEvent = false, properties = {}) {
         const isUnique = await ping();
 
         var url = window.location.href;
@@ -53,6 +53,9 @@
             },
             body: JSON.stringify({
                 site_id: siteId,
+                event_name: eventName,
+                is_custom_event: isCustomEvent,
+                properties: JSON.stringify(properties),
                 url: url,
                 referrer: referrer,
                 user_agent: userAgent,
@@ -65,13 +68,15 @@
         });
     }
 
+    window.baEvent = (eventName, eventProps = {}) => trackEvent(eventName, true, eventProps);
+
     // Track initial page view
-    trackEvent();
+    trackEvent("pageview");
 
     // Track page visibility changes
     document.addEventListener("visibilitychange", function() {
         if (document.visibilityState === "visible") {
-            trackEvent();
+            trackEvent("pageview");
         }
     });
 
@@ -83,7 +88,7 @@
             originalPushState.apply(this, arguments);
             if (currentPath !== window.location.pathname) {
                 currentPath = window.location.pathname;
-                trackEvent();
+                trackEvent("pageview");
             }
         };
 
@@ -91,7 +96,7 @@
         window.addEventListener("popstate", function() {
             if (currentPath !== window.location.pathname) {
                 currentPath = window.location.pathname;
-                trackEvent();
+                trackEvent("pageview");
             }
         });
     }
