@@ -176,8 +176,8 @@ export async function getReferrerTableData(
     SELECT
       r.referrer_source as source_type,
       r.referrer_source_name as source_name,
-      -- Count unique sessions for this referrer
-      uniq(r.session_id) as visits,
+      r.referrer_url as source_url,
+      count() as visits,
       -- Calculate bounce rate for this referrer
       round(
         countIf(sp.page_count = 1) / uniq(r.session_id) * 100,
@@ -194,7 +194,7 @@ export async function getReferrerTableData(
     WHERE r.site_id = {site_id:String}
       AND r.timestamp >= {start:DateTime}
       AND r.timestamp <= {end:DateTime}
-    GROUP BY r.referrer_source, r.referrer_source_name
+    GROUP BY r.referrer_source, r.referrer_source_name, r.referrer_url
     ORDER BY visits DESC
     LIMIT {limit:UInt32}
   `;

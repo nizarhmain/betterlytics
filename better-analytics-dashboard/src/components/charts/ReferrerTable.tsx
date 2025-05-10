@@ -6,6 +6,7 @@ import { formatNumber, formatPercentage } from "@/utils/formatters";
 import { formatDuration } from "@/utils/dateFormatters";
 import { ReferrerTableRow } from '@/entities/referrers';
 import { getReferrerColor, REFERRER_COLORS } from '@/utils/referrerColors';
+import { Globe, Link } from 'lucide-react';
 
 export enum ReferrerTab {
   All = 'all',
@@ -33,7 +34,7 @@ const SourceTypeBadge = ({ type }: { type: string }) => {
   
   return (
     <span 
-      className="px-2 py-1 rounded-full text-xs font-medium"
+      className="px-2 py-1 rounded-full text-xs font-bold"
       style={bgColorStyle}
     >
       {type}
@@ -111,7 +112,20 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
                   className="h-16 hover:bg-gray-50"
                 >
                   <TableCell className="font-medium">
-                    {row.source_name || row.source_type}
+                    <div className="flex items-center gap-2">
+                      {row.source_type.toLowerCase() === 'direct' ? (
+                        <Globe className="h-4 w-4 text-gray-500" />
+                      ) : (
+                        <Link className="h-4 w-4 text-gray-500" />
+                      )}
+                      {
+                        row.source_url ? 
+                          row.source_url : 
+                          (row.source_type.toLowerCase() === 'direct' ? 
+                            'Direct' : 
+                            row.source_name || row.source_type)
+                      }
+                    </div>
                   </TableCell>
                   <TableCell>
                     <SourceTypeBadge type={row.source_type} />

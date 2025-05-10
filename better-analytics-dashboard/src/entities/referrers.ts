@@ -20,6 +20,7 @@ export const ReferrerSummarySchema = z.object({
 export const ReferrerTableRowSchema = z.object({
   source_type: z.string(),
   source_name: z.string(),
+  source_url: z.string().optional(),
   visits: z.number().int().min(0),
   bounce_rate: z.number().min(0),
   avg_visit_duration: z.number().min(0),
