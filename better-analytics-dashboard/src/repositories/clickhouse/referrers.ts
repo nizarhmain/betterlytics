@@ -50,7 +50,7 @@ export async function getReferrerTrafficTrendBySource(
     SELECT 
       ${granularityFunc}(timestamp) as date,
       referrer_source,
-      uniq(session_id) as count
+      count() as count
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp >= {start:DateTime}

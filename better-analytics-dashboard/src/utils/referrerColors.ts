@@ -1,10 +1,11 @@
 // Colors for different referrer categories
 export const REFERRER_COLORS: Record<string, string> = {
-  'search': '#22C55E', // Green
+  'search': '#3B82F6', // Blue
   'social': '#8B5CF6', // Violet
   'direct': '#10B981', // Emerald
   'email': '#EF4444',  // Red
   'other': '#F59E0B',  // Amber
+  'internal': '#22C55E', // Green
 };
 
 /**
@@ -12,5 +13,5 @@ export const REFERRER_COLORS: Record<string, string> = {
  */
 export function getReferrerColor(referrerType: string): string {
   const type = referrerType.toLowerCase();
-  return REFERRER_COLORS[type] || REFERRER_COLORS.other;
+  return REFERRER_COLORS[type];
 } 

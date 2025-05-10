@@ -12,6 +12,29 @@ interface ReferrerTrafficTrendChartProps {
   loading?: boolean;
 }
 
+// Helper function to calculate total counts for each referrer source
+const calculateSourceTotals = (data: ReferrerTrafficBySourceRow[]): Record<string, number> => {
+  if (!data || data.length === 0) {
+    return {};
+  }
+  return data.reduce((acc, item) => {
+    acc[item.referrer_source] = (acc[item.referrer_source] || 0) + item.count;
+    return acc;
+  }, {} as Record<string, number>);
+};
+
+// Helper function to get unique referrer sources sorted by their total counts (ascending)
+const getSortedReferrerSources = (
+  data: ReferrerTrafficBySourceRow[],
+  sourceTotals: Record<string, number>
+): string[] => {
+  if (!data || data.length === 0) {
+    return [];
+  }
+  return Array.from(new Set(data.map(item => item.referrer_source)))
+    .sort((a, b) => (sourceTotals[a] || 0) - (sourceTotals[b] || 0));
+};
+
 // Custom tooltip for better display
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -29,41 +52,53 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-// Process raw data into a format suitable for the stacked area chart
-const processDataForStackedArea = (data: ReferrerTrafficBySourceRow[]) => {
-  // Group by date
-  const groupedByDate = data.reduce((acc, item) => {
-    const date = item.date;
-    if (!acc[date]) {
-      acc[date] = { date };
-    }
-    
-    acc[date][item.referrer_source] = item.count;
-    return acc;
-  }, {} as Record<string, any>);
+// Prepares raw data for the stacked area chart
+const prepareChartData = (
+  rawData: ReferrerTrafficBySourceRow[],
+  allSources: string[]
+): Array<Record<string, any>> => {
+  if (!rawData || rawData.length === 0 || !allSources || allSources.length === 0) {
+    return [];
+  }
 
-  // Convert to array and sort by date
-  return Object.values(groupedByDate).sort((a, b) => 
+  const dataByDate: Record<string, Record<string, any>> = {};
+
+  rawData.forEach(item => {
+    const { date } = item;
+    if (!dataByDate[date]) {
+      dataByDate[date] = { date };
+      allSources.forEach(source => {
+        dataByDate[date][source] = 0;
+      });
+    }
+  });
+
+  rawData.forEach(item => {
+    const { date, referrer_source, count } = item;
+    if (dataByDate[date]) {
+      dataByDate[date][referrer_source] = count;
+    }
+  });
+
+  return Object.values(dataByDate).sort((a, b) =>
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 };
 
 export default function ReferrerTrafficTrendChart({ data, loading = false }: ReferrerTrafficTrendChartProps) {
-  // Process the data for the stacked area chart
-  const chartData = useMemo(() => {
-    if (!data || data.length === 0) {
-      return [];
-    }
-    return processDataForStackedArea(data);
-  }, [data]);
+  const sourceTotals = useMemo(() => calculateSourceTotals(data!), [data]);
 
-  // Get all unique referrer sources from the data
-  const referrerSources = useMemo(() => {
-    if (!data || data.length === 0) {
+  const referrerSources = useMemo(
+    () => getSortedReferrerSources(data!, sourceTotals),
+    [data, sourceTotals]
+  );
+
+  const chartData = useMemo(() => {
+    if (!data || data.length === 0 || referrerSources.length === 0) {
       return [];
     }
-    return Array.from(new Set(data.map(item => item.referrer_source)));
-  }, [data]);
+    return prepareChartData(data, referrerSources);
+  }, [data, referrerSources]);
 
   if (loading) {
     return (
