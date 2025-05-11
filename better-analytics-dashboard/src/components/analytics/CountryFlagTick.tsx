@@ -3,24 +3,24 @@ import React, { useEffect, useRef, useState } from 'react';
 
 export const CountryFlagTick = ({ x, y, payload }: any) => {
   const alpha3 = payload.value;
+  console.log(alpha3)
+  if (!alpha3) return (<div></div>);
   const flagUrl = `https://flagcdn.com/h20/${alpha3ToAlpha2(alpha3).toLowerCase()}.png`;
 
-  // References for the text and image elements
   const textRef = useRef<SVGTextElement>(null);
   const [textWidth, setTextWidth] = useState(0);
 
-  // UseEffect hook to calculate text width once it's rendered
   useEffect(() => {
     if (textRef.current) {
-      const bbox = textRef.current.getBBox(); // Get bounding box of the text
-      setTextWidth(bbox.width); // Set the width of the text
+      const bbox = textRef.current.getBBox(); 
+      setTextWidth(bbox.width);
     }
   }, [alpha3]);
 
   return (
     <g transform={`translate(${x},${y})`}>
       <text 
-        ref={textRef} // Set the reference to the text element
+        ref={textRef} 
         x={0} 
         y={5} 
         dy={0} 
