@@ -1,27 +1,16 @@
 'use client';
 
-import { useMemo, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
-import PagesTable from "@/components/analytics/PagesTable";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { SummaryStats } from '@/entities/stats';
-import { fetchSummaryStatsAction } from "@/app/actions/overview";
-import { fetchPageAnalyticsAction } from "@/app/actions/pages";
-import { PageAnalytics } from "@/entities/pages";
+import { CreateFunnelDialog } from "./CreateFunnelDialog";
+import { Funnel } from "@/entities/funnels";
+import { fetchFunnelsAction } from "@/app/actions/funnels";
+import FunnelsTable from '@/components/analytics/FunnelsTable';
 
 export default function FunnelsClient() {
-  const [range, setRange] = useState<TimeRangeValue>("7d");
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
-
-  const { data: summary, isLoading: summaryLoading } = useQuery<SummaryStats>({
-    queryKey: ['summaryStats', 'default-site', startDate, endDate],
-    queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate),
-  });
-
-  const { data: pages = [], isLoading: pagesLoading } = useQuery<PageAnalytics[]>({
-    queryKey: ['pageAnalytics', 'default-site', startDate, endDate],
-    queryFn: () => fetchPageAnalyticsAction('default-site', startDate, endDate),
+  const { data: funnels = [], isLoading: funnelsLoading } = useQuery<Funnel[]>({
+    queryKey: ['funnels', 'default-site'],
+    queryFn: () => fetchFunnelsAction('default-site'),
   });
 
   return (
@@ -32,46 +21,19 @@ export default function FunnelsClient() {
           <p className="text-sm text-gray-500">Funnels for your website</p>
         </div>
         <div className="relative inline-block text-left">
-          <select
-            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={range}
-            onChange={e => setRange(e.target.value as TimeRangeValue)}
-          >
-            {TIME_RANGE_PRESETS.map(r => (
-              <option key={r.value} value={r.value}>{r.label}</option>
-            ))}
-          </select>
+          <CreateFunnelDialog />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard
-          title="Total Pages"
-          value={pagesLoading ? '...' : String(pages.length)}
-          changeText=""
-        />
-        <SummaryCard
-          title="Avg. Page Views"
-          value={pagesLoading ? '...' : 
-            pages.length > 0 
-              ? Math.round(pages.reduce((sum, p) => sum + p.pageviews, 0) / pages.length).toLocaleString()
-              : '0'
-          }
-          changeText=""
-        />
-        <SummaryCard
-          title="Avg. Time on Page"
-          value={summaryLoading ? '...' : summary?.avgVisitDuration ? `${Math.round(summary.avgVisitDuration / 60)}m ${summary.avgVisitDuration % 60}s` : '0s'}
-          changeText=""
-        />
-        <SummaryCard
-          title="Bounce Rate"
-          value={summaryLoading ? '...' : summary?.bounceRate ? `${summary.bounceRate}%` : '0%'}
+          title="Total funnels"
+          value={funnelsLoading ? '...' : String(funnels.length)}
           changeText=""
         />
       </div>
 
-      <PagesTable data={pages} />
+      <FunnelsTable data={funnels} />
     </div>
   );
 } 
