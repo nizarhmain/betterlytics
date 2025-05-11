@@ -7,8 +7,8 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { CountryFlagTick } from './CountryFlagTick';
-import { alpha3ToAlpha2, getName } from 'i18n-iso-countries';
+import { CountryFlagLabel, CountryFlagPieLabel, getColorFromAlpha3 } from '@/components/analytics/Country';
+import { getName } from 'i18n-iso-countries';
 import DropdownSelect from '@/components/DropdownSelect';
 import { capitalize } from '@/lib/utils';
 import { FileChartColumnIcon, BarChart as BarChartIcon, LineChartIcon, PieChartIcon } from 'lucide-react';
@@ -39,22 +39,6 @@ type GeographyChartProps = {
   defaultChartType: GeographyChartType;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-const CountryAlpha3AxisProps = {
-  dataKey: 'country_code',
-  type: 'category' as "number" | "category" | undefined,
-  interval: 0,
-  tick: <CountryFlagTick />,
-  tickMargin: 0,
-};
-
-const VisitorsAxisProps = {
-  dataKey: "visitors",
-  type: "number" as "number" | "category" | undefined,
-  doman: ['auto','auto'],
-  allowDecimals: false
-}
-
-
 
 const GeographyChart = ({ data, maxCountries, hexColor, defaultChartType = GeographyChartType.Line, ...props }: GeographyChartProps) => {
   const [chartType, setChartType] = useState<GeographyChartType>(defaultChartType);
@@ -66,35 +50,21 @@ const GeographyChart = ({ data, maxCountries, hexColor, defaultChartType = Geogr
     })
     .slice(0, maxCountries)
     
-    // TODO: Rewrite such that we can use a single CountryFlagLabel
-    const renderCountryFlagLabel = (props: any) => {
-      const { x, y, index } = props;
-      const countryData = data[index]; // This is the original `GeoVisitor` item
-      const alpha3 = countryData.country_code;
-      const flagUrl = `https://flagcdn.com/h20/${alpha3ToAlpha2(alpha3).toLowerCase()}.png`;
-    
-      return (
-        <g transform={`translate(${x},${y})`}>
-          <image
-            href={flagUrl}
-            x={-12}
-            y={-10}
-            height={18}
-            width={24}
-            preserveAspectRatio="xMidYMid meet"
-          />
-          <text
-            x={0}
-            y={22}
-            textAnchor="middle"
-            fill="#333"
-            fontSize={12}
-          >
-            {alpha3}
-          </text>
-        </g>
-      );
+    const CountryAlpha3AxisProps = {
+      dataKey: 'country_code',
+      type: 'category' as "number" | "category" | undefined,
+      interval: 0,
+      tick: <CountryFlagLabel/>,
+      tickMargin: 0,
     };
+
+    const VisitorsAxisProps = {
+      dataKey: "visitors",
+      type: "number" as "number" | "category" | undefined,
+      doman: ['auto','auto'],
+      allowDecimals: false
+    }
+
   
   return (
     <div className="flex flex-col overflow-hidden" {...props}>
@@ -125,7 +95,14 @@ const GeographyChart = ({ data, maxCountries, hexColor, defaultChartType = Geogr
             </XAxis>
             <YAxis { ...CountryAlpha3AxisProps }/>
             <Tooltip labelFormatter={(value: any) => getName(value, 'en')}/>
-            <Bar dataKey="visitors" fill={hexColor} /> { }
+            <Bar dataKey="visitors">
+              {filteredData.map((entry, index) => (
+                <Cell
+                  key={`bar-${entry.country_code}`}
+                  fill={getColorFromAlpha3(entry.country_code)}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       )}
@@ -153,9 +130,15 @@ const GeographyChart = ({ data, maxCountries, hexColor, defaultChartType = Geogr
             innerRadius={50}
             outerRadius={70}
             fill={hexColor}
-            paddingAngle={2}
-            label={renderCountryFlagLabel}
-          />
+            label={ <CountryFlagPieLabel/> }
+          >
+            {filteredData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={getColorFromAlpha3(entry.country_code)}
+              />
+            ))}
+          </Pie>
           <Tooltip />
         </PieChart>
       </ResponsiveContainer>
