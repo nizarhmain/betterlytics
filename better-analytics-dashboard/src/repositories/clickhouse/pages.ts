@@ -15,6 +15,7 @@ export async function getTotalPageViews(siteId: string, startDate: DateString, e
       count() as views
     FROM analytics.events
     WHERE site_id = {site_id:String}
+      AND event_type = 'pageview' 
       AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
     GROUP BY date
     ORDER BY date ASC, views DESC
@@ -42,6 +43,7 @@ export async function getPageViews(siteId: string, startDate: DateString, endDat
       count() as views
     FROM analytics.events
     WHERE site_id = {site_id:String}
+      AND event_type = 'pageview' 
       AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
     GROUP BY date, url
     ORDER BY date ASC, views DESC
@@ -62,6 +64,7 @@ export async function getTotalPageviews(siteId: string, startDate: DateTimeStrin
     SELECT count() as pageviews
     FROM analytics.events
     WHERE site_id = {site_id:String}
+      AND event_type = 'pageview' 
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
   `;
@@ -83,6 +86,7 @@ export async function getTopPages(
       uniq(session_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
+      AND event_type = 'pageview' 
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
     GROUP BY url
     ORDER BY visitors DESC
@@ -129,11 +133,12 @@ export async function getPageMetrics(
           ) as duration_seconds
         FROM analytics.events
         WHERE site_id = {site_id:String}
+          AND event_type = 'pageview' 
           AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
       ),
       session_page_counts AS (
         SELECT session_id, count() as page_count FROM analytics.events
-        WHERE site_id = {site_id:String} AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+        WHERE site_id = {site_id:String} AND timestamp BETWEEN {start:DateTime} AND {end:DateTime} AND event_type = 'pageview'
         GROUP BY session_id
       ),
       page_aggregates AS (
