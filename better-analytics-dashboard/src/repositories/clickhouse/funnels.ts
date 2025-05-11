@@ -49,7 +49,7 @@ export async function getFunnelDetails(siteId: string, pages: string[]): Promise
     params: {
       site_id: siteId,
       window_size: 24*60*60,
-      levels_array: new Array(pages.length + 1).fill(0).map((_, i) => i)
+      levels_array: new Array(pages.length).fill(0).map((_, i) => i+1)
     },
   }).toPromise() as any[];
 
