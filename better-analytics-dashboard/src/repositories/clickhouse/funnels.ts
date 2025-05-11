@@ -1,31 +1,58 @@
 import { clickhouse } from '@/lib/clickhouse';
-import { DailyUniqueVisitorsRow, DailyUniqueVisitorsRowSchema } from '@/entities/visitors';
-import { DateString } from '@/types/dates';
-import { GranularityRangeValues } from "@/utils/granularityRanges";
-import { BAQuery } from "@/lib/ba-query";
+import { z } from 'zod';
 
-export async function getFunnel(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<DailyUniqueVisitorsRow[]> {
+export async function getFunnelDetails(siteId: string, pages: string[]): Promise<number[]> {
   
-  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
-
   const query = `
+    WITH
+      -- Base pages funnel results
+      baseFunnel AS (
+          SELECT
+              windowFunnel(24*60*60)(
+                  timestamp,
+                  url = 'http://localhost:3000/dashboard',
+                  url = 'http://localhost:3000/dashboard/pages',
+                  url = 'http://localhost:3000/dashboard/geography'
+              ) AS level
+          FROM analytics.events
+          WHERE site_id = {site_id:String}
+          GROUP BY visitor_id
+      ),
+      -- Aggregate by level
+      funnelCounts AS (
+          SELECT
+              level,
+              count() AS raw_count
+          FROM baseFunnel
+          GROUP BY level
+      ),
+      -- Static funnel levels
+      levels AS (
+          SELECT arrayJoin({levels_array:Array(UInt32)}) AS level
+      ),
+      -- Left join counts with all levels
+      joined AS (
+          SELECT
+              levels.level,
+              coalesce(funnelCounts.raw_count, 0) AS count
+          FROM levels
+          LEFT JOIN funnelCounts USING (level)
+      )
+    -- Cumulative aggregation on joined data
     SELECT
-      ${granularityFunc}(timestamp) as date,
-      uniq(session_id) as unique_visitors
-    FROM analytics.events
-    WHERE site_id = {site_id:String}
-      AND date BETWEEN {start:DateTime} AND {end:DateTime}
-    GROUP BY date
-    ORDER BY date ASC
-    LIMIT 10080
+        sum(count) OVER (ORDER BY level DESC) AS count
+    FROM joined
+    ORDER BY level
   `;
   
   const result = await clickhouse.query(query, {
     params: {
       site_id: siteId,
-      start: startDate,
-      end: endDate,
+      window_size: 24*60*60,
+      levels_array: new Array(pages.length + 1).fill(0).map((_, i) => i)
     },
   }).toPromise() as any[];
-  return result.map(row => DailyUniqueVisitorsRowSchema.parse(row));
+
+  return result.map((res) => z.number().parse(res.count));
 }
+

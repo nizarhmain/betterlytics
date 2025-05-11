@@ -10,6 +10,19 @@ export async function getFunnelsBySiteId(siteId: string) {
   return funnels.map((funnel) => FunnelSchema.parse(funnel));
 }
 
+export async function getFunnelById(id: string) {
+
+  const funnel = await prisma.funnel.findUnique({
+    where: { id }
+  });
+
+  if (funnel === null) {
+    return null;
+  }
+
+  return FunnelSchema.parse(funnel);
+}
+
 export async function createFunnel(funnel: CreateFunnel) {
 
   const createdFunnel = await prisma.funnel.create({
