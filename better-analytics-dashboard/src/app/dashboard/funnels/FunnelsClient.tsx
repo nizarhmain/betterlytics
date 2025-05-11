@@ -5,7 +5,7 @@ import SummaryCard from "@/components/SummaryCard";
 import { CreateFunnelDialog } from "./CreateFunnelDialog";
 import { Funnel } from "@/entities/funnels";
 import { fetchFunnelsAction } from "@/app/actions/funnels";
-import FunnelsTable from '@/components/analytics/FunnelsTable';
+import { CollapsibleFunnelData } from './CollapsibleFunnelData';
 
 export default function FunnelsClient() {
   const { data: funnels = [], isLoading: funnelsLoading } = useQuery<Funnel[]>({
@@ -32,8 +32,15 @@ export default function FunnelsClient() {
           changeText=""
         />
       </div>
-
-      <FunnelsTable data={funnels} />
+      {
+        funnels.length === 0 && (<div>No funnels yet...</div>)
+      }
+      {
+        funnels
+          .map((funnel) => (
+            <CollapsibleFunnelData key={funnel.id} funnel={funnel} />
+          ))
+      }
     </div>
   );
 } 
