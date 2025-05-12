@@ -260,7 +260,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
 
   return (
     <div 
-      className="h-[500px] w-full relative" 
+      className="h-[500px] w-full relative overflow-hidden" 
       ref={containerRef}
     >
       <ResponsiveContainer width="100%" height="100%">
