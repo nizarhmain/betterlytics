@@ -12,9 +12,10 @@ export const SequentialPathSchema = z.object({
 
 // Node in the Sankey diagram
 export const SankeyNodeSchema = z.object({
-  id: z.string(),      // Unique identifier (url_depth)
-  name: z.string(),    // The URL for display
-  depth: z.number(),   // The depth of the node in the journey
+  id: z.string(),          // Unique identifier (url_depth)
+  name: z.string(),        // The URL for display
+  depth: z.number(),       // The depth of the node in the journey
+  totalTraffic: z.number() // Total number of users passing through this node
 });
 
 // Link between nodes in the Sankey diagram

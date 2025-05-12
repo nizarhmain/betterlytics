@@ -42,6 +42,11 @@ export function transformSequentialPathsToSankeyData(
   // Track links and their values
   const linkMap = new Map<string, number>(); // linkId key is formatted as 'sourceIndex|targetIndex'
   
+  // Track incoming traffic through each node
+  const nodeIncomingTrafficMap = new Map<number, number>(); // nodeIndex -> incoming traffic count
+  // Track outgoing traffic through each node
+  const nodeOutgoingTrafficMap = new Map<number, number>(); // nodeIndex -> outgoing traffic count
+  
   // Process each user journey path from each session
   sequentialPaths.forEach(({ path, count }) => {
     // Limit to maxSteps nodes
@@ -65,8 +70,11 @@ export function transformSequentialPathsToSankeyData(
         nodes.push({
           id: sourceId,
           name: currentPage,
-          depth: i
+          depth: i,
+          totalTraffic: 0
         });
+        nodeIncomingTrafficMap.set(sourceIndex, 0);
+        nodeOutgoingTrafficMap.set(sourceIndex, 0);
       }
       
       // Get or create target node index
@@ -77,14 +85,32 @@ export function transformSequentialPathsToSankeyData(
         nodes.push({
           id: targetId,
           name: nextPage,
-          depth: i + 1
+          depth: i + 1,
+          totalTraffic: 0
         });
+        nodeIncomingTrafficMap.set(targetIndex, 0);
+        nodeOutgoingTrafficMap.set(targetIndex, 0);
       }
       
       // Create or update link counter
       const linkId = `${sourceIndex}|${targetIndex}`;
       linkMap.set(linkId, (linkMap.get(linkId) || 0) + count);
+      
+      // Update traffic counts
+      nodeIncomingTrafficMap.set(targetIndex, (nodeIncomingTrafficMap.get(targetIndex) || 0) + count);
+      nodeOutgoingTrafficMap.set(sourceIndex, (nodeOutgoingTrafficMap.get(sourceIndex) || 0) + count);
     }
+  });
+  
+  // Assign total traffic to each node based on its position
+  nodes.forEach((node, index) => {
+    node.depth === 0 
+    ? 
+      // Root nodes: use outgoing traffic as total traffic
+      node.totalTraffic = nodeOutgoingTrafficMap.get(index) || 0
+    :
+      // Non-root nodes: use incoming traffic as total traffic
+      node.totalTraffic = nodeIncomingTrafficMap.get(index) || 0;
   });
   
   // Convert link map to SankeyLinks

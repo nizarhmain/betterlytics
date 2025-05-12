@@ -1,8 +1,17 @@
 'use client';
 
 import { SankeyData } from "@/entities/userJourney";
-import { Sankey, Rectangle, ResponsiveContainer } from "recharts";
-import { useState, useRef, useEffect } from "react";
+import { Sankey, Rectangle, ResponsiveContainer, Layer, Text } from "recharts";
+import { useState, useRef, useEffect, useMemo, memo } from "react";
+
+const COLORS = {
+  primary: "#0ea5e9", // Blue - Color of root nodes
+  secondary: "#64748b", // Gray - Color of other nodes
+  labelBg: "#f8fafc", // Light Gray - Background color of label box
+  labelBorder: "#cbd5e1", // Gray - Border color of label box
+  labelText: "#334155", // Dark Gray - Text color of label text
+  labelTextDark: "#475569" // Gray - Text color of label count
+};
 
 interface UserJourneyChartProps {
   data: SankeyData;
@@ -18,6 +27,101 @@ interface TooltipState {
     value: number;
   } | null;
 }
+
+interface NodeLabelProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  url: string;
+  count: number;
+}
+
+// Accurately measure text width using Canvas https://www.w3schools.com/tags/canvas_measuretext.asp
+const measureTextWidth = (() => {
+  // Create a canvas once to avoid recreating it for each measurement
+  let canvas: HTMLCanvasElement | null = null;
+  
+  return (text: string, fontSize: number, fontFamily: string = 'Arial'): number => {
+    if (!canvas && typeof document !== 'undefined') {
+      canvas = document.createElement('canvas');
+    }
+    
+    if (canvas) {
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.font = `${fontSize}px ${fontFamily}`;
+        const metrics = context.measureText(text);
+        return metrics.width + 10; // Add 10px padding for better fit
+      }
+    }
+    
+    // Fallback to approximation if canvas is not available
+    const avgCharWidth = fontSize * 0.55;
+    return Math.max(text.length * avgCharWidth, 30);
+  };
+})();
+
+// Node label component
+const NodeLabel = memo(({ x, y, width, height, url, count }: NodeLabelProps) => {
+  // Calculate dimensions for the label box
+  const urlWidth = measureTextWidth(url, 12);
+  const countWidth = measureTextWidth(count.toString(), 14);
+  const contentWidth = Math.max(urlWidth, countWidth);
+  
+  const paddingX = 8;
+  const boxWidth = contentWidth + (paddingX * 2);
+  const boxHeight = 55;
+  const boxX = x + width + 5;
+  const boxY = y + (height - boxHeight) / 2;
+  
+  const textPadding = paddingX;
+  
+  return (
+    <Layer>
+      {/* Background box */}
+      <Rectangle
+        x={boxX}
+        y={boxY}
+        width={boxWidth}
+        height={boxHeight}
+        fill={COLORS.labelBg} 
+        fillOpacity={0.6} 
+        stroke={COLORS.labelBorder}
+        strokeWidth={1}
+        rx={4}
+        ry={4}
+      />
+      
+      {/* URL text */}
+      <Text 
+        x={boxX + textPadding} 
+        y={boxY + 18}
+        textAnchor="start"
+        verticalAnchor="middle"
+        fontSize={12}
+        fill={COLORS.labelText}
+      >
+        {url}
+      </Text>
+      
+      {/* Count text */}
+      <Text 
+        x={boxX + textPadding} 
+        y={boxY + 38}
+        textAnchor="start"
+        verticalAnchor="middle"
+        fontSize={14}
+        fontWeight="bold"
+        fill={COLORS.labelTextDark}
+      >
+        {count}
+      </Text>
+    </Layer>
+  );
+});
+
+NodeLabel.displayName = 'NodeLabel';
 
 export default function UserJourneyChart({ data }: UserJourneyChartProps) {
   const [activeLink, setActiveLink] = useState<number | null>(null);
@@ -77,14 +181,24 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
     const isFirstColumn = payload.depth === 0;
     
     return (
-      <Rectangle
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill={isFirstColumn ? "#0ea5e9" : "#64748b"}
-        fillOpacity={0.9}
-      />
+      <>
+        <Rectangle
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill={isFirstColumn ? COLORS.primary : COLORS.secondary}
+          fillOpacity={0.9}
+        />
+        <NodeLabel
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          url={payload.name}
+          count={payload.totalTraffic}
+        />
+      </>
     );
   };
   
@@ -134,11 +248,12 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
           C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}
         `}
         fill="none"
-        stroke={activeLink === index ? "#0ea5e9" : "#aaa"}
+        stroke={activeLink === index ? COLORS.primary : "#aaa"}
         strokeWidth={linkWidth}
         strokeOpacity={activeLink !== null && activeLink !== index ? 0.3 : 0.7}
         onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}
+        onMouseLeave={() => setActiveLink(null)}
       />
     );
   };
@@ -153,7 +268,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
           data={data}
           node={<CustomNode />}
           link={<CustomLink />}
-          margin={{ top: 10, right: 30, bottom: 10, left: 30 }}
+          margin={{ top: 10, right: 160, bottom: 10, left: 30 }}
           nodePadding={50}
           iterations={64}
         />
