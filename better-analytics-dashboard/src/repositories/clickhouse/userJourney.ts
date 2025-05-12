@@ -13,26 +13,34 @@ export async function getUserSequentialPaths(
   maxPathLength: number = 3,
   limit: number = 25
 ): Promise<SequentialPath[]> {
+  console.log(startDate, endDate, maxPathLength, limit);
+
   const query = `
-    WITH session_paths AS (
-      SELECT
-        session_id,
-        arraySlice(groupArray(page_url ORDER BY timestamp), 1, {max_length:UInt8}) AS path
-      FROM analytics.events
-      WHERE
-        site_id = {site_id:String}
-        AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-        AND page_url IS NOT NULL AND page_url != ''
-      GROUP BY session_id
-      HAVING length(path) > 1
-    )
+  WITH ordered_events AS (
     SELECT
-      path,
-      COUNT(*) AS count
-    FROM session_paths
-    GROUP BY path
-    ORDER BY count DESC
-    LIMIT {limit:UInt32}
+      session_id,
+      groupArray((timestamp, url)) AS page_tuples
+    FROM analytics.events
+    WHERE
+      site_id = {site_id:String}
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND url IS NOT NULL AND url != ''
+    GROUP BY session_id
+  ),
+  session_paths AS (
+    SELECT
+      session_id,
+      arrayMap(x -> x.2, arraySlice(arraySort(x -> x.1, page_tuples), 1, {max_length:UInt8})) AS path
+    FROM ordered_events
+    HAVING length(path) > 1
+  )
+  SELECT
+    path,
+    COUNT(*) AS count
+  FROM session_paths
+  GROUP BY path
+  ORDER BY count DESC
+  LIMIT {limit:UInt32}
   `;
 
   const result = await clickhouse.query(query, {
