@@ -1,5 +1,3 @@
-
-
 /**
  * Tag SQL with parameters safely:\
  * Use the premade `SQL.*` functions to to add variables and parameters.\
