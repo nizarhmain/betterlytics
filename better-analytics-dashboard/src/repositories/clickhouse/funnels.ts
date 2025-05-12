@@ -1,21 +1,24 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { z } from 'zod';
 
+const test = {
+  
+}
+
 export async function getFunnelDetails(siteId: string, pages: string[]): Promise<number[]> {
 
-  const taggedSqlResponse = pages.map((page, index) => safeSql`url = ${[page, `page_${index}`, 'String']}`);
+  const taggedSqlResponse = pages
+    .map((page, index) => SQL.String({ [`page_${index}`]: page }))
+    .map((page) => safeSql`url = ${page}`);
 
-  const taggedParams = taggedSqlResponse.reduce((acc, curr) => ({...acc, ...curr.taggedParams}), {});
-  const taggedSql = taggedSqlResponse.map((tagged) => tagged.taggedSql).join(', ');
-
-  const sql = `
+  const sql = safeSql`
     WITH
       -- Base pages funnel results
       baseFunnel AS (
           SELECT
               windowFunnel(24*60*60)(
                   timestamp,
-                  ${taggedSql}
+                  ${SQL.SEPARATOR(taggedSqlResponse)}
               ) AS level
           FROM analytics.events
           WHERE site_id = {site_id:String}
@@ -48,9 +51,9 @@ export async function getFunnelDetails(siteId: string, pages: string[]): Promise
     ORDER BY level
   `;
   
-  const result = await clickhouse.query(sql, {
+  const result = await clickhouse.query(sql.taggedSql, {
     params: {
-      ...taggedParams,
+      ...sql.taggedParams,
       site_id: siteId,
       window_size: 24*60*60,
       levels_array: new Array(pages.length).fill(0).map((_, i) => i+1)
