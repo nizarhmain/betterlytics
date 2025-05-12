@@ -7,6 +7,7 @@ const navItems = [
   { name: "Pages", href: "/dashboard/pages", icon: <FileText size={18} /> },
   //{ name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
   { name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
+  { name: "User Journey", href: "/dashboard/user-journey", icon: <CircleDot size={18} /> },
   { name: "Devices", href: "/dashboard/devices", icon: <Smartphone size={18} /> },
   { name: "Events", href: "/dashboard/events", icon: <CircleDot size={18} /> },
 ];
