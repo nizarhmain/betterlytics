@@ -135,6 +135,24 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Calculate dynamic height based on number of nodes
+  const chartHeight = useMemo(() => {
+    if (!data?.nodes?.length) return 500;
+    
+    // Count max nodes at any depth level
+    const nodesByDepth: Record<number, number> = {};
+    data.nodes.forEach(node => {
+      const depth = node.depth || 0;
+      nodesByDepth[depth] = (nodesByDepth[depth] || 0) + 1;
+    });
+    
+    const maxNodesInOneColumn = Math.max(...Object.values(nodesByDepth));
+    
+    // Each node needs about 70px of height minimum to ensure they don't overlap with their labels
+    const baseHeight = maxNodesInOneColumn * 70;
+    return Math.max(500, baseHeight);
+  }, [data]);
+  
   // Reset tooltip when activeLink changes
   useEffect(() => {
     if (activeLink === null) {
@@ -259,40 +277,45 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
   };
 
   return (
-    <div 
-      className="h-[500px] w-full relative overflow-hidden" 
-      ref={containerRef}
-    >
-      <ResponsiveContainer width="100%" height="100%">
-        <Sankey
-          data={data}
-          node={<CustomNode />}
-          link={<CustomLink />}
-          margin={{ top: 10, right: 160, bottom: 10, left: 30 }}
-          nodePadding={50}
-          iterations={64}
-        />
-      </ResponsiveContainer>
-      
-      {tooltip.visible && tooltip.content && (
-        <div 
-          className="absolute bg-white p-2 shadow-md rounded border z-10"
-          style={{ 
-            left: `${tooltip.x}px`, 
-            top: `${tooltip.y}px`,
-            pointerEvents: 'none'
-          }}
-        >
-          <p className="font-medium text-gray-800">
-            Source: {tooltip.content.source}
-            <br />
-            Target: {tooltip.content.target}
-          </p>
-          <p className="text-sm text-gray-600">
-            Count: {tooltip.content.value}
-          </p>
-        </div>
-      )}
+    <div className="w-full">
+      <div 
+        className="w-full relative"
+        style={{ height: `${chartHeight}px`, minHeight: "500px" }} 
+        ref={containerRef}
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <Sankey
+            data={data}
+            node={<CustomNode />}
+            link={<CustomLink />}
+            margin={{ top: 20, right: 200, bottom: 20, left: 20 }}
+            nodePadding={50}
+            nodeWidth={10} 
+            iterations={64}
+            linkCurvature={0.5}
+          />
+        </ResponsiveContainer>
+        
+        {tooltip.visible && tooltip.content && (
+          <div 
+            className="absolute bg-white p-2 shadow-md rounded border z-10"
+            style={{ 
+              left: `${tooltip.x}px`, 
+              top: `${tooltip.y}px`,
+              pointerEvents: 'none'
+            }}
+          >
+            <p className="font-medium text-gray-800">
+              Source: {tooltip.content.source}
+              <br />
+              Target: {tooltip.content.target}
+            </p>
+            <p className="text-sm text-gray-600">
+              Count: {tooltip.content.value}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 } 
