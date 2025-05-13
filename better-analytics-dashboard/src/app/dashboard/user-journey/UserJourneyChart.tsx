@@ -299,12 +299,10 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
         }}
       >
         <p className="font-medium text-gray-800">
-          Source: {tooltip.content.source}
-          <br />
-          Target: {tooltip.content.target}
+          {tooltip.content.source} → {tooltip.content.target}
         </p>
         <p className="text-sm text-gray-600">
-          Count: {tooltip.content.value}
+          Sessions: {tooltip.content.value}
         </p>
       </div>
     );
@@ -322,7 +320,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
             data={data}
             node={CustomNode}
             link={CustomLink}
-            margin={{ top: 20, right: 200, bottom: 30, left: 20 }}
+            margin={{ top: 20, right: 240, bottom: 30, left: 20 }}
             nodePadding={50}
             nodeWidth={10} 
             iterations={64}
