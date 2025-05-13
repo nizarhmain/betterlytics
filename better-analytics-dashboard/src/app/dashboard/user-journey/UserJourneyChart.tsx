@@ -194,7 +194,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
     };
   }, [tooltip.visible]);
   
-  const CustomNode = (props: any) => {
+  const CustomNode = memo((props: any) => {
     const { x, y, width, height, index, payload } = props;
     const isFirstColumn = payload.depth === 0;
     
@@ -218,9 +218,9 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
         />
       </>
     );
-  };
+  });
   
-  const CustomLink = (props: any) => {
+  const CustomLink = memo((props: any) => {
     const { sourceX, sourceY, sourceControlX, targetX, targetY, targetControlX, linkWidth, index, payload } = props;
     
     const handleMouseEnter = (e: React.MouseEvent) => {
@@ -274,7 +274,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
         onMouseLeave={() => setActiveLink(null)}
       />
     );
-  };
+  });
 
   return (
     <div className="w-full">
