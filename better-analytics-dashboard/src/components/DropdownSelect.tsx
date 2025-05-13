@@ -23,8 +23,7 @@ const DropdownSelect = ({
   options,
   onChange,
   leftIcon,
-  className,
-  ...props
+  className
 }: DropdownSelectProps) => {
   const [selectedKey, setSelectedKey] = useState(defaultValue);
 
