@@ -1,9 +1,8 @@
-import { fetchFunnelDetailsAction } from "@/app/actions/funnels";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Funnel, FunnelDetails } from "@/entities/funnels";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { fetchFunnelDetailsAction } from "@/app/actions/funnels";
+import { Funnel, FunnelDetails } from "@/entities/funnels";
+import { MultiProgress } from "@/components/MultiProgress";
 
 type FunnelDataContentProps = {
   funnel: Funnel;
@@ -22,25 +21,46 @@ export function FunnelDataContent({ funnel }: FunnelDataContentProps) {
     }
 
     return funnelDetails.pages.map((page, index) => ({ page, visitors: funnelDetails.visitors[index] }));
+  }, [funnelDetails]);
+
+  const maxVisitors = useMemo(() => {
+    if (!funnelDetails) {
+      return 0;
+    }
+
+    return Math.max(...funnelDetails.visitors, 0);
   }, [funnelDetails])
+
 
   if (funnelDetailsLoading || !funnelDetails) {
     return <div>Loading...</div>;
   }
 
-  console.log(chartData)
-
   return (
     <div>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart layout="vertical" data={chartData} margin={{ top: 0, bottom: 0, left: 300, right: 500}}>
-          <XAxis type="number" />
-          <YAxis dataKey="page" type="category" />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="visitors" fill="#8884d8" />
-        </BarChart>
-      </ResponsiveContainer>
+      {
+        chartData
+          .map(({ page, visitors }) => (
+            <div key={page}>
+              <h3>{page}</h3>
+              <MultiProgress
+                progresses={[
+                  {
+                    colorHex: "#06b6d4",
+                    value: 2 * visitors,
+                    name: "lost"
+                  },
+                  {
+                    colorHex: "#FFb6d4",
+                    value: visitors,
+                    name: "visitors"
+                  }
+                ]}
+                maxValue={3 * maxVisitors}
+              />
+            </div>
+          ))
+      }
     </div>
   );
 }
