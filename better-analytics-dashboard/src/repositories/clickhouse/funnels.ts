@@ -1,9 +1,7 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { z } from 'zod';
 
-const test = {
-  
-}
+import { SQL, safeSql } from '@/lib/safe-sql';
 
 export async function getFunnelDetails(siteId: string, pages: string[]): Promise<number[]> {
 

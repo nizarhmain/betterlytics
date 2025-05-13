@@ -62,7 +62,7 @@
  *   { params: taggedParams }
  * );
  */
-function safeSql<T extends SQLTaggedExpression[]>(template: TemplateStringsArray, ...variables: T): SQLTaggedExpression {
+export function safeSql<T extends SQLTaggedExpression[]>(template: TemplateStringsArray, ...variables: T): SQLTaggedExpression {
   return template
     .reduce((acc, current, index) => {
       const taggedSql = `${acc.taggedSql}${current}`;
@@ -83,7 +83,7 @@ function safeSql<T extends SQLTaggedExpression[]>(template: TemplateStringsArray
     }, { taggedSql: "", taggedParams: {} as Record<string, unknown> });
 }
 
-const SQL = {
+export const SQL = {
   // "Primitives"
   String: asType<string>("String"),
   UInt32: asType<number>("UInt32"),
@@ -105,7 +105,7 @@ function asJoin(kind: string): (expressions: SQLTaggedExpression[]) => SQLTagged
 
     const taggedParams = expressions
       .reduce(
-        (acc, curr) => ({ ...acc, ...curr }),
+        (acc, curr) => ({ ...acc, ...curr.taggedParams }),
         {} as SQLTaggedExpression['taggedParams']
       );
     
