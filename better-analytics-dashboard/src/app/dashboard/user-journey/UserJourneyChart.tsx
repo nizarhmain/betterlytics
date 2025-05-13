@@ -2,7 +2,7 @@
 
 import { SankeyData } from "@/entities/userJourney";
 import { Sankey, Rectangle, ResponsiveContainer, Layer, Text } from "recharts";
-import { useState, useRef, useEffect, useMemo, memo } from "react";
+import { useState, useRef, useEffect, useMemo, memo, useCallback } from "react";
 
 const COLORS = {
   primary: "#0ea5e9", // Blue - Color of root nodes
@@ -135,6 +135,10 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  const updateTooltip = useCallback((newTooltip: Partial<TooltipState>) => {
+    setTooltip(prev => ({ ...prev, ...newTooltip }));
+  }, []);
+  
   // Calculate dynamic height based on number of nodes
   const chartHeight = useMemo(() => {
     if (!data?.nodes?.length) return 500;
@@ -156,9 +160,9 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
   // Reset tooltip when activeLink changes
   useEffect(() => {
     if (activeLink === null) {
-      setTooltip(prev => ({ ...prev, visible: false }));
+      updateTooltip({ visible: false });
     }
-  }, [activeLink]);
+  }, [activeLink, updateTooltip]);
   
   // Global mouse move handler to ensure tooltip disappears.
   // This is to ensure the tooltip disappears when the mouse leaves the container as it sometimes doesn't trigger the onMouseLeave event for some reason
@@ -178,7 +182,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
         e.clientY > rect.bottom
       ) {
         setActiveLink(null);
-        setTooltip(prev => ({ ...prev, visible: false }));
+        updateTooltip({ visible: false });
       }
     };
     
@@ -192,89 +196,119 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
         clearTimeout(tooltipTimeoutRef.current);
       }
     };
-  }, [tooltip.visible]);
+  }, [tooltip.visible, updateTooltip]);
   
-  const CustomNode = memo((props: any) => {
-    const { x, y, width, height, index, payload } = props;
-    const isFirstColumn = payload.depth === 0;
-    
-    return (
-      <>
-        <Rectangle
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          fill={isFirstColumn ? COLORS.primary : COLORS.secondary}
-          fillOpacity={0.9}
-        />
-        <NodeLabel
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          url={payload.name}
-          count={payload.totalTraffic}
-        />
-      </>
-    );
-  });
-  
-  const CustomLink = memo((props: any) => {
-    const { sourceX, sourceY, sourceControlX, targetX, targetY, targetControlX, linkWidth, index, payload } = props;
-    
-    const handleMouseEnter = (e: React.MouseEvent) => {
-      setActiveLink(index);
+  // Custom Sankey Node component
+  const CustomNode = useMemo(() => {
+    return (props: any) => {
+      const { x, y, width, height, index, payload } = props;
+      const isFirstColumn = payload.depth === 0;
       
-      try {
-        const source = payload?.source?.name || "Unknown";
-        const target = payload?.target?.name || "Unknown";
-        
-        const rect = containerRef.current?.getBoundingClientRect();
-        const x = e.clientX - (rect?.left || 0) + 10;
-        const y = e.clientY - (rect?.top || 0) - 40;
-        
-        setTooltip({
-          visible: true,
-          x, 
-          y,
-          content: {
-            source: source,
-            target: target,
-            value: payload.value || 0
-          }
-        });
-      } catch (error) {
-        console.error("Error showing tooltip:", error);
-      }
+      return (
+        <>
+          <Rectangle
+            x={x}
+            y={y}
+            width={width}
+            height={height}
+            fill={isFirstColumn ? COLORS.primary : COLORS.secondary}
+            fillOpacity={0.9}
+          />
+          <NodeLabel
+            x={x}
+            y={y}
+            width={width}
+            height={height}
+            url={payload.name}
+            count={payload.totalTraffic}
+          />
+        </>
+      );
     };
-    
-    const handleMouseMove = (e: React.MouseEvent) => {
-      if (activeLink === index) {
-        const rect = containerRef.current?.getBoundingClientRect();
-        const x = e.clientX - (rect?.left || 0) + 10;
-        const y = e.clientY - (rect?.top || 0) - 40;
+  }, []);
+  
+  // Custom Sankey Link component
+  const CustomLink = useMemo(() => {
+    return (props: any) => {
+      const { sourceX, sourceY, sourceControlX, targetX, targetY, targetControlX, linkWidth, index, payload } = props;
+      
+      const handleMouseEnter = (e: React.MouseEvent) => {
+        setActiveLink(index);
         
-        setTooltip(prev => ({ ...prev, x, y }));
-      }
+        try {
+          const source = payload?.source?.name || "Unknown";
+          const target = payload?.target?.name || "Unknown";
+          
+          const rect = containerRef.current?.getBoundingClientRect();
+          const x = e.clientX - (rect?.left || 0) + 10;
+          const y = e.clientY - (rect?.top || 0) - 40;
+          
+          updateTooltip({
+            visible: true,
+            x, 
+            y,
+            content: {
+              source: source,
+              target: target,
+              value: payload.value || 0
+            }
+          });
+        } catch (error) {
+          console.error("Error showing tooltip:", error);
+        }
+      };
+      
+      const handleMouseMove = (e: React.MouseEvent) => {
+        if (activeLink === index) {
+          const rect = containerRef.current?.getBoundingClientRect();
+          const x = e.clientX - (rect?.left || 0) + 10;
+          const y = e.clientY - (rect?.top || 0) - 40;
+          
+          updateTooltip({ x, y });
+        }
+      };
+      
+      return (
+        <path
+          d={`
+            M${sourceX},${sourceY}
+            C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}
+          `}
+          fill="none"
+          stroke={activeLink === index ? COLORS.primary : "#aaa"}
+          strokeWidth={linkWidth}
+          strokeOpacity={activeLink !== null && activeLink !== index ? 0.3 : 0.7}
+          onMouseEnter={handleMouseEnter}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => setActiveLink(null)}
+        />
+      );
     };
+  }, [activeLink, updateTooltip]);
+  
+  const TooltipComponent = useMemo(() => {
+    if (!tooltip.visible || !tooltip.content) return null;
     
     return (
-      <path
-        d={`
-          M${sourceX},${sourceY}
-          C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}
-        `}
-        fill="none"
-        stroke={activeLink === index ? COLORS.primary : "#aaa"}
-        strokeWidth={linkWidth}
-        strokeOpacity={activeLink !== null && activeLink !== index ? 0.3 : 0.7}
-        onMouseEnter={handleMouseEnter}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={() => setActiveLink(null)}
-      />
+      <div 
+        className="absolute bg-white p-2 shadow-md rounded border z-10"
+        style={{ 
+          left: `${tooltip.x}px`, 
+          top: `${tooltip.y}px`,
+          pointerEvents: 'none'
+        }}
+      >
+        <p className="font-medium text-gray-800">
+          Source: {tooltip.content.source}
+          <br />
+          Target: {tooltip.content.target}
+        </p>
+        <p className="text-sm text-gray-600">
+          Count: {tooltip.content.value}
+        </p>
+      </div>
     );
-  });
+  }, [tooltip.visible, tooltip.content, tooltip.x, tooltip.y]);
 
   return (
     <div className="w-full">
@@ -286,8 +320,8 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
         <ResponsiveContainer width="100%" height="100%">
           <Sankey
             data={data}
-            node={<CustomNode />}
-            link={<CustomLink />}
+            node={CustomNode}
+            link={CustomLink}
             margin={{ top: 20, right: 200, bottom: 20, left: 20 }}
             nodePadding={50}
             nodeWidth={10} 
@@ -296,25 +330,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
           />
         </ResponsiveContainer>
         
-        {tooltip.visible && tooltip.content && (
-          <div 
-            className="absolute bg-white p-2 shadow-md rounded border z-10"
-            style={{ 
-              left: `${tooltip.x}px`, 
-              top: `${tooltip.y}px`,
-              pointerEvents: 'none'
-            }}
-          >
-            <p className="font-medium text-gray-800">
-              Source: {tooltip.content.source}
-              <br />
-              Target: {tooltip.content.target}
-            </p>
-            <p className="text-sm text-gray-600">
-              Count: {tooltip.content.value}
-            </p>
-          </div>
-        )}
+        {TooltipComponent}
       </div>
     </div>
   );
