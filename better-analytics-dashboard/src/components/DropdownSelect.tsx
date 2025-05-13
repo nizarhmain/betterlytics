@@ -12,18 +12,20 @@ export type DropdownSelectOption = {
 export type DropdownSelectProps = {
   defaultValue: string;
   label: string;
+  labelIcon?: React.ReactNode;
   options: DropdownSelectOption[];
+  labelClassName?: string;
   onChange?: (selectedKey: string) => void;
-  leftIcon?: React.ReactNode;
-} & React.HTMLAttributes<HTMLDivElement>;
+} &  React.ComponentProps<typeof DropdownMenu>;
 
 const DropdownSelect = ({
   defaultValue,
   label,
+  labelIcon,
+  labelClassName,
   options,
   onChange,
-  leftIcon,
-  className
+  ...props
 }: DropdownSelectProps) => {
   const [selectedKey, setSelectedKey] = useState(defaultValue);
 
@@ -32,12 +34,18 @@ const DropdownSelect = ({
   }, [defaultValue]);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu {...props}>
       <DropdownMenuTrigger asChild>
         <button
-          className={`inline-flex items-center gap-2 rounded-none px-1.5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 shadow-sm hover:bg-gray-50 ${className}`}
-        >
-          {leftIcon}
+          className={cn(
+            labelClassName,
+            'inline-flex items-center gap-2 px-1.5 py-2',
+            'text-sm font-medium text-gray-700 bg-white',
+            'rounded-none border border-gray-300 shadow-sm',
+            'hover:bg-gray-50',
+          )}
+          >
+          {labelIcon}
           <span>{label}</span>
           <ChevronDownIcon className="w-4 h-4" />
         </button>

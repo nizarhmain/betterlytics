@@ -1,17 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { alpha3ToAlpha2 } from 'i18n-iso-countries';
-import { hashString, generateColorFromHash } from "@/lib/utils";
 
 export const CountryFlagLabel = ({
   x = 0,
   y = 0,
-  index = 0,
   payload,
   textAnchor = "end",
 }: any) => {
   const alpha3 = payload?.value;
-
   if (!alpha3) return null;
+
   const alpha2 = alpha3ToAlpha2(alpha3);
   const flagUrl = `https://flagcdn.com/h20/${alpha2.toLowerCase()}.png`;
 
@@ -103,5 +101,5 @@ export function alpha3ToHue(alpha3: string): number {
 
 export function getColorFromAlpha3(alpha3: string): string {
   const hue = alpha3ToHue(alpha3);
-  return `hsl(${hue}, 65%, 55%)`; // You can tweak S/L for theme
+  return `hsl(${hue}, 65%, 55%)`; 
 }

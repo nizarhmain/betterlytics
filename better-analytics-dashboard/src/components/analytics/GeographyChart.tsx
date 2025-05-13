@@ -2,15 +2,12 @@ import { GeoVisitor } from '@/entities/geography';
 import { useState } from 'react';
 import {
   BarChart, LineChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Label,
-  PieChart,
-  Pie,
-  Cell,
+  Label, PieChart, Pie, Cell,
 } from 'recharts';
 import { CountryFlagLabel, CountryFlagPieLabel, getColorFromAlpha3 } from '@/components/analytics/Country';
 import { getName } from 'i18n-iso-countries';
 import DropdownSelect from '@/components/DropdownSelect';
-import { capitalize } from '@/lib/utils';
+import { capitalize, cn } from '@/lib/utils';
 import { FileChartColumnIcon, BarChart as BarChartIcon, LineChartIcon, PieChartIcon } from 'lucide-react';
 
 export const GeographyChartType = {
@@ -23,12 +20,15 @@ export type GeographyChartType = (typeof GeographyChartType)[keyof typeof Geogra
 
 const chartTypeToIcon = (chartType: GeographyChartType) => {
   const className ="w-4 h-4 text-foreground";
-  if (chartType === GeographyChartType.Bar) {
-    return < BarChartIcon className={className} />
-  } else if (chartType === GeographyChartType.Line) {
-    return < LineChartIcon className={className}/>
-  } else if (chartType === GeographyChartType.Pie) {
-    return < PieChartIcon className={className}/>
+  switch (chartType) {
+    case GeographyChartType.Bar:
+      return < BarChartIcon className={className} />
+    case GeographyChartType.Line:
+      return < LineChartIcon className={className}/>
+    case GeographyChartType.Pie:
+      return < PieChartIcon className={className}/>
+    default:
+      throw new Error(`Unknown chart type: ${chartType}`);
   }
 }
 
@@ -38,7 +38,6 @@ type GeographyChartProps = {
   hexColor: string;
   defaultChartType: GeographyChartType;
 } & React.HTMLAttributes<HTMLDivElement>;
-
 
 const GeographyChart = ({ data, maxCountries, hexColor, defaultChartType = GeographyChartType.Line, ...props }: GeographyChartProps) => {
   const [chartType, setChartType] = useState<GeographyChartType>(defaultChartType);
@@ -50,24 +49,26 @@ const GeographyChart = ({ data, maxCountries, hexColor, defaultChartType = Geogr
     })
     .slice(0, maxCountries)
     
-    const CountryAlpha3AxisProps = {
-      dataKey: 'country_code',
-      type: 'category' as "number" | "category" | undefined,
-      interval: 0,
-      tick: <CountryFlagLabel/>,
-      tickMargin: 0,
-    };
+  const CountryAlpha3AxisProps = {
+    dataKey: 'country_code',
+    type: 'category' as "number" | "category" | undefined,
+    interval: 0,
+    tick: <CountryFlagLabel/>,
+    tickMargin: 0,
+  };
 
-    const VisitorsAxisProps = {
-      dataKey: "visitors",
-      type: "number" as "number" | "category" | undefined,
-      doman: ['auto','auto'],
-      allowDecimals: false
-    }
-
+  const VisitorsAxisProps = {
+    dataKey: "visitors",
+    type: "number" as "number" | "category" | undefined,
+    doman: ['auto','auto'],
+    allowDecimals: false
+  }
   
   return (
-    <div className="flex flex-col overflow-hidden" {...props}>
+    <div 
+      className={cn("flex flex-col overflow-hidden", props.className)} 
+      {...props}
+    >
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col">
           <h3 className="text-lg font-semibold mb-1">{"Top Countries"}</h3>
@@ -79,7 +80,10 @@ const GeographyChart = ({ data, maxCountries, hexColor, defaultChartType = Geogr
           leftIcon={< FileChartColumnIcon className="w-4 h-4"/>}
           options={
             Object.values(GeographyChartType).map(
-              (ctype) => ({ key: ctype, label: { name: capitalize(ctype), icon: chartTypeToIcon(ctype) } })
+              (ctype) => ({ 
+                key: ctype, 
+                label: { name: capitalize(ctype), icon: chartTypeToIcon(ctype) } 
+              })
             )
           }
           onChange={(value) => setChartType(value as GeographyChartType)}

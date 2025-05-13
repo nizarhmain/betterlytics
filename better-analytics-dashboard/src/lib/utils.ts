@@ -12,8 +12,8 @@ export const capitalize = (str: string): string => {
 
 /**
  * Generate a consistent hash code from a string
- * This is used to get a consistent color for a device type across users
- * Perhaps we should instead use a consistent color for different device types
+ * This is used to get a consistent colors for a type across users
+ * Perhaps we should instead use a consistent color for different types
  */
 export function hashString(str: string): number {
   let hash = 0;
