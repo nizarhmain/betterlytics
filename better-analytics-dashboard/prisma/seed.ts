@@ -13,9 +13,9 @@ const funnelData = {
   name: 'Basic funnel',
   siteId: SITE_ID,
   pages: [
-    '/dashboard',
-    '/dashboard/pages',
-    '/dashboard/geography',
+    'http://localhost:3000/dashboard',
+    'http://localhost:3000/dashboard/pages',
+    'http://localhost:3000/dashboard/geography',
   ]
 }
 

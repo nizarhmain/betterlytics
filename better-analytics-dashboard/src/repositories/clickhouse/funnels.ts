@@ -5,9 +5,11 @@ import { SQL, safeSql } from '@/lib/safe-sql';
 
 export async function getFunnelDetails(siteId: string, pages: string[]): Promise<number[]> {
 
-  const taggedSqlResponse = pages
+  const urlPagesEqualityChecks = pages
     .map((page, index) => SQL.String({ [`page_${index}`]: page }))
     .map((page) => safeSql`url = ${page}`);
+
+  const levelsArray = new Array(pages.length).fill(0).map((_, i) => i+1);
 
   const sql = safeSql`
     WITH
@@ -16,10 +18,10 @@ export async function getFunnelDetails(siteId: string, pages: string[]): Promise
           SELECT
               windowFunnel(24*60*60)(
                   timestamp,
-                  ${SQL.SEPARATOR(taggedSqlResponse)}
+                  ${SQL.SEPARATOR(urlPagesEqualityChecks)}
               ) AS level
           FROM analytics.events
-          WHERE site_id = {site_id:String}
+          WHERE site_id = ${SQL.String({siteId})}
           GROUP BY visitor_id
       ),
       -- Aggregate by level
@@ -32,7 +34,7 @@ export async function getFunnelDetails(siteId: string, pages: string[]): Promise
       ),
       -- Static funnel levels
       levels AS (
-          SELECT arrayJoin({levels_array:Array(UInt32)}) AS level
+          SELECT arrayJoin(${SQL.UInt32Array({ levelsArray })}) AS level
       ),
       -- Left join counts with all levels
       joined AS (
@@ -49,14 +51,16 @@ export async function getFunnelDetails(siteId: string, pages: string[]): Promise
     ORDER BY level
   `;
   
-  const result = await clickhouse.query(sql.taggedSql, {
-    params: {
-      ...sql.taggedParams,
-      site_id: siteId,
-      window_size: 24*60*60,
-      levels_array: new Array(pages.length).fill(0).map((_, i) => i+1)
-    },
-  }).toPromise() as any[];
+  console.log("SQL:")
+  console.log(sql.taggedSql)
+
+  console.log("Params:")
+  console.log(sql.taggedParams)
+
+  const result = await clickhouse.query(
+    sql.taggedSql,
+    { params: sql.taggedParams }
+  ).toPromise() as any[];
 
   return result.map((res) => z.number().parse(res.count));
 }
