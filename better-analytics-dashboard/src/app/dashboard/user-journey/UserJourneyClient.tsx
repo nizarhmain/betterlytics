@@ -8,7 +8,7 @@ import { SankeyData } from "@/entities/userJourney";
 import UserJourneyChart from "./UserJourneyChart";
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
-const JOURNEY_OPTIONS = [5, 10, 20, 50];
+const JOURNEY_OPTIONS = [5, 10, 20, 50, 100];
 
 export default function UserJourneyClient({ siteId }: { siteId: string }) {
     const [range, setRange] = useState<TimeRangeValue>("7d");
