@@ -322,7 +322,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
             data={data}
             node={CustomNode}
             link={CustomLink}
-            margin={{ top: 20, right: 200, bottom: 20, left: 20 }}
+            margin={{ top: 20, right: 200, bottom: 30, left: 20 }}
             nodePadding={50}
             nodeWidth={10} 
             iterations={64}
