@@ -5,7 +5,7 @@ import { TIME_RANGE_PRESETS } from "@/utils/timeRanges";
 import { useEffect, useMemo, useState } from "react";
 import { fetchUserJourneyAction } from "@/app/actions/userJourney";
 import { SankeyData } from "@/entities/userJourney";
-import UserJourneyChart from "./UserJourneyChart";
+import UserJourneyChart from "../../../components/analytics/UserJourneyChart";
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
 const JOURNEY_OPTIONS = [5, 10, 20, 50, 100];

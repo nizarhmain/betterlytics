@@ -62,7 +62,6 @@ const measureTextWidth = (() => {
   };
 })();
 
-// Node label component
 const NodeLabel = memo(({ x, y, width, height, url, count }: NodeLabelProps) => {
   // Calculate dimensions for the label box
   const urlWidth = measureTextWidth(url, 12);
@@ -198,7 +197,6 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
     };
   }, [tooltip.visible, updateTooltip]);
   
-  // Custom Sankey Node component
   const CustomNode = useMemo(() => {
     return (props: any) => {
       const { x, y, width, height, index, payload } = props;
@@ -227,7 +225,6 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
     };
   }, []);
   
-  // Custom Sankey Link component
   const CustomLink = useMemo(() => {
     return (props: any) => {
       const { sourceX, sourceY, sourceControlX, targetX, targetY, targetControlX, linkWidth, index, payload } = props;
