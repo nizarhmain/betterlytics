@@ -2,11 +2,14 @@
 
 import { getReferrerSourceAggregationDataForSite, getReferrerSummaryDataForSite, getReferrerTableDataForSite, getReferrerTrafficTrendBySourceDataForSite } from '@/services/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
+import { checkAuth } from '@/lib/auth-actions';
 
 /**
  * Fetches the referrer distribution data for a site
  */
 export async function fetchReferrerSourceAggregationDataForSite(siteId: string, startDate: string, endDate: string) {
+  await checkAuth();
+
   try {
     const data = await getReferrerSourceAggregationDataForSite(siteId, startDate, endDate);
     return { data };
@@ -25,6 +28,8 @@ export async function fetchReferrerTrafficTrendBySourceDataForSite(
   endDate: string,
   granularity: GranularityRangeValues
 ) {
+  await checkAuth();
+
   try {
     const data = await getReferrerTrafficTrendBySourceDataForSite(siteId, startDate, endDate, granularity);
     return { data };
@@ -38,6 +43,8 @@ export async function fetchReferrerTrafficTrendBySourceDataForSite(
  * Fetches the summary data for referrers including total count, traffic and bounce rate
  */
 export async function fetchReferrerSummaryDataForSite(siteId: string, startDate: string, endDate: string) {
+  await checkAuth();
+
   try {
     const data = await getReferrerSummaryDataForSite(siteId, startDate, endDate);
     return { data };
@@ -51,6 +58,8 @@ export async function fetchReferrerSummaryDataForSite(siteId: string, startDate:
  * Fetches detailed referrer data for table display
  */
 export async function fetchReferrerTableDataForSite(siteId: string, startDate: string, endDate: string, limit = 100) {
+  await checkAuth();
+  
   try {
     const data = await getReferrerTableDataForSite(siteId, startDate, endDate, limit);
     return { data };
