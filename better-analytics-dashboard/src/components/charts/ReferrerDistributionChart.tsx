@@ -11,7 +11,6 @@ interface ReferrerDistributionChartProps {
   loading?: boolean;
 }
 
-// Custom tooltip
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -77,8 +76,8 @@ export default function ReferrerDistributionChart({ data, loading = false }: Ref
             dataKey="value"
             stroke="none"
           >
-            {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={getReferrerColor(entry.name)} />
+            {chartData.map((entry) => (
+              <Cell key={`cell-${entry.name}`} fill={getReferrerColor(entry.name)} />
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />

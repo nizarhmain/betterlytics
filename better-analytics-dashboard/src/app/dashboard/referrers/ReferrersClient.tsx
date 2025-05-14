@@ -97,17 +97,17 @@ export default function ReferrersClient() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <SummaryCard
             title="Total Referrers"
-            value={loading ? "-" : summaryData ? summaryData.totalReferrers.toString() : "-"}
+            value={(loading || !summaryData) ? "-" : summaryData.totalReferrers.toString()}
             changeText=""
           />
           <SummaryCard
             title="Referral Traffic"
-            value={loading ? "-" : summaryData ? summaryData.referralTraffic.toString() : "-"}
+            value={(loading || !summaryData) ? "-" : summaryData.referralTraffic.toString()}
             changeText=""
           />
           <SummaryCard
             title="Avg. Bounce Rate"
-            value={loading ? "-" : summaryData ? formatPercentage(summaryData.avgBounceRate) : "-"}
+            value={(loading || !summaryData) ? "-" : formatPercentage(summaryData.avgBounceRate)}
             changeText=""
           />
         </div>

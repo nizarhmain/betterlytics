@@ -5,17 +5,21 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { formatNumber, formatPercentage } from "@/utils/formatters";
 import { formatDuration } from "@/utils/dateFormatters";
 import { ReferrerTableRow } from '@/entities/referrers';
-import { getReferrerColor, REFERRER_COLORS } from '@/utils/referrerColors';
+import { getReferrerColor } from '@/utils/referrerColors';
 import { Globe, Link } from 'lucide-react';
 
-export enum ReferrerTab {
-  All = 'all',
-  Search = 'search',
-  Social = 'social',
-  Direct = 'direct',
-  Email = 'email',
-  Other = 'other'
-}
+export const ReferrerTab = {
+  All: 'all',
+  Search: 'search',
+  Social: 'social',
+  Direct: 'direct',
+  Email: 'email',
+  Other: 'other'
+} as const;
+
+export type ReferrerTabKey = typeof ReferrerTab[keyof typeof ReferrerTab];
+
+export type ReferrerTabValue = keyof typeof ReferrerTab;
 
 interface ReferrerTableProps {
   data?: ReferrerTableRow[];
@@ -27,9 +31,9 @@ const SourceTypeBadge = ({ type }: { type: string }) => {
   const color = getReferrerColor(type);
   
   const bgColorStyle = {
-    backgroundColor: `${color}20`, // 20% opacity
+    backgroundColor: `${color}33`, // 20% opacity (33 hex = ~20% opacity)
     color: color,
-    border: `1px solid ${color}50`,  // 50% opacity border
+    border: `1px solid ${color}80`,  // 50% opacity border (80 hex = 50% opacity)
   };
   
   return (
@@ -43,7 +47,7 @@ const SourceTypeBadge = ({ type }: { type: string }) => {
 };
 
 export default function ReferrerTable({ data = [], loading }: ReferrerTableProps) {
-  const [activeTab, setActiveTab] = useState<ReferrerTab>(ReferrerTab.All);
+  const [activeTab, setActiveTab] = useState<ReferrerTabKey>(ReferrerTab.All);
   
   // Calculate total visits for percentage
   const totalVisits = data.reduce((sum, row) => sum + row.visits, 0);
@@ -58,24 +62,17 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
     <div>
       <div className="border-b mb-4">
         <div className="flex space-x-4 overflow-x-auto">
-          {[
-            { id: ReferrerTab.All, label: 'All' },
-            { id: ReferrerTab.Search, label: 'Search' },
-            { id: ReferrerTab.Social, label: 'Social' },
-            { id: ReferrerTab.Direct, label: 'Direct' },
-            { id: ReferrerTab.Email, label: 'Email' },
-            { id: ReferrerTab.Other, label: 'Other' }
-          ].map((tab) => (
+          {(Object.entries(ReferrerTab) as [ReferrerTabValue, ReferrerTabKey][]).map(([key, value]) => (
             <button
-              key={tab.id}
+              key={value}
               className={`px-3 py-2 text-sm font-medium border-b-2 whitespace-nowrap ${
-                activeTab === tab.id 
+                activeTab === value 
                   ? 'border-gray-800 text-gray-800' 
                   : 'border-transparent hover:border-gray-300 text-gray-600'
               }`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => setActiveTab(value)}
             >
-              {tab.label}
+              {key}
             </button>
           ))}
         </div>
