@@ -1,11 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import SummaryCard from "@/components/SummaryCard";
 import { CreateFunnelDialog } from "./CreateFunnelDialog";
 import { Funnel } from "@/entities/funnels";
 import { fetchFunnelsAction } from "@/app/actions/funnels";
-import { CollapsibleFunnelData } from './CollapsibleFunnelData';
+import { FunnelDataContent } from './FunnelDataContent';
 
 export default function FunnelsClient() {
   const { data: funnels = [], isLoading: funnelsLoading } = useQuery<Funnel[]>({
@@ -24,21 +23,13 @@ export default function FunnelsClient() {
           <CreateFunnelDialog />
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <SummaryCard
-          title="Total funnels"
-          value={funnelsLoading ? '...' : String(funnels.length)}
-          changeText=""
-        />
-      </div>
       {
         funnels.length === 0 && (<div>No funnels yet...</div>)
       }
       {
         funnels
           .map((funnel) => (
-            <CollapsibleFunnelData key={funnel.id} funnel={funnel} />
+            <FunnelDataContent key={funnel.id} funnel={funnel} />
           ))
       }
     </div>
