@@ -9,6 +9,8 @@ import SummaryCard from "@/components/SummaryCard";
 import { fetchPageDetailAction } from "@/app/actions/pages";
 import { PageAnalytics } from "@/entities/pages";
 import { formatDuration } from "@/utils/dateFormatters";
+import PageTrafficChart from "@/components/PageTrafficChart";
+import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
 
 interface PageDetailClientProps {
   path: string;
@@ -16,6 +18,7 @@ interface PageDetailClientProps {
 
 export default function PageDetailClient({ path }: PageDetailClientProps) {
   const [range, setRange] = useState<TimeRangeValue>("7d");
+  const [granularity, setGranularity] = useState<GranularityRangeValues>("day");
   const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
 
   const { data: pageDetail, isLoading } = useQuery<PageAnalytics | null>({
@@ -35,13 +38,22 @@ export default function PageDetailClient({ path }: PageDetailClientProps) {
           <h1 className="text-2xl font-bold text-gray-900">Page Details</h1>
         </div>
         
-        <div className="relative inline-block text-left">
+        <div className="flex gap-2">
           <select
             className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={range}
             onChange={e => setRange(e.target.value as TimeRangeValue)}
           >
             {TIME_RANGE_PRESETS.map(r => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
+          </select>
+          <select
+            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={granularity}
+            onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
+          >
+            {GRANULARITY_RANGE_PRESETS.map(r => (
               <option key={r.value} value={r.value}>{r.label}</option>
             ))}
           </select>
@@ -75,9 +87,13 @@ export default function PageDetailClient({ path }: PageDetailClientProps) {
 
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Traffic Over Time</h2>
-        <div className="text-gray-500 text-center py-8">
-          Chart placeholder
-        </div>
+        <PageTrafficChart 
+          siteId="default-site" 
+          path={path} 
+          startDate={startDate} 
+          endDate={endDate} 
+          granularity={granularity} 
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
