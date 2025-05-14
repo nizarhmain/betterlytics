@@ -42,9 +42,7 @@ export function transformSequentialPathsToSankeyData(
   // Track links and their values
   const linkMap = new Map<string, number>(); // linkId key is formatted as 'sourceIndex|targetIndex'
   
-  // Track incoming traffic through each node
   const nodeIncomingTrafficMap = new Map<number, number>(); // nodeIndex -> incoming traffic count
-  // Track outgoing traffic through each node
   const nodeOutgoingTrafficMap = new Map<number, number>(); // nodeIndex -> outgoing traffic count
   
   // Process each user journey path from each session
@@ -52,9 +50,8 @@ export function transformSequentialPathsToSankeyData(
     // Limit to maxSteps nodes
     const limitedPath = path.slice(0, maxSteps);
     
-    // Process each sequential step in the path
+    // Process each step in the path
     for (let i = 0; i < limitedPath.length - 1; i++) {
-      // Get current and next pages
       const currentPage = limitedPath[i];
       const nextPage = limitedPath[i + 1];
       

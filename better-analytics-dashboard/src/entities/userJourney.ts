@@ -10,7 +10,6 @@ export const SequentialPathSchema = z.object({
   count: z.number(),         // Number of users who took this exact path
 });
 
-// Node in the Sankey diagram
 export const SankeyNodeSchema = z.object({
   id: z.string(),          // Unique identifier (url_depth)
   name: z.string(),        // The URL for display
@@ -18,10 +17,9 @@ export const SankeyNodeSchema = z.object({
   totalTraffic: z.number() // Total number of users passing through this node
 });
 
-// Link between nodes in the Sankey diagram
 export const SankeyLinkSchema = z.object({
-  source: z.number(), // Index of source node in nodes array - required for Recharts Sankey diagram
-  target: z.number(), // Index of target node in nodes array - required for Recharts Sankey diagram
+  source: z.number(), // Index of source node in nodes array - required format for Recharts Sankey diagram
+  target: z.number(), // Index of target node in nodes array - required format for Recharts Sankey diagram
   value: z.number(),  // Number of users who took this path
 });
 

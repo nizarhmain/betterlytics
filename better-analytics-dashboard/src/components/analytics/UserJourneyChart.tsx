@@ -156,7 +156,6 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
     return Math.max(500, baseHeight);
   }, [data]);
   
-  // Reset tooltip when activeLink changes
   useEffect(() => {
     if (activeLink === null) {
       updateTooltip({ visible: false });
@@ -169,7 +168,6 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (!tooltip.visible) return;
       
-      // Get container bounds
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
       
