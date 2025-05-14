@@ -23,7 +23,7 @@ export default function PageDetailClient({ path }: PageDetailClientProps) {
     queryFn: () => fetchPageDetailAction('default-site', path, startDate, endDate),
   });
 
-  const displayTitle = path === "/" ? "Homepage" : path;
+  const displayTitle = path;
 
   return (
     <div className="p-6 space-y-6">
@@ -48,38 +48,35 @@ export default function PageDetailClient({ path }: PageDetailClientProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-2 break-all">{displayTitle}</h2>
+      <h2 className="text-xl font-semibold mb-6 ml-1 break-all">{displayTitle}</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <SummaryCard
-            title="Visitors"
-            value={isLoading ? '...' : (pageDetail?.visitors.toLocaleString() || '0')}
-            changeText=""
-          />
-          <SummaryCard
-            title="Page Views"
-            value={isLoading ? '...' : (pageDetail?.pageviews.toLocaleString() || '0')}
-            changeText=""
-          />
-          <SummaryCard
-            title="Bounce Rate"
-            value={isLoading ? '...' : `${pageDetail?.bounceRate || 0}%`}
-            changeText=""
-          />
-          <SummaryCard
-            title="Avg. Time on Page"
-            value={isLoading ? '...' : formatDuration(pageDetail?.avgTime || 0)}
-            changeText=""
-          />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <SummaryCard
+          title="Visitors"
+          value={isLoading ? '...' : (pageDetail?.visitors.toLocaleString() || '0')}
+          changeText=""
+        />
+        <SummaryCard
+          title="Page Views"
+          value={isLoading ? '...' : (pageDetail?.pageviews.toLocaleString() || '0')}
+          changeText=""
+        />
+        <SummaryCard
+          title="Bounce Rate"
+          value={isLoading ? '...' : `${pageDetail?.bounceRate || 0}%`}
+          changeText=""
+        />
+        <SummaryCard
+          title="Avg. Time on Page"
+          value={isLoading ? '...' : formatDuration(pageDetail?.avgTime || 0)}
+          changeText=""
+        />
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Traffic Over Time</h2>
         <div className="text-gray-500 text-center py-8">
           Chart placeholder
-
         </div>
       </div>
 

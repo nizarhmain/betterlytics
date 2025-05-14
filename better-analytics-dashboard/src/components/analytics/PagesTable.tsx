@@ -16,14 +16,8 @@ interface PagesTableProps {
 }
 
 export default function PagesTable({ data }: PagesTableProps) {
-  const encodePath = (path: string): string => {
-    // Handle root path specifically with a prefix that's unlikely to conflict
-    if (path === "/") {
-      return "__index__";
-    }
-    
-    // Remove leading slash if present for routing purposes
-    return path.startsWith('/') ? path.substring(1) : path;
+  const generatePageDetailUrl = (path: string): string => {
+    return `/dashboard/pages/page-detail?path=${encodeURIComponent(path)}`;
   };
 
   const formatPath = (path: string): string => {
@@ -49,13 +43,13 @@ export default function PagesTable({ data }: PagesTableProps) {
           </TableHeader>
           <TableBody>
             {data.map((page) => {
-              const encodedPath = encodePath(page.path);
+              const pageDetailUrl = generatePageDetailUrl(page.path);
               
               return (
                 <TableRow 
                   key={page.path} 
                   className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => window.location.href = `/dashboard/pages/${encodedPath}`}
+                  onClick={() => window.location.href = pageDetailUrl}
                 >
                   <TableCell className="font-medium">{formatPath(page.path)}</TableCell>
                   <TableCell className="text-gray-500">{formatPath(page.path)}</TableCell>
@@ -65,7 +59,7 @@ export default function PagesTable({ data }: PagesTableProps) {
                   <TableCell className="text-right">{formatDuration(page.avgTime)}</TableCell>
                   <TableCell className="text-right">
                     <Link 
-                      href={`/dashboard/pages/${encodedPath}`} 
+                      href={pageDetailUrl} 
                       className="text-gray-400 hover:text-gray-600"
                       onClick={(e) => e.stopPropagation()}
                     >
