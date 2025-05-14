@@ -11,8 +11,7 @@ export async function getDeviceTypeBreakdown(siteId: string, startDate: DateTime
     SELECT device_type, uniq(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND timestamp >= {start:DateTime}
-      AND timestamp <= {end:DateTime}
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
     GROUP BY device_type
     ORDER BY visitors DESC
   `;
@@ -33,8 +32,7 @@ export async function getBrowserBreakdown(siteId: string, startDate: DateTimeStr
     SELECT browser, uniq(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND timestamp >= {start:DateTime}
-      AND timestamp <= {end:DateTime}
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
     GROUP BY browser
     ORDER BY visitors DESC
   `;
@@ -55,8 +53,7 @@ export async function getOperatingSystemBreakdown(siteId: string, startDate: Dat
     SELECT os, uniq(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND timestamp >= {start:DateTime}
-      AND timestamp <= {end:DateTime}
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
     GROUP BY os
     ORDER BY visitors DESC
   `;
