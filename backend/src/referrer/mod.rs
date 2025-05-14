@@ -52,7 +52,7 @@ pub struct ReferrerInfo {
     /// Original referrer URL
     pub url: Option<String>,
     /// Source category (direct, search, social, etc.)
-    pub source: ReferrerSource,
+    pub source_type: ReferrerSource,
     /// Source name (e.g., "Google", "Facebook", etc.)
     pub source_name: Option<String>,
     /// Search term (if available from search engines)
@@ -80,11 +80,11 @@ fn get_parser() -> &'static RefDb {
 /// Sanitize a referrer URL for privacy compliance
 /// - For search engines: keeps only search query parameters
 /// - For all other sites: strips all query parameters
+/// - For all URLs: strips protocol prefixes (http://, https://)
 fn sanitize_referrer_url(referrer_url: &Url, is_search_engine: bool, search_params: &[String]) -> String {
     if is_search_engine && !search_params.is_empty() {
         // For search engines, keep only search query parameters
-        let mut clean_url = Url::parse(&format!("{}://{}{}", 
-            referrer_url.scheme(), 
+        let mut clean_url = Url::parse(&format!("http://{}{}", 
             referrer_url.host_str().unwrap_or(""), 
             referrer_url.path()
         )).unwrap_or_else(|_| referrer_url.clone());
@@ -99,13 +99,16 @@ fn sanitize_referrer_url(referrer_url: &Url, is_search_engine: bool, search_para
             }
         }
         
-        clean_url.to_string()
+        let url_str = clean_url.to_string();
+        url_str.replace("http://", "")
     } else {
         // For all other URLs, strip query parameters and fragments
         let mut clean_url = referrer_url.clone();
         clean_url.set_query(None);
         clean_url.set_fragment(None);
-        clean_url.to_string()
+        
+        let url_str = clean_url.to_string();
+        url_str.replace("https://", "").replace("http://", "")
     }
 }
 
@@ -121,7 +124,7 @@ pub fn parse_referrer(referrer: Option<&str>, current_url: Option<&str>) -> Refe
         _ => {
             return ReferrerInfo {
                 url: None,
-                source: ReferrerSource::Direct,
+                source_type: ReferrerSource::Direct,
                 source_name: None,
                 search_term: None,
             }
@@ -133,7 +136,7 @@ pub fn parse_referrer(referrer: Option<&str>, current_url: Option<&str>) -> Refe
         Err(_) => {
             return ReferrerInfo {
                 url: Some(referrer_str.to_string()),
-                source: ReferrerSource::Other,
+                source_type: ReferrerSource::Other,
                 source_name: None,
                 search_term: None,
             };
@@ -200,7 +203,7 @@ pub fn parse_referrer(referrer: Option<&str>, current_url: Option<&str>) -> Refe
 
     ReferrerInfo {
         url: Some(sanitized_referrer),
-        source: source_type,
+        source_type,
         source_name: referrer_name,
         search_term,
     }
