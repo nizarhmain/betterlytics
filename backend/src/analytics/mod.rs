@@ -10,6 +10,12 @@ pub use fingerprint::*;
 pub struct RawTrackingEvent {
     /// Site identifier
     pub site_id: String,
+    /// Name of event
+    pub event_name: String,
+    /// Is event custom
+    pub is_custom_event: bool,
+    /// String encoded custom JSON properties
+    pub properties: String,
     /// Page URL
     pub url: String,
     /// Referrer URL
@@ -29,12 +35,18 @@ impl RawTrackingEvent {
         referrer: Option<String>,
         user_agent: String,
         screen_resolution: String,
+        event_name: String,
+        is_custom_event: bool,
+        properties: String
     ) -> Self {
         Self {
             site_id,
             url,
             referrer,
             user_agent,
+            event_name,
+            is_custom_event,
+            properties,
             screen_resolution,
             timestamp: SystemTime::now()
                 .duration_since(UNIX_EPOCH)

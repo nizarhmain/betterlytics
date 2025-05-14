@@ -8,26 +8,10 @@
         return console.error("Better Analytics: data-site-id attribute missing");
     }
 
-    function ping() {
-        return fetch(
-            "http://localhost:3001/ping",
-            {
-                method: "GET",
-                cache: "default",
-                mode: "cors",
-                keepalive: false
-            }
-        )
-            .then((res) => res.json())
-            .catch((error) => console.error("Analytics ping failed:", error));
-    }
-
     // Track current path for SPA navigation
     var currentPath = window.location.pathname;
 
-    async function trackEvent() {
-        const isUnique = await ping();
-
+    function trackEvent(eventName, isCustomEvent = false, properties = {}) {
         var url = window.location.href;
         var referrer = document.referrer || null;
         var userAgent = navigator.userAgent;
@@ -53,6 +37,9 @@
             },
             body: JSON.stringify({
                 site_id: siteId,
+                event_name: eventName,
+                is_custom_event: isCustomEvent,
+                properties: JSON.stringify(properties),
                 url: url,
                 referrer: referrer,
                 user_agent: userAgent,
@@ -65,13 +52,15 @@
         });
     }
 
+    window.baEvent = (eventName, eventProps = {}) => trackEvent(eventName, true, eventProps);
+
     // Track initial page view
-    trackEvent();
+    trackEvent("pageview");
 
     // Track page visibility changes
     document.addEventListener("visibilitychange", function() {
         if (document.visibilityState === "visible") {
-            trackEvent();
+            trackEvent("pageview");
         }
     });
 
@@ -83,7 +72,7 @@
             originalPushState.apply(this, arguments);
             if (currentPath !== window.location.pathname) {
                 currentPath = window.location.pathname;
-                trackEvent();
+                trackEvent("pageview");
             }
         };
 
@@ -91,7 +80,7 @@
         window.addEventListener("popstate", function() {
             if (currentPath !== window.location.pathname) {
                 currentPath = window.location.pathname;
-                trackEvent();
+                trackEvent("pageview");
             }
         });
     }

@@ -1,17 +1,16 @@
 use anyhow::Result;
 use tokio::sync::mpsc;
+use tracing::{error, debug};
 use crate::analytics::{AnalyticsEvent, generate_fingerprint};
 use crate::db::SharedDatabase;
 use crate::geoip::GeoIpService;
-use tracing::{error, debug};
 use crate::session;
-use r2d2::Pool;
-use redis::Client as RedisClient;
-use std::sync::Arc;
 use crate::bot_detection;
+use crate::referrer::{ReferrerInfo, parse_referrer};
 use woothee::parser::Parser;
 use once_cell::sync::Lazy;
 use url::Url;
+use crate::campaign::{CampaignInfo, parse_campaign_params};
 
 static USER_AGENT_PARSER: Lazy<Parser> = Lazy::new(|| Parser::new());
 
@@ -37,22 +36,28 @@ pub struct ProcessedEvent {
     pub timestamp: chrono::DateTime<chrono::Utc>,
     pub url: String,
     pub referrer: Option<String>,
+    /// Parsed referrer information
+    pub referrer_info: ReferrerInfo,
+    /// Parsed campaign parameters
+    pub campaign_info: CampaignInfo,
     pub user_agent: String,
+    /// Custom event handling
+    pub event_type: String,
+    pub custom_event_name: String,
+    pub custom_event_json: String,
 }
 
 /// Event processor that handles real-time processing
 pub struct EventProcessor {
     db: SharedDatabase,
     event_tx: mpsc::Sender<ProcessedEvent>,
-    redis_pool: Arc<Pool<RedisClient>>,
     geoip_service: GeoIpService,
 }
 
 impl EventProcessor {
     pub fn new(db: SharedDatabase, geoip_service: GeoIpService) -> (Self, mpsc::Receiver<ProcessedEvent>) {
         let (event_tx, event_rx) = mpsc::channel(100_000);
-        let redis_pool = session::REDIS_POOL.clone();
-        (Self { db, event_tx, redis_pool, geoip_service }, event_rx)
+        (Self { db, event_tx, geoip_service }, event_rx)
     }
 
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
@@ -70,6 +75,7 @@ impl EventProcessor {
 
         let mut processed = ProcessedEvent {
             event: event.clone(),
+            event_type: String::new(),
             session_id: String::new(),
             is_bot: false,
             country_code: None,
@@ -82,8 +88,25 @@ impl EventProcessor {
             timestamp: timestamp.clone(),
             url: url_path,
             referrer: processed_referrer,
+            referrer_info: ReferrerInfo::default(),
             user_agent: user_agent.clone(),
+            campaign_info: CampaignInfo::default(),
+            custom_event_name: String::new(),
+            custom_event_json: String::new(),
         };
+
+        // Handle event types
+        if let Err(e) = self.handle_event_types(&mut processed).await {
+            error!("Failed to handle event type: {}", e);
+        }
+
+        // Parse referrer information
+        processed.referrer_info = parse_referrer(referrer.as_deref(), Some(&raw_url));
+        debug!("referrer_info: {:?}", processed.referrer_info);
+        
+        // Parse campaign parameters from URL
+        processed.campaign_info = parse_campaign_params(&raw_url);
+        debug!("campaign_info: {:?}", processed.campaign_info);
 
         if let Err(e) = self.get_geolocation(&mut processed).await {
             error!("Failed to get geolocation: {}", e);
@@ -100,19 +123,19 @@ impl EventProcessor {
         }
 
         let session_id_result = session::get_or_create_session_id(
-            &self.redis_pool, 
             &site_id, 
             &processed.visitor_fingerprint, 
-            &timestamp
         );
 
         match session_id_result {
             Ok(id) => processed.session_id = id,
             Err(e) => {
-                error!("Failed to get session ID from Redis: {}. Event processing aborted for: {:?}", e, processed.event);
+                error!("Failed to get session ID: {}. Event processing aborted for: {:?}", e, processed.event);
                 return Ok(());
             }
         };
+
+        debug!("Session ID: {}", processed.session_id);
 
         if let Err(e) = self.detect_device_type_from_resolution(&mut processed).await {
             error!("Failed to detect device type from resolution: {}", e);
@@ -120,10 +143,6 @@ impl EventProcessor {
         
         if let Err(e) = self.parse_user_agent(&mut processed).await {
             error!("Failed to parse user agent: {}", e);
-        }
-        
-        if let Err(e) = self.update_real_time_metrics(&processed).await {
-            error!("Failed to update real-time metrics: {}", e);
         }
 
         if let Err(e) = self.event_tx.send(processed).await {
@@ -154,6 +173,19 @@ impl EventProcessor {
                 }
             }
         }
+    }
+
+    /// Handle different event types
+    async fn handle_event_types(&self, processed: &mut ProcessedEvent) -> Result<()> {
+        let event_name = processed.event.raw.event_name.clone();
+        if processed.event.raw.is_custom_event {
+            processed.event_type = "custom".to_string();
+            processed.custom_event_name = event_name;
+            processed.custom_event_json = processed.event.raw.properties.clone();
+        } else {
+            processed.event_type = event_name;
+        }
+        Ok(())
     }
 
     /// Get geolocation data for the IP
@@ -218,11 +250,4 @@ impl EventProcessor {
 
         Ok(())
     } 
-
-    /// Update real-time metrics in ClickHouse
-    async fn update_real_time_metrics(&self, processed: &ProcessedEvent) -> Result<()> {
-        debug!("Updating real-time metrics using session_id: {}", processed.session_id);
-        // TODO: Implement real-time metrics update
-        Ok(())
-    }
 }

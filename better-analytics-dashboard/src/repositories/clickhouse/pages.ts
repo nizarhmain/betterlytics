@@ -1,17 +1,53 @@
 import { clickhouse } from '@/lib/clickhouse';
-import { DailyPageViewRowSchema, DailyPageViewRow } from '@/entities/pageviews';
+import { DailyPageViewRowSchema, DailyPageViewRow, TotalPageViewsRow, TotalPageViewRowSchema } from '@/entities/pageviews';
 import { PageAnalytics, PageAnalyticsSchema } from '@/entities/pages';
 import { DateString, DateTimeString } from '@/types/dates';
+import { GranularityRangeValues } from '@/utils/granularityRanges';
+import { BAQuery } from '@/lib/ba-query';
 
-export async function getDailyPageViews(siteId: string, startDate: DateString, endDate: DateString): Promise<DailyPageViewRow[]> {
+export async function getTotalPageViews(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<TotalPageViewsRow[]> {
+  
+  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  
   const query = `
-    SELECT date, url, views
-    FROM analytics.daily_page_views FINAL
+    SELECT
+      ${granularityFunc}(timestamp) as date,
+      count() as views
+    FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND date >= {start_date:Date}
-      AND date <= {end_date:Date}
+      AND event_type = 'pageview' 
+      AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
+    GROUP BY date
     ORDER BY date ASC, views DESC
-    LIMIT 100
+    LIMIT 10080
+  `;
+  const result = await clickhouse.query(query, {
+    params: {
+      site_id: siteId,
+      start_date: startDate,
+      end_date: endDate,
+    },
+  }).toPromise() as unknown[];
+  return result.map(row => TotalPageViewRowSchema.parse(row));
+}
+
+
+export async function getPageViews(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<DailyPageViewRow[]> {
+  
+  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  
+  const query = `
+    SELECT
+      ${granularityFunc}(timestamp) as date,
+      url,
+      count() as views
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND event_type = 'pageview' 
+      AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
+    GROUP BY date, url
+    ORDER BY date ASC, views DESC
+    LIMIT 10080
   `;
   const result = await clickhouse.query(query, {
     params: {
@@ -28,6 +64,7 @@ export async function getTotalPageviews(siteId: string, startDate: DateTimeStrin
     SELECT count() as pageviews
     FROM analytics.events
     WHERE site_id = {site_id:String}
+      AND event_type = 'pageview' 
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
   `;
@@ -35,56 +72,6 @@ export async function getTotalPageviews(siteId: string, startDate: DateTimeStrin
     params: { site_id: siteId, start: startDate, end: endDate },
   }).toPromise() as any[];
   return Number(result[0]?.pageviews ?? 0);
-}
-
-export async function getHourlyPageViews(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyPageViewRow[]> {
-  const query = `
-    SELECT toStartOfHour(timestamp) as date, url, count() as views
-    FROM analytics.events
-    WHERE site_id = {site_id:String}
-      AND timestamp >= {start:DateTime}
-      AND timestamp <= {end:DateTime}
-    GROUP BY date, url
-    ORDER BY date ASC, views DESC
-    LIMIT 100
-  `;
-  const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
-  
-  const mappedResults = result.map(row => {
-    const r = row as any;
-    return {
-      date: r.date,
-      url: r.url,
-      views: Number(r.views),
-    };
-  });
-  
-  return DailyPageViewRowSchema.array().parse(mappedResults);
-}
-
-export async function getMinutePageViews(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DailyPageViewRow[]> {
-  const query = `
-    SELECT toStartOfMinute(timestamp) as date, url, count() as views
-    FROM analytics.events
-    WHERE site_id = {site_id:String}
-      AND timestamp >= {start:DateTime}
-      AND timestamp <= {end:DateTime}
-    GROUP BY date, url
-    ORDER BY date ASC, views DESC
-    LIMIT 100
-  `;
-  const result = await clickhouse.query(query, { params: { site_id: siteId, start: startDate, end: endDate } }).toPromise() as unknown[];
-  
-  const mappedResults = result.map(row => {
-    const r = row as any;
-    return {
-      date: r.date,
-      url: r.url,
-      views: Number(r.views),
-    };
-  });
-  
-  return DailyPageViewRowSchema.array().parse(mappedResults);
 }
 
 export async function getTopPages(
@@ -99,6 +86,7 @@ export async function getTopPages(
       uniq(session_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
+      AND event_type = 'pageview' 
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
     GROUP BY url
     ORDER BY visitors DESC
@@ -145,11 +133,12 @@ export async function getPageMetrics(
           ) as duration_seconds
         FROM analytics.events
         WHERE site_id = {site_id:String}
+          AND event_type = 'pageview' 
           AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
       ),
       session_page_counts AS (
         SELECT session_id, count() as page_count FROM analytics.events
-        WHERE site_id = {site_id:String} AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+        WHERE site_id = {site_id:String} AND timestamp BETWEEN {start:DateTime} AND {end:DateTime} AND event_type = 'pageview'
         GROUP BY session_id
       ),
       page_aggregates AS (

@@ -1,30 +1,40 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
-import { fetchPageViewsAction } from '@/app/actions/overview';
-import { DailyPageViewRow } from "@/entities/pageviews";
+import { useMemo } from 'react';
+import { fetchTotalPageViewsAction } from '@/app/actions/overview';
+import { TotalPageViewsRow } from "@/entities/pageviews";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { getGroupingForRange, TimeGrouping } from '@/utils/timeRanges';
+import { timeFormat } from "d3-time-format";
+import { GranularityRangeValues } from '@/utils/granularityRanges';
+import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragmentedGranularityTimeSeriesLineChart';
 
 interface PageviewsChartProps {
   siteId: string;
   startDate: string;
   endDate: string;
+  granularity: GranularityRangeValues;
 }
 
-export default function PageviewsChart({ siteId, startDate, endDate }: PageviewsChartProps) {
-  const groupBy: TimeGrouping = getGroupingForRange(startDate, endDate);
-  const { data = [], isLoading } = useQuery<DailyPageViewRow[]>({
-    queryKey: ['pageViews', siteId, startDate, endDate, groupBy],
-    queryFn: () => fetchPageViewsAction(siteId, startDate, endDate, groupBy),
+export default function PageviewsChart({ siteId, startDate, endDate, granularity }: PageviewsChartProps) {
+  const { data = [], isLoading } = useQuery<TotalPageViewsRow[]>({
+    queryKey: ['pageViews', siteId, startDate, endDate, granularity],
+    queryFn: () => fetchTotalPageViewsAction(siteId, startDate, endDate, granularity),
   });
 
-  const grouped: Record<string, Record<string, number>> = {};
-  data.forEach(row => {
-    if (!grouped[row.date]) grouped[row.date] = {};
-    grouped[row.date][row.url] = row.views;
-  });
-  const chartData = Object.entries(grouped).map(([date, urls]) => ({ date, ...urls }));
-  const urls = Array.from(new Set(data.map(row => row.url)));
+  const timeSeriesProps = useMemo(() => {
+    return {
+      dataKey: 'views',
+      data,
+      granularity
+    } as const;
+  }, [data, granularity]);
+
+  const {
+    chartData,
+    tooltipLabelFormatter,
+    scale,
+    ticks
+  } = useFragmentedGranularityTimeSeriesLineChart(timeSeriesProps);
 
   if (isLoading) return <div>Loading chart...</div>;
   if (data.length === 0) return <div>No data available.</div>;
@@ -38,12 +48,22 @@ export default function PageviewsChart({ siteId, startDate, endDate }: Pageviews
       <div className="w-full h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-            <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+            <XAxis
+              dataKey="date"
+              type='number'
+              ticks={ticks}
+              domain={["dataMin", "dataMax"]}
+              scale={scale}
+              tickFormatter={timeFormat("%b %d")}
+              tick={{ textAnchor: "middle", fill: '#64748b', fontSize: 12 }}
+              axisLine={false} tickLine={false}
+            />
             <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} width={48} />
-            <Tooltip />
-            {urls.map((url) => (
-              <Line key={url} type="monotone" dataKey={url} stroke={`#a78bfa`} strokeWidth={3} dot={false} />
-            ))}
+            <Tooltip
+              labelFormatter={tooltipLabelFormatter}
+              formatter={(value) => [value, "Total views"]}
+            />
+            <Line type="monotone" dataKey="views" stroke={`#a78bfa`} strokeWidth={3} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>
