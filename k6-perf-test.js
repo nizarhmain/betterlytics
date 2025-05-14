@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 
 const targetUrl = __ENV.TARGET_URL || 'http://localhost:3001/track';
@@ -10,6 +10,9 @@ const basePayload = {
   referrer: null,
   screen_resolution: "1920x1080",
   site_id: "default-site",
+  event_name: "pageview",
+  is_custom_event: false,
+  properties: JSON.stringify({}),
   timestamp: 0,
   url: "http://localhost:3000/dashboard",
   user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",

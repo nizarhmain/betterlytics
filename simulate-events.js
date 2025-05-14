@@ -2,14 +2,22 @@
  * Parameters
  */
 const TARGET_URL = 'http://localhost:3001/track'
-const NUMBER_OF_EVENTS = 5_000;
-const NUMBER_OF_USERS = 1_000;
+const NUMBER_OF_EVENTS = 2_000;
+const NUMBER_OF_USERS = 500;
 const SIMULATED_DAYS = 7;
+const CUSTOM_EVENTS = [
+  { event_name: 'cart-checkout', properties: JSON.stringify({ test_value: 6 }) },
+  { event_name: 'product-clicked', properties: JSON.stringify({ product_id: 'abc123' }) },
+];
+const CUSTOM_EVENT_FREQUENCY = 0.2;
 
 const BASE_PAYLOAD = {
   referrer: null,
   screen_resolution: "1920x1080",
   site_id: "default-site",
+  event_name: "pageview",
+  is_custom_event: false,
+  properties: JSON.stringify({}),
   timestamp: 0,
   url: "http://localhost:3000/dashboard",
   user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
@@ -43,6 +51,15 @@ const userIds = (
     .map((_) => uuidv4())
 );
 
+function getExtraPayload(payload) {
+  return {
+    ...payload,
+    ...(Math.random() < CUSTOM_EVENT_FREQUENCY)
+      ? { ...CUSTOM_EVENTS[Math.floor(Math.random() * CUSTOM_EVENTS.length)], is_custom_event: true }
+      : {}
+    };
+}
+
 const events = (
  new Array(NUMBER_OF_EVENTS)
     .fill(0)
@@ -51,6 +68,7 @@ const events = (
     .map((stamp) => Math.floor((Date.now() / 1000) - stamp))
     .sort()
     .map((timestamp) => ({ timestamp, visitor_id: userIds[Math.floor(userIds.length * Math.random())] }))
+    .map((payload) => getExtraPayload(payload))
     .map((payload) => ({ ...BASE_PAYLOAD, ...payload }))
 );
 
