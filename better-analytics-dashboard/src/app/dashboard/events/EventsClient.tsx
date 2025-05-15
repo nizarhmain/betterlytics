@@ -32,12 +32,12 @@ export default function EventsClient() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Pages</h1>
-          <p className="text-sm text-gray-500">Analytics and insights for your website</p>
+          <h1 className="text-2xl font-bold text-foreground mb-1">Events</h1>
+          <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
         </div>
         <div className="relative inline-block text-left">
           <select
-            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-card border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             value={range}
             onChange={e => setRange(e.target.value as TimeRangeValue)}
           >
