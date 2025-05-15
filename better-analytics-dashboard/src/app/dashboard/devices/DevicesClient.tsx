@@ -36,12 +36,12 @@ export default function DevicesClient() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Devices</h1>
-          <p className="text-sm text-gray-500">Analytics and insights for your website</p>
+          <h1 className="text-2xl font-bold text-foreground mb-1">Devices</h1>
+          <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
         </div>
         <div className="relative inline-block text-left">
           <select
-            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-card border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             value={range}
             onChange={e => setRange(e.target.value as TimeRangeValue)}
           >
@@ -85,17 +85,17 @@ export default function DevicesClient() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Device Types</h2>
-          <p className="text-sm text-gray-500 mb-4">Visitors by device category</p>
+        <div className="bg-card rounded-lg shadow border border-border p-6">
+          <h2 className="text-lg font-bold text-foreground mb-1">Device Types</h2>
+          <p className="text-sm text-muted-foreground mb-4">Visitors by device category</p>
           <DeviceTypeChart 
             data={deviceBreakdown} 
             isLoading={deviceBreakdownLoading} 
           />
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Top Browsers</h2>
-          <p className="text-sm text-gray-500 mb-4">Most common browsers</p>
+        <div className="bg-card rounded-lg shadow border border-border p-6">
+          <h2 className="text-lg font-bold text-foreground mb-1">Top Browsers</h2>
+          <p className="text-sm text-muted-foreground mb-4">Most common browsers</p>
           <BrowserTable 
             data={browserStats} 
             isLoading={browserStatsLoading} 
