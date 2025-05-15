@@ -25,9 +25,9 @@ export default function PagesTable({ data }: PagesTableProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-bold text-gray-900 mb-1">All Pages</h2>
-      <p className="text-sm text-gray-500 mb-4">Analytics for all tracked pages</p>
+    <div className="bg-card rounded-lg shadow border border-border p-6">
+      <h2 className="text-lg font-bold text-foreground mb-1">All Pages</h2>
+      <p className="text-sm text-muted-foreground mb-4">Analytics for all tracked pages</p>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -48,11 +48,11 @@ export default function PagesTable({ data }: PagesTableProps) {
               return (
                 <TableRow 
                   key={page.path} 
-                  className="cursor-pointer hover:bg-gray-50"
+                  className="cursor-pointer hover:bg-accent"
                   onClick={() => window.location.href = pageDetailUrl}
                 >
                   <TableCell className="font-medium">{formatPath(page.path)}</TableCell>
-                  <TableCell className="text-gray-500">{formatPath(page.path)}</TableCell>
+                  <TableCell className="text-muted-foreground">{formatPath(page.path)}</TableCell>
                   <TableCell className="text-right">{page.visitors.toLocaleString()}</TableCell>
                   <TableCell className="text-right">{page.pageviews.toLocaleString()}</TableCell>
                   <TableCell className="text-right">{page.bounceRate}%</TableCell>
@@ -60,7 +60,7 @@ export default function PagesTable({ data }: PagesTableProps) {
                   <TableCell className="text-right">
                     <Link 
                       href={pageDetailUrl} 
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-muted-foreground hover:text-foreground"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <ArrowUpRight size={16} />
