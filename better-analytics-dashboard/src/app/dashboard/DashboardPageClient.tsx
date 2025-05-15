@@ -36,80 +36,81 @@ export default function DashboardPageClient() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="bg-card text-card-foreground shadow rounded-lg p-6">
-        <div className="flex justify-end mb-4 gap-4">
-          <div className="relative inline-block text-left">
-            <select
-              className="bg-background border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              value={range}
-              onChange={e => setRange(e.target.value as TimeRangeValue)}
-            >
-              {TIME_RANGE_PRESETS.map(r => (
-                <option key={r.value} value={r.value}>{r.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="relative inline-block text-left">
-            <select
-              className="bg-background border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              value={granularity}
-              onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
-            >
-              {GRANULARITY_RANGE_PRESETS.map(r => (
-                <option key={r.value} value={r.value}>{r.label}</option>
-              ))}
-            </select>
-          </div>
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="flex justify-end mb-4 gap-4">
+        <div className="relative inline-block text-left">
+          <select
+            className="bg-card border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            value={range}
+            onChange={e => setRange(e.target.value as TimeRangeValue)}
+          >
+            {TIME_RANGE_PRESETS.map(r => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
+          </select>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <SummaryCard
-            title="Unique Visitors"
-            value={summaryLoading ? '...' : summary?.uniqueVisitors?.toLocaleString() ?? '0'}
-            changeText=""
-            changeColor="text-green-600"
-          />
-          <SummaryCard
-            title="Total Pageviews"
-            value={summaryLoading ? '...' : summary?.pageviews?.toLocaleString() ?? '0'}
-            changeText=""
-            changeColor="text-red-600"
-          />
-          <SummaryCard
-            title="Bounce Rate"
-            value={summaryLoading ? '...' : summary?.bounceRate !== undefined ? `${summary.bounceRate}%` : '0%'}
-            changeText=""
-          />
-          <SummaryCard
-            title="Avg. Visit Duration"
-            value={summaryLoading ? '...' : formatDuration(summary?.avgVisitDuration ?? 0)}
-            changeText=""
-            changeColor="text-green-600"
-          />
+        <div className="relative inline-block text-left">
+          <select
+            className="bg-card border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            value={granularity}
+            onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
+          >
+            {GRANULARITY_RANGE_PRESETS.map(r => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
+          </select>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div className="bg-card rounded-lg p-4 border border-border">
-            <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
-          </div>
-          <div className="bg-card rounded-lg p-4 border border-border">
-            <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
-          </div>
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <SummaryCard
+          title="Unique Visitors"
+          value={summaryLoading ? '...' : summary?.uniqueVisitors?.toLocaleString() ?? '0'}
+          changeText=""
+          changeColor="text-green-600"
+        />
+        <SummaryCard
+          title="Total Pageviews"
+          value={summaryLoading ? '...' : summary?.pageviews?.toLocaleString() ?? '0'}
+          changeText=""
+          changeColor="text-red-600"
+        />
+        <SummaryCard
+          title="Bounce Rate"
+          value={summaryLoading ? '...' : summary?.bounceRate !== undefined ? `${summary.bounceRate}%` : '0%'}
+          changeText=""
+        />
+        <SummaryCard
+          title="Avg. Visit Duration"
+          value={summaryLoading ? '...' : formatDuration(summary?.avgVisitDuration ?? 0)}
+          changeText=""
+          changeColor="text-green-600"
+        />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="bg-card rounded-lg p-6 border border-border shadow">
+          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div className="bg-card rounded-lg p-4 border border-border">
-            {topPagesLoading ? (
-              <div className="text-center p-8 text-muted-foreground">Loading...</div>
-            ) : (
-              <TopPagesTable pages={topPages ?? []} />
-            )}
-          </div>
-          <div className="bg-card rounded-lg p-4 border border-border">
-            {deviceBreakdownLoading ? (
-              <div className="text-center p-8 text-muted-foreground">Loading...</div>
-            ) : (
-              <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />
-            )}
-          </div>
+        <div className="bg-card rounded-lg p-6 border border-border shadow">
+          <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="bg-card rounded-lg p-6 border border-border shadow">
+          {topPagesLoading ? (
+            <div className="text-center p-8 text-muted-foreground">Loading...</div>
+          ) : (
+            <TopPagesTable pages={topPages ?? []} />
+          )}
+        </div>
+        <div className="bg-card rounded-lg p-6 border border-border shadow">
+          {deviceBreakdownLoading ? (
+            <div className="text-center p-8 text-muted-foreground">Loading...</div>
+          ) : (
+            <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />
+          )}
         </div>
       </div>
     </div>
