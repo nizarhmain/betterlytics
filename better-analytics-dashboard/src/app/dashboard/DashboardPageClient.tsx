@@ -37,11 +37,11 @@ export default function DashboardPageClient() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-card text-card-foreground shadow rounded-lg p-6">
         <div className="flex justify-end mb-4 gap-4">
           <div className="relative inline-block text-left">
             <select
-              className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-background border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               value={range}
               onChange={e => setRange(e.target.value as TimeRangeValue)}
             >
@@ -52,7 +52,7 @@ export default function DashboardPageClient() {
           </div>
           <div className="relative inline-block text-left">
             <select
-              className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-background border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               value={granularity}
               onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
             >
@@ -88,15 +88,27 @@ export default function DashboardPageClient() {
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
-          <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+          </div>
+          <div className="bg-card rounded-lg p-4 border border-border">
+            <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div>
-            {topPagesLoading ? <div>Loading...</div> : <TopPagesTable pages={topPages ?? []} />}
+          <div className="bg-card rounded-lg p-4 border border-border">
+            {topPagesLoading ? (
+              <div className="text-center p-8 text-muted-foreground">Loading...</div>
+            ) : (
+              <TopPagesTable pages={topPages ?? []} />
+            )}
           </div>
-          <div>
-            {deviceBreakdownLoading ? <div>Loading...</div> : <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />}
+          <div className="bg-card rounded-lg p-4 border border-border">
+            {deviceBreakdownLoading ? (
+              <div className="text-center p-8 text-muted-foreground">Loading...</div>
+            ) : (
+              <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />
+            )}
           </div>
         </div>
       </div>
