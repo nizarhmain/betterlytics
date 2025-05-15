@@ -64,9 +64,9 @@ export default function GeographyClient() {
       </div>
       
       <div className="absolute top-4 right-4 z-[1001]">
-        <div className="bg-white shadow-md rounded-md p-2">
+        <div className="bg-card shadow-md rounded-md p-2 border border-border">
           <select
-            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-card border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             value={range}
             onChange={e => setRange(e.target.value as TimeRangeValue)}
             aria-label="Select time range"
@@ -79,17 +79,17 @@ export default function GeographyClient() {
       </div>
       
       {loading && (
-        <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center z-[1000]">
+        <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-[1000]">
           <div className="flex flex-col items-center">
-            <div className="w-10 h-10 border-4 border-t-blue-600 border-r-transparent border-b-blue-600 border-l-transparent rounded-full animate-spin mb-2"></div>
-            <p className="text-gray-700">Loading visitor data...</p>
+            <div className="w-10 h-10 border-4 border-accent border-t-primary rounded-full animate-spin mb-2"></div>
+            <p className="text-foreground">Loading visitor data...</p>
           </div>
         </div>
       )}
       
       {!loading && error && (
-        <div className="absolute bottom-4 right-4 bg-red-50 border border-red-200 rounded-md p-3 shadow-md z-[1000]">
-          <p className="text-red-600 text-sm">{error}</p>
+        <div className="absolute bottom-4 right-4 bg-destructive/10 border border-destructive/20 rounded-md p-3 shadow-md z-[1000]">
+          <p className="text-destructive text-sm">{error}</p>
         </div>
       )}
       
