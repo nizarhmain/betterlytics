@@ -5,6 +5,7 @@ import SummaryCard from "@/components/SummaryCard";
 import ReferrerDistributionChart from '@/components/charts/ReferrerDistributionChart';
 import ReferrerTrafficTrendChart from '@/components/charts/ReferrerTrafficTrendChart';
 import ReferrerTable from '@/components/charts/ReferrerTable';
+import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { 
   fetchReferrerSourceAggregationDataForSite, 
   fetchReferrerSummaryDataForSite,
@@ -18,8 +19,8 @@ import {
   ReferrerTrafficBySourceRow 
 } from "@/entities/referrers";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
+import { getRangeForValue } from "@/utils/timeRanges";
+import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { formatPercentage } from "@/utils/formatters";
 
 export default function ReferrersClient() {
@@ -68,28 +69,11 @@ export default function ReferrersClient() {
             <p className="text-sm text-gray-500">Analytics and insights for your website</p>
           </div>
           <div className="flex gap-4">
-            <div className="relative inline-block text-left">
-              <select
-                className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={range}
-                onChange={e => setRange(e.target.value as TimeRangeValue)}
-              >
-                {TIME_RANGE_PRESETS.map(r => (
-                  <option key={r.value} value={r.value}>{r.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="relative inline-block text-left">
-              <select
-                className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={granularity}
-                onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
-              >
-                {GRANULARITY_RANGE_PRESETS.map(r => (
-                  <option key={r.value} value={r.value}>{r.label}</option>
-                ))}
-              </select>
-            </div>
+            <TimeRangeSelector
+              showGranularity={true}
+              granularity={granularity}
+              onGranularityChange={setGranularity}
+            />
           </div>
         </div>
         
