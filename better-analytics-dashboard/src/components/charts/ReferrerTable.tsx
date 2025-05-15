@@ -60,15 +60,15 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
   
   return (
     <div>
-      <div className="border-b mb-4">
+      <div className="border-b border-border mb-4">
         <div className="flex space-x-4 overflow-x-auto">
           {(Object.entries(ReferrerTab) as [ReferrerTabValue, ReferrerTabKey][]).map(([key, value]) => (
             <button
               key={value}
               className={`px-3 py-2 text-sm font-medium border-b-2 whitespace-nowrap ${
                 activeTab === value 
-                  ? 'border-gray-800 text-gray-800' 
-                  : 'border-transparent hover:border-gray-300 text-gray-600'
+                  ? 'border-primary text-foreground' 
+                  : 'border-transparent hover:border-border text-muted-foreground'
               }`}
               onClick={() => setActiveTab(value)}
             >
@@ -96,8 +96,8 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
                 <TableCell colSpan={6} className="h-24 text-center">
                   <div className="flex justify-center items-center">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
-                      <p className="text-gray-500">Loading data...</p>
+                      <div className="w-10 h-10 border-4 border-accent border-t-primary rounded-full animate-spin"></div>
+                      <p className="text-muted-foreground">Loading data...</p>
                     </div>
                   </div>
                 </TableCell>
@@ -106,14 +106,14 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
               filteredData.map((row, index) => (
                 <TableRow 
                   key={index}
-                  className="h-16 hover:bg-gray-50"
+                  className="h-16 hover:bg-accent"
                 >
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       {row.source_type.toLowerCase() === 'direct' ? (
-                        <Globe className="h-4 w-4 text-gray-500" />
+                        <Globe className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Link className="h-4 w-4 text-gray-500" />
+                        <Link className="h-4 w-4 text-muted-foreground" />
                       )}
                       {
                         row.source_url ? 
@@ -135,7 +135,7 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-gray-500">
+                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                   No data to display for {activeTab !== ReferrerTab.All ? activeTab : ''}
                 </TableCell>
               </TableRow>
