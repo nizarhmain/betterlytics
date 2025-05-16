@@ -53,19 +53,19 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className={className}>
+    <div className={`rounded-lg ${className || ''} border border-gray-200 dark:border-slate-700 overflow-hidden`}>
       <Table>
-        <TableHeader>
+        <TableHeader className="bg-gray-50 dark:bg-slate-800">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} className="border-b border-gray-200 dark:border-slate-700">
               {headerGroup.headers.map((header) => (
                 <TableHead
                   key={header.id}
-                  className={
+                  className={`px-4 py-3 text-left text-sm font-medium text-slate-500 dark:text-slate-400 ${
                     header.column.getCanSort()
-                      ? 'cursor-pointer select-none hover:bg-gray-100'
+                      ? 'cursor-pointer select-none hover:bg-gray-200 dark:hover:bg-slate-700'
                       : ''
-                  }
+                  }`}
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   <div className="flex items-center">
@@ -85,14 +85,14 @@ export function DataTable<TData, TValue>({
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody>
+        <TableBody className="bg-white dark:bg-slate-900 divide-y divide-gray-200 dark:divide-slate-700">
           {loading ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
+              <TableCell colSpan={columns.length} className="h-24 text-center px-4 py-3">
                 <div className="flex justify-center items-center">
                   <div className="flex flex-col items-center gap-3">
                     <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading data...</p>
+                    <p className="text-gray-500 dark:text-slate-400">Loading data...</p>
                   </div>
                 </div>
               </TableCell>
@@ -101,11 +101,11 @@ export function DataTable<TData, TValue>({
             table.getRowModel().rows.map((row) => (
               <TableRow 
                 key={row.id} 
-                className={`h-16 hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
+                className={`hover:bg-gray-50 dark:hover:bg-slate-800/50 ${onRowClick ? 'cursor-pointer' : ''}`}
                 onClick={() => onRowClick && onRowClick(row)}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -113,7 +113,7 @@ export function DataTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center text-gray-500">
+              <TableCell colSpan={columns.length} className="h-24 text-center px-4 py-3 text-gray-500 dark:text-slate-400">
                 No results.
               </TableCell>
             </TableRow>
