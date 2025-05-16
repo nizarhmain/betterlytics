@@ -1,9 +1,10 @@
 'server-only';
 
-import { getDeviceTypeBreakdown, getBrowserBreakdown, getOperatingSystemBreakdown } from '@/repositories/clickhouse/devices';
+import { getDeviceTypeBreakdown, getBrowserBreakdown, getOperatingSystemBreakdown, getDeviceUsageTrend } from '@/repositories/clickhouse/devices';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { DeviceType, BrowserInfo, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema, OperatingSystemInfo, OperatingSystemStats, OperatingSystemStatsSchema } from '@/entities/devices';
+import { DeviceType, BrowserInfo, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema, OperatingSystemInfo, OperatingSystemStats, OperatingSystemStatsSchema, DeviceUsageTrendRow, DeviceUsageTrendRowSchema } from '@/entities/devices';
 import { getDeviceLabel } from '@/constants/deviceTypes';
+import { GranularityRangeValues } from '@/utils/granularityRanges';
 
 export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: string, endDate: string): Promise<DeviceType[]> {
   return getDeviceTypeBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
@@ -63,6 +64,15 @@ export async function getOperatingSystemBreakdownForSite(siteId: string, startDa
   }));
   
   return OperatingSystemStatsSchema.array().parse(statsWithPercentages);
+}
+
+export async function getDeviceUsageTrendForSite(
+  siteId: string, 
+  startDate: string, 
+  endDate: string,
+  granularity: GranularityRangeValues
+): Promise<DeviceUsageTrendRow[]> {
+  return getDeviceUsageTrend(siteId, toDateTimeString(startDate), toDateTimeString(endDate), granularity);
 }
 
 // Helper to find top item and calculate percentage from a breakdown list
