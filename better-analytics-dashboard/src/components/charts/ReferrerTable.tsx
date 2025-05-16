@@ -53,7 +53,6 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
     return row.source_type.toLowerCase() === activeTab.toLowerCase();
   });
 
-  // Define the columns
   const columns: ColumnDef<ReferrerTableRow>[] = [
     {
       accessorKey: 'source',

@@ -28,12 +28,6 @@ export default function PagesTable({ data }: PagesTableProps) {
       cell: ({ row }) => formatPath(row.original.path),
     },
     {
-      accessorKey: 'title', // Assuming title exists in PageAnalytics, if not, use path or another relevant field
-      header: 'Title',
-      // If title is not part of PageAnalytics, you might want to derive it or use path again
-      cell: ({ row }) => row.original.title || formatPath(row.original.path), 
-    },
-    {
       accessorKey: 'visitors',
       header: 'Visitors',
       cell: ({ row }) => row.original.visitors.toLocaleString(),
