@@ -26,12 +26,12 @@ export default function FunnelsClient() {
       {
         funnelsData
           .map((funnel) => (
-            <div key={funnel.id} className='flex justify-between place-items-center bg-white p-3 rounded-md shadow mb-5'>
-              <div className="flex gap-3 grow-1">
+            <div key={funnel.id} className='grid grid-cols-5 bg-white p-3 rounded-md shadow mb-5'>
+              <div className="flex col-span-1 gap-2">
                 <h1 className="text-xl font-semibold">{funnel.name}</h1>
                 <Badge className="rounded-full mt-0.5 text-gray-800" variant='outline'>{funnel.steps.length} steps</Badge>  
               </div>
-              <div className='flex justify-evenly grow-1'>
+              <div className='grid col-span-3 grid-cols-4 gap-2'>
                 <InlineDataDisplay
                   title={'conversion rate'}
                   value={`${Math.floor(100 * funnel.conversionRate)}%`}
@@ -45,12 +45,12 @@ export default function FunnelsClient() {
                   value={funnel.visitorCount.max}
                 />
                 <InlineDataDisplay
-                  title={'on biggest drop-off'}
+                  title={'- largest drop-off'}
                   value={`${Math.floor(100 * funnel.biggestDropOff.dropoffRatio)}%`}
                 />
               </div>
 
-              <div className='grow-1 flex justify-end'>
+              <div className='col-span-1 flex justify-end'>
                 <Link className='text-right mr-2' href={`/dashboard/funnels/${funnel.id}`}><ArrowRightCircleIcon /></Link>
               </div>
             </div>
@@ -66,7 +66,7 @@ type InlineDataDisplayProps = {
 }
 function InlineDataDisplay({ title, value }: InlineDataDisplayProps) {
   return (
-    <div className='flex gap-2 place-items-center border-1 px-2 rounded-md shadow'>
+    <div className='flex justify-center gap-2 place-items-center border-1 px-2 rounded-md shadow'>
       <p className='text-lg font-semibold'>{value}</p>
       <h4 className='text-gray-700'>{title}</h4>
     </div>
