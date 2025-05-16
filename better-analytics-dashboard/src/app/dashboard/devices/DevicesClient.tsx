@@ -5,10 +5,15 @@ import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
 import DeviceTypeChart from "@/components/analytics/DeviceTypeChart";
 import BrowserTable from "@/components/analytics/BrowserTable";
+import OperatingSystemTable from "@/components/analytics/OperatingSystemTable";
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { fetchDeviceTypeBreakdownAction, fetchDeviceSummaryAction } from "@/app/actions/devices";
-import { fetchBrowserBreakdownAction } from "@/app/actions/devices";
-import { DeviceSummary } from "@/entities/devices";
+import { 
+  fetchDeviceTypeBreakdownAction, 
+  fetchDeviceSummaryAction,
+  fetchBrowserBreakdownAction,
+  fetchOperatingSystemBreakdownAction
+} from "@/app/actions/devices";
+import { DeviceSummary, OperatingSystemStats } from "@/entities/devices";
 
 export default function DevicesClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
@@ -30,6 +35,12 @@ export default function DevicesClient() {
   const { data: browserStats = [], isLoading: browserStatsLoading } = useQuery({
     queryKey: ['browserBreakdown', 'default-site', startDate, endDate],
     queryFn: () => fetchBrowserBreakdownAction('default-site', startDate, endDate),
+  });
+
+  // Fetch OS stats
+  const { data: osStats = [], isLoading: osStatsLoading } = useQuery<OperatingSystemStats[]>({
+    queryKey: ['osBreakdown', 'default-site', startDate, endDate],
+    queryFn: () => fetchOperatingSystemBreakdownAction('default-site', startDate, endDate),
   });
 
   return (
@@ -99,6 +110,14 @@ export default function DevicesClient() {
           <BrowserTable 
             data={browserStats} 
             isLoading={browserStatsLoading} 
+          />
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-1">Top Operating Systems</h2>
+          <p className="text-sm text-gray-500 mb-4">Most common operating systems</p>
+          <OperatingSystemTable 
+            data={osStats} 
+            isLoading={osStatsLoading} 
           />
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import { getDeviceTypeBreakdown, getBrowserBreakdown, getOperatingSystemBreakdown } from '@/repositories/clickhouse/devices';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { DeviceType, BrowserInfo, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema, OperatingSystemInfo } from '@/entities/devices';
+import { DeviceType, BrowserInfo, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema, OperatingSystemInfo, OperatingSystemStats, OperatingSystemStatsSchema } from '@/entities/devices';
 import { getDeviceLabel } from '@/constants/deviceTypes';
 
 export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: string, endDate: string): Promise<DeviceType[]> {
@@ -45,10 +45,24 @@ export async function getBrowserBreakdownForSite(siteId: string, startDate: stri
   const statsWithPercentages = browserData.map(item => ({
     browser: item.browser,
     visitors: item.visitors,
-    percentage: Math.round((item.visitors / totalVisitors) * 100)
+    percentage: totalVisitors > 0 ? Math.round((item.visitors / totalVisitors) * 100) : 0
   }));
   
   return BrowserStatsSchema.array().parse(statsWithPercentages);
+}
+
+export async function getOperatingSystemBreakdownForSite(siteId: string, startDate: string, endDate: string): Promise<OperatingSystemStats[]> {
+  const osData = await getOperatingSystemBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+  
+  const totalVisitors = osData.reduce((sum, item) => sum + item.visitors, 0);
+  
+  const statsWithPercentages = osData.map(item => ({
+    os: item.os,
+    visitors: item.visitors,
+    percentage: totalVisitors > 0 ? Math.round((item.visitors / totalVisitors) * 100) : 0
+  }));
+  
+  return OperatingSystemStatsSchema.array().parse(statsWithPercentages);
 }
 
 // Helper to find top item and calculate percentage from a breakdown list
