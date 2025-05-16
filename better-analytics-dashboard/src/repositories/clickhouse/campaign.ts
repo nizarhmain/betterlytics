@@ -5,6 +5,8 @@ import {
   RawCampaignDataArraySchema,
   CampaignSourceBreakdownItem,
   CampaignSourceBreakdownArraySchema,
+  CampaignTrendRow,
+  CampaignTrendRowArraySchema,
 } from "@/entities/campaign";
 
 export async function getCampaignPerformanceData(
@@ -76,4 +78,33 @@ export async function getCampaignSourceBreakdownData(
   }).toPromise();
   
   return CampaignSourceBreakdownArraySchema.parse(resultSet);
+}
+
+export async function getCampaignVisitorTrendData(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString
+): Promise<CampaignTrendRow[]> {
+  const query = `
+    SELECT
+      toDate(timestamp) AS event_date,
+      utm_campaign,
+      COUNT(DISTINCT visitor_id) AS visitors
+    FROM analytics.events
+    WHERE site_id = {siteId:String}
+      AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
+      AND utm_campaign IS NOT NULL AND utm_campaign != ''
+    GROUP BY event_date, utm_campaign
+    ORDER BY event_date ASC, utm_campaign ASC
+  `;
+
+  const resultSet = await clickhouse.query(query, {
+    params: {
+      siteId: siteId,
+      startDate: startDate,
+      endDate: endDate,
+    },
+  }).toPromise();
+
+  return CampaignTrendRowArraySchema.parse(resultSet);
 } 

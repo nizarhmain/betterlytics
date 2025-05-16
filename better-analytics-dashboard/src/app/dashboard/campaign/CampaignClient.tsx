@@ -3,10 +3,19 @@
 import { useMemo, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { fetchCampaignPerformanceAction, fetchCampaignSourceBreakdownAction } from "@/app/actions/campaigns";
-import { CampaignPerformance, CampaignSourceBreakdownItem } from "@/entities/campaign";
+import {
+  fetchCampaignPerformanceAction,
+  fetchCampaignSourceBreakdownAction,
+  fetchCampaignVisitorTrendAction,
+} from "@/app/actions/campaigns";
+import {
+  CampaignPerformance,
+  CampaignSourceBreakdownItem,
+  PivotedCampaignVisitorTrendItem,
+} from "@/entities/campaign";
 import CampaignPerformanceTable from "@/components/analytics/CampaignPerformanceTable";
 import CampaignSourceChart from "@/components/analytics/CampaignSourceChart";
+import CampaignVisitorTrendChart from "@/components/analytics/CampaignVisitorTrendChart";
 
 export default function CampaignClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
@@ -20,6 +29,11 @@ export default function CampaignClient() {
   const { data: sourceBreakdown = [], isLoading: sourceBreakdownLoading } = useQuery<CampaignSourceBreakdownItem[]>({
     queryKey: ['campaignSourceBreakdown', 'default-site', startDate, endDate],
     queryFn: () => fetchCampaignSourceBreakdownAction('default-site', startDate, endDate),
+  });
+
+  const { data: visitorTrend = [], isLoading: visitorTrendLoading } = useQuery<PivotedCampaignVisitorTrendItem[]>({
+    queryKey: ['campaignVisitorTrend', 'default-site', startDate, endDate],
+    queryFn: () => fetchCampaignVisitorTrendAction('default-site', startDate, endDate),
   });
 
   return (
@@ -42,15 +56,23 @@ export default function CampaignClient() {
         </div>
       </div>
 
-      <CampaignPerformanceTable 
-        data={campaignPerformance} 
-        isLoading={campaignPerformanceLoading} 
+      <CampaignVisitorTrendChart
+        data={visitorTrend}
+        isLoading={visitorTrendLoading}
       />
 
-      <CampaignSourceChart 
-        data={sourceBreakdown} 
-        isLoading={sourceBreakdownLoading} 
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <CampaignPerformanceTable 
+            data={campaignPerformance} 
+            isLoading={campaignPerformanceLoading} 
+          />
+        </div>
+        <CampaignSourceChart 
+          data={sourceBreakdown} 
+          isLoading={sourceBreakdownLoading} 
+        />
+      </div>
     </div>
   );
 } 

@@ -28,11 +28,28 @@ export const CampaignMediumBreakdownItemSchema = z.object({
   visitors: z.number().int().nonnegative(),
 });
 
+const CampaignVisitorValuesSchema = z.record(z.string(), z.number().nonnegative());
+
+export const PivotedCampaignVisitorTrendItemSchema = z.object({
+  date: z.string(),
+  campaignValues: CampaignVisitorValuesSchema,
+});
+
+export const CampaignTrendRowSchema = z.object({
+  event_date: z.string(),
+  utm_campaign: z.string(),
+  visitors: z.number().int().nonnegative(),
+});
+
 export type RawCampaignData = z.infer<typeof RawCampaignDataSchema>;
 export type CampaignPerformance = z.infer<typeof CampaignPerformanceSchema>;
 export type CampaignSourceBreakdownItem = z.infer<typeof CampaignSourceBreakdownItemSchema>;
 export type CampaignMediumBreakdownItem = z.infer<typeof CampaignMediumBreakdownItemSchema>;
+export type CampaignTrendRow = z.infer<typeof CampaignTrendRowSchema>;
+export type PivotedCampaignVisitorTrendItem = z.infer<typeof PivotedCampaignVisitorTrendItemSchema>;
 export const RawCampaignDataArraySchema = z.array(RawCampaignDataSchema);
 export const CampaignPerformanceArraySchema = z.array(CampaignPerformanceSchema);
 export const CampaignSourceBreakdownArraySchema = z.array(CampaignSourceBreakdownItemSchema);
-export const CampaignMediumBreakdownArraySchema = z.array(CampaignMediumBreakdownItemSchema); 
+export const CampaignMediumBreakdownArraySchema = z.array(CampaignMediumBreakdownItemSchema);
+export const CampaignTrendRowArraySchema = z.array(CampaignTrendRowSchema);
+export const PivotedCampaignVisitorTrendArraySchema = z.array(PivotedCampaignVisitorTrendItemSchema);

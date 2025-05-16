@@ -1,11 +1,18 @@
 'server-only';
 
-import { getCampaignPerformanceData, getCampaignSourceBreakdownData } from "@/repositories/clickhouse/campaign";
+import {
+  getCampaignPerformanceData,
+  getCampaignSourceBreakdownData,
+  getCampaignVisitorTrendData,
+} from "@/repositories/clickhouse/campaign";
 import {
   CampaignPerformance,
   CampaignPerformanceArraySchema,
   CampaignSourceBreakdownItem,
   RawCampaignData,
+  CampaignTrendRow,
+  PivotedCampaignVisitorTrendItem,
+  PivotedCampaignVisitorTrendArraySchema,
 } from "@/entities/campaign";
 import { toDateTimeString } from '@/utils/dateFormatters';
 import { formatDuration } from '@/utils/dateFormatters';
@@ -47,4 +54,41 @@ export async function fetchCampaignSourceBreakdown(
   const endDateTime = toDateTimeString(endDate);
 
   return await getCampaignSourceBreakdownData(siteId, startDateTime, endDateTime);
+}
+
+export async function fetchCampaignVisitorTrend(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<PivotedCampaignVisitorTrendItem[]> {
+  const startDateTime = toDateTimeString(startDate);
+  const endDateTime = toDateTimeString(endDate);
+
+  const rawTrendData: CampaignTrendRow[] = await getCampaignVisitorTrendData(siteId, startDateTime, endDateTime);
+
+  if (rawTrendData.length === 0) {
+    return [];
+  }
+
+  const pivotedDataMap = new Map<string, PivotedCampaignVisitorTrendItem>();
+
+  const allCampaignNames = Array.from(new Set(rawTrendData.map(item => item.utm_campaign)));
+
+  rawTrendData.forEach(item => {
+    let dailyData = pivotedDataMap.get(item.event_date);
+
+    if (!dailyData) {
+      dailyData = {
+        date: item.event_date,
+        campaignValues: Object.fromEntries(
+          allCampaignNames.map(campaignName => [campaignName, 0])
+        ),
+      };
+      pivotedDataMap.set(item.event_date, dailyData);
+    }
+
+    dailyData.campaignValues[item.utm_campaign] += item.visitors;
+  });
+
+  return PivotedCampaignVisitorTrendArraySchema.parse(Array.from(pivotedDataMap.values()));
 } 

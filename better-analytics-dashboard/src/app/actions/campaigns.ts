@@ -3,8 +3,13 @@
 import {
   fetchCampaignPerformance,
   fetchCampaignSourceBreakdown,
+  fetchCampaignVisitorTrend,
 } from "@/services/campaign";
-import { CampaignPerformance, CampaignSourceBreakdownItem } from "@/entities/campaign";
+import {
+  CampaignPerformance,
+  CampaignSourceBreakdownItem,
+  PivotedCampaignVisitorTrendItem,
+} from "@/entities/campaign";
 import { checkAuth } from "@/lib/auth-actions";
 
 export async function fetchCampaignPerformanceAction(
@@ -43,6 +48,20 @@ export async function fetchCampaignSourceBreakdownAction(
     return breakdownData;
   } catch (error) {
     console.error("Error in fetchCampaignSourceBreakdownAction:", error);
+    return [];
+  }
+}
+
+export async function fetchCampaignVisitorTrendAction(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<PivotedCampaignVisitorTrendItem[]> {
+  await checkAuth();
+  try {
+    return await fetchCampaignVisitorTrend(siteId, startDate, endDate);
+  } catch (error) {
+    console.error("Error in fetchCampaignVisitorTrendAction:", error);
     return [];
   }
 } 
