@@ -17,7 +17,22 @@ export const CampaignPerformanceSchema = z.object({
   pagesPerSession: z.number().nonnegative(),
 });
 
+export const CampaignSourceBreakdownItemSchema = z.object({
+  source: z.string(),
+  visitors: z.number().int().nonnegative(),
+});
+
+// For UTM Medium Breakdown
+export const CampaignMediumBreakdownItemSchema = z.object({
+  medium: z.string(),
+  visitors: z.number().int().nonnegative(),
+});
+
 export type RawCampaignData = z.infer<typeof RawCampaignDataSchema>;
 export type CampaignPerformance = z.infer<typeof CampaignPerformanceSchema>;
+export type CampaignSourceBreakdownItem = z.infer<typeof CampaignSourceBreakdownItemSchema>;
+export type CampaignMediumBreakdownItem = z.infer<typeof CampaignMediumBreakdownItemSchema>;
 export const RawCampaignDataArraySchema = z.array(RawCampaignDataSchema);
-export const CampaignPerformanceArraySchema = z.array(CampaignPerformanceSchema); 
+export const CampaignPerformanceArraySchema = z.array(CampaignPerformanceSchema);
+export const CampaignSourceBreakdownArraySchema = z.array(CampaignSourceBreakdownItemSchema);
+export const CampaignMediumBreakdownArraySchema = z.array(CampaignMediumBreakdownItemSchema); 

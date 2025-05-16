@@ -1,6 +1,11 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DateTimeString } from "@/types/dates";
-import { RawCampaignData, RawCampaignDataArraySchema } from "@/entities/campaign";
+import {
+  RawCampaignData,
+  RawCampaignDataArraySchema,
+  CampaignSourceBreakdownItem,
+  CampaignSourceBreakdownArraySchema,
+} from "@/entities/campaign";
 
 export async function getCampaignPerformanceData(
   siteId: string,
@@ -42,4 +47,33 @@ export async function getCampaignPerformanceData(
   }).toPromise();
 
   return RawCampaignDataArraySchema.parse(resultSet);
+}
+
+export async function getCampaignSourceBreakdownData(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString
+): Promise<CampaignSourceBreakdownItem[]> {
+  const query = `
+    SELECT
+      utm_source AS source,
+      COUNT(DISTINCT visitor_id) AS visitors
+    FROM analytics.events
+    WHERE site_id = {siteId:String}
+      AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
+      AND utm_campaign IS NOT NULL AND utm_campaign != ''
+      AND utm_source IS NOT NULL AND utm_source != ''
+    GROUP BY utm_source
+    ORDER BY visitors DESC
+  `;
+
+  const resultSet = await clickhouse.query(query, {
+    params: {
+      siteId: siteId,
+      startDate: startDate,
+      endDate: endDate,
+    },
+  }).toPromise();
+  
+  return CampaignSourceBreakdownArraySchema.parse(resultSet);
 } 

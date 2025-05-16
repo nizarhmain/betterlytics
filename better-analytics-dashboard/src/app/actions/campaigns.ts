@@ -1,7 +1,10 @@
 "use server";
 
-import { fetchCampaignPerformance as fetchCampaignPerformanceService } from "@/services/campaign";
-import { CampaignPerformance } from "@/entities/campaign";
+import {
+  fetchCampaignPerformance,
+  fetchCampaignSourceBreakdown,
+} from "@/services/campaign";
+import { CampaignPerformance, CampaignSourceBreakdownItem } from "@/entities/campaign";
 import { checkAuth } from "@/lib/auth-actions";
 
 export async function fetchCampaignPerformanceAction(
@@ -12,7 +15,7 @@ export async function fetchCampaignPerformanceAction(
   await checkAuth();
 
   try {
-    const performanceData = await fetchCampaignPerformanceService(
+    const performanceData = await fetchCampaignPerformance(
       siteId,
       startDate,
       endDate
@@ -20,6 +23,26 @@ export async function fetchCampaignPerformanceAction(
     return performanceData;
   } catch (error) {
     console.error("Error in fetchCampaignPerformanceAction:", error);
+    return [];
+  }
+}
+
+export async function fetchCampaignSourceBreakdownAction(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<CampaignSourceBreakdownItem[]> {
+  await checkAuth();
+
+  try {
+    const breakdownData = await fetchCampaignSourceBreakdown(
+      siteId,
+      startDate,
+      endDate
+    );
+    return breakdownData;
+  } catch (error) {
+    console.error("Error in fetchCampaignSourceBreakdownAction:", error);
     return [];
   }
 } 

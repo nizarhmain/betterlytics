@@ -1,7 +1,12 @@
 'server-only';
 
-import { getCampaignPerformanceData } from "@/repositories/clickhouse/campaign";
-import { CampaignPerformance, CampaignPerformanceArraySchema, RawCampaignData } from "@/entities/campaign";
+import { getCampaignPerformanceData, getCampaignSourceBreakdownData } from "@/repositories/clickhouse/campaign";
+import {
+  CampaignPerformance,
+  CampaignPerformanceArraySchema,
+  CampaignSourceBreakdownItem,
+  RawCampaignData,
+} from "@/entities/campaign";
 import { toDateTimeString } from '@/utils/dateFormatters';
 import { formatDuration } from '@/utils/dateFormatters';
 
@@ -31,4 +36,15 @@ export async function fetchCampaignPerformance(
   });
 
   return CampaignPerformanceArraySchema.parse(transformedData);
+}
+
+export async function fetchCampaignSourceBreakdown(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<CampaignSourceBreakdownItem[]> {
+  const startDateTime = toDateTimeString(startDate);
+  const endDateTime = toDateTimeString(endDate);
+
+  return await getCampaignSourceBreakdownData(siteId, startDateTime, endDateTime);
 } 

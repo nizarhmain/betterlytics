@@ -3,9 +3,10 @@
 import { useMemo, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { fetchCampaignPerformanceAction } from "@/app/actions/campaigns";
-import { CampaignPerformance } from "@/entities/campaign";
+import { fetchCampaignPerformanceAction, fetchCampaignSourceBreakdownAction } from "@/app/actions/campaigns";
+import { CampaignPerformance, CampaignSourceBreakdownItem } from "@/entities/campaign";
 import CampaignPerformanceTable from "@/components/analytics/CampaignPerformanceTable";
+import CampaignSourceChart from "@/components/analytics/CampaignSourceChart";
 
 export default function CampaignClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
@@ -14,6 +15,11 @@ export default function CampaignClient() {
   const { data: campaignPerformance = [], isLoading: campaignPerformanceLoading } = useQuery<CampaignPerformance[]>({
     queryKey: ['campaignPerformance', 'default-site', startDate, endDate],
     queryFn: () => fetchCampaignPerformanceAction('default-site', startDate, endDate),
+  });
+
+  const { data: sourceBreakdown = [], isLoading: sourceBreakdownLoading } = useQuery<CampaignSourceBreakdownItem[]>({
+    queryKey: ['campaignSourceBreakdown', 'default-site', startDate, endDate],
+    queryFn: () => fetchCampaignSourceBreakdownAction('default-site', startDate, endDate),
   });
 
   return (
@@ -41,6 +47,10 @@ export default function CampaignClient() {
         isLoading={campaignPerformanceLoading} 
       />
 
+      <CampaignSourceChart 
+        data={sourceBreakdown} 
+        isLoading={sourceBreakdownLoading} 
+      />
     </div>
   );
 } 
