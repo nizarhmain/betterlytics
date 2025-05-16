@@ -9,6 +9,7 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
+  Row,
 } from '@tanstack/react-table';
 import {
   Table,
@@ -26,6 +27,7 @@ interface DataTableProps<TData, TValue> {
   loading?: boolean;
   defaultSorting?: SortingState;
   className?: string;
+  onRowClick?: (row: Row<TData>) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -34,6 +36,7 @@ export function DataTable<TData, TValue>({
   loading = false,
   defaultSorting = [],
   className,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>(defaultSorting);
 
@@ -96,7 +99,11 @@ export function DataTable<TData, TValue>({
             </TableRow>
           ) : table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="h-16 hover:bg-gray-50">
+              <TableRow 
+                key={row.id} 
+                className={`h-16 hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
+                onClick={() => onRowClick && onRowClick(row)}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
