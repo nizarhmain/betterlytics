@@ -50,12 +50,6 @@ export async function getFunnelDetails(siteId: string, pages: string[]): Promise
     FROM joined
     ORDER BY level
   `;
-  
-  console.log("SQL:")
-  console.log(sql.taggedSql)
-
-  console.log("Params:")
-  console.log(sql.taggedParams)
 
   const result = await clickhouse.query(
     sql.taggedSql,

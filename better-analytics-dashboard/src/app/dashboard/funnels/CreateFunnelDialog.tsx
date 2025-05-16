@@ -1,6 +1,7 @@
 'use client';
 
 import { toast } from "sonner";
+import { useQueryClient } from '@tanstack/react-query';
 import { postFunnelAction } from "@/app/actions/funnels";
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCallback, useState } from "react";
+import { PlusIcon, Trash2 } from "lucide-react";
 
 type Page = {
   value: string;
@@ -40,18 +42,26 @@ export function CreateFunnelDialog() {
     ]
   });
 
+  const [ open, setOpen ] = useState<boolean>(false);
+
+  const queryClient = useQueryClient()
+
   const submit = useCallback(() => {
     postFunnelAction(
       'default-site',
       funnel.name,
       funnel.pages.map((f) => f.value)
     )
-      .then(() => toast.success('Funnel created!'))
+      .then(() => {
+        toast.success('Funnel created!');
+        queryClient.invalidateQueries({ queryKey: ['funnels', 'default-site'] });
+        setOpen(false);
+      })
       .catch(() => toast.error('Funnel creation failed!'));
   }, [funnel]);
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Create Funnel</Button>
       </DialogTrigger>
@@ -78,12 +88,12 @@ export function CreateFunnelDialog() {
               />
             </div>
             <div className="bg-white rounded-lg p-4 shadow flex flex-col col-span-1">
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-4">
                 {
                   funnel
                     .pages
                     .map((page, index) => (
-                      <div key={page.key} className="flex flex-col gap-2">
+                      <div key={page.key} className="flex gap-2">
                         <Label htmlFor="page" className="text-right">
                           Page
                         </Label>
@@ -108,13 +118,28 @@ export function CreateFunnelDialog() {
                             })
                           }
                         />
+                        <Button
+                          className="size-9"
+                          variant='outline'
+                          onClick={() => setFunnel((prev) => ({ ...prev, pages: prev.pages.filter((_page) => _page.key !== page.key) }))}
+                        >
+                          <Trash2 />
+                        </Button>
                       </div>
                     ))
                 }
+                <Button
+                  className="size-8 rounded-full"
+                  onClick={() => setFunnel((prev) => ({ ...prev, pages: [ ...prev.pages, { key: generateTmpId(), value: '' }] }))}
+                >
+                  <PlusIcon />
+                </Button>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow flex flex-col col-span-2"></div>
+          <div className="bg-white rounded-lg p-4 shadow flex flex-col col-span-2 text-center">
+            <p>Placeholder</p>
+          </div>
         </div>
         <DialogFooter>
           <Button type="submit" onClick={submit}>Create</Button>
