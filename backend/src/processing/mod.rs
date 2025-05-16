@@ -216,9 +216,6 @@ impl EventProcessor {
             // Extract OS information
             processed.os = Some(result.os.to_string());
             
-            // Extract device type
-            processed.device_type = Some(result.category.to_string());
-            
             debug!(
                 "User agent parsed: browser={:?}, version={:?}, os={:?}, device_type={:?}",
                 processed.browser, processed.browser_version, processed.os, processed.device_type
