@@ -25,7 +25,7 @@ export async function fetchFunnelDetailsAction(siteId: string, funnelId: string)
 }
 
 
-export async function fetchFunnelsAction(siteId: string): Promise<Funnel[]> {
+export async function fetchFunnelsAction(siteId: string): Promise<FunnelDetails[]> {
   await checkAuth();
   return getFunnelsBySiteId(siteId);
 }

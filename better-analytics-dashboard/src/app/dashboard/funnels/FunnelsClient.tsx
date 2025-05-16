@@ -1,37 +1,74 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { CreateFunnelDialog } from "./CreateFunnelDialog";
-import { Funnel } from "@/entities/funnels";
+import { FunnelDetails } from "@/entities/funnels";
 import { fetchFunnelsAction } from "@/app/actions/funnels";
-import { FunnelDataContent } from './FunnelDataContent';
+import { Badge } from '@/components/ui/badge';
+import { ReactNode, useMemo } from 'react';
+import { analyzeFunnel } from './analytics';
+import Link from 'next/link';
+import { ArrowRightCircleIcon } from 'lucide-react';
 
 export default function FunnelsClient() {
-  const { data: funnels = [], isLoading: funnelsLoading } = useQuery<Funnel[]>({
+  const { data: funnels = [], isLoading: funnelsLoading } = useQuery<FunnelDetails[]>({
     queryKey: ['funnels', 'default-site'],
     queryFn: () => fetchFunnelsAction('default-site'),
   });
 
+  const funnelsData = useMemo(() => funnels.map((funnel) => analyzeFunnel(funnel)), [funnels]);
+
+  if (funnelsLoading) {
+    return <div>Loading...</div>
+  }
+
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Funnels</h1>
-          <p className="text-sm text-gray-500">Funnels for your website</p>
-        </div>
-        <div className="relative inline-block text-left">
-          <CreateFunnelDialog />
-        </div>
-      </div>
+    <div>
       {
-        funnels.length === 0 && (<div>No funnels yet...</div>)
-      }
-      {
-        funnels
+        funnelsData
           .map((funnel) => (
-            <FunnelDataContent key={funnel.id} funnel={funnel} />
+            <div key={funnel.id} className='flex justify-between place-items-center bg-white p-3 rounded-md shadow mb-5'>
+              <div className="flex gap-3 grow-1">
+                <h1 className="text-xl font-semibold">{funnel.name}</h1>
+                <Badge className="rounded-full mt-0.5 text-gray-800" variant='outline'>{funnel.steps.length} steps</Badge>  
+              </div>
+              <div className='flex justify-evenly grow-1'>
+                <InlineDataDisplay
+                  title={'conversion rate'}
+                  value={`${Math.floor(100 * funnel.conversionRate)}%`}
+                />
+                <InlineDataDisplay
+                  title={'completed'}
+                  value={funnel.visitorCount.min}
+                />
+                <InlineDataDisplay
+                  title={'total users'}
+                  value={funnel.visitorCount.max}
+                />
+                <InlineDataDisplay
+                  title={'on biggest drop-off'}
+                  value={`${Math.floor(100 * funnel.biggestDropOff.dropoffRatio)}%`}
+                />
+              </div>
+
+              <div className='grow-1 flex justify-end'>
+                <Link className='text-right mr-2' href={`/dashboard/funnels/${funnel.id}`}><ArrowRightCircleIcon /></Link>
+              </div>
+            </div>
           ))
       }
     </div>
   );
-} 
+}
+
+type InlineDataDisplayProps = {
+  title: ReactNode;
+  value: ReactNode;
+}
+function InlineDataDisplay({ title, value }: InlineDataDisplayProps) {
+  return (
+    <div className='flex gap-2 place-items-center border-1 px-2 rounded-md shadow'>
+      <p className='text-lg font-semibold'>{value}</p>
+      <h4 className='text-gray-700'>{title}</h4>
+    </div>
+  )
+}

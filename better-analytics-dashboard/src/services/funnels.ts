@@ -4,8 +4,18 @@ import { type Funnel, type CreateFunnel, FunnelDetails, FunnelDetailsSchema } fr
 import * as PostgresFunnelRepository from '@/repositories/postgres/funnels';
 import * as ClickhouseFunnelRepository from '@/repositories/clickhouse/funnels';
 
-export async function getFunnelsBySiteId(siteId: string): Promise<Funnel[]> {
-  return PostgresFunnelRepository.getFunnelsBySiteId(siteId);
+export async function getFunnelsBySiteId(siteId: string): Promise<FunnelDetails[]> {
+  const funnels = await PostgresFunnelRepository.getFunnelsBySiteId(siteId);
+  
+  const funnelsDetails = await Promise.all(
+      funnels.map(async (funnel) => (
+        FunnelDetailsSchema.parse({
+          ...funnel,
+          visitors: await ClickhouseFunnelRepository.getFunnelDetails(siteId, funnel.pages)
+        })
+      ))
+  );
+  return funnelsDetails;
 }
 
 export async function getFunnelDetailsById(siteId: string, funnelId: string): Promise<FunnelDetails | null> {
