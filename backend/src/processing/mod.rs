@@ -9,6 +9,7 @@ use crate::bot_detection;
 use crate::referrer::{ReferrerInfo, parse_referrer};
 use woothee::parser::Parser;
 use once_cell::sync::Lazy;
+use url::Url;
 use crate::campaign::{CampaignInfo, parse_campaign_params};
 
 static USER_AGENT_PARSER: Lazy<Parser> = Lazy::new(|| Parser::new());
@@ -34,7 +35,6 @@ pub struct ProcessedEvent {
     pub visitor_fingerprint: String,
     pub timestamp: chrono::DateTime<chrono::Utc>,
     pub url: String,
-    pub referrer: Option<String>,
     /// Parsed referrer information
     pub referrer_info: ReferrerInfo,
     /// Parsed campaign parameters
@@ -62,9 +62,15 @@ impl EventProcessor {
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
         let site_id = event.raw.site_id.clone();
         let timestamp = chrono::DateTime::from_timestamp(event.raw.timestamp as i64, 0).unwrap_or_else(|| chrono::Utc::now());
-        let url = event.raw.url.clone();
+        let raw_url = event.raw.url.clone();
         let referrer = event.raw.referrer.clone();
         let user_agent = event.raw.user_agent.clone();
+
+        let url_path = self.extract_path_from_url(&raw_url);
+        debug!("Extracted path '{}' from URL '{}'", url_path, raw_url);
+
+        let processed_referrer = referrer.as_ref()
+            .and_then(|r| if r.is_empty() { None } else { Some(self.extract_path_from_url(r)) });
 
         let mut processed = ProcessedEvent {
             event: event.clone(),
@@ -79,8 +85,7 @@ impl EventProcessor {
             site_id: site_id.clone(),
             visitor_fingerprint: String::new(),
             timestamp: timestamp.clone(),
-            url: url.clone(),
-            referrer: referrer.clone(),
+            url: url_path,
             referrer_info: ReferrerInfo::default(),
             user_agent: user_agent.clone(),
             campaign_info: CampaignInfo::default(),
@@ -94,11 +99,11 @@ impl EventProcessor {
         }
 
         // Parse referrer information
-        processed.referrer_info = parse_referrer(referrer.as_deref(), Some(&url));
+        processed.referrer_info = parse_referrer(referrer.as_deref(), Some(&raw_url));
         debug!("referrer_info: {:?}", processed.referrer_info);
         
         // Parse campaign parameters from URL
-        processed.campaign_info = parse_campaign_params(&url);
+        processed.campaign_info = parse_campaign_params(&raw_url);
         debug!("campaign_info: {:?}", processed.campaign_info);
 
         if let Err(e) = self.get_geolocation(&mut processed).await {
@@ -144,6 +149,28 @@ impl EventProcessor {
 
         debug!("Processed event finished!");
         Ok(())
+    }
+
+    /// Extract just the path component from a URL
+    fn extract_path_from_url(&self, url_str: &str) -> String {
+        match Url::parse(url_str) {
+            Ok(url) => {
+                let path = url.path();
+                if path.is_empty() {
+                    "/".to_string()
+                } else {
+                    path.to_string()
+                }
+            },
+            Err(_) => {
+                // If URL parsing fails, check if it might be just a path
+                if url_str.starts_with('/') {
+                    url_str.to_string()
+                } else {
+                    format!("/{}", url_str)
+                }
+            }
+        }
     }
 
     /// Handle different event types
