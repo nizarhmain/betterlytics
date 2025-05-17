@@ -35,6 +35,32 @@ import {
 import { toDateTimeString } from '@/utils/dateFormatters';
 import { formatDuration } from '@/utils/dateFormatters';
 
+interface RawMetricsData {
+  total_sessions: number;
+  bounced_sessions: number;
+  sum_session_duration_seconds: number;
+  total_pageviews: number;
+}
+
+interface CalculatedMetrics {
+  bounceRate: number;
+  avgSessionDuration: string;
+  pagesPerSession: number;
+}
+
+function calculateCommonCampaignMetrics(rawData: RawMetricsData): CalculatedMetrics {
+  const bounceRate = rawData.total_sessions > 0 ? (rawData.bounced_sessions / rawData.total_sessions) * 100 : 0;
+  const avgSessionDurationSeconds = rawData.total_sessions > 0 ? rawData.sum_session_duration_seconds / rawData.total_sessions : 0;
+  const pagesPerSession = rawData.total_sessions > 0 ? rawData.total_pageviews / rawData.total_sessions : 0;
+  const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
+
+  return {
+    bounceRate: parseFloat(bounceRate.toFixed(1)),
+    avgSessionDuration: avgSessionDurationFormatted,
+    pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+  };
+}
+
 export async function fetchCampaignPerformance(
   siteId: string,
   startDate: string,
@@ -46,17 +72,11 @@ export async function fetchCampaignPerformance(
   const rawCampaignData: RawCampaignData[] = await getCampaignPerformanceData(siteId, startDateTime, endDateTime);
 
   const transformedData: CampaignPerformance[] = rawCampaignData.map((raw: RawCampaignData) => {
-    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
-    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
-    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
-    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
-
+    const metrics = calculateCommonCampaignMetrics(raw);
     return {
       name: raw.utm_campaign_name,
       visitors: raw.total_visitors,
-      bounceRate: parseFloat(bounceRate.toFixed(1)),
-      avgSessionDuration: avgSessionDurationFormatted,
-      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+      ...metrics,
     };
   });
 
@@ -74,17 +94,11 @@ export async function fetchCampaignSourceBreakdown(
   const rawSourceData: RawCampaignSourceBreakdownItem[] = await getCampaignSourceBreakdownData(siteId, startDateTime, endDateTime);
 
   const transformedData: CampaignSourceBreakdownItem[] = rawSourceData.map((raw: RawCampaignSourceBreakdownItem) => {
-    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
-    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
-    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
-    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
-
+    const metrics = calculateCommonCampaignMetrics(raw);
     return {
       source: raw.source,
       visitors: raw.total_visitors,
-      bounceRate: parseFloat(bounceRate.toFixed(1)),
-      avgSessionDuration: avgSessionDurationFormatted,
-      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+      ...metrics,
     };
   });
 
@@ -102,17 +116,11 @@ export async function fetchCampaignMediumBreakdown(
   const rawMediumData: RawCampaignMediumBreakdownItem[] = await getCampaignMediumBreakdownData(siteId, startDateTime, endDateTime);
 
   const transformedData: CampaignMediumBreakdownItem[] = rawMediumData.map((raw: RawCampaignMediumBreakdownItem) => {
-    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
-    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
-    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
-    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
-
+    const metrics = calculateCommonCampaignMetrics(raw);
     return {
       medium: raw.medium,
       visitors: raw.total_visitors,
-      bounceRate: parseFloat(bounceRate.toFixed(1)),
-      avgSessionDuration: avgSessionDurationFormatted,
-      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+      ...metrics,
     };
   });
 
@@ -130,17 +138,11 @@ export async function fetchCampaignContentBreakdown(
   const rawContentData: RawCampaignContentBreakdownItem[] = await getCampaignContentBreakdownData(siteId, startDateTime, endDateTime);
 
   const transformedData: CampaignContentBreakdownItem[] = rawContentData.map((raw: RawCampaignContentBreakdownItem) => {
-    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
-    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
-    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
-    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
-
+    const metrics = calculateCommonCampaignMetrics(raw);
     return {
       content: raw.content,
       visitors: raw.total_visitors,
-      bounceRate: parseFloat(bounceRate.toFixed(1)),
-      avgSessionDuration: avgSessionDurationFormatted,
-      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+      ...metrics,
     };
   });
 
@@ -158,17 +160,11 @@ export async function fetchCampaignTermBreakdown(
   const rawTermData: RawCampaignTermBreakdownItem[] = await getCampaignTermBreakdownData(siteId, startDateTime, endDateTime);
 
   const transformedData: CampaignTermBreakdownItem[] = rawTermData.map((raw: RawCampaignTermBreakdownItem) => {
-    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
-    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
-    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
-    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
-
+    const metrics = calculateCommonCampaignMetrics(raw);
     return {
       term: raw.term,
       visitors: raw.total_visitors,
-      bounceRate: parseFloat(bounceRate.toFixed(1)),
-      avgSessionDuration: avgSessionDurationFormatted,
-      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+      ...metrics,
     };
   });
 
@@ -187,18 +183,12 @@ export async function fetchCampaignLandingPagePerformance(
     await getCampaignLandingPagePerformanceData(siteId, startDateTime, endDateTime);
 
   const transformedData: CampaignLandingPagePerformanceItem[] = rawLandingPageData.map((raw: RawCampaignLandingPagePerformanceItem) => {
-    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
-    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
-    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
-    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
-
+    const metrics = calculateCommonCampaignMetrics(raw);
     return {
       campaignName: raw.utm_campaign_name,
       landingPageUrl: raw.landing_page_url,
       visitors: raw.total_visitors,
-      bounceRate: parseFloat(bounceRate.toFixed(1)),
-      avgSessionDuration: avgSessionDurationFormatted,
-      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+      ...metrics,
     };
   });
 

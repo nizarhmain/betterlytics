@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CampaignMediumBreakdownItem } from "@/entities/campaign"; // Correct type for data
+import { CampaignMediumBreakdownItem } from "@/entities/campaign";
 import {
   Table,
   TableHeader,

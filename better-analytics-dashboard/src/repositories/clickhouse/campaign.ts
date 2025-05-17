@@ -41,7 +41,7 @@ export async function getCampaignPerformanceData(
       WHERE site_id = {siteId:String}
         AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
         AND event_type = 1
-        AND utm_campaign IS NOT NULL AND utm_campaign != ''
+        AND utm_campaign != ''
       GROUP BY visitor_id, session_id, utm_campaign
     ) s
     GROUP BY s.utm_campaign
@@ -83,8 +83,8 @@ export async function getCampaignSourceBreakdownData(
       WHERE site_id = {siteId:String}
         AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
         AND event_type = 1
-        AND utm_campaign IS NOT NULL AND utm_campaign != ''
-        AND utm_source IS NOT NULL AND utm_source != ''
+        AND utm_campaign != ''
+        AND utm_source != ''
       GROUP BY visitor_id, session_id, utm_source
     ) s
     GROUP BY s.utm_source
@@ -126,8 +126,8 @@ export async function getCampaignMediumBreakdownData(
       WHERE site_id = {siteId:String}
         AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
         AND event_type = 1
-        AND utm_campaign IS NOT NULL AND utm_campaign != ''
-        AND utm_medium IS NOT NULL AND utm_medium != ''
+        AND utm_campaign != ''
+        AND utm_medium != ''
       GROUP BY visitor_id, session_id, utm_medium
     ) s
     GROUP BY s.utm_medium
@@ -169,8 +169,8 @@ export async function getCampaignContentBreakdownData(
       WHERE site_id = {siteId:String}
         AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
         AND event_type = 1
-        AND utm_campaign IS NOT NULL AND utm_campaign != ''
-        AND utm_content IS NOT NULL AND utm_content != ''
+        AND utm_campaign != ''
+        AND utm_content != ''
       GROUP BY visitor_id, session_id, utm_content
     ) s
     GROUP BY s.utm_content
@@ -212,8 +212,8 @@ export async function getCampaignTermBreakdownData(
       WHERE site_id = {siteId:String}
         AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
         AND event_type = 1
-        AND utm_campaign IS NOT NULL AND utm_campaign != ''
-        AND utm_term IS NOT NULL AND utm_term != ''
+        AND utm_campaign != ''
+        AND utm_term != ''
       GROUP BY visitor_id, session_id, utm_term
     ) s
     GROUP BY s.utm_term
@@ -258,7 +258,7 @@ export async function getCampaignLandingPagePerformanceData(
         WHERE e.site_id = {siteId:String}
           AND e.timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
           AND e.event_type = 1 -- Pageview event
-          AND e.utm_campaign IS NOT NULL AND e.utm_campaign != ''
+          AND e.utm_campaign != ''
     ) s
     WHERE s.rn = 1
     GROUP BY s.utm_campaign, s.landing_page_url
@@ -289,7 +289,7 @@ export async function getCampaignVisitorTrendData(
     FROM analytics.events
     WHERE site_id = {siteId:String}
       AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
-      AND utm_campaign IS NOT NULL AND utm_campaign != ''
+      AND utm_campaign != ''
     GROUP BY event_date, utm_campaign
     ORDER BY event_date ASC, utm_campaign ASC
   `;
