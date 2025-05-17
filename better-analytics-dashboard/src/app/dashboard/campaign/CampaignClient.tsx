@@ -133,7 +133,8 @@ export default function CampaignClient() {
 
         {activeTab === "utmBreakdowns" && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800">UTM Source Breakdown</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">UTM Source Breakdown</h2>
+            <p className="text-sm text-gray-500 mb-4">Visitors and engagement by UTM source</p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
               <div className="lg:col-span-2">
@@ -149,7 +150,8 @@ export default function CampaignClient() {
               />
             </div>
             <hr className="my-6 border-gray-200"/>
-            <h2 className="text-xl font-semibold text-gray-800">UTM Medium Breakdown</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">UTM Medium Breakdown</h2>
+            <p className="text-sm text-gray-500 mb-4">Visitors and engagement by UTM medium</p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <CampaignMediumEngagementTable
@@ -163,7 +165,8 @@ export default function CampaignClient() {
               />
             </div>
             <hr className="my-6 border-gray-200"/>
-            <h2 className="text-xl font-semibold text-gray-800">UTM Content Breakdown</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">UTM Content Breakdown</h2>
+            <p className="text-sm text-gray-500 mb-4">Visitors and engagement by UTM content</p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <CampaignContentEngagementTable
@@ -177,7 +180,8 @@ export default function CampaignClient() {
               />
             </div>
             <hr className="my-6 border-gray-200"/>
-            <h2 className="text-xl font-semibold text-gray-800">UTM Term Breakdown</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">UTM Term Breakdown</h2>
+            <p className="text-sm text-gray-500 mb-4">Visitors and engagement by UTM term</p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <CampaignTermEngagementTable

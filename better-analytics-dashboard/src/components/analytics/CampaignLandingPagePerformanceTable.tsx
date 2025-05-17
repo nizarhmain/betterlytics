@@ -23,8 +23,8 @@ export default function CampaignLandingPagePerformanceTable({
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h3>Campaign Landing Page Performance</h3>
-        <p>Key metrics for campaign landing pages</p>
+        <h2 className="text-lg font-bold text-gray-900 mb-1">Campaign Landing Page Performance</h2>
+        <p className="text-sm text-gray-500 mb-4">Key metrics for campaign landing pages</p>
         <div className="text-center py-4">Loading landing page performance data...</div>
       </div>
     );
@@ -33,8 +33,8 @@ export default function CampaignLandingPagePerformanceTable({
   if (!data || data.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h3>Campaign Landing Page Performance</h3>
-        <p>Key metrics for campaign landing pages</p>
+        <h2 className="text-lg font-bold text-gray-900 mb-1">Campaign Landing Page Performance</h2>
+        <p className="text-sm text-gray-500 mb-4">Key metrics for campaign landing pages</p>
         <div className="text-center py-4">No landing page performance data available for the selected period.</div>
       </div>
     );
@@ -42,8 +42,8 @@ export default function CampaignLandingPagePerformanceTable({
 
   return (
     <div className="bg-white rounded-lg shadow p-6 col-span-1 lg:col-span-3">
-      <h3>Campaign Landing Page Performance</h3>
-      <p>Key metrics for campaign landing pages</p>
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Campaign Landing Page Performance</h2>
+      <p className="text-sm text-gray-500 mb-4">Key metrics for campaign landing pages</p>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>

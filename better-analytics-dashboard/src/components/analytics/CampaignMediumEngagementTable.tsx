@@ -23,8 +23,8 @@ export default function CampaignMediumEngagementTable({
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h3>Medium Engagement Metrics</h3>
-        <p>Engagement details for each campaign medium</p>
+        <h2 className="text-lg font-bold text-gray-900 mb-1">Medium Engagement Metrics</h2>
+        <p className="text-sm text-gray-500 mb-4">Engagement details for each campaign medium</p>
         <div className="text-center py-4">Loading medium engagement data...</div>
       </div>
     );
@@ -33,8 +33,8 @@ export default function CampaignMediumEngagementTable({
   if (!data || data.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6">
-        <h3>Medium Engagement Metrics</h3>
-        <p>Engagement details for each campaign medium</p>
+        <h2 className="text-lg font-bold text-gray-900 mb-1">Medium Engagement Metrics</h2>
+        <p className="text-sm text-gray-500 mb-4">Engagement details for each campaign medium</p>
         <div className="text-center py-4">No medium engagement data available.</div>
       </div>
     );
@@ -42,8 +42,8 @@ export default function CampaignMediumEngagementTable({
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3>Medium Engagement Metrics</h3>
-      <p>Engagement details for each campaign medium</p>
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Medium Engagement Metrics</h2>
+      <p className="text-sm text-gray-500 mb-4">Engagement details for each campaign medium</p>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>

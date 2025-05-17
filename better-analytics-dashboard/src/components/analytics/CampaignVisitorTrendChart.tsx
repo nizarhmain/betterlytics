@@ -42,7 +42,8 @@ export default function CampaignVisitorTrendChart({ data, isLoading }: CampaignV
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-md font-semibold text-gray-700 mb-4">Campaign Visitor Trend</h3>
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Campaign Visitor Trend</h2>
+      <p className="text-sm text-gray-500 mb-4">Visitor trends over time by campaign</p>
       <div style={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>
           <AreaChart data={data}

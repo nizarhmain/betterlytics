@@ -40,7 +40,8 @@ export default function CampaignMediumChart({ data, isLoading }: CampaignMediumC
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-md font-semibold text-gray-700 mb-1">Campaign Traffic by Medium</h3>
+      <h2 className="text-lg font-bold text-gray-900 mb-1">Campaign Traffic by Medium</h2>
+      <p className="text-sm text-gray-500 mb-4">Distribution of campaign visitors by medium</p>
       <div className="h-72 md:h-80 flex flex-col items-center mt-4">
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
