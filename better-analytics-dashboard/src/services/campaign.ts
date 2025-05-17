@@ -6,6 +6,7 @@ import {
   getCampaignVisitorTrendData,
   getCampaignMediumBreakdownData,
   getCampaignContentBreakdownData,
+  getCampaignTermBreakdownData,
 } from "@/repositories/clickhouse/campaign";
 import {
   CampaignPerformance,
@@ -23,6 +24,9 @@ import {
   RawCampaignContentBreakdownItem,
   CampaignContentBreakdownItem,
   CampaignContentBreakdownArraySchema,
+  RawCampaignTermBreakdownItem,
+  CampaignTermBreakdownItem,
+  CampaignTermBreakdownArraySchema,
 } from "@/entities/campaign";
 import { toDateTimeString } from '@/utils/dateFormatters';
 import { formatDuration } from '@/utils/dateFormatters';
@@ -137,6 +141,34 @@ export async function fetchCampaignContentBreakdown(
   });
 
   return CampaignContentBreakdownArraySchema.parse(transformedData);
+}
+
+export async function fetchCampaignTermBreakdown(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<CampaignTermBreakdownItem[]> {
+  const startDateTime = toDateTimeString(startDate);
+  const endDateTime = toDateTimeString(endDate);
+
+  const rawTermData: RawCampaignTermBreakdownItem[] = await getCampaignTermBreakdownData(siteId, startDateTime, endDateTime);
+
+  const transformedData: CampaignTermBreakdownItem[] = rawTermData.map((raw: RawCampaignTermBreakdownItem) => {
+    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
+    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
+    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
+    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
+
+    return {
+      term: raw.term,
+      visitors: raw.total_visitors,
+      bounceRate: parseFloat(bounceRate.toFixed(1)),
+      avgSessionDuration: avgSessionDurationFormatted,
+      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+    };
+  });
+
+  return CampaignTermBreakdownArraySchema.parse(transformedData);
 }
 
 export async function fetchCampaignVisitorTrend(

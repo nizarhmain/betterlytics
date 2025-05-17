@@ -9,6 +9,7 @@ import {
   fetchCampaignVisitorTrendAction,
   fetchCampaignMediumBreakdownAction,
   fetchCampaignContentBreakdownAction,
+  fetchCampaignTermBreakdownAction,
 } from "@/app/actions/campaigns";
 import {
   CampaignPerformance,
@@ -16,6 +17,7 @@ import {
   PivotedCampaignVisitorTrendItem,
   CampaignMediumBreakdownItem,
   CampaignContentBreakdownItem,
+  CampaignTermBreakdownItem,
 } from "@/entities/campaign";
 import CampaignPerformanceTable from "@/components/analytics/CampaignPerformanceTable";
 import CampaignSourceChart from "@/components/analytics/CampaignSourceChart";
@@ -25,6 +27,8 @@ import CampaignSourceEngagementTable from "@/components/analytics/CampaignSource
 import CampaignMediumEngagementTable from "@/components/analytics/CampaignMediumEngagementTable";
 import CampaignContentChart from "@/components/analytics/CampaignContentChart";
 import CampaignContentEngagementTable from "@/components/analytics/CampaignContentEngagementTable";
+import CampaignTermChart from "@/components/analytics/CampaignTermChart";
+import CampaignTermEngagementTable from "@/components/analytics/CampaignTermEngagementTable";
 
 export default function CampaignClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
@@ -53,6 +57,11 @@ export default function CampaignClient() {
   const { data: contentBreakdown = [], isLoading: contentBreakdownLoading } = useQuery<CampaignContentBreakdownItem[]>({
     queryKey: ['campaignContentBreakdown', 'default-site', startDate, endDate],
     queryFn: () => fetchCampaignContentBreakdownAction('default-site', startDate, endDate),
+  });
+
+  const { data: termBreakdown = [], isLoading: termBreakdownLoading } = useQuery<CampaignTermBreakdownItem[]>({
+    queryKey: ['campaignTermBreakdown', 'default-site', startDate, endDate],
+    queryFn: () => fetchCampaignTermBreakdownAction('default-site', startDate, endDate),
   });
 
   return (
@@ -114,6 +123,16 @@ export default function CampaignClient() {
         <CampaignContentEngagementTable
           data={contentBreakdown}
           isLoading={contentBreakdownLoading}
+        />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CampaignTermChart
+          data={termBreakdown}
+          isLoading={termBreakdownLoading}
+        />
+        <CampaignTermEngagementTable
+          data={termBreakdown}
+          isLoading={termBreakdownLoading}
         />
       </div>
     </div>
