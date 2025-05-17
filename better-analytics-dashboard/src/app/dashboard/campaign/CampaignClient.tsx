@@ -19,6 +19,7 @@ import CampaignPerformanceTable from "@/components/analytics/CampaignPerformance
 import CampaignSourceChart from "@/components/analytics/CampaignSourceChart";
 import CampaignVisitorTrendChart from "@/components/analytics/CampaignVisitorTrendChart";
 import CampaignMediumChart from "@/components/analytics/CampaignMediumChart";
+import CampaignSourceEngagementTable from "@/components/analytics/CampaignSourceEngagementTable";
 
 export default function CampaignClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
@@ -81,10 +82,16 @@ export default function CampaignClient() {
           isLoading={sourceBreakdownLoading} 
         />
       </div>
-      <CampaignMediumChart 
-        data={mediumBreakdown} 
-        isLoading={mediumBreakdownLoading} 
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CampaignSourceEngagementTable 
+          data={sourceBreakdown}
+          isLoading={sourceBreakdownLoading}
+        />
+        <CampaignMediumChart 
+          data={mediumBreakdown} 
+          isLoading={mediumBreakdownLoading} 
+        />
+      </div>
     </div>
   );
 } 

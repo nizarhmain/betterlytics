@@ -9,6 +9,15 @@ export const RawCampaignDataSchema = z.object({
   sum_session_duration_seconds: z.number().int().nonnegative(),
 });
 
+export const RawCampaignSourceBreakdownItemSchema = z.object({
+  source: z.string(),
+  total_visitors: z.number().int().nonnegative(),
+  bounced_sessions: z.number().int().nonnegative(),
+  total_sessions: z.number().int().nonnegative(),
+  total_pageviews: z.number().int().nonnegative(),
+  sum_session_duration_seconds: z.number().int().nonnegative(),
+});
+
 export const CampaignPerformanceSchema = z.object({
   name: z.string(),
   visitors: z.number().int().nonnegative(),
@@ -20,6 +29,9 @@ export const CampaignPerformanceSchema = z.object({
 export const CampaignSourceBreakdownItemSchema = z.object({
   source: z.string(),
   visitors: z.number().int().nonnegative(),
+  bounceRate: z.number().nonnegative(),
+  avgSessionDuration: z.string(),
+  pagesPerSession: z.number().nonnegative(),
 });
 
 // For UTM Medium Breakdown
@@ -43,12 +55,14 @@ export const CampaignTrendRowSchema = z.object({
 
 export type RawCampaignData = z.infer<typeof RawCampaignDataSchema>;
 export type CampaignPerformance = z.infer<typeof CampaignPerformanceSchema>;
+export type RawCampaignSourceBreakdownItem = z.infer<typeof RawCampaignSourceBreakdownItemSchema>;
 export type CampaignSourceBreakdownItem = z.infer<typeof CampaignSourceBreakdownItemSchema>;
 export type CampaignMediumBreakdownItem = z.infer<typeof CampaignMediumBreakdownItemSchema>;
 export type CampaignTrendRow = z.infer<typeof CampaignTrendRowSchema>;
 export type PivotedCampaignVisitorTrendItem = z.infer<typeof PivotedCampaignVisitorTrendItemSchema>;
 export const RawCampaignDataArraySchema = z.array(RawCampaignDataSchema);
 export const CampaignPerformanceArraySchema = z.array(CampaignPerformanceSchema);
+export const RawCampaignSourceBreakdownArraySchema = z.array(RawCampaignSourceBreakdownItemSchema);
 export const CampaignSourceBreakdownArraySchema = z.array(CampaignSourceBreakdownItemSchema);
 export const CampaignMediumBreakdownArraySchema = z.array(CampaignMediumBreakdownItemSchema);
 export const CampaignTrendRowArraySchema = z.array(CampaignTrendRowSchema);
