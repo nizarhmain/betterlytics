@@ -3,14 +3,14 @@ import { DateTimeString } from "@/types/dates";
 import {
   RawCampaignData,
   RawCampaignDataArraySchema,
-  CampaignSourceBreakdownItem,
-  CampaignSourceBreakdownArraySchema,
   CampaignTrendRow,
   CampaignTrendRowArraySchema,
-  CampaignMediumBreakdownItem,
-  CampaignMediumBreakdownArraySchema,
   RawCampaignSourceBreakdownItem,
   RawCampaignSourceBreakdownArraySchema,
+  RawCampaignMediumBreakdownItem,
+  RawCampaignMediumBreakdownArraySchema,
+  RawCampaignContentBreakdownItem,
+  RawCampaignContentBreakdownArraySchema,
 } from "@/entities/campaign";
 
 export async function getCampaignPerformanceData(
@@ -102,18 +102,32 @@ export async function getCampaignMediumBreakdownData(
   siteId: string,
   startDate: DateTimeString,
   endDate: DateTimeString
-): Promise<CampaignMediumBreakdownItem[]> {
+): Promise<RawCampaignMediumBreakdownItem[]> {
   const query = `
     SELECT
-      utm_medium AS medium,
-      COUNT(DISTINCT visitor_id) AS visitors
-    FROM analytics.events
-    WHERE site_id = {siteId:String}
-      AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
-      AND utm_campaign != ''
-      AND utm_medium != ''
-    GROUP BY utm_medium
-    ORDER BY visitors DESC
+      s.utm_medium AS medium,
+      COUNT(DISTINCT s.visitor_id) AS total_visitors,
+      COUNT(DISTINCT IF(s.session_pageviews = 1, s.session_id, NULL)) AS bounced_sessions,
+      COUNT(DISTINCT s.session_id) AS total_sessions,
+      SUM(s.session_pageviews) AS total_pageviews,
+      SUM(s.session_duration_seconds) AS sum_session_duration_seconds
+    FROM (
+      SELECT
+        visitor_id,
+        session_id,
+        utm_medium,
+        dateDiff('second', MIN(timestamp), MAX(timestamp)) AS session_duration_seconds,
+        COUNT(*) AS session_pageviews
+      FROM analytics.events
+      WHERE site_id = {siteId:String}
+        AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
+        AND event_type = 1
+        AND utm_campaign IS NOT NULL AND utm_campaign != ''
+        AND utm_medium IS NOT NULL AND utm_medium != ''
+      GROUP BY visitor_id, session_id, utm_medium
+    ) s
+    GROUP BY s.utm_medium
+    ORDER BY total_visitors DESC
   `;
 
   const resultSet = await clickhouse.query(query, {
@@ -124,7 +138,50 @@ export async function getCampaignMediumBreakdownData(
     },
   }).toPromise();
   
-  return CampaignMediumBreakdownArraySchema.parse(resultSet);
+  return RawCampaignMediumBreakdownArraySchema.parse(resultSet);
+}
+
+export async function getCampaignContentBreakdownData(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString
+): Promise<RawCampaignContentBreakdownItem[]> {
+  const query = `
+    SELECT
+      s.utm_content AS content,
+      COUNT(DISTINCT s.visitor_id) AS total_visitors,
+      COUNT(DISTINCT IF(s.session_pageviews = 1, s.session_id, NULL)) AS bounced_sessions,
+      COUNT(DISTINCT s.session_id) AS total_sessions,
+      SUM(s.session_pageviews) AS total_pageviews,
+      SUM(s.session_duration_seconds) AS sum_session_duration_seconds
+    FROM (
+      SELECT
+        visitor_id,
+        session_id,
+        utm_content,
+        dateDiff('second', MIN(timestamp), MAX(timestamp)) AS session_duration_seconds,
+        COUNT(*) AS session_pageviews
+      FROM analytics.events
+      WHERE site_id = {siteId:String}
+        AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
+        AND event_type = 1
+        AND utm_campaign IS NOT NULL AND utm_campaign != ''
+        AND utm_content IS NOT NULL AND utm_content != ''
+      GROUP BY visitor_id, session_id, utm_content
+    ) s
+    GROUP BY s.utm_content
+    ORDER BY total_visitors DESC
+  `;
+
+  const resultSet = await clickhouse.query(query, {
+    params: {
+      siteId: siteId,
+      startDate: startDate,
+      endDate: endDate,
+    },
+  }).toPromise();
+  
+  return RawCampaignContentBreakdownArraySchema.parse(resultSet);
 }
 
 export async function getCampaignVisitorTrendData(

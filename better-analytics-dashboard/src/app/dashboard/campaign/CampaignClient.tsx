@@ -8,18 +8,23 @@ import {
   fetchCampaignSourceBreakdownAction,
   fetchCampaignVisitorTrendAction,
   fetchCampaignMediumBreakdownAction,
+  fetchCampaignContentBreakdownAction,
 } from "@/app/actions/campaigns";
 import {
   CampaignPerformance,
   CampaignSourceBreakdownItem,
   PivotedCampaignVisitorTrendItem,
   CampaignMediumBreakdownItem,
+  CampaignContentBreakdownItem,
 } from "@/entities/campaign";
 import CampaignPerformanceTable from "@/components/analytics/CampaignPerformanceTable";
 import CampaignSourceChart from "@/components/analytics/CampaignSourceChart";
 import CampaignVisitorTrendChart from "@/components/analytics/CampaignVisitorTrendChart";
 import CampaignMediumChart from "@/components/analytics/CampaignMediumChart";
 import CampaignSourceEngagementTable from "@/components/analytics/CampaignSourceEngagementTable";
+import CampaignMediumEngagementTable from "@/components/analytics/CampaignMediumEngagementTable";
+import CampaignContentChart from "@/components/analytics/CampaignContentChart";
+import CampaignContentEngagementTable from "@/components/analytics/CampaignContentEngagementTable";
 
 export default function CampaignClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
@@ -43,6 +48,11 @@ export default function CampaignClient() {
   const { data: mediumBreakdown = [], isLoading: mediumBreakdownLoading } = useQuery<CampaignMediumBreakdownItem[]>({
     queryKey: ['campaignMediumBreakdown', 'default-site', startDate, endDate],
     queryFn: () => fetchCampaignMediumBreakdownAction('default-site', startDate, endDate),
+  });
+
+  const { data: contentBreakdown = [], isLoading: contentBreakdownLoading } = useQuery<CampaignContentBreakdownItem[]>({
+    queryKey: ['campaignContentBreakdown', 'default-site', startDate, endDate],
+    queryFn: () => fetchCampaignContentBreakdownAction('default-site', startDate, endDate),
   });
 
   return (
@@ -82,7 +92,7 @@ export default function CampaignClient() {
           isLoading={sourceBreakdownLoading} 
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <CampaignSourceEngagementTable 
           data={sourceBreakdown}
           isLoading={sourceBreakdownLoading}
@@ -90,6 +100,20 @@ export default function CampaignClient() {
         <CampaignMediumChart 
           data={mediumBreakdown} 
           isLoading={mediumBreakdownLoading} 
+        />
+        <CampaignMediumEngagementTable
+          data={mediumBreakdown}
+          isLoading={mediumBreakdownLoading}
+        />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CampaignContentChart
+          data={contentBreakdown}
+          isLoading={contentBreakdownLoading}
+        />
+        <CampaignContentEngagementTable
+          data={contentBreakdown}
+          isLoading={contentBreakdownLoading}
         />
       </div>
     </div>

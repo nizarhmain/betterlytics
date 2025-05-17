@@ -5,6 +5,7 @@ import {
   getCampaignSourceBreakdownData,
   getCampaignVisitorTrendData,
   getCampaignMediumBreakdownData,
+  getCampaignContentBreakdownData,
 } from "@/repositories/clickhouse/campaign";
 import {
   CampaignPerformance,
@@ -17,6 +18,11 @@ import {
   PivotedCampaignVisitorTrendItem,
   PivotedCampaignVisitorTrendArraySchema,
   CampaignMediumBreakdownItem,
+  CampaignMediumBreakdownArraySchema,
+  RawCampaignMediumBreakdownItem,
+  RawCampaignContentBreakdownItem,
+  CampaignContentBreakdownItem,
+  CampaignContentBreakdownArraySchema,
 } from "@/entities/campaign";
 import { toDateTimeString } from '@/utils/dateFormatters';
 import { formatDuration } from '@/utils/dateFormatters';
@@ -85,7 +91,52 @@ export async function fetchCampaignMediumBreakdown(
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);
 
-  return await getCampaignMediumBreakdownData(siteId, startDateTime, endDateTime);
+  const rawMediumData: RawCampaignMediumBreakdownItem[] = await getCampaignMediumBreakdownData(siteId, startDateTime, endDateTime);
+
+  const transformedData: CampaignMediumBreakdownItem[] = rawMediumData.map((raw: RawCampaignMediumBreakdownItem) => {
+    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
+    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
+    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
+    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
+
+    return {
+      medium: raw.medium,
+      visitors: raw.total_visitors,
+      bounceRate: parseFloat(bounceRate.toFixed(1)),
+      avgSessionDuration: avgSessionDurationFormatted,
+      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+    };
+  });
+
+  return CampaignMediumBreakdownArraySchema.parse(transformedData);
+}
+
+export async function fetchCampaignContentBreakdown(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<CampaignContentBreakdownItem[]> {
+  const startDateTime = toDateTimeString(startDate);
+  const endDateTime = toDateTimeString(endDate);
+
+  const rawContentData: RawCampaignContentBreakdownItem[] = await getCampaignContentBreakdownData(siteId, startDateTime, endDateTime);
+
+  const transformedData: CampaignContentBreakdownItem[] = rawContentData.map((raw: RawCampaignContentBreakdownItem) => {
+    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
+    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
+    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
+    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
+
+    return {
+      content: raw.content,
+      visitors: raw.total_visitors,
+      bounceRate: parseFloat(bounceRate.toFixed(1)),
+      avgSessionDuration: avgSessionDurationFormatted,
+      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+    };
+  });
+
+  return CampaignContentBreakdownArraySchema.parse(transformedData);
 }
 
 export async function fetchCampaignVisitorTrend(
