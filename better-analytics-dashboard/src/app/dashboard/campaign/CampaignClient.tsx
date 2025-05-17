@@ -120,18 +120,14 @@ export default function CampaignClient() {
       <div className="mt-6">
         {activeTab === "overview" && (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <CampaignPerformanceTable
-                data={campaignPerformance}
-                isLoading={campaignPerformanceLoading}
-              />
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <CampaignVisitorTrendChart
-                data={visitorTrend}
-                isLoading={visitorTrendLoading}
-              />
-            </div>
+            <CampaignPerformanceTable
+              data={campaignPerformance}
+              isLoading={campaignPerformanceLoading}
+            />
+            <CampaignVisitorTrendChart
+              data={visitorTrend}
+              isLoading={visitorTrendLoading}
+            />
           </div>
         )}
 
