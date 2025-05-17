@@ -43,8 +43,8 @@ async function getCampaignBreakdownByUTMDimension(
       WHERE site_id = {siteId:String}
         AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
         AND event_type = 1
-        AND utm_campaign IS NOT NULL AND utm_campaign != ''
-        AND ${utmDimension} IS NOT NULL AND ${utmDimension} != ''
+        AND utm_campaign != ''
+        AND ${utmDimension} != ''
       GROUP BY visitor_id, session_id, ${utmDimension}
     ) s
     GROUP BY s.${utmDimension}
