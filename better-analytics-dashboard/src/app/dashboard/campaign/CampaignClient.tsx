@@ -33,9 +33,12 @@ import CampaignTermChart from "@/components/analytics/CampaignTermChart";
 import CampaignTermEngagementTable from "@/components/analytics/CampaignTermEngagementTable";
 import CampaignLandingPagePerformanceTable from "@/components/analytics/CampaignLandingPagePerformanceTable";
 
+type TabValue = "overview" | "utmBreakdowns" | "landingPages";
+
 export default function CampaignClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
   const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const [activeTab, setActiveTab] = useState<TabValue>("overview");
 
   const { data: campaignPerformance = [], isLoading: campaignPerformanceLoading } = useQuery<CampaignPerformance[]>({
     queryKey: ['campaignPerformance', 'default-site', startDate, endDate],
@@ -72,6 +75,20 @@ export default function CampaignClient() {
     queryFn: () => fetchCampaignLandingPagePerformanceAction('default-site', startDate, endDate),
   });
 
+  const renderTabButton = (tabValue: TabValue, label: string) => (
+    <button
+      key={tabValue}
+      onClick={() => setActiveTab(tabValue)}
+      className={`px-4 py-2 font-medium text-sm rounded-md focus:outline-none
+        ${activeTab === tabValue
+          ? 'bg-blue-600 text-white'
+          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+        }`}
+    >
+      {label}
+    </button>
+  );
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -92,62 +109,102 @@ export default function CampaignClient() {
         </div>
       </div>
 
-      <CampaignVisitorTrendChart
-        data={visitorTrend}
-        isLoading={visitorTrendLoading}
-      />
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-4" aria-label="Tabs">
+          {renderTabButton("overview", "Overview")}
+          {renderTabButton("utmBreakdowns", "UTM Breakdowns")}
+          {renderTabButton("landingPages", "Landing Pages")}
+        </nav>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <CampaignPerformanceTable 
-            data={campaignPerformance} 
-            isLoading={campaignPerformanceLoading} 
-          />
-        </div>
-        <CampaignSourceChart 
-          data={sourceBreakdown} 
-          isLoading={sourceBreakdownLoading} 
-        />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <CampaignSourceEngagementTable 
-          data={sourceBreakdown}
-          isLoading={sourceBreakdownLoading}
-        />
-        <CampaignMediumChart 
-          data={mediumBreakdown} 
-          isLoading={mediumBreakdownLoading} 
-        />
-        <CampaignMediumEngagementTable
-          data={mediumBreakdown}
-          isLoading={mediumBreakdownLoading}
-        />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CampaignContentChart
-          data={contentBreakdown}
-          isLoading={contentBreakdownLoading}
-        />
-        <CampaignContentEngagementTable
-          data={contentBreakdown}
-          isLoading={contentBreakdownLoading}
-        />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CampaignTermChart
-          data={termBreakdown}
-          isLoading={termBreakdownLoading}
-        />
-        <CampaignTermEngagementTable
-          data={termBreakdown}
-          isLoading={termBreakdownLoading}
-        />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <CampaignLandingPagePerformanceTable
-          data={landingPagePerformance}
-          isLoading={landingPagePerformanceLoading}
-        />
+      <div className="mt-6">
+        {activeTab === "overview" && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <CampaignPerformanceTable
+                data={campaignPerformance}
+                isLoading={campaignPerformanceLoading}
+              />
+            </div>
+            <div className="bg-white rounded-lg shadow p-6">
+              <CampaignVisitorTrendChart
+                data={visitorTrend}
+                isLoading={visitorTrendLoading}
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === "utmBreakdowns" && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold text-gray-800">UTM Source Breakdown</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              <div className="lg:col-span-2">
+                <CampaignSourceEngagementTable
+                  data={sourceBreakdown}
+                  isLoading={sourceBreakdownLoading}
+                />
+              </div>
+
+              <CampaignSourceChart
+                data={sourceBreakdown}
+                isLoading={sourceBreakdownLoading}
+              />
+            </div>
+            <hr className="my-6 border-gray-200"/>
+            <h2 className="text-xl font-semibold text-gray-800">UTM Medium Breakdown</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <CampaignMediumEngagementTable
+                  data={mediumBreakdown}
+                  isLoading={mediumBreakdownLoading}
+                />
+              </div>
+              <CampaignMediumChart
+                data={mediumBreakdown}
+                isLoading={mediumBreakdownLoading}
+              />
+            </div>
+            <hr className="my-6 border-gray-200"/>
+            <h2 className="text-xl font-semibold text-gray-800">UTM Content Breakdown</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <CampaignContentEngagementTable
+                  data={contentBreakdown}
+                  isLoading={contentBreakdownLoading}
+                />
+              </div>
+              <CampaignContentChart
+                data={contentBreakdown}
+                isLoading={contentBreakdownLoading}
+              />
+            </div>
+            <hr className="my-6 border-gray-200"/>
+            <h2 className="text-xl font-semibold text-gray-800">UTM Term Breakdown</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <CampaignTermEngagementTable
+                  data={termBreakdown}
+                  isLoading={termBreakdownLoading}
+                />
+              </div>
+              <CampaignTermChart
+                data={termBreakdown}
+                isLoading={termBreakdownLoading}
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === "landingPages" && (
+          <div>
+            <CampaignLandingPagePerformanceTable
+              data={landingPagePerformance}
+              isLoading={landingPagePerformanceLoading}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
