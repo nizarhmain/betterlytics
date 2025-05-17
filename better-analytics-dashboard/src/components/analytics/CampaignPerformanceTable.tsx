@@ -8,6 +8,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
+import { getBounceRateColor } from "@/utils/bounceRateColors";
 
 interface CampaignPerformanceTableProps {
   data: CampaignPerformance[];
@@ -46,19 +47,25 @@ export default function CampaignPerformanceTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Campaign Name</TableHead>
+              <TableHead className="w-[250px]">Campaign Name</TableHead>
               <TableHead className="text-right">Visitors</TableHead>
-              <TableHead className="text-right">Bounce Rate</TableHead>
-              <TableHead className="text-right">Avg. Session Duration</TableHead>
-              <TableHead className="text-right">Pages / Session</TableHead>
+              <TableHead className="text-right w-[120px]">Bounce Rate</TableHead>
+              <TableHead className="text-right w-[180px]">Avg. Session Duration</TableHead>
+              <TableHead className="text-right w-[150px]">Pages / Session</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.map((campaign) => (
               <TableRow key={campaign.name}>
-                <TableCell className="font-medium">{campaign.name}</TableCell>
-                <TableCell className="text-right">{campaign.visitors.toLocaleString()}</TableCell>
-                <TableCell className="text-right">{campaign.bounceRate.toFixed(1)}%</TableCell>
+                <TableCell className="font-medium truncate" title={campaign.name}>
+                  {campaign.name}
+                </TableCell>
+                <TableCell className="text-right">
+                  {campaign.visitors}
+                </TableCell>
+                <TableCell className={`text-right font-medium ${getBounceRateColor(campaign.bounceRate)}`}>
+                  {campaign.bounceRate.toFixed(1)}%
+                </TableCell>
                 <TableCell className="text-right">{campaign.avgSessionDuration}</TableCell>
                 <TableCell className="text-right">{campaign.pagesPerSession.toFixed(1)}</TableCell>
               </TableRow>
