@@ -7,6 +7,8 @@ import {
   CampaignSourceBreakdownArraySchema,
   CampaignTrendRow,
   CampaignTrendRowArraySchema,
+  CampaignMediumBreakdownItem,
+  CampaignMediumBreakdownArraySchema,
 } from "@/entities/campaign";
 
 export async function getCampaignPerformanceData(
@@ -78,6 +80,35 @@ export async function getCampaignSourceBreakdownData(
   }).toPromise();
   
   return CampaignSourceBreakdownArraySchema.parse(resultSet);
+}
+
+export async function getCampaignMediumBreakdownData(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString
+): Promise<CampaignMediumBreakdownItem[]> {
+  const query = `
+    SELECT
+      utm_medium AS medium,
+      COUNT(DISTINCT visitor_id) AS visitors
+    FROM analytics.events
+    WHERE site_id = {siteId:String}
+      AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
+      AND utm_campaign != ''
+      AND utm_medium != ''
+    GROUP BY utm_medium
+    ORDER BY visitors DESC
+  `;
+
+  const resultSet = await clickhouse.query(query, {
+    params: {
+      siteId: siteId,
+      startDate: startDate,
+      endDate: endDate,
+    },
+  }).toPromise();
+  
+  return CampaignMediumBreakdownArraySchema.parse(resultSet);
 }
 
 export async function getCampaignVisitorTrendData(

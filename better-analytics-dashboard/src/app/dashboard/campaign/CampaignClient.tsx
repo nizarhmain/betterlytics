@@ -7,15 +7,18 @@ import {
   fetchCampaignPerformanceAction,
   fetchCampaignSourceBreakdownAction,
   fetchCampaignVisitorTrendAction,
+  fetchCampaignMediumBreakdownAction,
 } from "@/app/actions/campaigns";
 import {
   CampaignPerformance,
   CampaignSourceBreakdownItem,
   PivotedCampaignVisitorTrendItem,
+  CampaignMediumBreakdownItem,
 } from "@/entities/campaign";
 import CampaignPerformanceTable from "@/components/analytics/CampaignPerformanceTable";
 import CampaignSourceChart from "@/components/analytics/CampaignSourceChart";
 import CampaignVisitorTrendChart from "@/components/analytics/CampaignVisitorTrendChart";
+import CampaignMediumChart from "@/components/analytics/CampaignMediumChart";
 
 export default function CampaignClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
@@ -34,6 +37,11 @@ export default function CampaignClient() {
   const { data: visitorTrend = [], isLoading: visitorTrendLoading } = useQuery<PivotedCampaignVisitorTrendItem[]>({
     queryKey: ['campaignVisitorTrend', 'default-site', startDate, endDate],
     queryFn: () => fetchCampaignVisitorTrendAction('default-site', startDate, endDate),
+  });
+
+  const { data: mediumBreakdown = [], isLoading: mediumBreakdownLoading } = useQuery<CampaignMediumBreakdownItem[]>({
+    queryKey: ['campaignMediumBreakdown', 'default-site', startDate, endDate],
+    queryFn: () => fetchCampaignMediumBreakdownAction('default-site', startDate, endDate),
   });
 
   return (
@@ -73,6 +81,10 @@ export default function CampaignClient() {
           isLoading={sourceBreakdownLoading} 
         />
       </div>
+      <CampaignMediumChart 
+        data={mediumBreakdown} 
+        isLoading={mediumBreakdownLoading} 
+      />
     </div>
   );
 } 

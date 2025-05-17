@@ -4,6 +4,7 @@ import {
   getCampaignPerformanceData,
   getCampaignSourceBreakdownData,
   getCampaignVisitorTrendData,
+  getCampaignMediumBreakdownData,
 } from "@/repositories/clickhouse/campaign";
 import {
   CampaignPerformance,
@@ -13,6 +14,7 @@ import {
   CampaignTrendRow,
   PivotedCampaignVisitorTrendItem,
   PivotedCampaignVisitorTrendArraySchema,
+  CampaignMediumBreakdownItem,
 } from "@/entities/campaign";
 import { toDateTimeString } from '@/utils/dateFormatters';
 import { formatDuration } from '@/utils/dateFormatters';
@@ -54,6 +56,17 @@ export async function fetchCampaignSourceBreakdown(
   const endDateTime = toDateTimeString(endDate);
 
   return await getCampaignSourceBreakdownData(siteId, startDateTime, endDateTime);
+}
+
+export async function fetchCampaignMediumBreakdown(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<CampaignMediumBreakdownItem[]> {
+  const startDateTime = toDateTimeString(startDate);
+  const endDateTime = toDateTimeString(endDate);
+
+  return await getCampaignMediumBreakdownData(siteId, startDateTime, endDateTime);
 }
 
 export async function fetchCampaignVisitorTrend(
