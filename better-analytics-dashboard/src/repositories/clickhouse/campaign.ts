@@ -12,7 +12,9 @@ import {
   RawCampaignContentBreakdownItem,
   RawCampaignContentBreakdownArraySchema,
   RawCampaignTermBreakdownItem,
-  RawCampaignTermBreakdownArraySchema
+  RawCampaignTermBreakdownArraySchema,
+  RawCampaignLandingPagePerformanceItem,
+  RawCampaignLandingPagePerformanceArraySchema
 } from "@/entities/campaign";
 
 export async function getCampaignPerformanceData(
@@ -227,6 +229,51 @@ export async function getCampaignTermBreakdownData(
   }).toPromise();
   
   return RawCampaignTermBreakdownArraySchema.parse(resultSet);
+}
+
+export async function getCampaignLandingPagePerformanceData(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString
+): Promise<RawCampaignLandingPagePerformanceItem[]> {
+  const query = `
+    SELECT
+        s.utm_campaign AS utm_campaign_name,
+        s.landing_page_url,
+        COUNT(DISTINCT s.visitor_id) AS total_visitors,
+        COUNT(DISTINCT IF(s.session_total_pageviews = 1, s.session_id, NULL)) AS bounced_sessions,
+        COUNT(DISTINCT s.session_id) AS total_sessions,
+        SUM(s.session_total_pageviews) AS total_pageviews,
+        SUM(s.session_total_duration_seconds) AS sum_session_duration_seconds
+    FROM (
+        SELECT
+            e.visitor_id,
+            e.session_id,
+            e.utm_campaign,
+            FIRST_VALUE(e.url) OVER (PARTITION BY e.session_id ORDER BY e.timestamp ASC) as landing_page_url,
+            COUNT(e.url) OVER (PARTITION BY e.session_id) as session_total_pageviews,
+            dateDiff('second', MIN(e.timestamp) OVER (PARTITION BY e.session_id), MAX(e.timestamp) OVER (PARTITION BY e.session_id)) as session_total_duration_seconds,
+            ROW_NUMBER() OVER (PARTITION BY e.session_id ORDER BY e.timestamp ASC) as rn
+        FROM analytics.events e
+        WHERE e.site_id = {siteId:String}
+          AND e.timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
+          AND e.event_type = 1 -- Pageview event
+          AND e.utm_campaign IS NOT NULL AND e.utm_campaign != ''
+    ) s
+    WHERE s.rn = 1
+    GROUP BY s.utm_campaign, s.landing_page_url
+    ORDER BY s.utm_campaign ASC, total_visitors DESC
+  `;
+
+  const resultSet = await clickhouse.query(query, {
+    params: {
+      siteId: siteId,
+      startDate: startDate,
+      endDate: endDate,
+    },
+  }).toPromise();
+  
+  return RawCampaignLandingPagePerformanceArraySchema.parse(resultSet);
 }
 
 export async function getCampaignVisitorTrendData(

@@ -10,6 +10,7 @@ import {
   fetchCampaignMediumBreakdownAction,
   fetchCampaignContentBreakdownAction,
   fetchCampaignTermBreakdownAction,
+  fetchCampaignLandingPagePerformanceAction,
 } from "@/app/actions/campaigns";
 import {
   CampaignPerformance,
@@ -18,6 +19,7 @@ import {
   CampaignMediumBreakdownItem,
   CampaignContentBreakdownItem,
   CampaignTermBreakdownItem,
+  CampaignLandingPagePerformanceItem,
 } from "@/entities/campaign";
 import CampaignPerformanceTable from "@/components/analytics/CampaignPerformanceTable";
 import CampaignSourceChart from "@/components/analytics/CampaignSourceChart";
@@ -29,6 +31,7 @@ import CampaignContentChart from "@/components/analytics/CampaignContentChart";
 import CampaignContentEngagementTable from "@/components/analytics/CampaignContentEngagementTable";
 import CampaignTermChart from "@/components/analytics/CampaignTermChart";
 import CampaignTermEngagementTable from "@/components/analytics/CampaignTermEngagementTable";
+import CampaignLandingPagePerformanceTable from "@/components/analytics/CampaignLandingPagePerformanceTable";
 
 export default function CampaignClient() {
   const [range, setRange] = useState<TimeRangeValue>("7d");
@@ -62,6 +65,11 @@ export default function CampaignClient() {
   const { data: termBreakdown = [], isLoading: termBreakdownLoading } = useQuery<CampaignTermBreakdownItem[]>({
     queryKey: ['campaignTermBreakdown', 'default-site', startDate, endDate],
     queryFn: () => fetchCampaignTermBreakdownAction('default-site', startDate, endDate),
+  });
+
+  const { data: landingPagePerformance = [], isLoading: landingPagePerformanceLoading } = useQuery<CampaignLandingPagePerformanceItem[]>({
+    queryKey: ['campaignLandingPagePerformance', 'default-site', startDate, endDate],
+    queryFn: () => fetchCampaignLandingPagePerformanceAction('default-site', startDate, endDate),
   });
 
   return (
@@ -133,6 +141,12 @@ export default function CampaignClient() {
         <CampaignTermEngagementTable
           data={termBreakdown}
           isLoading={termBreakdownLoading}
+        />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <CampaignLandingPagePerformanceTable
+          data={landingPagePerformance}
+          isLoading={landingPagePerformanceLoading}
         />
       </div>
     </div>

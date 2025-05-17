@@ -7,6 +7,7 @@ import {
   fetchCampaignMediumBreakdown,
   fetchCampaignContentBreakdown,
   fetchCampaignTermBreakdown,
+  fetchCampaignLandingPagePerformance,
 } from "@/services/campaign";
 import {
   CampaignPerformance,
@@ -15,6 +16,7 @@ import {
   CampaignMediumBreakdownItem,
   CampaignContentBreakdownItem,
   CampaignTermBreakdownItem,
+  CampaignLandingPagePerformanceItem,
 } from "@/entities/campaign";
 import { checkAuth } from "@/lib/auth-actions";
 
@@ -114,6 +116,26 @@ export async function fetchCampaignTermBreakdownAction(
     return breakdownData;
   } catch (error) {
     console.error("Error in fetchCampaignTermBreakdownAction:", error);
+    return [];
+  }
+}
+
+export async function fetchCampaignLandingPagePerformanceAction(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<CampaignLandingPagePerformanceItem[]> {
+  await checkAuth();
+
+  try {
+    const performanceData = await fetchCampaignLandingPagePerformance(
+      siteId,
+      startDate,
+      endDate
+    );
+    return performanceData;
+  } catch (error) {
+    console.error("Error in fetchCampaignLandingPagePerformanceAction:", error);
     return [];
   }
 }

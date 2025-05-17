@@ -7,6 +7,7 @@ import {
   getCampaignMediumBreakdownData,
   getCampaignContentBreakdownData,
   getCampaignTermBreakdownData,
+  getCampaignLandingPagePerformanceData,
 } from "@/repositories/clickhouse/campaign";
 import {
   CampaignPerformance,
@@ -27,6 +28,9 @@ import {
   RawCampaignTermBreakdownItem,
   CampaignTermBreakdownItem,
   CampaignTermBreakdownArraySchema,
+  RawCampaignLandingPagePerformanceItem,
+  CampaignLandingPagePerformanceItem,
+  CampaignLandingPagePerformanceArraySchema,
 } from "@/entities/campaign";
 import { toDateTimeString } from '@/utils/dateFormatters';
 import { formatDuration } from '@/utils/dateFormatters';
@@ -169,6 +173,36 @@ export async function fetchCampaignTermBreakdown(
   });
 
   return CampaignTermBreakdownArraySchema.parse(transformedData);
+}
+
+export async function fetchCampaignLandingPagePerformance(
+  siteId: string,
+  startDate: string,
+  endDate: string
+): Promise<CampaignLandingPagePerformanceItem[]> {
+  const startDateTime = toDateTimeString(startDate);
+  const endDateTime = toDateTimeString(endDate);
+
+  const rawLandingPageData: RawCampaignLandingPagePerformanceItem[] = 
+    await getCampaignLandingPagePerformanceData(siteId, startDateTime, endDateTime);
+
+  const transformedData: CampaignLandingPagePerformanceItem[] = rawLandingPageData.map((raw: RawCampaignLandingPagePerformanceItem) => {
+    const bounceRate = raw.total_sessions > 0 ? (raw.bounced_sessions / raw.total_sessions) * 100 : 0;
+    const avgSessionDurationSeconds = raw.total_sessions > 0 ? raw.sum_session_duration_seconds / raw.total_sessions : 0;
+    const pagesPerSession = raw.total_sessions > 0 ? raw.total_pageviews / raw.total_sessions : 0;
+    const avgSessionDurationFormatted = formatDuration(avgSessionDurationSeconds);
+
+    return {
+      campaignName: raw.utm_campaign_name,
+      landingPageUrl: raw.landing_page_url,
+      visitors: raw.total_visitors,
+      bounceRate: parseFloat(bounceRate.toFixed(1)),
+      avgSessionDuration: avgSessionDurationFormatted,
+      pagesPerSession: parseFloat(pagesPerSession.toFixed(1)),
+    };
+  });
+
+  return CampaignLandingPagePerformanceArraySchema.parse(transformedData);
 }
 
 export async function fetchCampaignVisitorTrend(
