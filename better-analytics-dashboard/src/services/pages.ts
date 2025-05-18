@@ -6,6 +6,7 @@ import {
   getPageMetrics,
   getPageDetailMetrics,
   getTotalPageViews,
+  getPageTrafficTimeSeries,
 } from '@/repositories/clickhouse';
 import { DailyPageViewRow, TotalPageViewsRow } from '@/entities/pageviews';
 import { toDateTimeString } from '@/utils/dateFormatters';
@@ -36,4 +37,16 @@ export async function getPageDetail(siteId: string, path: string, startDate: Dat
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
   return getPageDetailMetrics(siteId, path, formattedStart, formattedEnd);
+}
+
+export async function getPageTrafficForTimePeriod(
+  siteId: string, 
+  path: string,
+  startDate: Date, 
+  endDate: Date, 
+  granularity: GranularityRangeValues
+): Promise<TotalPageViewsRow[]> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  return getPageTrafficTimeSeries(siteId, path, formattedStart, formattedEnd, granularity);
 }
