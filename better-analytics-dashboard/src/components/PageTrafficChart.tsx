@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { TotalPageViewsRow } from "@/entities/pageviews";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { timeFormat } from "d3-time-format";
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragmentedGranularityTimeSeriesLineChart';
@@ -45,7 +45,7 @@ export default function PageTrafficChart({ pageTrafficData, isLoading, granulari
   return (
     <div className="w-full h-80">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+        <AreaChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <XAxis
             dataKey="date"
             type='number'
@@ -61,8 +61,8 @@ export default function PageTrafficChart({ pageTrafficData, isLoading, granulari
             labelFormatter={tooltipLabelFormatter}
             formatter={(value) => [value, "Views"]}
           />
-          <Line type="monotone" dataKey="views" stroke="#3b82f6" strokeWidth={3} dot={false} />
-        </LineChart>
+          <Area type="monotone" dataKey="views" stroke="#3b82f6" strokeWidth={3} fillOpacity={0.3} fill="#3b82f6" dot={false} />
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );
