@@ -17,18 +17,18 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
     const { startDate, endDate } = useTimeRangeContext();
 
     const { data: journeyData, isLoading, error } = useQuery({
-        queryKey: ['userJourney', siteId, startDate, endDate, numberOfSteps, numberOfJourneys],
-        queryFn: async () => {
-            return await fetchUserJourneyAction(
-                siteId,
-                startDate,
-                endDate,
-                numberOfSteps,
-                numberOfJourneys
-            );
-        },
-        staleTime: 5 * 60 * 1000,
-        gcTime: 30 * 60 * 1000
+      queryKey: ['userJourney', siteId, startDate, endDate, numberOfSteps, numberOfJourneys],
+      queryFn: () => {
+        return fetchUserJourneyAction(
+          siteId,
+          startDate,
+          endDate,
+          numberOfSteps,
+          numberOfJourneys
+        );
+      },
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000
     });
 
     const errorMessage = error instanceof Error ? error.message : "Failed to fetch journey data";
@@ -84,7 +84,7 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
               </div>
             )}
             
-            {!isLoading && !error && (!journeyData || journeyData.nodes.length === 0) && (
+            {journeyData?.nodes.length === 0 && (
               <div className="bg-gray-50 p-8 rounded-md text-center">
                 <p className="text-gray-500">No journey data available for the selected criteria.</p>
               </div>

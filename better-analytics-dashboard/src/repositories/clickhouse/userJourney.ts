@@ -13,8 +13,6 @@ export async function getUserSequentialPaths(
   maxPathLength: number = 3,
   limit: number = 25
 ): Promise<SequentialPath[]> {
-  console.log(startDate, endDate, maxPathLength, limit);
-
   const query = `
   WITH ordered_events AS (
     SELECT
@@ -24,7 +22,7 @@ export async function getUserSequentialPaths(
     WHERE
       site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-      AND url IS NOT NULL AND url != ''
+      AND url != ''
     GROUP BY session_id
   ),
   session_paths AS (

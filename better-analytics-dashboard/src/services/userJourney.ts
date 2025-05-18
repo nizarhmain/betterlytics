@@ -31,7 +31,7 @@ export async function getUserJourneyForSankeyDiagram(
 /**
  * Transforms sequential journey data into Sankey format
  */
-export function transformSequentialPathsToSankeyData(
+function transformSequentialPathsToSankeyData(
   sequentialPaths: SequentialPath[],
   maxSteps: number = 3
 ): SankeyData {

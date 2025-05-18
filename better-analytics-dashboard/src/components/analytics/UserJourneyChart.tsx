@@ -4,14 +4,14 @@ import { SankeyData } from "@/entities/userJourney";
 import { Sankey, Rectangle, ResponsiveContainer, Layer, Text } from "recharts";
 import { useState, useRef, useEffect, useMemo, memo, useCallback } from "react";
 
-const COLORS = {
+const Colors = {
   primary: "#0ea5e9", // Blue - Color of root nodes
   secondary: "#64748b", // Gray - Color of other nodes
   labelBg: "#f8fafc", // Light Gray - Background color of label box
   labelBorder: "#cbd5e1", // Gray - Border color of label box
   labelText: "#334155", // Dark Gray - Text color of label text
   labelTextDark: "#475569" // Gray - Text color of label count
-};
+} as const;
 
 interface UserJourneyChartProps {
   data: SankeyData;
@@ -84,9 +84,9 @@ const NodeLabel = memo(({ x, y, width, height, url, count }: NodeLabelProps) => 
         y={boxY}
         width={boxWidth}
         height={boxHeight}
-        fill={COLORS.labelBg} 
+        fill={Colors.labelBg} 
         fillOpacity={0.6} 
-        stroke={COLORS.labelBorder}
+        stroke={Colors.labelBorder}
         strokeWidth={1}
         rx={4}
         ry={4}
@@ -99,7 +99,7 @@ const NodeLabel = memo(({ x, y, width, height, url, count }: NodeLabelProps) => 
         textAnchor="start"
         verticalAnchor="middle"
         fontSize={12}
-        fill={COLORS.labelText}
+        fill={Colors.labelText}
       >
         {url}
       </Text>
@@ -112,7 +112,7 @@ const NodeLabel = memo(({ x, y, width, height, url, count }: NodeLabelProps) => 
         verticalAnchor="middle"
         fontSize={14}
         fontWeight="bold"
-        fill={COLORS.labelTextDark}
+        fill={Colors.labelTextDark}
       >
         {count}
       </Text>
@@ -207,7 +207,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
             y={y}
             width={width}
             height={height}
-            fill={isFirstColumn ? COLORS.primary : COLORS.secondary}
+            fill={isFirstColumn ? Colors.primary : Colors.secondary}
             fillOpacity={0.9}
           />
           <NodeLabel
@@ -270,7 +270,7 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
             C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}
           `}
           fill="none"
-          stroke={activeLink === index ? COLORS.primary : "#aaa"}
+          stroke={activeLink === index ? Colors.primary : "#aaa"}
           strokeWidth={linkWidth}
           strokeOpacity={activeLink !== null && activeLink !== index ? 0.3 : 0.7}
           onMouseEnter={handleMouseEnter}
