@@ -3,8 +3,8 @@
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { TIME_RANGE_PRESETS, TimeRangeValue, getRangeForValue } from "@/utils/timeRanges";
 import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
-import React, { useState } from "react";
-import { format } from 'date-fns';
+import React, { useState, useMemo, useEffect } from "react";
+import { format, addDays, differenceInCalendarDays } from 'date-fns';
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -43,6 +43,27 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   const [tempCompare, setTempCompare] = useState<boolean>(compareEnabled);
   const [tempCompareStartDate, setTempCompareStartDate] = useState<Date | undefined>(compareStartDate);
   const [tempCompareEndDate, setTempCompareEndDate] = useState<Date | undefined>(compareEndDate);
+
+  const tempMainPeriodDurationDays = useMemo(() => {
+    if (tempRange === 'custom' && tempCustomStart && tempCustomEnd) {
+      return differenceInCalendarDays(tempCustomEnd, tempCustomStart) + 1;
+    }
+    if (tempRange !== 'custom') {
+      const { startDate: presetStart, endDate: presetEnd } = getRangeForValue(tempRange);
+      if (presetStart && presetEnd) {
+        return differenceInCalendarDays(presetEnd, presetStart) + 1;
+      }
+    }
+    return null;
+  }, [tempRange, tempCustomStart, tempCustomEnd]);
+
+  useEffect(() => {
+    if (tempCompareStartDate && tempMainPeriodDurationDays !== null) {
+      setTempCompareEndDate(addDays(tempCompareStartDate, tempMainPeriodDurationDays - 1));
+    }
+    // We only want to run this effect if the duration of the main period changes,
+    // or if the user explicitly changes the comparison start date.
+  }, [tempMainPeriodDurationDays, tempCompareStartDate]);
 
   const handlePopoverOpenChange = (open: boolean) => {
     setIsPopoverOpen(open);
@@ -97,12 +118,18 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   const handleCompareStartDateSelect = (date: Date | undefined) => {
     if (!date) return;
     setTempCompareStartDate(date);
+    if (tempMainPeriodDurationDays !== null) {
+      setTempCompareEndDate(addDays(date, tempMainPeriodDurationDays -1 ));
+    }
     setIsCompareStartDatePopoverOpen(false);
   };
 
   const handleCompareEndDateSelect = (date: Date | undefined) => {
     if (!date) return;
     setTempCompareEndDate(date);
+    if (tempMainPeriodDurationDays !== null) {
+      setTempCompareStartDate(addDays(date, -(tempMainPeriodDurationDays -1)));
+    }
     setIsCompareEndDatePopoverOpen(false);
   };
 
