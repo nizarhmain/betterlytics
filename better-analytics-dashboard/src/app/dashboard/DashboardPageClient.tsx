@@ -63,12 +63,8 @@ export default function DashboardPageClient() {
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {startDate && endDate && (
-            <>
-              <VisitorsChart siteId={siteId} startDate={startDate} endDate={endDate} granularity={granularity} />
-              <PageviewsChart siteId={siteId} startDate={startDate} endDate={endDate} granularity={granularity} />
-            </>
-          )}
+          <VisitorsChart siteId={siteId} startDate={startDate} endDate={endDate} granularity={granularity} />
+          <PageviewsChart siteId={siteId} startDate={startDate} endDate={endDate} granularity={granularity} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div>

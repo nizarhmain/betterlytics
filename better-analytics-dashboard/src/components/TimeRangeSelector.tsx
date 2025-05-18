@@ -15,42 +15,42 @@ import { cn } from "@/lib/utils";
 
 export default function TimeRangeSelector({ className = "" }: { className?: string }) {
   const {
-    range: contextRange,
-    setRange: contextSetRange,
-    granularity: contextGranularity,
-    setGranularity: contextSetGranularity,
-    setCustomDateRange: contextSetCustomDateRange,
-    compareEnabled: contextCompareEnabled,
-    setCompareEnabled: contextSetCompareEnabled,
-    startDate: resolvedContextStartDate,
-    endDate: resolvedContextEndDate,
+    range,
+    setRange,
+    granularity,
+    setGranularity,
+    setCustomDateRange,
+    compareEnabled,
+    setCompareEnabled,
+    startDate,
+    endDate,
   } = useTimeRangeContext();
 
   const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false);
   const [isEndDatePopoverOpen, setIsEndDatePopoverOpen] = useState(false);
 
-  const [tempRange, setTempRange] = useState<TimeRangeValue>(contextRange);
-  const [tempGranularity, setTempGranularity] = useState<GranularityRangeValues>(contextGranularity);
+  const [tempRange, setTempRange] = useState<TimeRangeValue>(range);
+  const [tempGranularity, setTempGranularity] = useState<GranularityRangeValues>(granularity);
   
-  const [tempCustomStart, setTempCustomStart] = useState<Date | undefined>(resolvedContextStartDate);
-  const [tempCustomEnd, setTempCustomEnd] = useState<Date | undefined>(resolvedContextEndDate);
-  const [tempCompare, setTempCompare] = useState<boolean>(contextCompareEnabled);
+  const [tempCustomStart, setTempCustomStart] = useState<Date | undefined>(startDate);
+  const [tempCustomEnd, setTempCustomEnd] = useState<Date | undefined>(endDate);
+  const [tempCompare, setTempCompare] = useState<boolean>(compareEnabled);
 
   useEffect(() => {
-    setTempRange(contextRange);
-    setTempGranularity(contextGranularity);
-    setTempCustomStart(resolvedContextStartDate);
-    setTempCustomEnd(resolvedContextEndDate);
-    setTempCompare(contextCompareEnabled);
-  }, [contextRange, contextGranularity, resolvedContextStartDate, resolvedContextEndDate, contextCompareEnabled]);
+    setTempRange(range);
+    setTempGranularity(granularity);
+    setTempCustomStart(startDate);
+    setTempCustomEnd(endDate);
+    setTempCompare(compareEnabled);
+  }, [range, granularity, startDate, endDate, compareEnabled]);
 
   const handleApply = () => {
-    contextSetGranularity(tempGranularity);
-    contextSetCompareEnabled(tempCompare);
+    setGranularity(tempGranularity);
+    setCompareEnabled(tempCompare);
     if (tempRange === 'custom' && tempCustomStart && tempCustomEnd) {
-      contextSetCustomDateRange(tempCustomStart, tempCustomEnd);
+      setCustomDateRange(tempCustomStart, tempCustomEnd);
     } else if (tempRange !== 'custom') {
-      contextSetRange(tempRange);
+      setRange(tempRange);
     }
   };
 
@@ -78,13 +78,10 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   };
 
   const displayRangeLabel = () => {
-    if (contextRange === 'custom') {
-      if (resolvedContextStartDate && resolvedContextEndDate) {
-        return `${format(resolvedContextStartDate, 'P')} - ${format(resolvedContextEndDate, 'P')}`;
-      }
-      return 'Custom Range';
+    if (range === 'custom') {
+      return `${format(startDate, 'P')} - ${format(endDate, 'P')}`;
     }
-    const preset = TIME_RANGE_PRESETS.find(p => p.value === contextRange);
+    const preset = TIME_RANGE_PRESETS.find(p => p.value === range);
     return preset ? preset.label : 'Date Range';
   };
 
@@ -94,7 +91,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
         <Button
           variant="outline"
           role="combobox"
-          className={cn("min-w-[200px] justify-between shadow-sm", className, resolvedContextStartDate && "text-muted-foreground")}
+          className={cn("min-w-[200px] justify-between shadow-sm", className)}
         >
           <div className="flex items-center gap-2">
             <CalendarIcon className="w-4 h-4" />

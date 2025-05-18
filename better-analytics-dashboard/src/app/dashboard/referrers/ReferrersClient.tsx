@@ -33,7 +33,6 @@ export default function ReferrersClient() {
 
   useEffect(() => {
     async function loadData() {
-      if (!startDate || !endDate) return;
       setLoading(true);
       try {
         const [distributionResult, trendBySourceResult, summaryResult, tableResult] = await Promise.all([
