@@ -1,11 +1,9 @@
 'use client';
 
-import { useMemo } from "react";
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
-import { getDateRangeForTimePresets } from "@/utils/timeRanges";
 import SummaryCard from "@/components/SummaryCard";
 import { fetchPageDetailAction } from "@/app/actions/pages";
 import { PageAnalytics } from "@/entities/pages";

@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import LeafletMap from '@/components/LeafletMap';
 import TimeRangeSelector from "@/components/TimeRangeSelector";
-import { getDateRangeForTimePresets } from "@/utils/timeRanges";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { getWorldMapData } from '@/app/actions/geography';
 import { GeoVisitor } from '@/entities/geography';

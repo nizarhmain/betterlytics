@@ -1,6 +1,6 @@
-import { TimeRangeValue, getDateRangeForTimePresets, TIME_RANGE_PRESETS } from "@/utils/timeRanges";
+import { getDateRangeForTimePresets } from "@/utils/timeRanges";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
-import React, { Dispatch, SetStateAction, useCallback, useMemo } from "react";
+import React, { Dispatch, SetStateAction, useCallback } from "react";
 import { startOfDay, endOfDay } from 'date-fns';
 
 type TimeRangeContextProps = {
