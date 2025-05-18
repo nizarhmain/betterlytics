@@ -1,22 +1,21 @@
 'use client';
 
-import { useMemo, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
+import TimeRangeSelector from "@/components/TimeRangeSelector";
 import SummaryCard from "@/components/SummaryCard";
 import { fetchPageDetailAction } from "@/app/actions/pages";
 import { PageAnalytics } from "@/entities/pages";
 import { formatDuration } from "@/utils/dateFormatters";
+import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 
 interface PageDetailClientProps {
   path: string;
 }
 
 export default function PageDetailClient({ path }: PageDetailClientProps) {
-  const [range, setRange] = useState<TimeRangeValue>("7d");
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const { startDate, endDate } = useTimeRangeContext();
 
   const { data: pageDetail, isLoading } = useQuery<PageAnalytics | null>({
     queryKey: ['pageDetail', 'default-site', path, startDate, endDate],
@@ -35,17 +34,7 @@ export default function PageDetailClient({ path }: PageDetailClientProps) {
           <h1 className="text-2xl font-bold text-gray-900">Page Details</h1>
         </div>
         
-        <div className="relative inline-block text-left">
-          <select
-            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={range}
-            onChange={e => setRange(e.target.value as TimeRangeValue)}
-          >
-            {TIME_RANGE_PRESETS.map(r => (
-              <option key={r.value} value={r.value}>{r.label}</option>
-            ))}
-          </select>
-        </div>
+        <TimeRangeSelector />
       </div>
 
       <h2 className="text-xl font-semibold mb-6 ml-1 break-all">{displayTitle}</h2>

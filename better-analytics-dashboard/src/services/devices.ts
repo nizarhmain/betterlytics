@@ -5,11 +5,11 @@ import { toDateTimeString } from '@/utils/dateFormatters';
 import { DeviceType, BrowserInfo, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema, OperatingSystemInfo } from '@/entities/devices';
 import { getDeviceLabel } from '@/constants/deviceTypes';
 
-export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: string, endDate: string): Promise<DeviceType[]> {
+export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: Date, endDate: Date): Promise<DeviceType[]> {
   return getDeviceTypeBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
 }
 
-export async function getDeviceSummaryForSite(siteId: string, startDate: string, endDate: string): Promise<DeviceSummary> {
+export async function getDeviceSummaryForSite(siteId: string, startDate: Date, endDate: Date): Promise<DeviceSummary> {
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);
 
@@ -36,7 +36,7 @@ export async function getDeviceSummaryForSite(siteId: string, startDate: string,
   return DeviceSummarySchema.parse(summary);
 }
 
-export async function getBrowserBreakdownForSite(siteId: string, startDate: string, endDate: string): Promise<BrowserStats[]> {
+export async function getBrowserBreakdownForSite(siteId: string, startDate: Date, endDate: Date): Promise<BrowserStats[]> {
   const browserData = await getBrowserBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
   
   // Calculate total visitors for percentage calculation
