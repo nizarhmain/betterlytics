@@ -17,13 +17,24 @@ import {
   RawCampaignLandingPagePerformanceArraySchema
 } from "@/entities/campaign";
 
+const UTM_DIMENSION_ALIASES = {
+  'utm_campaign': 'utm_campaign_name',
+  'utm_source': 'source',
+  'utm_medium': 'medium',
+  'utm_content': 'content',
+  'utm_term': 'term',
+} as const;
+
+type ValidUTMDimension = keyof typeof UTM_DIMENSION_ALIASES;
+
 async function getCampaignBreakdownByUTMDimension(
   siteId: string,
   startDate: DateTimeString,
   endDate: DateTimeString,
-  utmDimension: 'utm_campaign' | 'utm_source' | 'utm_medium' | 'utm_content' | 'utm_term',
-  dimensionAlias: string
+  utmDimension: ValidUTMDimension
 ): Promise<unknown[]> {
+  const dimensionAlias = UTM_DIMENSION_ALIASES[utmDimension];
+
   const query = `
     SELECT
       s.${utmDimension} AS ${dimensionAlias},
@@ -71,8 +82,7 @@ export async function getCampaignPerformanceData(
     siteId,
     startDate,
     endDate,
-    'utm_campaign',
-    'utm_campaign_name'
+    'utm_campaign'
   );
   return RawCampaignDataArraySchema.parse(rawData);
 }
@@ -86,8 +96,7 @@ export async function getCampaignSourceBreakdownData(
     siteId,
     startDate,
     endDate,
-    'utm_source',
-    'source'
+    'utm_source'
   );
   return RawCampaignSourceBreakdownArraySchema.parse(rawData);
 }
@@ -101,8 +110,7 @@ export async function getCampaignMediumBreakdownData(
     siteId,
     startDate,
     endDate,
-    'utm_medium',
-    'medium'
+    'utm_medium'
   );
   return RawCampaignMediumBreakdownArraySchema.parse(rawData);
 }
@@ -116,8 +124,7 @@ export async function getCampaignContentBreakdownData(
     siteId,
     startDate,
     endDate,
-    'utm_content',
-    'content'
+    'utm_content'
   );
   return RawCampaignContentBreakdownArraySchema.parse(rawData);
 }
@@ -131,8 +138,7 @@ export async function getCampaignTermBreakdownData(
     siteId,
     startDate,
     endDate,
-    'utm_term',
-    'term'
+    'utm_term'
   );
   return RawCampaignTermBreakdownArraySchema.parse(rawData);
 }
