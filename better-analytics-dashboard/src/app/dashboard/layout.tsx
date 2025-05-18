@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner"
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
 import { DashboardProvider } from "./DashboardProvider";
@@ -11,6 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Topbar />
           <div className="flex-1">{children}</div>
         </main>
+        <Toaster />
       </div>
     </DashboardProvider>
   );
