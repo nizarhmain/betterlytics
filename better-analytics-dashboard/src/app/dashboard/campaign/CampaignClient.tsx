@@ -22,14 +22,11 @@ import {
 } from "@/entities/campaign";
 import CampaignPerformanceTable from "@/components/analytics/CampaignPerformanceTable";
 import CampaignVisitorTrendChart from "@/components/analytics/CampaignVisitorTrendChart";
-import CampaignSourceEngagementTable from "@/components/analytics/CampaignSourceEngagementTable";
-import CampaignMediumEngagementTable from "@/components/analytics/CampaignMediumEngagementTable";
-import CampaignContentEngagementTable from "@/components/analytics/CampaignContentEngagementTable";
-import CampaignTermEngagementTable from "@/components/analytics/CampaignTermEngagementTable";
 import CampaignLandingPagePerformanceTable from "@/components/analytics/CampaignLandingPagePerformanceTable";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import CampaignPieChart, { CampaignDataKey } from "@/components/analytics/CampaignPieChart";
+import CampaignEngagementTable from "@/components/analytics/CampaignEngagementTable";
 
 type TabValue = "overview" | "utmBreakdowns" | "landingPages";
 
@@ -120,17 +117,16 @@ export default function CampaignClient() {
 
         {activeTab === "utmBreakdowns" && (
           <div className="space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-1">UTM Source Breakdown</h2>
-            <p className="text-sm text-gray-500 mb-4">Visitors and engagement by UTM source</p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
               <div className="lg:col-span-2">
-                <CampaignSourceEngagementTable
+                <CampaignEngagementTable
                   data={sourceBreakdown}
                   isLoading={sourceBreakdownLoading}
+                  title="Source Engagement Metrics"
+                  subtitle="Engagement details for each campaign source"
+                  dataKey="source"
                 />
               </div>
-
               <CampaignPieChart
                 data={sourceBreakdown}
                 isLoading={sourceBreakdownLoading}
@@ -141,13 +137,14 @@ export default function CampaignClient() {
               />
             </div>
             <hr className="my-6 border-gray-200"/>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">UTM Medium Breakdown</h2>
-            <p className="text-sm text-gray-500 mb-4">Visitors and engagement by UTM medium</p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <CampaignMediumEngagementTable
+                <CampaignEngagementTable
                   data={mediumBreakdown}
                   isLoading={mediumBreakdownLoading}
+                  title="Medium Engagement Metrics"
+                  subtitle="Engagement details for each campaign medium"
+                  dataKey="medium"
                 />
               </div>
               <CampaignPieChart
@@ -160,13 +157,14 @@ export default function CampaignClient() {
               />
             </div>
             <hr className="my-6 border-gray-200"/>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">UTM Content Breakdown</h2>
-            <p className="text-sm text-gray-500 mb-4">Visitors and engagement by UTM content</p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <CampaignContentEngagementTable
+                <CampaignEngagementTable
                   data={contentBreakdown}
                   isLoading={contentBreakdownLoading}
+                  title="Content Engagement Metrics"
+                  subtitle="Engagement details for each campaign content"
+                  dataKey="content"
                 />
               </div>
               <CampaignPieChart
@@ -179,13 +177,14 @@ export default function CampaignClient() {
               />
             </div>
             <hr className="my-6 border-gray-200"/>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">UTM Term Breakdown</h2>
-            <p className="text-sm text-gray-500 mb-4">Visitors and engagement by UTM term</p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <CampaignTermEngagementTable
+                <CampaignEngagementTable
                   data={termBreakdown}
                   isLoading={termBreakdownLoading}
+                  title="Term/Keyword Engagement Metrics"
+                  subtitle="Engagement details for each campaign term/keyword"
+                  dataKey="term"
                 />
               </div>
               <CampaignPieChart
@@ -211,4 +210,4 @@ export default function CampaignClient() {
       </div>
     </div>
   );
-} 
+}
