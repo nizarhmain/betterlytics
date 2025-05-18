@@ -6,12 +6,12 @@ import { checkAuth } from "@/lib/auth-actions";
 import { TotalPageViewsRow } from "@/entities/pageviews";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 
-export async function fetchPageAnalyticsAction(siteId: string, startDate: string, endDate: string): Promise<PageAnalytics[]> {
+export async function fetchPageAnalyticsAction(siteId: string, startDate: Date, endDate: Date): Promise<PageAnalytics[]> {
   await checkAuth();
   return getPageAnalytics(siteId, startDate, endDate);
 }
 
-export async function fetchPageDetailAction(siteId: string, path: string, startDate: string, endDate: string): Promise<PageAnalytics | null> {
+export async function fetchPageDetailAction(siteId: string, path: string, startDate: Date, endDate: Date): Promise<PageAnalytics | null> {
   await checkAuth();
   return getPageDetail(siteId, path, startDate, endDate);
 }

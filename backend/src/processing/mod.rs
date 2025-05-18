@@ -35,7 +35,6 @@ pub struct ProcessedEvent {
     pub visitor_fingerprint: String,
     pub timestamp: chrono::DateTime<chrono::Utc>,
     pub url: String,
-    pub referrer: Option<String>,
     /// Parsed referrer information
     pub referrer_info: ReferrerInfo,
     /// Parsed campaign parameters
@@ -87,7 +86,6 @@ impl EventProcessor {
             visitor_fingerprint: String::new(),
             timestamp: timestamp.clone(),
             url: url_path,
-            referrer: processed_referrer,
             referrer_info: ReferrerInfo::default(),
             user_agent: user_agent.clone(),
             campaign_info: CampaignInfo::default(),

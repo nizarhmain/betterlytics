@@ -10,8 +10,8 @@ import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragment
 
 interface PageviewsChartProps {
   siteId: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   granularity: GranularityRangeValues;
 }
 

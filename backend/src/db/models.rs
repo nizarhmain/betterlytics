@@ -58,7 +58,7 @@ impl EventRow {
             date: timestamp.date_naive(),
             browser: event.browser.unwrap_or_else(|| "unknown".to_string()),
             os: event.os.unwrap_or_else(|| "unknown".to_string()),
-            referrer_source: event.referrer_info.source.as_str().to_string(),
+            referrer_source: event.referrer_info.source_type.as_str().to_string(),
             referrer_source_name: event.referrer_info.source_name.unwrap_or_default(),
             referrer_search_term: event.referrer_info.search_term.unwrap_or_default(),
             referrer_url: event.referrer_info.url.unwrap_or_default(),
