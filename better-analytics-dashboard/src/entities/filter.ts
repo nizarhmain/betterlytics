@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const FILTER_KINDS = [
+const FILTER_COLUMNS = [
   "url",
   "device_type",
   "country_code",
@@ -25,7 +25,7 @@ const FILTER_OPERATORS = [
 ] as const;
 
 export const QueryFilterSchema = z.object({
-  kind: z.enum(FILTER_KINDS),
+  column: z.enum(FILTER_COLUMNS),
   operator: z.enum(FILTER_OPERATORS),
   value: z.string()
 });
