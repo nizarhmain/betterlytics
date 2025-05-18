@@ -1,5 +1,4 @@
 import { DateString, DateTimeString } from '@/types/dates';
-import { parseISO, format } from 'date-fns';
 
 // Formats date strings to Clickhouse date column format
 export function toDateString(date: string | Date): DateString {

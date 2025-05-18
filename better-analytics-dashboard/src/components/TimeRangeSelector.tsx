@@ -1,7 +1,7 @@
 'use client';
 
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { TIME_RANGE_PRESETS, TimeRangeValue, getRangeForValue } from "@/utils/timeRanges";
+import { TIME_RANGE_PRESETS, TimeRangeValue, getDateRangeForTimePresets } from "@/utils/timeRanges";
 import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
 import React, { useState, useMemo, useEffect } from "react";
 import { format, addDays, differenceInCalendarDays } from 'date-fns';
@@ -34,7 +34,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
     }
     for (const preset of TIME_RANGE_PRESETS) {
       if (preset.value === 'custom') continue;
-      const { startDate: presetStart, endDate: presetEnd } = getRangeForValue(preset.value);
+      const { startDate: presetStart, endDate: presetEnd } = getDateRangeForTimePresets(preset.value);
       if (presetStart && presetEnd &&
           startDate.getTime() === presetStart.getTime() &&
           endDate.getTime() === presetEnd.getTime()) {
@@ -63,7 +63,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
     if (!isPopoverOpen) {
       setTempRange(currentActivePreset);
       if (currentActivePreset !== 'custom') {
-        const { startDate: presetStart, endDate: presetEnd } = getRangeForValue(currentActivePreset);
+        const { startDate: presetStart, endDate: presetEnd } = getDateRangeForTimePresets(currentActivePreset);
         setTempCustomStart(presetStart);
         setTempCustomEnd(presetEnd);
       } else {
@@ -78,7 +78,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
       return differenceInCalendarDays(tempCustomEnd, tempCustomStart) + 1;
     }
     if (tempRange !== 'custom') {
-      const { startDate: presetStart, endDate: presetEnd } = getRangeForValue(tempRange);
+      const { startDate: presetStart, endDate: presetEnd } = getDateRangeForTimePresets(tempRange);
       if (presetStart && presetEnd) {
         return differenceInCalendarDays(presetEnd, presetStart) + 1;
       }
@@ -111,7 +111,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
     if (tempRange === 'custom' && tempCustomStart && tempCustomEnd) {
       setPeriod(tempCustomStart, tempCustomEnd);
     } else if (tempRange !== 'custom') {
-      const { startDate: presetStart, endDate: presetEnd } = getRangeForValue(tempRange);
+      const { startDate: presetStart, endDate: presetEnd } = getDateRangeForTimePresets(tempRange);
       if (presetStart && presetEnd) {
         setPeriod(presetStart, presetEnd);
       }
@@ -125,7 +125,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   const handleQuickSelect = (value: TimeRangeValue) => {
     setTempRange(value);
     if (value !== 'custom') {
-        const { startDate: presetStartDate, endDate: presetEndDate } = getRangeForValue(value);
+        const { startDate: presetStartDate, endDate: presetEndDate } = getDateRangeForTimePresets(value);
         setTempCustomStart(presetStartDate);
         setTempCustomEnd(presetEndDate);
     }

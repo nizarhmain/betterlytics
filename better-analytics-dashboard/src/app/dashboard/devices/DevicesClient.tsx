@@ -1,20 +1,17 @@
 'use client';
 
-import { useMemo } from "react";
 import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
 import DeviceTypeChart from "@/components/analytics/DeviceTypeChart";
 import BrowserTable from "@/components/analytics/BrowserTable";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
-import { getRangeForValue } from "@/utils/timeRanges";
 import { fetchDeviceTypeBreakdownAction, fetchDeviceSummaryAction } from "@/app/actions/devices";
 import { fetchBrowserBreakdownAction } from "@/app/actions/devices";
 import { DeviceSummary } from "@/entities/devices";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 
 export default function DevicesClient() {
-  const { range } = useTimeRangeContext();
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const { startDate, endDate } = useTimeRangeContext();
 
   // Fetch device summary
   const { data: deviceSummary, isLoading: summaryLoading } = useQuery<DeviceSummary>({

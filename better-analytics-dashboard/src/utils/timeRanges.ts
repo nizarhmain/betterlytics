@@ -48,7 +48,7 @@ export const TIME_RANGE_PRESETS: TimeRangePreset[] = [
   },
 ];
 
-export function getRangeForValue(value: TimeRangeValue): { startDate: Date; endDate: Date } {
+export function getDateRangeForTimePresets(value: TimeRangeValue): { startDate: Date; endDate: Date } {
   const preset = TIME_RANGE_PRESETS.find(p => p.value === value);
   if (!preset || value === 'custom') {
     return TIME_RANGE_PRESETS.find(p => p.value === '7d')!.getRange();

@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
-import { getRangeForValue } from "@/utils/timeRanges";
+import { getDateRangeForTimePresets } from "@/utils/timeRanges";
 import SummaryCard from "@/components/SummaryCard";
 import { fetchPageDetailAction } from "@/app/actions/pages";
 import { PageAnalytics } from "@/entities/pages";
@@ -17,8 +17,7 @@ interface PageDetailClientProps {
 }
 
 export default function PageDetailClient({ path }: PageDetailClientProps) {
-  const { range } = useTimeRangeContext();
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const { startDate, endDate } = useTimeRangeContext();
 
   const { data: pageDetail, isLoading } = useQuery<PageAnalytics | null>({
     queryKey: ['pageDetail', 'default-site', path, startDate, endDate],

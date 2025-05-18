@@ -1,4 +1,4 @@
-import { TimeRangeValue, getRangeForValue, TIME_RANGE_PRESETS } from "@/utils/timeRanges";
+import { TimeRangeValue, getDateRangeForTimePresets, TIME_RANGE_PRESETS } from "@/utils/timeRanges";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import React, { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { startOfDay, endOfDay } from 'date-fns';
@@ -23,7 +23,7 @@ type TimeRangeContextProviderProps = {
 }
 
 export function TimeRangeContextProvider({ children }: TimeRangeContextProviderProps) {
-  const initialRangeDetails = getRangeForValue("7d");
+  const initialRangeDetails = getDateRangeForTimePresets("7d");
   const [startDate, setStartDate] = React.useState<Date>(initialRangeDetails.startDate);
   const [endDate, setEndDate] = React.useState<Date>(initialRangeDetails.endDate);
 

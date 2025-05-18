@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import LeafletMap from '@/components/LeafletMap';
 import TimeRangeSelector from "@/components/TimeRangeSelector";
-import { getRangeForValue } from "@/utils/timeRanges";
+import { getDateRangeForTimePresets } from "@/utils/timeRanges";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { getWorldMapData } from '@/app/actions/geography';
 import { GeoVisitor } from '@/entities/geography';
@@ -15,8 +15,7 @@ export default function GeographyClient() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { range } = useTimeRangeContext();
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const { startDate, endDate } = useTimeRangeContext();
   
   const siteId = 'default-site';
 
