@@ -11,15 +11,15 @@ import { safeSql, SQL } from "./safe-sql";
 function getFilterQuery(queryFilters: QueryFilter[]) {
   const filters = QueryFilterSchema.array().parse(queryFilters);
 
+  // No-op in case of empty filters
+  if (filters.length === 0) {
+    return safeSql` 1=1 `;
+  }
+
   const expressions = filters
     .map(({ column, operator, value }, index) => {
       return safeSql`${SQL._Unsafe(column)} ${SQL._Unsafe(operator)} ${SQL.String({ [`query_filter_${index}`]: value })}`
-    });
-  
-  // No-op in case of empty filters
-  if (expressions.length === 0) {
-    return safeSql` 1=1 `;
-  }
+    });  
 
   return safeSql` ${SQL.AND(expressions)} `;
 }
