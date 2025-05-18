@@ -1,8 +1,7 @@
 'use client';
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useQuery } from '@tanstack/react-query';
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
 import {
   fetchCampaignPerformanceAction,
   fetchCampaignSourceBreakdownAction,
@@ -32,12 +31,13 @@ import CampaignContentEngagementTable from "@/components/analytics/CampaignConte
 import CampaignTermChart from "@/components/analytics/CampaignTermChart";
 import CampaignTermEngagementTable from "@/components/analytics/CampaignTermEngagementTable";
 import CampaignLandingPagePerformanceTable from "@/components/analytics/CampaignLandingPagePerformanceTable";
+import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import TimeRangeSelector from "@/components/TimeRangeSelector";
 
 type TabValue = "overview" | "utmBreakdowns" | "landingPages";
 
 export default function CampaignClient() {
-  const [range, setRange] = useState<TimeRangeValue>("7d");
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const { startDate, endDate } = useTimeRangeContext();
   const [activeTab, setActiveTab] = useState<TabValue>("overview");
 
   const { data: campaignPerformance = [], isLoading: campaignPerformanceLoading } = useQuery<CampaignPerformance[]>({
@@ -96,17 +96,7 @@ export default function CampaignClient() {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Campaigns</h1>
           <p className="text-sm text-gray-500">Campaign performance analytics and insights</p>
         </div>
-        <div className="relative inline-block text-left">
-          <select
-            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={range}
-            onChange={e => setRange(e.target.value as TimeRangeValue)}
-          >
-            {TIME_RANGE_PRESETS.map(r => (
-              <option key={r.value} value={r.value}>{r.label}</option>
-            ))}
-          </select>
-        </div>
+        <TimeRangeSelector />
       </div>
 
       <div className="border-b border-gray-200">

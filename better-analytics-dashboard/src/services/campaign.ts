@@ -63,8 +63,8 @@ function calculateCommonCampaignMetrics(rawData: RawMetricsData): CalculatedMetr
 
 export async function fetchCampaignPerformance(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignPerformance[]> {
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);
@@ -85,8 +85,8 @@ export async function fetchCampaignPerformance(
 
 export async function fetchCampaignSourceBreakdown(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignSourceBreakdownItem[]> {
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);
@@ -107,8 +107,8 @@ export async function fetchCampaignSourceBreakdown(
 
 export async function fetchCampaignMediumBreakdown(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignMediumBreakdownItem[]> {
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);
@@ -129,8 +129,8 @@ export async function fetchCampaignMediumBreakdown(
 
 export async function fetchCampaignContentBreakdown(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignContentBreakdownItem[]> {
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);
@@ -151,8 +151,8 @@ export async function fetchCampaignContentBreakdown(
 
 export async function fetchCampaignTermBreakdown(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignTermBreakdownItem[]> {
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);
@@ -173,8 +173,8 @@ export async function fetchCampaignTermBreakdown(
 
 export async function fetchCampaignLandingPagePerformance(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignLandingPagePerformanceItem[]> {
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);
@@ -197,8 +197,8 @@ export async function fetchCampaignLandingPagePerformance(
 
 export async function fetchCampaignVisitorTrend(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<PivotedCampaignVisitorTrendItem[]> {
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);

@@ -22,8 +22,8 @@ import { checkAuth } from "@/lib/auth-actions";
 
 export async function fetchCampaignPerformanceAction(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignPerformance[]> {
   await checkAuth();
 
@@ -42,8 +42,8 @@ export async function fetchCampaignPerformanceAction(
 
 export async function fetchCampaignSourceBreakdownAction(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignSourceBreakdownItem[]> {
   await checkAuth();
 
@@ -62,8 +62,8 @@ export async function fetchCampaignSourceBreakdownAction(
 
 export async function fetchCampaignMediumBreakdownAction(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignMediumBreakdownItem[]> {
   await checkAuth();
 
@@ -82,8 +82,8 @@ export async function fetchCampaignMediumBreakdownAction(
 
 export async function fetchCampaignContentBreakdownAction(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignContentBreakdownItem[]> {
   await checkAuth();
 
@@ -102,8 +102,8 @@ export async function fetchCampaignContentBreakdownAction(
 
 export async function fetchCampaignTermBreakdownAction(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignTermBreakdownItem[]> {
   await checkAuth();
 
@@ -122,8 +122,8 @@ export async function fetchCampaignTermBreakdownAction(
 
 export async function fetchCampaignLandingPagePerformanceAction(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<CampaignLandingPagePerformanceItem[]> {
   await checkAuth();
 
@@ -142,8 +142,8 @@ export async function fetchCampaignLandingPagePerformanceAction(
 
 export async function fetchCampaignVisitorTrendAction(
   siteId: string,
-  startDate: string,
-  endDate: string
+  startDate: Date,
+  endDate: Date
 ): Promise<PivotedCampaignVisitorTrendItem[]> {
   await checkAuth();
   try {
