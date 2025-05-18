@@ -20,8 +20,8 @@ const FILTER_KINDS = [
 ] as const;
 
 const FILTER_OPERATORS = [
-  "is",
-  "is-not"
+  "=",
+  "!="
 ] as const;
 
 export const QueryFilterSchema = z.object({
