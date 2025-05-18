@@ -21,18 +21,15 @@ import {
   CampaignLandingPagePerformanceItem,
 } from "@/entities/campaign";
 import CampaignPerformanceTable from "@/components/analytics/CampaignPerformanceTable";
-import CampaignSourceChart from "@/components/analytics/CampaignSourceChart";
 import CampaignVisitorTrendChart from "@/components/analytics/CampaignVisitorTrendChart";
-import CampaignMediumChart from "@/components/analytics/CampaignMediumChart";
 import CampaignSourceEngagementTable from "@/components/analytics/CampaignSourceEngagementTable";
 import CampaignMediumEngagementTable from "@/components/analytics/CampaignMediumEngagementTable";
-import CampaignContentChart from "@/components/analytics/CampaignContentChart";
 import CampaignContentEngagementTable from "@/components/analytics/CampaignContentEngagementTable";
-import CampaignTermChart from "@/components/analytics/CampaignTermChart";
 import CampaignTermEngagementTable from "@/components/analytics/CampaignTermEngagementTable";
 import CampaignLandingPagePerformanceTable from "@/components/analytics/CampaignLandingPagePerformanceTable";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
+import CampaignPieChart, { CampaignDataKey } from "@/components/analytics/CampaignPieChart";
 
 type TabValue = "overview" | "utmBreakdowns" | "landingPages";
 
@@ -134,9 +131,13 @@ export default function CampaignClient() {
                 />
               </div>
 
-              <CampaignSourceChart
+              <CampaignPieChart
                 data={sourceBreakdown}
                 isLoading={sourceBreakdownLoading}
+                dataKey={CampaignDataKey.SOURCE}
+                title="Campaign Traffic by Source"
+                subtitle="Distribution of campaign visitors by source"
+                emptyStateMessage="No source breakdown data available for campaigns."
               />
             </div>
             <hr className="my-6 border-gray-200"/>
@@ -149,9 +150,13 @@ export default function CampaignClient() {
                   isLoading={mediumBreakdownLoading}
                 />
               </div>
-              <CampaignMediumChart
+              <CampaignPieChart
                 data={mediumBreakdown}
                 isLoading={mediumBreakdownLoading}
+                dataKey={CampaignDataKey.MEDIUM}
+                title="Campaign Traffic by Medium"
+                subtitle="Distribution of campaign visitors by medium"
+                emptyStateMessage="No medium breakdown data available for campaigns."
               />
             </div>
             <hr className="my-6 border-gray-200"/>
@@ -164,9 +169,13 @@ export default function CampaignClient() {
                   isLoading={contentBreakdownLoading}
                 />
               </div>
-              <CampaignContentChart
+              <CampaignPieChart
                 data={contentBreakdown}
                 isLoading={contentBreakdownLoading}
+                dataKey={CampaignDataKey.CONTENT}
+                title="Campaign Traffic by Content"
+                subtitle="Distribution of campaign visitors by content"
+                emptyStateMessage="No content breakdown data available for campaigns."
               />
             </div>
             <hr className="my-6 border-gray-200"/>
@@ -179,9 +188,13 @@ export default function CampaignClient() {
                   isLoading={termBreakdownLoading}
                 />
               </div>
-              <CampaignTermChart
+              <CampaignPieChart
                 data={termBreakdown}
                 isLoading={termBreakdownLoading}
+                dataKey={CampaignDataKey.TERM}
+                title="Campaign Traffic by Term/Keyword"
+                subtitle="Distribution of campaign visitors by term/keyword"
+                emptyStateMessage="No term breakdown data available for campaigns."
               />
             </div>
           </div>

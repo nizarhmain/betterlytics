@@ -1,20 +1,44 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { CampaignSourceBreakdownItem } from '@/entities/campaign';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { getCampaignSourceColor } from '@/utils/campaignColors';
 
-interface CampaignSourceChartProps {
-  data: CampaignSourceBreakdownItem[];
-  isLoading: boolean;
+export const CampaignDataKey = {
+  SOURCE: 'source',
+  MEDIUM: 'medium',
+  TERM: 'term',
+  CONTENT: 'content',
+} as const;
+
+type CampaignDataKeyValue = typeof CampaignDataKey[keyof typeof CampaignDataKey];
+
+interface CampaignBreakdownItem {
+  visitors: number;
+  [key: string]: unknown; // source, medium, term, content
 }
 
-export default function CampaignSourceChart({ data, isLoading }: CampaignSourceChartProps) {
+interface CampaignPieChartProps {
+  data: CampaignBreakdownItem[];
+  isLoading: boolean;
+  dataKey: CampaignDataKeyValue;
+  title: string;
+  subtitle: string;
+  emptyStateMessage: string;
+}
+
+export default function CampaignPieChart({
+  data,
+  isLoading,
+  dataKey,
+  title,
+  subtitle,
+  emptyStateMessage,
+}: CampaignPieChartProps) {
   if (isLoading) {
     return (
-      <div>
-        <p>Loading chart data...</p>
+      <div className="bg-white rounded-lg shadow p-6 min-h-[300px] flex items-center justify-center">
+        <p className="text-gray-500">Loading chart data...</p>
       </div>
     );
   }
@@ -23,25 +47,25 @@ export default function CampaignSourceChart({ data, isLoading }: CampaignSourceC
     if (!data || data.length === 0) return [];
     const totalVisitors = data.reduce((sum, item) => sum + item.visitors, 0);
     return data.map((item) => ({
-      name: item.source,
+      name: item[dataKey],
       value: item.visitors,
-      color: getCampaignSourceColor(item.source),
+      color: getCampaignSourceColor(item[dataKey] as string),
       percent: totalVisitors > 0 ? Math.round((item.visitors / totalVisitors) * 100) : 0,
     }));
-  }, [data]);
+  }, [data, dataKey]);
 
   if (chartData.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-6 min-h-[300px] flex items-center justify-center">
-        <p className="text-gray-500">No source breakdown data available for campaigns.</p>
+        <p className="text-gray-500">{emptyStateMessage}</p>
       </div>
     );
   }
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-bold text-gray-900 mb-1">Campaign Traffic by Source</h2>
-      <p className="text-sm text-gray-500 mb-4">Distribution of campaign visitors by source</p>
+      <h2 className="text-lg font-bold text-gray-900 mb-1">{title}</h2>
+      <p className="text-sm text-gray-500 mb-4">{subtitle}</p>
       <div className="h-72 md:h-80 flex flex-col items-center mt-4">
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
@@ -56,7 +80,7 @@ export default function CampaignSourceChart({ data, isLoading }: CampaignSourceC
               nameKey="name"
             >
               {chartData.map((entry) => (
-                <Cell key={entry.name} fill={entry.color} />
+                <Cell key={entry.name as string} fill={entry.color as string} />
               ))}
             </Pie>
             <Tooltip formatter={(value: number, name: string, props: any) => [`${value.toLocaleString()} visitors (${props.payload.percent}%)`, name]} />
@@ -66,12 +90,12 @@ export default function CampaignSourceChart({ data, isLoading }: CampaignSourceC
         {/* Legend */}
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 text-sm">
           {chartData.map((entry) => (
-            <div key={entry.name} className="flex items-center">
+            <div key={entry.name as string} className="flex items-center">
               <span
                 className="inline-block w-3 h-3 rounded-full mr-1.5"
-                style={{ backgroundColor: entry.color }}
+                style={{ backgroundColor: entry.color as string }}
               ></span>
-              <span className="text-gray-600">{entry.name} ({entry.percent}%)</span>
+              <span className="text-gray-600">{entry.name as string} ({entry.percent}%)</span>
             </div>
           ))}
         </div>
