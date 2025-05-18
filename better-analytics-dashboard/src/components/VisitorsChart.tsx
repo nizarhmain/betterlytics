@@ -11,8 +11,8 @@ import { timeFormat } from 'd3-time-format';
 
 interface VisitorsChartProps {
   siteId: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   granularity: GranularityRangeValues;
 }
 

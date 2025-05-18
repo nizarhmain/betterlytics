@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import SummaryCard from "@/components/SummaryCard";
 import ReferrerDistributionChart from '@/components/charts/ReferrerDistributionChart';
 import ReferrerTrafficTrendChart from '@/components/charts/ReferrerTrafficTrendChart';
@@ -19,7 +19,6 @@ import {
   ReferrerTrafficBySourceRow 
 } from "@/entities/referrers";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { getRangeForValue } from "@/utils/timeRanges";
 import { formatPercentage } from "@/utils/formatters";
 
 export default function ReferrersClient() {
@@ -28,13 +27,13 @@ export default function ReferrersClient() {
   const [summaryData, setSummaryData] = useState<ReferrerSummary | undefined>(undefined);
   const [tableData, setTableData] = useState<ReferrerTableRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const { range, granularity } = useTimeRangeContext();
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
-
+  const { granularity, startDate, endDate } = useTimeRangeContext();
+  
   const siteId = 'default-site';
 
   useEffect(() => {
     async function loadData() {
+      if (!startDate || !endDate) return;
       setLoading(true);
       try {
         const [distributionResult, trendBySourceResult, summaryResult, tableResult] = await Promise.all([
@@ -56,7 +55,7 @@ export default function ReferrersClient() {
     }
     
     loadData();
-  }, [startDate, endDate, granularity]);
+  }, [startDate, endDate, granularity, siteId]);
 
   return (
     <div className="p-6 space-y-6">
@@ -67,9 +66,7 @@ export default function ReferrersClient() {
             <p className="text-sm text-gray-500">Analytics and insights for your website</p>
           </div>
           <div className="flex gap-4">
-            <TimeRangeSelector
-              showGranularity={true}
-            />
+            <TimeRangeSelector />
           </div>
         </div>
         

@@ -1,11 +1,9 @@
 'use client';
 
-import { useMemo } from "react";
 import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
 import PagesTable from "@/components/analytics/PagesTable";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
-import { getRangeForValue } from "@/utils/timeRanges";
 import { SummaryStats } from '@/entities/stats';
 import { fetchSummaryStatsAction } from "@/app/actions/overview";
 import { fetchPageAnalyticsAction } from "@/app/actions/pages";
@@ -13,8 +11,7 @@ import { PageAnalytics } from "@/entities/pages";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 
 export default function PagesClient() {
-  const { range } = useTimeRangeContext();
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const { startDate, endDate } = useTimeRangeContext();
 
   const { data: summary, isLoading: summaryLoading } = useQuery<SummaryStats>({
     queryKey: ['summaryStats', 'default-site', startDate, endDate],
