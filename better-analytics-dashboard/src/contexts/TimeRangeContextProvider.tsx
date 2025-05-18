@@ -15,6 +15,9 @@ type TimeRangeContextProps = {
   setCompareEnabled: Dispatch<SetStateAction<boolean>>;
   startDate: Date;
   endDate: Date;
+  compareStartDate?: Date;
+  compareEndDate?: Date;
+  setCompareDateRange: (startDate: Date, endDate: Date) => void;
 }
 
 const TimeRangeContext = React.createContext<TimeRangeContextProps>({} as TimeRangeContextProps);
@@ -29,6 +32,8 @@ export function TimeRangeContextProvider({ children }: TimeRangeContextProviderP
   const [customStartDate, setCustomStartDate] = React.useState<Date | undefined>(undefined);
   const [customEndDate, setCustomEndDate] = React.useState<Date | undefined>(undefined);
   const [compareEnabled, setCompareEnabled] = React.useState<boolean>(false);
+  const [compareStartDate, setCompareStartDate] = React.useState<Date | undefined>(undefined);
+  const [compareEndDate, setCompareEndDate] = React.useState<Date | undefined>(undefined);
 
   const handleSetRange = useCallback((value: TimeRangeValue) => {
     setRangeState(value);
@@ -42,6 +47,11 @@ export function TimeRangeContextProvider({ children }: TimeRangeContextProviderP
     setCustomStartDate(startOfDay(startDate));
     setCustomEndDate(endOfDay(endDate));
     setRangeState('custom');
+  }, []);
+
+  const handleSetCompareDateRange = useCallback((startDate: Date, endDate: Date) => {
+    setCompareStartDate(startOfDay(startDate));
+    setCompareEndDate(endOfDay(endDate));
   }, []);
 
   const { startDate, endDate } = useMemo(() => {
@@ -63,7 +73,10 @@ export function TimeRangeContextProvider({ children }: TimeRangeContextProviderP
       compareEnabled,
       setCompareEnabled,
       startDate,
-      endDate
+      endDate,
+      compareStartDate,
+      compareEndDate,
+      setCompareDateRange: handleSetCompareDateRange
     }}>
       {children}
     </TimeRangeContext.Provider>

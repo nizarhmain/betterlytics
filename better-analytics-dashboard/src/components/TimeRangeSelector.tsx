@@ -24,11 +24,16 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
     setCompareEnabled,
     startDate,
     endDate,
+    compareStartDate,
+    compareEndDate,
+    setCompareDateRange,
   } = useTimeRangeContext();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false);
   const [isEndDatePopoverOpen, setIsEndDatePopoverOpen] = useState(false);
+  const [isCompareStartDatePopoverOpen, setIsCompareStartDatePopoverOpen] = useState(false);
+  const [isCompareEndDatePopoverOpen, setIsCompareEndDatePopoverOpen] = useState(false);
 
   const [tempRange, setTempRange] = useState<TimeRangeValue>(range);
   const [tempGranularity, setTempGranularity] = useState<GranularityRangeValues>(granularity);
@@ -36,6 +41,8 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   const [tempCustomStart, setTempCustomStart] = useState<Date | undefined>(startDate);
   const [tempCustomEnd, setTempCustomEnd] = useState<Date | undefined>(endDate);
   const [tempCompare, setTempCompare] = useState<boolean>(compareEnabled);
+  const [tempCompareStartDate, setTempCompareStartDate] = useState<Date | undefined>(compareStartDate);
+  const [tempCompareEndDate, setTempCompareEndDate] = useState<Date | undefined>(compareEndDate);
 
   const handlePopoverOpenChange = (open: boolean) => {
     setIsPopoverOpen(open);
@@ -45,6 +52,8 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
       setTempCustomStart(startDate);
       setTempCustomEnd(endDate);
       setTempCompare(compareEnabled);
+      setTempCompareStartDate(compareStartDate);
+      setTempCompareEndDate(compareEndDate);
     }
   };
 
@@ -55,6 +64,9 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
       setCustomDateRange(tempCustomStart, tempCustomEnd);
     } else if (tempRange !== 'custom') {
       setRange(tempRange);
+    }
+    if (tempCompare && tempCompareStartDate && tempCompareEndDate) {
+      setCompareDateRange(tempCompareStartDate, tempCompareEndDate);
     }
     setIsPopoverOpen(false);
   };
@@ -80,6 +92,18 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
     setTempCustomEnd(date);
     setTempRange('custom'); 
     setIsEndDatePopoverOpen(false);
+  };
+
+  const handleCompareStartDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+    setTempCompareStartDate(date);
+    setIsCompareStartDatePopoverOpen(false);
+  };
+
+  const handleCompareEndDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+    setTempCompareEndDate(date);
+    setIsCompareEndDatePopoverOpen(false);
   };
 
   const displayRangeLabel = () => {
@@ -202,6 +226,64 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
           />
           <Label htmlFor="comparePeriodCheckbox" className="text-sm font-normal text-gray-700">Compare with previous period</Label>
         </div>
+
+        {tempCompare && (
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 mb-2 pt-4 border-t border-gray-100">Compare to period</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label htmlFor="compareStartDateInput">Start date</Label>
+                <Popover open={isCompareStartDatePopoverOpen} onOpenChange={setIsCompareStartDatePopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !tempCompareStartDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {tempCompareStartDate ? format(tempCompareStartDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={tempCompareStartDate}
+                      onSelect={handleCompareStartDateSelect}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="compareEndDateInput">End date</Label>
+                <Popover open={isCompareEndDatePopoverOpen} onOpenChange={setIsCompareEndDatePopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !tempCompareEndDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {tempCompareEndDate ? format(tempCompareEndDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={tempCompareEndDate}
+                      onSelect={handleCompareEndDateSelect}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-end pt-4 border-t border-gray-200">
           <Button onClick={handleApply}>
