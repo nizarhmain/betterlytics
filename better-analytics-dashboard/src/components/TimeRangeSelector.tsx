@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 export default function TimeRangeSelector({ className = "" }: { className?: string }) {
@@ -255,64 +256,68 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
         </div>
 
         {tempCompare && (
-          <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2 pt-4 border-t border-gray-100">Compare to period</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label htmlFor="compareStartDateInput">Start date</Label>
-                <Popover open={isCompareStartDatePopoverOpen} onOpenChange={setIsCompareStartDatePopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal truncate",
-                        !tempCompareStartDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="h-4 w-4" />
-                      {tempCompareStartDate ? format(tempCompareStartDate, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={tempCompareStartDate}
-                      onSelect={handleCompareStartDateSelect}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="compareEndDateInput">End date</Label>
-                <Popover open={isCompareEndDatePopoverOpen} onOpenChange={setIsCompareEndDatePopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal truncate",
-                        !tempCompareEndDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="h-4 w-4" />
-                      {tempCompareEndDate ? format(tempCompareEndDate, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={tempCompareEndDate}
-                      onSelect={handleCompareEndDateSelect}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+          <>
+            <Separator className="my-4" />
+            <div>
+              <h3 className="text-sm font-medium text-gray-500 mb-2">Compare to period</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label htmlFor="compareStartDateInput">Start date</Label>
+                  <Popover open={isCompareStartDatePopoverOpen} onOpenChange={setIsCompareStartDatePopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal truncate",
+                          !tempCompareStartDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                        {tempCompareStartDate ? format(tempCompareStartDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={tempCompareStartDate}
+                        onSelect={handleCompareStartDateSelect}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="compareEndDateInput">End date</Label>
+                  <Popover open={isCompareEndDatePopoverOpen} onOpenChange={setIsCompareEndDatePopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal truncate",
+                          !tempCompareEndDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                        {tempCompareEndDate ? format(tempCompareEndDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={tempCompareEndDate}
+                        onSelect={handleCompareEndDateSelect}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
             </div>
-          </div>
+          </>
         )}
 
-        <div className="flex justify-end pt-4 border-t border-gray-200">
+        <Separator className="my-4" />
+        <div className="flex justify-end">
           <Button onClick={handleApply}>
             Apply
           </Button>
