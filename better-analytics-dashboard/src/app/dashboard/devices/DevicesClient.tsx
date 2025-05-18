@@ -1,13 +1,12 @@
 'use client';
 
-import { useMemo, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
 import DeviceTypeChart from "@/components/analytics/DeviceTypeChart";
 import BrowserTable from "@/components/analytics/BrowserTable";
 import OperatingSystemTable from "@/components/analytics/OperatingSystemTable";
 import DeviceUsageTrendChart from "@/components/charts/DeviceUsageTrendChart";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
+import { TIME_RANGE_PRESETS, TimeRangeValue } from "@/utils/timeRanges";
 import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
 import { 
   fetchDeviceTypeBreakdownAction, 
@@ -17,11 +16,11 @@ import {
   fetchDeviceUsageTrendAction
 } from "@/app/actions/devices";
 import { DeviceSummary, OperatingSystemStats, DeviceUsageTrendRow } from "@/entities/devices";
+import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import TimeRangeSelector from '@/components/TimeRangeSelector';
 
 export default function DevicesClient() {
-  const [range, setRange] = useState<TimeRangeValue>("7d");
-  const [granularity, setGranularity] = useState<GranularityRangeValues>("day");
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const { startDate, endDate, granularity } = useTimeRangeContext();
 
   // Fetch device summary
   const { data: deviceSummary, isLoading: summaryLoading } = useQuery<DeviceSummary>({
@@ -60,30 +59,7 @@ export default function DevicesClient() {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Devices</h1>
           <p className="text-sm text-gray-500">Analytics and insights for your website</p>
         </div>
-        <div className="flex gap-4">
-          <div className="relative inline-block text-left">
-            <select
-              className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={range}
-              onChange={e => setRange(e.target.value as TimeRangeValue)}
-            >
-              {TIME_RANGE_PRESETS.map(r => (
-                <option key={r.value} value={r.value}>{r.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="relative inline-block text-left">
-            <select
-              className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={granularity}
-              onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
-            >
-              {GRANULARITY_RANGE_PRESETS.map(g => (
-                <option key={g.value} value={g.value}>{g.label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <TimeRangeSelector />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

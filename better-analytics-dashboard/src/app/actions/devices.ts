@@ -5,17 +5,17 @@ import { DeviceType, BrowserStats, DeviceSummary, OperatingSystemStats, DeviceUs
 import { checkAuth } from "@/lib/auth-actions";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 
-export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: string, endDate: string): Promise<DeviceType[]> {
+export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: Date, endDate: Date): Promise<DeviceType[]> {
   await checkAuth();
   return getDeviceTypeBreakdownForSite(siteId, startDate, endDate);
 }
 
-export async function fetchDeviceSummaryAction(siteId: string, startDate: string, endDate: string): Promise<DeviceSummary> {
+export async function fetchDeviceSummaryAction(siteId: string, startDate: Date, endDate: Date): Promise<DeviceSummary> {
   await checkAuth();
   return getDeviceSummaryForSite(siteId, startDate, endDate);
 }
 
-export async function fetchBrowserBreakdownAction(siteId: string, startDate: string, endDate: string): Promise<BrowserStats[]> {
+export async function fetchBrowserBreakdownAction(siteId: string, startDate: Date, endDate: Date): Promise<BrowserStats[]> {
   await checkAuth();
   return getBrowserBreakdownForSite(siteId, startDate, endDate);
 }

@@ -1,9 +1,9 @@
 import React from "react";
 
 interface SummaryCardProps {
-  title: string;
-  value: string;
-  changeText: string;
+  title: React.ReactNode;
+  value: React.ReactNode;
+  changeText: React.ReactNode;
   changeColor?: string;
 }
 
