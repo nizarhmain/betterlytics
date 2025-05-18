@@ -1,20 +1,16 @@
-import { TimeRangeValue, getRangeForValue } from "@/utils/timeRanges";
+import { TimeRangeValue, getRangeForValue, TIME_RANGE_PRESETS } from "@/utils/timeRanges";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import React, { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { startOfDay, endOfDay } from 'date-fns';
 
 type TimeRangeContextProps = {
-  range: TimeRangeValue;
-  setRange: (value: TimeRangeValue) => void;
-  granularity: GranularityRangeValues;
-  setGranularity: Dispatch<SetStateAction<GranularityRangeValues>>;
-  customStartDate?: Date;
-  customEndDate?: Date;
-  setCustomDateRange: (startDate: Date, endDate: Date) => void;
-  compareEnabled: boolean;
-  setCompareEnabled: Dispatch<SetStateAction<boolean>>;
   startDate: Date;
   endDate: Date;
+  setPeriod: (startDate: Date, endDate: Date) => void;
+  granularity: GranularityRangeValues;
+  setGranularity: Dispatch<SetStateAction<GranularityRangeValues>>;
+  compareEnabled: boolean;
+  setCompareEnabled: Dispatch<SetStateAction<boolean>>;
   compareStartDate?: Date;
   compareEndDate?: Date;
   setCompareDateRange: (startDate: Date, endDate: Date) => void;
@@ -27,53 +23,34 @@ type TimeRangeContextProviderProps = {
 }
 
 export function TimeRangeContextProvider({ children }: TimeRangeContextProviderProps) {
-  const [range, setRangeState] = React.useState<TimeRangeValue>("7d");
+  const initialRangeDetails = getRangeForValue("7d");
+  const [startDate, setStartDate] = React.useState<Date>(initialRangeDetails.startDate);
+  const [endDate, setEndDate] = React.useState<Date>(initialRangeDetails.endDate);
+
   const [granularity, setGranularity] = React.useState<GranularityRangeValues>("day");
-  const [customStartDate, setCustomStartDate] = React.useState<Date | undefined>(undefined);
-  const [customEndDate, setCustomEndDate] = React.useState<Date | undefined>(undefined);
   const [compareEnabled, setCompareEnabled] = React.useState<boolean>(false);
   const [compareStartDate, setCompareStartDate] = React.useState<Date | undefined>(undefined);
   const [compareEndDate, setCompareEndDate] = React.useState<Date | undefined>(undefined);
 
-  const handleSetRange = useCallback((value: TimeRangeValue) => {
-    setRangeState(value);
-    if (value !== 'custom') {
-      setCustomStartDate(undefined);
-      setCustomEndDate(undefined);
-    }
+  const setPeriod = useCallback((newStartDate: Date, newEndDate: Date) => {
+    setStartDate(startOfDay(newStartDate));
+    setEndDate(endOfDay(newEndDate));
   }, []);
 
-  const handleSetCustomDateRange = useCallback((startDate: Date, endDate: Date) => {
-    setCustomStartDate(startOfDay(startDate));
-    setCustomEndDate(endOfDay(endDate));
-    setRangeState('custom');
+  const handleSetCompareDateRange = useCallback((csDate: Date, ceDate: Date) => {
+    setCompareStartDate(startOfDay(csDate));
+    setCompareEndDate(endOfDay(ceDate));
   }, []);
-
-  const handleSetCompareDateRange = useCallback((startDate: Date, endDate: Date) => {
-    setCompareStartDate(startOfDay(startDate));
-    setCompareEndDate(endOfDay(endDate));
-  }, []);
-
-  const { startDate, endDate } = useMemo(() => {
-    if (range === 'custom' && customStartDate && customEndDate) {
-      return { startDate: customStartDate, endDate: customEndDate };
-    }
-    return getRangeForValue(range);
-  }, [range, customStartDate, customEndDate]);
 
   return (
     <TimeRangeContext.Provider value={{
-      range,
-      setRange: handleSetRange,
-      granularity,
-      setGranularity,
-      customStartDate,
-      customEndDate,
-      setCustomDateRange: handleSetCustomDateRange,
-      compareEnabled,
-      setCompareEnabled,
       startDate,
       endDate,
+      setPeriod,
+      granularity,
+      setGranularity,
+      compareEnabled,
+      setCompareEnabled,
       compareStartDate,
       compareEndDate,
       setCompareDateRange: handleSetCompareDateRange

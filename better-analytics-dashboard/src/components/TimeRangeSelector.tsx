@@ -16,19 +16,33 @@ import { cn } from "@/lib/utils";
 
 export default function TimeRangeSelector({ className = "" }: { className?: string }) {
   const {
-    range,
-    setRange,
-    granularity,
-    setGranularity,
-    setCustomDateRange,
-    compareEnabled,
-    setCompareEnabled,
     startDate,
     endDate,
+    setPeriod,
+    granularity,
+    setGranularity,
+    compareEnabled,
+    setCompareEnabled,
     compareStartDate,
     compareEndDate,
     setCompareDateRange,
   } = useTimeRangeContext();
+
+  const currentActivePreset = useMemo<TimeRangeValue>(() => {
+    if (!startDate || !endDate) {
+      return 'custom'; 
+    }
+    for (const preset of TIME_RANGE_PRESETS) {
+      if (preset.value === 'custom') continue;
+      const { startDate: presetStart, endDate: presetEnd } = getRangeForValue(preset.value);
+      if (presetStart && presetEnd &&
+          startDate.getTime() === presetStart.getTime() &&
+          endDate.getTime() === presetEnd.getTime()) {
+        return preset.value;
+      }
+    }
+    return 'custom';
+  }, [startDate, endDate]);
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false);
@@ -36,7 +50,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   const [isCompareStartDatePopoverOpen, setIsCompareStartDatePopoverOpen] = useState(false);
   const [isCompareEndDatePopoverOpen, setIsCompareEndDatePopoverOpen] = useState(false);
 
-  const [tempRange, setTempRange] = useState<TimeRangeValue>(range);
+  const [tempRange, setTempRange] = useState<TimeRangeValue>(currentActivePreset);
   const [tempGranularity, setTempGranularity] = useState<GranularityRangeValues>(granularity);
   
   const [tempCustomStart, setTempCustomStart] = useState<Date | undefined>(startDate);
@@ -44,6 +58,20 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   const [tempCompare, setTempCompare] = useState<boolean>(compareEnabled);
   const [tempCompareStartDate, setTempCompareStartDate] = useState<Date | undefined>(compareStartDate);
   const [tempCompareEndDate, setTempCompareEndDate] = useState<Date | undefined>(compareEndDate);
+
+  useEffect(() => {
+    if (!isPopoverOpen) {
+      setTempRange(currentActivePreset);
+      if (currentActivePreset !== 'custom') {
+        const { startDate: presetStart, endDate: presetEnd } = getRangeForValue(currentActivePreset);
+        setTempCustomStart(presetStart);
+        setTempCustomEnd(presetEnd);
+      } else {
+        setTempCustomStart(startDate);
+        setTempCustomEnd(endDate);
+      }
+    }
+  }, [currentActivePreset, isPopoverOpen, startDate, endDate]);
 
   const tempMainPeriodDurationDays = useMemo(() => {
     if (tempRange === 'custom' && tempCustomStart && tempCustomEnd) {
@@ -62,14 +90,12 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
     if (tempCompareStartDate && tempMainPeriodDurationDays !== null) {
       setTempCompareEndDate(addDays(tempCompareStartDate, tempMainPeriodDurationDays - 1));
     }
-    // We only want to run this effect if the duration of the main period changes,
-    // or if the user explicitly changes the comparison start date.
   }, [tempMainPeriodDurationDays, tempCompareStartDate]);
 
   const handlePopoverOpenChange = (open: boolean) => {
     setIsPopoverOpen(open);
     if (open) {
-      setTempRange(range);
+      setTempRange(currentActivePreset);
       setTempGranularity(granularity);
       setTempCustomStart(startDate);
       setTempCustomEnd(endDate);
@@ -83,9 +109,12 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
     setGranularity(tempGranularity);
     setCompareEnabled(tempCompare);
     if (tempRange === 'custom' && tempCustomStart && tempCustomEnd) {
-      setCustomDateRange(tempCustomStart, tempCustomEnd);
+      setPeriod(tempCustomStart, tempCustomEnd);
     } else if (tempRange !== 'custom') {
-      setRange(tempRange);
+      const { startDate: presetStart, endDate: presetEnd } = getRangeForValue(tempRange);
+      if (presetStart && presetEnd) {
+        setPeriod(presetStart, presetEnd);
+      }
     }
     if (tempCompare && tempCompareStartDate && tempCompareEndDate) {
       setCompareDateRange(tempCompareStartDate, tempCompareEndDate);
@@ -135,10 +164,10 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   };
 
   const displayRangeLabel = () => {
-    if (range === 'custom') {
+    if (currentActivePreset === 'custom' && startDate && endDate) {
       return `${format(startDate, 'P')} - ${format(endDate, 'P')}`;
     }
-    const preset = TIME_RANGE_PRESETS.find(p => p.value === range);
+    const preset = TIME_RANGE_PRESETS.find(p => p.value === currentActivePreset);
     return preset ? preset.label : 'Date Range';
   };
 
