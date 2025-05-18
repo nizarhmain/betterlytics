@@ -52,7 +52,7 @@ export async function getBrowserBreakdownForSite(siteId: string, startDate: Date
   return BrowserStatsSchema.array().parse(statsWithPercentages);
 }
 
-export async function getOperatingSystemBreakdownForSite(siteId: string, startDate: string, endDate: string): Promise<OperatingSystemStats[]> {
+export async function getOperatingSystemBreakdownForSite(siteId: string, startDate: Date, endDate: Date): Promise<OperatingSystemStats[]> {
   const osData = await getOperatingSystemBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
   
   const totalVisitors = osData.reduce((sum, item) => sum + item.visitors, 0);
@@ -68,8 +68,8 @@ export async function getOperatingSystemBreakdownForSite(siteId: string, startDa
 
 export async function getDeviceUsageTrendForSite(
   siteId: string, 
-  startDate: string, 
-  endDate: string,
+  startDate: Date, 
+  endDate: Date,
   granularity: GranularityRangeValues
 ): Promise<DeviceUsageTrendRow[]> {
   return getDeviceUsageTrend(siteId, toDateTimeString(startDate), toDateTimeString(endDate), granularity);

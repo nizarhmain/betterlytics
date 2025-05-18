@@ -20,15 +20,15 @@ export async function fetchBrowserBreakdownAction(siteId: string, startDate: Dat
   return getBrowserBreakdownForSite(siteId, startDate, endDate);
 }
 
-export async function fetchOperatingSystemBreakdownAction(siteId: string, startDate: string, endDate: string): Promise<OperatingSystemStats[]> {
+export async function fetchOperatingSystemBreakdownAction(siteId: string, startDate: Date, endDate: Date): Promise<OperatingSystemStats[]> {
   await checkAuth();
   return getOperatingSystemBreakdownForSite(siteId, startDate, endDate);
 }
 
 export async function fetchDeviceUsageTrendAction(
   siteId: string, 
-  startDate: string, 
-  endDate: string,
+  startDate: Date, 
+  endDate: Date,
   granularity: GranularityRangeValues
 ): Promise<DeviceUsageTrendRow[]> {
   await checkAuth();
