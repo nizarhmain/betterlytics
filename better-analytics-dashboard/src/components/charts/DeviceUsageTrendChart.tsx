@@ -5,6 +5,7 @@ import { DeviceUsageTrendRow } from '@/entities/devices';
 import { getDeviceColor } from '@/utils/deviceColors';
 import { useMemo } from 'react';
 import { format } from 'date-fns';
+import { capitalizeFirstLetter } from '@/utils/formatters';
 
 interface DeviceUsageTrendChartProps {
   data?: DeviceUsageTrendRow[];
@@ -39,7 +40,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p className="text-xs text-gray-500">{format(new Date(label), 'MMM dd, yyyy HH:mm')}</p>
         {payload.map((entry: any) => (
           <p key={entry.name} className="text-sm text-gray-700" style={{ color: entry.color }}>
-            {`${entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}: ${entry.value.toLocaleString()}`}
+            {`${capitalizeFirstLetter(entry.name)}: ${entry.value.toLocaleString()}`}
           </p>
         ))}
       </div>
@@ -152,7 +153,7 @@ export default function DeviceUsageTrendChart({
               stroke={getDeviceColor(deviceType)}
               fill={getDeviceColor(deviceType)}
               fillOpacity={0.7}
-              name={deviceType.charAt(0).toUpperCase() + deviceType.slice(1)}
+              name={capitalizeFirstLetter(deviceType)}
             />
           ))}
         </AreaChart>
