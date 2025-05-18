@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, FileText, Smartphone, CircleDot, Globe, Link2 } from "lucide-react";
+import { LayoutDashboard, FileText, Smartphone, CircleDot, Globe, Funnel, Link2 } from "lucide-react";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: <LayoutDashboard size={18} /> },
@@ -9,6 +9,7 @@ const navItems = [
   //{ name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
   //{ name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
   { name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
+  { name: "Funnels", href: "/dashboard/funnels", icon: <Funnel size={18} /> },
   { name: "Devices", href: "/dashboard/devices", icon: <Smartphone size={18} /> },
   { name: "Events", href: "/dashboard/events", icon: <CircleDot size={18} /> },
 ];
