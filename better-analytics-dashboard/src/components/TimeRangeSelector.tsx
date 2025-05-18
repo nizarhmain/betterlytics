@@ -199,11 +199,11 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal truncate",
                       !tempCustomStart && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="h-4 w-4" />
                     {tempCustomStart ? format(tempCustomStart, "PPP") : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
@@ -224,11 +224,11 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal truncate",
                       !tempCustomEnd && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="h-4 w-4" />
                     {tempCustomEnd ? format(tempCustomEnd, "PPP") : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
@@ -265,11 +265,11 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-full justify-start text-left font-normal",
+                        "w-full justify-start text-left font-normal truncate",
                         !tempCompareStartDate && "text-muted-foreground"
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarIcon className="h-4 w-4" />
                       {tempCompareStartDate ? format(tempCompareStartDate, "PPP") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
@@ -290,11 +290,11 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-full justify-start text-left font-normal",
+                        "w-full justify-start text-left font-normal truncate",
                         !tempCompareEndDate && "text-muted-foreground"
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarIcon className="h-4 w-4" />
                       {tempCompareEndDate ? format(tempCompareEndDate, "PPP") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
