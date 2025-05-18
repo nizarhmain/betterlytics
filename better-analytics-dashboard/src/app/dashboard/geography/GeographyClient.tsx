@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import LeafletMap from '@/components/LeafletMap';
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
+import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { getWorldMapData } from '@/app/actions/geography';
 import { GeoVisitor } from '@/entities/geography';
@@ -14,8 +14,7 @@ export default function GeographyClient() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { range, setRange } = useTimeRangeContext();
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const { startDate, endDate } = useTimeRangeContext();
   
   const siteId = 'default-site';
 
@@ -65,16 +64,7 @@ export default function GeographyClient() {
       
       <div className="absolute top-4 right-4 z-[1001]">
         <div className="bg-white shadow-md rounded-md p-2">
-          <select
-            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={range}
-            onChange={e => setRange(e.target.value as TimeRangeValue)}
-            aria-label="Select time range"
-          >
-            {TIME_RANGE_PRESETS.map(r => (
-              <option key={r.value} value={r.value}>{r.label}</option>
-            ))}
-          </select>
+          <TimeRangeSelector />
         </div>
       </div>
       

@@ -1,18 +1,26 @@
 'use client';
 
-import { useMemo, useState } from "react";
 import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
 import DeviceTypeChart from "@/components/analytics/DeviceTypeChart";
 import BrowserTable from "@/components/analytics/BrowserTable";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { fetchDeviceTypeBreakdownAction, fetchDeviceSummaryAction } from "@/app/actions/devices";
-import { fetchBrowserBreakdownAction } from "@/app/actions/devices";
-import { DeviceSummary } from "@/entities/devices";
+import OperatingSystemTable from "@/components/analytics/OperatingSystemTable";
+import DeviceUsageTrendChart from "@/components/charts/DeviceUsageTrendChart";
+import { TIME_RANGE_PRESETS, TimeRangeValue } from "@/utils/timeRanges";
+import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
+import { 
+  fetchDeviceTypeBreakdownAction, 
+  fetchDeviceSummaryAction,
+  fetchBrowserBreakdownAction,
+  fetchOperatingSystemBreakdownAction,
+  fetchDeviceUsageTrendAction
+} from "@/app/actions/devices";
+import { DeviceSummary, OperatingSystemStats, DeviceUsageTrendRow } from "@/entities/devices";
+import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import TimeRangeSelector from '@/components/TimeRangeSelector';
 
 export default function DevicesClient() {
-  const [range, setRange] = useState<TimeRangeValue>("7d");
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const { startDate, endDate, granularity } = useTimeRangeContext();
 
   // Fetch device summary
   const { data: deviceSummary, isLoading: summaryLoading } = useQuery<DeviceSummary>({
@@ -32,6 +40,18 @@ export default function DevicesClient() {
     queryFn: () => fetchBrowserBreakdownAction('default-site', startDate, endDate),
   });
 
+  // Fetch OS stats
+  const { data: osStats = [], isLoading: osStatsLoading } = useQuery<OperatingSystemStats[]>({
+    queryKey: ['osBreakdown', 'default-site', startDate, endDate],
+    queryFn: () => fetchOperatingSystemBreakdownAction('default-site', startDate, endDate),
+  });
+
+  // Fetch device usage trend
+  const { data: deviceUsageTrend = [], isLoading: deviceUsageTrendLoading } = useQuery<DeviceUsageTrendRow[]>({
+    queryKey: ['deviceUsageTrend', 'default-site', startDate, endDate, granularity],
+    queryFn: () => fetchDeviceUsageTrendAction('default-site', startDate, endDate, granularity),
+  });
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -39,17 +59,7 @@ export default function DevicesClient() {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Devices</h1>
           <p className="text-sm text-gray-500">Analytics and insights for your website</p>
         </div>
-        <div className="relative inline-block text-left">
-          <select
-            className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={range}
-            onChange={e => setRange(e.target.value as TimeRangeValue)}
-          >
-            {TIME_RANGE_PRESETS.map(r => (
-              <option key={r.value} value={r.value}>{r.label}</option>
-            ))}
-          </select>
-        </div>
+        <TimeRangeSelector />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -91,6 +101,22 @@ export default function DevicesClient() {
           <DeviceTypeChart 
             data={deviceBreakdown} 
             isLoading={deviceBreakdownLoading} 
+          />
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-1">Device Usage Trend</h2>
+          <p className="text-sm text-gray-500 mb-4">Visitor trends by device type</p>
+          <DeviceUsageTrendChart 
+            data={deviceUsageTrend} 
+            loading={deviceUsageTrendLoading} 
+          />
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-1">Top Operating Systems</h2>
+          <p className="text-sm text-gray-500 mb-4">Most common operating systems</p>
+          <OperatingSystemTable 
+            data={osStats} 
+            isLoading={osStatsLoading} 
           />
         </div>
         <div className="bg-white rounded-lg shadow p-6">
