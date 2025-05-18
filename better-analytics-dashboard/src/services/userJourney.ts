@@ -9,8 +9,8 @@ import { toDateTimeString } from '@/utils/dateFormatters';
  */
 export async function getUserJourneyForSankeyDiagram(
   siteId: string, 
-  startDate: string, 
-  endDate: string, 
+  startDate: Date, 
+  endDate: Date, 
   maxSteps: number = 3,
   limit: number = 50
 ): Promise<SankeyData> {

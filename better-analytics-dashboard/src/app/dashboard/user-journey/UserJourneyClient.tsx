@@ -1,21 +1,20 @@
 'use client';
 
-import { TimeRangeValue, getRangeForValue } from "@/utils/timeRanges";
-import { TIME_RANGE_PRESETS } from "@/utils/timeRanges";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { fetchUserJourneyAction } from "@/app/actions/userJourney";
 import UserJourneyChart from "../../../components/analytics/UserJourneyChart";
 import { useQuery } from "@tanstack/react-query";
+import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import TimeRangeSelector from "@/components/TimeRangeSelector";
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
 const JOURNEY_OPTIONS = [5, 10, 20, 50, 100];
 
 export default function UserJourneyClient({ siteId }: { siteId: string }) {
-    const [range, setRange] = useState<TimeRangeValue>("7d");
     const [numberOfSteps, setNumberOfSteps] = useState<number>(3);
     const [numberOfJourneys, setNumberOfJourneys] = useState<number>(10);
-    
-    const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+
+    const { startDate, endDate } = useTimeRangeContext();
 
     const { data: journeyData, isLoading, error } = useQuery({
         queryKey: ['userJourney', siteId, startDate, endDate, numberOfSteps, numberOfJourneys],
@@ -68,19 +67,7 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
                   ))}
                 </select>
               </div>
-              <div className="relative inline-block text-left">
-                <label htmlFor="range-select" className="sr-only">Time Range</label>
-                <select
-                  id="range-select"
-                  className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={range}
-                  onChange={e => setRange(e.target.value as TimeRangeValue)}
-                >
-                  {TIME_RANGE_PRESETS.map(r => (
-                    <option key={r.value} value={r.value}>{r.label}</option>
-                  ))}
-                </select>
-              </div>
+              <TimeRangeSelector />
             </div>
           </div>
           
