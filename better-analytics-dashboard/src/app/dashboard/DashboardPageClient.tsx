@@ -10,9 +10,11 @@ import { formatDuration } from "@/utils/dateFormatters";
 import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 
 export default function DashboardPageClient() {
   const { granularity, startDate, endDate } = useTimeRangeContext();
+  const { queryFilters } = useQueryFiltersContext();
 
   const siteId = 'default-site';
 
@@ -22,8 +24,8 @@ export default function DashboardPageClient() {
   });
 
   const { data: topPages, isLoading: topPagesLoading } = useQuery({
-    queryKey: ['topPages', siteId, startDate, endDate],
-    queryFn: () => fetchTopPagesAction(siteId, startDate, endDate, 5),
+    queryKey: ['topPages', siteId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTopPagesAction(siteId, startDate, endDate, 5, queryFilters),
   });
 
   const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
