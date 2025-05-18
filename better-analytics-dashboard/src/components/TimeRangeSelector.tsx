@@ -3,7 +3,7 @@
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { TIME_RANGE_PRESETS, TimeRangeValue, getRangeForValue } from "@/utils/timeRanges";
 import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { format } from 'date-fns';
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
     endDate,
   } = useTimeRangeContext();
 
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isStartDatePopoverOpen, setIsStartDatePopoverOpen] = useState(false);
   const [isEndDatePopoverOpen, setIsEndDatePopoverOpen] = useState(false);
 
@@ -36,13 +37,16 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   const [tempCustomEnd, setTempCustomEnd] = useState<Date | undefined>(endDate);
   const [tempCompare, setTempCompare] = useState<boolean>(compareEnabled);
 
-  useEffect(() => {
-    setTempRange(range);
-    setTempGranularity(granularity);
-    setTempCustomStart(startDate);
-    setTempCustomEnd(endDate);
-    setTempCompare(compareEnabled);
-  }, [range, granularity, startDate, endDate, compareEnabled]);
+  const handlePopoverOpenChange = (open: boolean) => {
+    setIsPopoverOpen(open);
+    if (open) {
+      setTempRange(range);
+      setTempGranularity(granularity);
+      setTempCustomStart(startDate);
+      setTempCustomEnd(endDate);
+      setTempCompare(compareEnabled);
+    }
+  };
 
   const handleApply = () => {
     setGranularity(tempGranularity);
@@ -52,6 +56,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
     } else if (tempRange !== 'custom') {
       setRange(tempRange);
     }
+    setIsPopoverOpen(false);
   };
 
   const handleQuickSelect = (value: TimeRangeValue) => {
@@ -86,7 +91,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
   };
 
   return (
-    <Popover>
+    <Popover open={isPopoverOpen} onOpenChange={handlePopoverOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
