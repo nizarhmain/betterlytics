@@ -5,19 +5,16 @@ import VisitorsChart from "@/components/VisitorsChart";
 import TopPagesTable from '@/components/TopPagesTable';
 import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import TimeRangeSelector from "@/components/TimeRangeSelector";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { getRangeForValue } from "@/utils/timeRanges";
 import { useQuery } from '@tanstack/react-query';
 import { formatDuration } from "@/utils/dateFormatters";
 import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { GranularityRangeValues } from "@/utils/granularityRanges";
 
 export default function DashboardPageClient() {
-  const { range } = useTimeRangeContext();
-
-  const [ granularity, setGranularity ] = useState<GranularityRangeValues>("day");
+  const { range, granularity, setGranularity } = useTimeRangeContext();
 
   const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
 
@@ -42,8 +39,6 @@ export default function DashboardPageClient() {
         <div className="flex justify-end mb-4 gap-4">
           <TimeRangeSelector
             showGranularity={true}
-            granularity={granularity}
-            onGranularityChange={setGranularity}
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

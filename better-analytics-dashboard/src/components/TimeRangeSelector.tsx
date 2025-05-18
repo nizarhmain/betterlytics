@@ -4,18 +4,14 @@ import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granu
 
 interface TimeRangeSelectorProps {
   showGranularity?: boolean;
-  granularity?: GranularityRangeValues;
-  onGranularityChange?: (value: GranularityRangeValues) => void;
   className?: string;
 }
 
 export default function TimeRangeSelector({
   showGranularity = false,
-  granularity,
-  onGranularityChange,
   className = "",
 }: TimeRangeSelectorProps) {
-  const { range, setRange } = useTimeRangeContext();
+  const { range, setRange, granularity, setGranularity } = useTimeRangeContext();
 
   return (
     <div className={`flex gap-4 ${className}`}>
@@ -33,12 +29,12 @@ export default function TimeRangeSelector({
         </select>
       </div>
       
-      {showGranularity && granularity !== undefined && onGranularityChange && (
+      {showGranularity && granularity !== undefined && setGranularity && (
         <div className="relative inline-block text-left">
           <select
             className="border rounded px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={granularity}
-            onChange={(e) => onGranularityChange(e.target.value as GranularityRangeValues)}
+            onChange={(e) => setGranularity(e.target.value as GranularityRangeValues)}
           >
             {GRANULARITY_RANGE_PRESETS.map((r) => (
               <option key={r.value} value={r.value}>
