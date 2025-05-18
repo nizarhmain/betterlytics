@@ -23,6 +23,7 @@ export async function getUserSequentialPaths(
       site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
       AND url != ''
+      AND event_type = 'pageview'
     GROUP BY session_id
   ),
   session_paths AS (

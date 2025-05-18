@@ -179,7 +179,6 @@ export default function UserJourneyChart({ data }: UserJourneyChartProps) {
         e.clientY > rect.bottom
       ) {
         setActiveLink(null);
-        updateTooltip({ visible: false });
       }
     };
     
