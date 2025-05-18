@@ -185,7 +185,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
               >
                 {gran.label} 
               </Button>
-            ))}
+            )).reverse()}
           </div>
         </div>
 
