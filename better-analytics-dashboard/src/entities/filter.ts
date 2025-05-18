@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const FILTER_COLUMNS = [
+export const FILTER_COLUMNS = [
   "url",
   "device_type",
   "country_code",
@@ -19,7 +19,7 @@ const FILTER_COLUMNS = [
   "custom_event_name"
 ] as const;
 
-const FILTER_OPERATORS = [
+export const FILTER_OPERATORS = [
   "=",
   "!="
 ] as const;

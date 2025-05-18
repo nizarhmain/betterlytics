@@ -11,6 +11,7 @@ import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
+import QueryFiltersSelector from "@/components/QueryFiltersSelector";
 
 export default function DashboardPageClient() {
   const { granularity, startDate, endDate } = useTimeRangeContext();
@@ -37,6 +38,7 @@ export default function DashboardPageClient() {
     <div className="max-w-7xl mx-auto">
       <div className="bg-white shadow rounded-lg p-6">
         <div className="flex justify-end mb-4 gap-4">
+          <QueryFiltersSelector />
           <TimeRangeSelector />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
