@@ -42,8 +42,8 @@ export async function getPageDetail(siteId: string, path: string, startDate: Dat
 export async function getPageTrafficForTimePeriod(
   siteId: string, 
   path: string,
-  startDate: string, 
-  endDate: string, 
+  startDate: Date, 
+  endDate: Date, 
   granularity: GranularityRangeValues
 ): Promise<TotalPageViewsRow[]> {
   const formattedStart = toDateTimeString(startDate);

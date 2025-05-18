@@ -19,8 +19,8 @@ export async function fetchPageDetailAction(siteId: string, path: string, startD
 export async function fetchPageTrafficTimeSeriesAction(
   siteId: string,
   path: string,
-  startDate: string,
-  endDate: string,
+  startDate: Date,
+  endDate: Date,
   granularity: GranularityRangeValues
 ): Promise<TotalPageViewsRow[]> {
   await checkAuth();

@@ -1,8 +1,6 @@
 "use client";
 
-import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { fetchPageTrafficTimeSeriesAction } from '@/app/actions/pages';
 import { TotalPageViewsRow } from "@/entities/pageviews";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { timeFormat } from "d3-time-format";
@@ -10,26 +8,19 @@ import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragmentedGranularityTimeSeriesLineChart';
 
 interface PageTrafficChartProps {
-  siteId: string;
-  path: string;
-  startDate: string;
-  endDate: string;
+  pageTrafficData: TotalPageViewsRow[];
+  isLoading: boolean;
   granularity: GranularityRangeValues;
 }
 
-export default function PageTrafficChart({ siteId, path, startDate, endDate, granularity }: PageTrafficChartProps) {
-  const { data = [] as TotalPageViewsRow[], isLoading } = useQuery<TotalPageViewsRow[]>({
-    queryKey: ['pageTraffic', siteId, path, startDate, endDate, granularity],
-    queryFn: () => fetchPageTrafficTimeSeriesAction(siteId, path, startDate, endDate, granularity),
-  });
-
+export default function PageTrafficChart({ pageTrafficData, isLoading, granularity }: PageTrafficChartProps) {
   const timeSeriesProps = useMemo(() => {
     return {
       dataKey: 'views',
-      data: data,
+      data: pageTrafficData,
       granularity
     } as const;
-  }, [data, granularity]);
+  }, [pageTrafficData, granularity]);
 
   const {
     chartData,
@@ -45,7 +36,7 @@ export default function PageTrafficChart({ siteId, path, startDate, endDate, gra
       </div>
     </div>
   );
-  if (data.length === 0) return (
+  if (pageTrafficData.length === 0) return (
     <div className="h-80 flex items-center justify-center text-gray-500">
       No data available
     </div>
