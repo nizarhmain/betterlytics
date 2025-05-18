@@ -56,8 +56,8 @@ export function getRangeForValue(value: TimeRangeValue): { startDate: Date; endD
   return preset.getRange();
 }
 
-export function getGroupingForRange(startDateISO: string, endDateISO: string): TimeGrouping {
-  const diff = new Date(endDateISO).getTime() - new Date(startDateISO).getTime();
+export function getGroupingForRange(startDate: Date, endDate: Date): TimeGrouping {
+  const diff = endDate.getTime() - startDate.getTime();
   if (diff <= 60 * 60 * 1000) return 'minute';
   if (diff <= 24 * 60 * 60 * 1000) return 'hour';
   return 'day';

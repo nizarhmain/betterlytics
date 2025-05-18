@@ -27,14 +27,3 @@ export function formatDuration(seconds: number): string {
 
   return parts.join(' ');
 }
-
-// Helper to format ISO date string to 'yyyy-MM-dd' for date pickers
-export const formatISOToDatePicker = (isoDateString: string | undefined): string | undefined => {
-  if (!isoDateString) return undefined;
-  try {
-    return format(parseISO(isoDateString), 'yyyy-MM-dd');
-  } catch (error) {
-    console.warn("Failed to parse ISO date for date picker:", isoDateString, error);
-    return undefined;
-  }
-};
