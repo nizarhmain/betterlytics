@@ -21,8 +21,7 @@ const FILTER_KINDS = [
 
 const FILTER_OPERATORS = [
   "is",
-  "is-not",
-  "contains"
+  "is-not"
 ] as const;
 
 export const QueryFilterSchema = z.object({
