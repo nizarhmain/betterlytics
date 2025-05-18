@@ -1,3 +1,5 @@
+"server only";
+
 import { QueryFilter, QueryFilterSchema } from "@/entities/filter";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { z } from "zod";
