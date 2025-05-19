@@ -32,11 +32,9 @@ export default function DashboardPageClient() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="bg-card shadow rounded-lg p-6">
-        <div className="flex justify-end mb-4 gap-4">
-          <TimeRangeSelector />
-        </div>
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="flex justify-end mb-4 gap-4">
+        <TimeRangeSelector />
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

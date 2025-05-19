@@ -103,25 +103,25 @@ export default function DevicesClient() {
             isLoading={deviceBreakdownLoading} 
           />
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Device Usage Trend</h2>
-          <p className="text-sm text-gray-500 mb-4">Visitor trends by device type</p>
+        <div className="bg-card rounded-lg shadow border border-border p-6">
+          <h2 className="text-lg font-bold text-foreground mb-1">Device Usage Trend</h2>
+          <p className="text-sm text-muted-foreground mb-4">Visitor trends by device type</p>
           <DeviceUsageTrendChart 
             data={deviceUsageTrend} 
             loading={deviceUsageTrendLoading} 
           />
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Top Operating Systems</h2>
-          <p className="text-sm text-gray-500 mb-4">Most common operating systems</p>
+        <div className="bg-card rounded-lg shadow border border-border p-6">
+          <h2 className="text-lg font-bold text-foreground mb-1">Top Operating Systems</h2>
+          <p className="text-sm text-muted-foreground mb-4">Most common operating systems</p>
           <OperatingSystemTable 
             data={osStats} 
             isLoading={osStatsLoading} 
           />
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-1">Top Browsers</h2>
-          <p className="text-sm text-gray-500 mb-4">Most common browsers</p>
+        <div className="bg-card rounded-lg shadow border border-border p-6">
+          <h2 className="text-lg font-bold text-foreground mb-1">Top Browsers</h2>
+          <p className="text-sm text-muted-foreground mb-4">Most common browsers</p>
           <BrowserTable 
             data={browserStats} 
             isLoading={browserStatsLoading} 
