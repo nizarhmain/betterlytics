@@ -35,7 +35,7 @@ export function QueryFiltersContextProvider({ children }: QueryFiltersContextPro
   }, [setQueryFilters]);
 
   const removeQueryFilter = useCallback((id: string) => {
-    setQueryFilters((filters) => filters.filter((filter) => filter.id === id));
+    setQueryFilters((filters) => filters.filter((filter) => filter.id !== id));
   }, []);
 
   const updateQueryFilter = useCallback((queryFilter: DashboardQueryFilter) => {
