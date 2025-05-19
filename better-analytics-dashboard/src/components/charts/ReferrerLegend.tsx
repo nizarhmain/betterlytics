@@ -1,16 +1,12 @@
 'use client';
 
 import React from 'react';
-import { formatPercentage } from '@/utils/formatters';
+import { capitalizeFirstLetter, formatPercentage } from '@/utils/formatters';
 
 interface ReferrerLegendProps {
   payload?: any[];
   showPercentage?: boolean;
 }
-
-const capitalizeFirstLetter = (string: string): string => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
 
 // Common legend component that can be used by all referrer charts
 export default function ReferrerLegend({ payload, showPercentage = false }: ReferrerLegendProps) {

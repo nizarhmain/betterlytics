@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import SummaryCard from "@/components/SummaryCard";
 import ReferrerDistributionChart from '@/components/charts/ReferrerDistributionChart';
 import ReferrerTrafficTrendChart from '@/components/charts/ReferrerTrafficTrendChart';
 import ReferrerTable from '@/components/charts/ReferrerTable';
+import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { 
   fetchReferrerSourceAggregationDataForSite, 
   fetchReferrerSummaryDataForSite,
@@ -18,8 +19,6 @@ import {
   ReferrerTrafficBySourceRow 
 } from "@/entities/referrers";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
-import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
 import { formatPercentage } from "@/utils/formatters";
 
 export default function ReferrersClient() {
@@ -28,10 +27,8 @@ export default function ReferrersClient() {
   const [summaryData, setSummaryData] = useState<ReferrerSummary | undefined>(undefined);
   const [tableData, setTableData] = useState<ReferrerTableRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const { range, setRange } = useTimeRangeContext();
-  const [granularity, setGranularity] = useState<GranularityRangeValues>("day");
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
-
+  const { granularity, startDate, endDate } = useTimeRangeContext();
+  
   const siteId = 'default-site';
 
   useEffect(() => {
@@ -57,7 +54,7 @@ export default function ReferrersClient() {
     }
     
     loadData();
-  }, [startDate, endDate, granularity]);
+  }, [startDate, endDate, granularity, siteId]);
 
   return (
     <div className="p-6 space-y-6">
@@ -68,28 +65,7 @@ export default function ReferrersClient() {
             <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
           </div>
           <div className="flex gap-4">
-            <div className="relative inline-block text-left">
-              <select
-                className="bg-card border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                value={range}
-                onChange={e => setRange(e.target.value as TimeRangeValue)}
-              >
-                {TIME_RANGE_PRESETS.map(r => (
-                  <option key={r.value} value={r.value}>{r.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="relative inline-block text-left">
-              <select
-                className="bg-card border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                value={granularity}
-                onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
-              >
-                {GRANULARITY_RANGE_PRESETS.map(r => (
-                  <option key={r.value} value={r.value}>{r.label}</option>
-                ))}
-              </select>
-            </div>
+            <TimeRangeSelector />
           </div>
         </div>
         

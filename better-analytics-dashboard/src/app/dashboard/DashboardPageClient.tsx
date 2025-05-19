@@ -4,61 +4,38 @@ import PageviewsChart from "@/components/PageviewsChart";
 import VisitorsChart from "@/components/VisitorsChart";
 import TopPagesTable from '@/components/TopPagesTable';
 import DeviceTypePieChart from '@/components/DeviceTypePieChart';
-import { useMemo, useState } from "react";
-import { TIME_RANGE_PRESETS, getRangeForValue, TimeRangeValue } from "@/utils/timeRanges";
+import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useQuery } from '@tanstack/react-query';
 import { formatDuration } from "@/utils/dateFormatters";
 import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
 
 export default function DashboardPageClient() {
-  const { range, setRange } = useTimeRangeContext();
+  const { granularity, startDate, endDate } = useTimeRangeContext();
 
-  const [ granularity, setGranularity ] = useState<GranularityRangeValues>("day");
-
-  const { startDate, endDate } = useMemo(() => getRangeForValue(range), [range]);
+  const siteId = 'default-site';
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
-    queryKey: ['summaryStats', 'default-site', startDate, endDate],
-    queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate),
+    queryKey: ['summaryStats', siteId, startDate, endDate],
+    queryFn: () => fetchSummaryStatsAction(siteId, startDate, endDate),
   });
 
   const { data: topPages, isLoading: topPagesLoading } = useQuery({
-    queryKey: ['topPages', 'default-site', startDate, endDate],
-    queryFn: () => fetchTopPagesAction('default-site', startDate, endDate, 5),
+    queryKey: ['topPages', siteId, startDate, endDate],
+    queryFn: () => fetchTopPagesAction(siteId, startDate, endDate, 5),
   });
 
   const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
-    queryKey: ['deviceTypeBreakdown', 'default-site', startDate, endDate],
-    queryFn: () => fetchDeviceTypeBreakdownAction('default-site', startDate, endDate),
+    queryKey: ['deviceTypeBreakdown', siteId, startDate, endDate],
+    queryFn: () => fetchDeviceTypeBreakdownAction(siteId, startDate, endDate),
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="flex justify-end mb-4 gap-4">
-        <div className="relative inline-block text-left">
-          <select
-            className="bg-card border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            value={range}
-            onChange={e => setRange(e.target.value as TimeRangeValue)}
-          >
-            {TIME_RANGE_PRESETS.map(r => (
-              <option key={r.value} value={r.value}>{r.label}</option>
-            ))}
-          </select>
-        </div>
-        <div className="relative inline-block text-left">
-          <select
-            className="bg-card border-input border rounded-md px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            value={granularity}
-            onChange={e => setGranularity(e.target.value as GranularityRangeValues)}
-          >
-            {GRANULARITY_RANGE_PRESETS.map(r => (
-              <option key={r.value} value={r.value}>{r.label}</option>
-            ))}
-          </select>
+    <div className="max-w-7xl mx-auto">
+      <div className="bg-card shadow rounded-lg p-6">
+        <div className="flex justify-end mb-4 gap-4">
+          <TimeRangeSelector />
         </div>
       </div>
       

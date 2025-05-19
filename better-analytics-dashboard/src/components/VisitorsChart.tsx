@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchUniqueVisitorsAction } from '@/app/actions/overview';
 import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { getGroupingForRange, TimeGrouping } from '@/utils/timeRanges';
+import { TimeGrouping } from '@/utils/timeRanges';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { useMemo } from 'react';
 import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragmentedGranularityTimeSeriesLineChart';
@@ -11,8 +11,8 @@ import { timeFormat } from 'd3-time-format';
 
 interface VisitorsChartProps {
   siteId: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   granularity: GranularityRangeValues;
 }
 
