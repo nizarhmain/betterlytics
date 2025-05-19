@@ -9,7 +9,12 @@ import { safeSql, SQL } from "./safe-sql";
  * Build query filters using `safeSql`
  */
 function getFilterQuery(queryFilters: QueryFilter[]) {
-  const filters = QueryFilterSchema.array().parse(queryFilters);
+  // Remove filters with empty strings
+  const nonEmptyFilters = queryFilters
+    .filter((filter) => Boolean(filter.column) && Boolean(filter.operator) && Boolean(filter.value));
+
+  // Validate filters
+  const filters = QueryFilterSchema.array().parse(nonEmptyFilters);
 
   // No-op in case of empty filters
   if (filters.length === 0) {

@@ -11,7 +11,7 @@ import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
-import QueryFiltersSelector from "@/components/QueryFiltersSelector";
+import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 
 export default function DashboardPageClient() {
   const { granularity, startDate, endDate } = useTimeRangeContext();

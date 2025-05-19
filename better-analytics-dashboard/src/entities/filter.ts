@@ -31,3 +31,5 @@ export const QueryFilterSchema = z.object({
 });
 
 export type QueryFilter = z.infer<typeof QueryFilterSchema>;
+export type FilterColumn = typeof FILTER_COLUMNS[number];
+export type FilterOperator = typeof FILTER_OPERATORS[number];

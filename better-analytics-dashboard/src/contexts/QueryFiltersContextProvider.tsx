@@ -24,7 +24,7 @@ type QueryFiltersContextProviderProps = {
 }
 
 export function QueryFiltersContextProvider({ children }: QueryFiltersContextProviderProps) {
-  const [ queryFilters, setQueryFilters ] = useState<DashboardQueryFilter[]>([]);
+  const [ queryFilters, setQueryFilters ] = useState<DashboardQueryFilter[]>([{ column: 'url', operator: '=', value: '', id: 'base-filter' }]);
 
   const addQueryFilter = useCallback((queryFilter: QueryFilter) => {
     const filter = {
