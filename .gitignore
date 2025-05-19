@@ -63,5 +63,5 @@ Thumbs.db
 /nextjs/static/
 node_modules
 
-# Postgres database / pgadmin
+# Docker volumnes
 /data/
