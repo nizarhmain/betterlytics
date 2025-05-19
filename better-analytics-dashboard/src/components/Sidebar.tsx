@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { LayoutDashboard, FileText, Smartphone, CircleDot, Globe, Link2, Funnel, DollarSign } from "lucide-react";
+import { LayoutDashboard, FileText, Smartphone, CircleDot, Globe, Link2, Funnel, DollarSign, Settings } from "lucide-react";
 import { SidebarHeader } from "./SidebarHeader";
+import SettingsButton from './SettingsButton';
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: <LayoutDashboard size={18} /> },
@@ -34,6 +35,10 @@ export default function Sidebar() {
           ))}
         </ul>
       </nav>
+      <div className="pt-4 mt-4 border-t border-border">
+        <div className="text-xs text-muted-foreground mb-2">Configuration</div>
+        <SettingsButton />
+      </div>
     </aside>
   );
 } 
