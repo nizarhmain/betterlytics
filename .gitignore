@@ -62,3 +62,7 @@ Thumbs.db
 /nextjs/public/
 /nextjs/static/
 node_modules
+
+# Postgres database / pgadmin
+/db-data/
+/pgadmin-data/
