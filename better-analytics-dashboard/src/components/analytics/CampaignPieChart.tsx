@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { getCampaignSourceColor } from '@/utils/campaignColors';
+import { formatPercentage } from '@/utils/formatters';
 
 export const CampaignDataKey = {
   SOURCE: 'source',
@@ -37,8 +38,8 @@ export default function CampaignPieChart({
 }: CampaignPieChartProps) {
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 min-h-[300px] flex items-center justify-center">
-        <p className="text-gray-500">Loading chart data...</p>
+      <div className="bg-card rounded-lg shadow border border-border p-6 min-h-[300px] flex items-center justify-center">
+        <p className="text-muted-foreground">Loading chart data...</p>
       </div>
     );
   }
@@ -56,16 +57,16 @@ export default function CampaignPieChart({
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 min-h-[300px] flex items-center justify-center">
-        <p className="text-gray-500">{emptyStateMessage}</p>
+      <div className="bg-card rounded-lg shadow border border-border p-6 min-h-[300px] flex items-center justify-center">
+        <p className="text-muted-foreground">{emptyStateMessage}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-bold text-gray-900 mb-1">{title}</h2>
-      <p className="text-sm text-gray-500 mb-4">{subtitle}</p>
+    <div className="bg-card rounded-lg shadow border border-border p-6">
+      <h2 className="text-lg font-bold text-foreground mb-1">{title}</h2>
+      <p className="text-sm text-muted-foreground mb-4">{subtitle}</p>
       <div className="h-72 md:h-80 flex flex-col items-center mt-4">
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
@@ -95,7 +96,7 @@ export default function CampaignPieChart({
                 className="inline-block w-3 h-3 rounded-full mr-1.5"
                 style={{ backgroundColor: entry.color as string }}
               ></span>
-              <span className="text-gray-600">{entry.name as string} ({entry.percent}%)</span>
+              <span className="text-muted-foreground">{entry.name as string} ({formatPercentage(entry.percent)})</span>
             </div>
           ))}
         </div>

@@ -21,8 +21,8 @@ interface CampaignVisitorTrendChartProps {
 export default function CampaignVisitorTrendChart({ data, isLoading }: CampaignVisitorTrendChartProps) {
   if (isLoading) {
     return (
-      <div>
-        <p>Loading visitor trend data...</p>
+      <div className="bg-card rounded-lg shadow border border-border p-6 min-h-[350px] flex items-center justify-center">
+        <p className="text-muted-foreground">Loading visitor trend data...</p>
       </div>
     );
   }
@@ -34,16 +34,16 @@ export default function CampaignVisitorTrendChart({ data, isLoading }: CampaignV
 
   if (!data || data.length === 0 || campaignKeys.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 min-h-[350px] flex items-center justify-center">
-        <p className="text-gray-500">No campaign visitor trend data available.</p>
+      <div className="bg-card rounded-lg shadow border border-border p-6 min-h-[350px] flex items-center justify-center">
+        <p className="text-muted-foreground">No campaign visitor trend data available.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-bold text-gray-900 mb-1">Campaign Visitor Trend</h2>
-      <p className="text-sm text-gray-500 mb-4">Visitor trends over time by campaign</p>
+    <div className="bg-card rounded-lg shadow border border-border p-6">
+      <h2 className="text-lg font-bold text-foreground mb-1">Campaign Visitor Trend</h2>
+      <p className="text-sm text-muted-foreground mb-4">Visitor trends over time by campaign</p>
       <div style={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>
           <AreaChart data={data}
@@ -52,7 +52,7 @@ export default function CampaignVisitorTrendChart({ data, isLoading }: CampaignV
             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip
-              contentStyle={{ fontSize: 12, borderRadius: '4px' }}
+              contentStyle={{ fontSize: 12, borderRadius: '4px', backgroundColor: 'var(--background)', borderColor: 'var(--border)' }}
               formatter={(value: number, name: string) => [value.toLocaleString(), name]}
             />
             {campaignKeys.map((campaignName) => (
@@ -77,7 +77,7 @@ export default function CampaignVisitorTrendChart({ data, isLoading }: CampaignV
               className="inline-block w-3 h-3 rounded-full mr-1.5"
               style={{ backgroundColor: getCampaignSourceColor(campaignName) }}
             ></span>
-            <span className="text-gray-600">{campaignName}</span>
+            <span className="text-muted-foreground">{campaignName}</span>
           </div>
         ))}
       </div>

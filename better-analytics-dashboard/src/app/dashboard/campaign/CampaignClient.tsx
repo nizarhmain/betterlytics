@@ -73,10 +73,10 @@ export default function CampaignClient() {
     <button
       key={tabValue}
       onClick={() => setActiveTab(tabValue)}
-      className={`px-4 py-2 font-medium text-sm rounded-md focus:outline-none
+      className={`px-4 py-2 font-medium text-sm rounded-md focus:outline-none transition-colors
         ${activeTab === tabValue
-          ? 'bg-blue-600 text-white'
-          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+          ? 'bg-primary text-primary-foreground'
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
         }`}
     >
       {label}
@@ -87,13 +87,13 @@ export default function CampaignClient() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Campaigns</h1>
-          <p className="text-sm text-gray-500">Campaign performance analytics and insights</p>
+          <h1 className="text-2xl font-bold text-foreground mb-1">Campaigns</h1>
+          <p className="text-sm text-muted-foreground">Campaign performance analytics and insights</p>
         </div>
         <TimeRangeSelector />
       </div>
 
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <nav className="-mb-px flex space-x-4" aria-label="Tabs">
           {renderTabButton("overview", "Overview")}
           {renderTabButton("utmBreakdowns", "UTM Breakdowns")}
@@ -136,7 +136,7 @@ export default function CampaignClient() {
                 emptyStateMessage="No source breakdown data available for campaigns."
               />
             </div>
-            <hr className="my-6 border-gray-200"/>
+            <hr className="my-6 border-border"/>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <CampaignEngagementTable
@@ -156,7 +156,7 @@ export default function CampaignClient() {
                 emptyStateMessage="No medium breakdown data available for campaigns."
               />
             </div>
-            <hr className="my-6 border-gray-200"/>
+            <hr className="my-6 border-border"/>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <CampaignEngagementTable
@@ -176,7 +176,7 @@ export default function CampaignClient() {
                 emptyStateMessage="No content breakdown data available for campaigns."
               />
             </div>
-            <hr className="my-6 border-gray-200"/>
+            <hr className="my-6 border-border"/>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <CampaignEngagementTable
