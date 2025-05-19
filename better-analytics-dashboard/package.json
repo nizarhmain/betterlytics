@@ -8,9 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "dashboard-unit-tests": "vitest run",
-    "dashboard-db-migrate": "npx prisma migrate dev",
-    "dashboard-db-generate": "npx prisma generate",
-    "dashboard-db-seed": "npx prisma db seed"
+    "migrate": "npx prisma migrate dev",
+    "generate": "npx prisma generate",
+    "seed": "npx prisma db seed"
   },
   "prisma": {
     "schema": "./prisma/schema.prisma",

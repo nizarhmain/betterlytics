@@ -64,5 +64,4 @@ Thumbs.db
 node_modules
 
 # Postgres database / pgadmin
-/db-data/
-/pgadmin-data/
+/data/
