@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LayoutDashboard, FileText, Smartphone, CircleDot, Globe, Link2, Funnel, DollarSign } from "lucide-react";
-import { ThemeSwitcher } from "./ThemeSwitcher";
+import { SidebarHeader } from "./SidebarHeader";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: <LayoutDashboard size={18} /> },
@@ -20,17 +20,7 @@ const navItems = [
 export default function Sidebar() {
   return (
     <aside className="w-56 bg-sidebar border-r border-border h-screen flex flex-col p-4">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="bg-primary text-primary-foreground rounded p-2"><LayoutDashboard size={20} /></span>
-            <div>
-              <div className="font-bold text-sm text-foreground">Betterlytics</div>
-            </div>
-          </div>
-          <ThemeSwitcher />
-        </div>
-      </div>
+      <SidebarHeader />
       <nav className="flex-1">
         <div className="text-xs text-muted-foreground mb-2">Analytics</div>
         <ul className="space-y-1">
