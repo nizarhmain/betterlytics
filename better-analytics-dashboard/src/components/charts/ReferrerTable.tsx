@@ -113,7 +113,7 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
 
   return (
     <div>
-      <div className="border-b mb-4">
+      <div className="border-b border-border mb-4">
         <div className="flex space-x-4 overflow-x-auto">
           {(Object.entries(ReferrerTab) as [ReferrerTabValue, ReferrerTabKey][]).map(
             ([key, value]) => (

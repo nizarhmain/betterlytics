@@ -1,14 +1,14 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import EventsClient from "./EventsClient";
+import CampaignClient from "./CampaignClient";
 
-export default async function EventsPage() {
+export default async function CampaignPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/");
   }
 
-  return <EventsClient />;
+  return <CampaignClient />;
 } 

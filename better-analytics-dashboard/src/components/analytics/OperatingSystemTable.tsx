@@ -1,20 +1,19 @@
 'use client';
 
-import { BrowserStats } from "@/entities/devices";
+import { OperatingSystemStats } from "@/entities/devices";
 import { DataTable } from "@/components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 
-interface BrowserTableProps {
-  data: BrowserStats[];
+interface OperatingSystemTableProps {
+  data: OperatingSystemStats[];
   isLoading: boolean;
 }
 
-export default function BrowserTable({ data, isLoading }: BrowserTableProps) {
-
-  const columns: ColumnDef<BrowserStats>[] = [
+export default function OperatingSystemTable({ data, isLoading }: OperatingSystemTableProps) {
+  const columns: ColumnDef<OperatingSystemStats>[] = [
     {
-      accessorKey: 'browser',
-      header: 'Browser',
+      accessorKey: 'os',
+      header: 'Operating System',
     },
     {
       accessorKey: 'visitors',

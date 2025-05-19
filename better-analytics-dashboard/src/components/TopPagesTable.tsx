@@ -50,9 +50,9 @@ export default function TopPagesTable({ pages, isLoading = false }: TopPagesTabl
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-bold text-gray-900 mb-1">Top Pages</h2>
-      <p className="text-sm text-gray-500 mb-4">Most visited pages</p>
+    <div>
+      <h2 className="text-lg font-bold text-foreground mb-1">Top Pages</h2>
+      <p className="text-sm text-muted-foreground mb-4">Most visited pages</p>
       <div className="overflow-x-auto">
         <DataTable
           columns={columns}
