@@ -26,9 +26,7 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
           numberOfSteps,
           numberOfJourneys
         );
-      },
-      staleTime: 5 * 60 * 1000,
-      gcTime: 30 * 60 * 1000
+      }
     });
 
     const errorMessage = error instanceof Error ? error.message : "Failed to fetch journey data";
