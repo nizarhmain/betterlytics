@@ -72,9 +72,9 @@ export default function PagesTable({ data }: PagesTableProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-bold text-gray-900 mb-1">All Pages</h2>
-      <p className="text-sm text-gray-500 mb-4">Analytics for all tracked pages</p>
+    <div className="bg-card rounded-lg shadow border border-border p-6">
+      <h2 className="text-lg font-bold text-foreground mb-1">All Pages</h2>
+      <p className="text-sm text-muted-foreground mb-4">Analytics for all tracked pages</p>
       <div className="overflow-x-auto">
         <DataTable
           columns={columns}

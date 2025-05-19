@@ -29,7 +29,14 @@ export default function BrowserTable({ data, isLoading }: BrowserTableProps) {
   ];
 
   if (isLoading) {
-    return <div className="h-48 flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="h-48 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-accent border-t-primary rounded-full animate-spin"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

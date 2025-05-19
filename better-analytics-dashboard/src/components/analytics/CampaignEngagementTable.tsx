@@ -72,11 +72,9 @@ export default function CampaignEngagementTable<TData extends CampaignEngagement
   }, [dataKey]);
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg shadow">
-      <div className="p-6">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-1">{title}</h2>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{subtitle}</p>
-      </div>
+    <div className="bg-card rounded-lg shadow border border-border p-6">
+      <h2 className="text-lg font-bold text-foreground mb-1">{title}</h2>
+      <p className="text-sm text-muted-foreground mb-4">{subtitle}</p>
       <DataTable
         columns={columns}
         data={data}
