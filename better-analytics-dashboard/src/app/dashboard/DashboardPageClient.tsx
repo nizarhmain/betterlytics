@@ -20,8 +20,8 @@ export default function DashboardPageClient() {
   const siteId = 'default-site';
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
-    queryKey: ['summaryStats', siteId, startDate, endDate],
-    queryFn: () => fetchSummaryStatsAction(siteId, startDate, endDate),
+    queryKey: ['summaryStats', siteId, startDate, endDate, queryFilters],
+    queryFn: () => fetchSummaryStatsAction(siteId, startDate, endDate, queryFilters),
   });
 
   const { data: topPages, isLoading: topPagesLoading } = useQuery({

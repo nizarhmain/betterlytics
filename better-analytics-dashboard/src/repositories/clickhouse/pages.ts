@@ -4,7 +4,7 @@ import { PageAnalytics, PageAnalyticsSchema } from '@/entities/pages';
 import { DateString, DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { BAQuery } from '@/lib/ba-query';
-import { safeSql } from '@/lib/safe-sql';
+import { safeSql, SQL } from '@/lib/safe-sql';
 import { QueryFilter } from '@/entities/filter';
 
 export async function getTotalPageViews(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<TotalPageViewsRow[]> {
@@ -61,17 +61,19 @@ export async function getPageViews(siteId: string, startDate: DateString, endDat
   return result.map(row => DailyPageViewRowSchema.parse(row));
 }
 
-export async function getTotalPageviews(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<number> {
-  const query = `
+export async function getTotalPageviews(siteId: string, startDate: DateTimeString, endDate: DateTimeString, queryFilters: QueryFilter[]): Promise<number> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
+  const queryResponse = safeSql`
     SELECT count() as pageviews
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND event_type = 'pageview' 
-      AND timestamp >= {start:DateTime}
-      AND timestamp <= {end:DateTime}
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND ${SQL.AND(filters)}
   `;
-  const result = await clickhouse.query(query, {
-    params: { site_id: siteId, start: startDate, end: endDate },
+  const result = await clickhouse.query(queryResponse.taggedSql, {
+    params: { ...queryResponse.taggedParams, site_id: siteId, start: startDate, end: endDate },
   }).toPromise() as any[];
   return Number(result[0]?.pageviews ?? 0);
 }
@@ -93,7 +95,7 @@ export async function getTopPages(
     WHERE site_id = {site_id:String}
       AND event_type = 'pageview' 
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-      AND ${filters}
+      AND ${SQL.AND(filters)}
     GROUP BY url
     ORDER BY visitors DESC
     LIMIT {limit:UInt64} 

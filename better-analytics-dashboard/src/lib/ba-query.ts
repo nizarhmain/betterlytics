@@ -15,15 +15,13 @@ function getFilterQuery(queryFilters: QueryFilter[]) {
   const filters = QueryFilterSchema.array().parse(nonEmptyFilters);
 
   if (filters.length === 0) {
-    return safeSql` 1=1 `;
+    return [safeSql`1=1`];
   }
 
-  const expressions = filters
+  return filters
     .map(({ column, operator, value }, index) => {
       return safeSql`${SQL._Unsafe(column)} ${SQL._Unsafe(operator)} ${SQL.String({ [`query_filter_${index}`]: value })}`
-    });  
-
-  return safeSql` ${SQL.AND(expressions)} `;
+    });
 }
 
 

@@ -25,9 +25,9 @@ export async function fetchUniqueVisitorsAction(siteId: string, startDate: Date,
   return getUniqueVisitorsForSite(siteId, startDate, endDate, granularity);
 }
 
-export async function fetchSummaryStatsAction(siteId: string, startDate: Date, endDate: Date) {
+export async function fetchSummaryStatsAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
   await checkAuth();
-  return getSummaryStatsForSite(siteId, startDate, endDate);
+  return getSummaryStatsForSite(siteId, startDate, endDate, queryFilters);
 }
 
 export async function fetchTopPagesAction(siteId: string, startDate: Date, endDate: Date, limit: number, queryFilters: QueryFilter[]) {
