@@ -3,6 +3,7 @@
 import { getUserSequentialPaths } from '@/repositories/clickhouse/userJourney';
 import { SankeyData, SankeyNode, SankeyLink, SequentialPath } from '@/entities/userJourney';
 import { toDateTimeString } from '@/utils/dateFormatters';
+import { QueryFilter } from '@/entities/filter';
 
 /**
  * Fetches user journey data and transforms it into Sankey diagram format
@@ -12,7 +13,8 @@ export async function getUserJourneyForSankeyDiagram(
   startDate: Date, 
   endDate: Date, 
   maxSteps: number = 3,
-  limit: number = 50
+  limit: number = 50,
+  queryFilters: QueryFilter[]
 ): Promise<SankeyData> {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
@@ -22,7 +24,8 @@ export async function getUserJourneyForSankeyDiagram(
     formattedStart, 
     formattedEnd,
     maxSteps,
-    limit
+    limit,
+    queryFilters
   );
   
   return transformSequentialPathsToSankeyData(sequentialPaths, maxSteps);

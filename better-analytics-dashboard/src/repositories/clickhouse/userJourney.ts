@@ -1,7 +1,9 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { SequentialPath, SequentialPathSchema } from '@/entities/userJourney';
 import { DateTimeString } from '@/types/dates';
-import { safeSql } from '@/lib/safe-sql';
+import { safeSql, SQL } from '@/lib/safe-sql';
+import { QueryFilter } from '@/entities/filter';
+import { BAQuery } from '@/lib/ba-query';
 
 /**
  * Gets complete sequential path data for sessions
@@ -12,8 +14,10 @@ export async function getUserSequentialPaths(
   startDate: DateTimeString,
   endDate: DateTimeString,
   maxPathLength: number = 3,
-  limit: number = 25
+  limit: number = 25,
+  queryFilters: QueryFilter[]
 ): Promise<SequentialPath[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
   const query = safeSql`
     WITH ordered_events AS (
       SELECT
@@ -25,6 +29,7 @@ export async function getUserSequentialPaths(
         AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
         AND url != ''
         AND event_type = 'pageview'
+        AND ${SQL.AND(filters)}
       GROUP BY session_id
     ),
     session_paths AS (
