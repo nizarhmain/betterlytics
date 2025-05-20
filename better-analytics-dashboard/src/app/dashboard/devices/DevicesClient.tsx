@@ -60,7 +60,7 @@ export default function DevicesClient() {
           <h1 className="text-2xl font-bold text-foreground mb-1">Devices</h1>
           <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
         </div>
-        <div className="flex justify-end mb-4 gap-4">
+        <div className="flex justify-end gap-4">
           <QueryFiltersSelector />
           <TimeRangeSelector />
         </div>

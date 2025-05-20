@@ -30,8 +30,8 @@ export async function getTopPagesForSite(siteId: string, startDate: Date, endDat
   return getTopPages(siteId, toDateTimeString(startDate), toDateTimeString(endDate), limit, queryFilters);
 }
 
-export async function getPageAnalytics(siteId: string, startDate: Date, endDate: Date): Promise<PageAnalytics[]> {
-  return getPageMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+export async function getPageAnalytics(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<PageAnalytics[]> {
+  return getPageMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters);
 }
 
 export async function getPageDetail(siteId: string, path: string, startDate: Date, endDate: Date): Promise<PageAnalytics | null> {

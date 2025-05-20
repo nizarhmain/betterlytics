@@ -124,9 +124,11 @@ export async function getTopPages(
 export async function getPageMetrics(
   siteId: string,
   startDate: DateTimeString,
-  endDate: DateTimeString
+  endDate: DateTimeString,
+  queryFilters: QueryFilter[]
 ): Promise<PageAnalytics[]> {
-  const query = `
+  const filters = BAQuery.getFilterQuery(queryFilters);
+  const query = safeSql`
     WITH 
       page_view_durations AS (
         SELECT
@@ -148,10 +150,14 @@ export async function getPageMetrics(
         WHERE site_id = {site_id:String}
           AND event_type = 'pageview' 
           AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+          AND ${SQL.AND(filters)}
       ),
       session_page_counts AS (
         SELECT session_id, count() as page_count FROM analytics.events
-        WHERE site_id = {site_id:String} AND timestamp BETWEEN {start:DateTime} AND {end:DateTime} AND event_type = 'pageview'
+        WHERE site_id = {site_id:String}
+          AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+          AND event_type = 'pageview'
+          AND ${SQL.AND(filters)}
         GROUP BY session_id
       ),
       page_aggregates AS (
@@ -167,8 +173,9 @@ export async function getPageMetrics(
     FROM page_aggregates ORDER BY visitors DESC, pageviews DESC LIMIT 100
   `;
   
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       start: startDate,
       end: endDate,
@@ -194,7 +201,7 @@ export async function getPageDetailMetrics(
   startDate: DateTimeString,
   endDate: DateTimeString
 ): Promise<PageAnalytics | null> {
-  const query = `
+  const query = safeSql`
     WITH 
       page_view_durations AS (
         SELECT
@@ -235,8 +242,9 @@ export async function getPageDetailMetrics(
     LIMIT 1
   `;
   
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       path: path,
       start: startDate,
