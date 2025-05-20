@@ -17,8 +17,8 @@ export async function requireAuth(): Promise<Session> {
     redirect("/auth/signin");
   }
 
-  if (!session?.dashboardId) {
-    console.error("Dashboard ID missing from session after user authentication.");
+  if (!session?.dashboardId || !session?.siteId) {
+    console.error("Dashboard ID or Site ID missing from session after user authentication.");
     redirect("/auth/signin");
   }
   
@@ -28,9 +28,13 @@ export async function requireAuth(): Promise<Session> {
 export async function requireDashboardAuth() {
   const session = await requireAuth();
 
-  if (!session.dashboardId) {
-    console.log("User authenticated but no active dashboard ID found in session, redirecting.");
+  if (!session.dashboardId || !session.siteId) {
+    console.log("User authenticated but critical dashboard/site identifiers are missing.");
     redirect("/auth/signin");
   }
-  return session as Session & { user: { role?: string }, dashboardId: string };
+  return session as Session & { 
+    user: { role?: string }, 
+    dashboardId: string, 
+    siteId: string 
+  };
 } 

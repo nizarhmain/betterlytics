@@ -11,6 +11,7 @@ interface User {
   email: string
   role: string
   dashboardId: string;
+  siteId: string;
 }
 
 declare module "next-auth" {
@@ -22,10 +23,12 @@ declare module "next-auth" {
       role?: string
     }
     dashboardId?: string;
+    siteId?: string;
   }
   interface JWT {
     role?: string;
     dashboardId?: string;
+    siteId?: string;
   }
 }
 
@@ -64,6 +67,7 @@ export const authOptions: NextAuthOptions = {
               email: "admin@localhost",
               role: "admin",
               dashboardId: dashboard.id,
+              siteId: dashboard.siteId,
             }
           } catch (error) {
             console.error("Error upserting dashboard during authorization:", error);
@@ -87,6 +91,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = (user as User).role
         token.dashboardId = (user as User).dashboardId;
+        token.siteId = (user as User).siteId;
       }
       return token
     },
@@ -95,6 +100,7 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string;
       }
       session.dashboardId = token.dashboardId as string;
+      session.siteId = token.siteId as string;
       return session
     },
   },
