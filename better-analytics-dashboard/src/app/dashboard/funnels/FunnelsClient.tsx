@@ -8,18 +8,19 @@ import { ReactNode, useMemo } from 'react';
 import { analyzeFunnel } from './analytics';
 import Link from 'next/link';
 import { ArrowRightCircleIcon } from 'lucide-react';
+import { useDashboard } from '@/app/dashboard/DashboardProvider';
 
 export default function FunnelsClient() {
-  const { data: funnels = [], isLoading: funnelsLoading } = useQuery<FunnelDetails[]>({
-    queryKey: ['funnels', 'default-site'],
-    queryFn: () => fetchFunnelsAction('default-site'),
+  const { dashboardId } = useDashboard();
+
+  const { data: funnels = [] } = useQuery<FunnelDetails[]>({
+    queryKey: ['funnels', dashboardId],
+    queryFn: () => {
+      return fetchFunnelsAction(dashboardId);
+    },
   });
 
   const funnelsData = useMemo(() => funnels.map((funnel) => analyzeFunnel(funnel)), [funnels]);
-
-  if (funnelsLoading) {
-    return <div>Loading...</div>
-  }
 
   return (
     <div>

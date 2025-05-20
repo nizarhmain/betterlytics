@@ -1,9 +1,10 @@
 import { z } from "zod";
 
 export const FunnelSchema = z.object({
-  id: z.string(),
+  id: z.string().cuid(),
   name: z.string(),
   pages: z.string().array(),
+  dashboardId: z.string().cuid(),
 });
 
 export const FunnelDetailsSchema = FunnelSchema.extend({
@@ -11,9 +12,9 @@ export const FunnelDetailsSchema = FunnelSchema.extend({
 });
 
 export const CreateFunnelSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, "Funnel name is required"),
   pages: z.string().array(),
-  siteId: z.string(),
+  dashboardId: z.string().cuid("Valid Dashboard ID is required"),
 });
 
 export type Funnel = z.infer<typeof FunnelSchema>;

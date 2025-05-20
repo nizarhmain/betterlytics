@@ -1,48 +1,37 @@
-
-import { Prisma, PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-const SITE_ID = 'default-site';
+const DEFAULT_DASHBOARD_TRACKING_ID = 'default-site'
 
-const siteData: Prisma.SiteCreateInput = {
-  siteId: SITE_ID,
-}
+async function main() {
+  const dashboard = await prisma.dashboard.upsert({
+    where: { siteId: DEFAULT_DASHBOARD_TRACKING_ID },
+    update: {},
+    create: {
+      siteId: DEFAULT_DASHBOARD_TRACKING_ID,
+    },
+  })
 
-const funnelData = {
-  name: 'Basic funnel',
-  siteId: SITE_ID,
-  pages: [
-    '/dashboard',
-    '/dashboard/pages',
-    '/dashboard/geography',
-  ]
-}
-
-
-export async function main() {
-  // Create site
-  const siteExists = await prisma.site.findFirst({
+  const funnelName = 'Basic funnel'
+  
+  let existingFunnel = await prisma.funnel.findFirst({
     where: {
-      siteId: siteData.siteId
+      name: funnelName,
+      dashboardId: dashboard.id
     }
-  });
+  })
 
-  if (!siteExists) { 
-    await prisma.site.create({ data: siteData });
-  }
-
-  // Create funnel
-  const funnelExists = await prisma.funnel.findFirst({
-    where: {
-      name: funnelData.name
-    }
-  });
-
-  if (!funnelExists) {  
+  if (!existingFunnel) {
     await prisma.funnel.create({
-      data: funnelData
-    });
+      data: {
+        name: funnelName,
+        pages: ['/dashboard', '/dashboard/pages', '/dashboard/geography'],
+        dashboard: {
+          connect: { id: dashboard.id }, 
+        },
+      }
+    })
   }
 }
 

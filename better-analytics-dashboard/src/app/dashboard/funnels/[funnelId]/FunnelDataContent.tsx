@@ -9,16 +9,20 @@ import { Badge } from "@/components/ui/badge";
 import SummaryCard from "@/components/SummaryCard";
 import { ArrowRight } from "lucide-react";
 import { analyzeFunnel } from "../analytics";
+import { useDashboard } from "@/app/dashboard/DashboardProvider";
 
 type FunnelDataContentProps = {
   funnelId: string;
 };
 
 export function FunnelDataContent({ funnelId }: FunnelDataContentProps) {
-  
+  const { dashboardId } = useDashboard();
+
   const { data: funnel, isLoading: funnelLoading } = useQuery<FunnelDetails>({
-    queryKey: ['funnel', 'default-site', funnelId],
-    queryFn: () => fetchFunnelDetailsAction('default-site', funnelId),
+    queryKey: ['funnel', dashboardId, funnelId],
+    queryFn: () => {
+      return fetchFunnelDetailsAction(dashboardId, funnelId);
+    },
   });
 
   const funnelData = useMemo(() => {

@@ -2,21 +2,21 @@
 
 import { checkAuth } from "@/lib/auth-actions";
 import { type Funnel, CreateFunnelSchema, FunnelDetails } from "@/entities/funnels";
-import { createFunnelForSite, getFunnelDetailsById, getFunnelsBySiteId } from "@/services/funnels";
+import { createFunnelForDashboard, getFunnelDetailsById, getFunnelsByDashboardId } from "@/services/funnels";
 
-export async function postFunnelAction(siteId: string, name: string, pages: string[]): Promise<Funnel> {
+export async function postFunnelAction(dashboardId: string, name: string, pages: string[]): Promise<Funnel> {
   await checkAuth();
   const funnel = CreateFunnelSchema.parse({
-    siteId,
+    dashboardId,
     name,
     pages
   });
-  return createFunnelForSite(funnel);
+  return createFunnelForDashboard(funnel);
 }
 
-export async function fetchFunnelDetailsAction(siteId: string, funnelId: string): Promise<FunnelDetails> {
+export async function fetchFunnelDetailsAction(dashboardId: string, funnelId: string): Promise<FunnelDetails> {
   await checkAuth();
-  const funnel = await getFunnelDetailsById(siteId, funnelId);
+  const funnel = await getFunnelDetailsById(dashboardId, funnelId);
   if (funnel === null) {
     throw 'Funnel not found'
   };
@@ -25,7 +25,7 @@ export async function fetchFunnelDetailsAction(siteId: string, funnelId: string)
 }
 
 
-export async function fetchFunnelsAction(siteId: string): Promise<FunnelDetails[]> {
+export async function fetchFunnelsAction(dashboardId: string): Promise<FunnelDetails[]> {
   await checkAuth();
-  return getFunnelsBySiteId(siteId);
+  return getFunnelsByDashboardId(dashboardId);
 }

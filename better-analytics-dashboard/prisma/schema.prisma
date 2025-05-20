@@ -10,11 +10,11 @@ datasource db {
   url      = env("POSTGRES_URL")
 }
 
-model Site {
+model Dashboard {
   id String @id @default(cuid())
   siteId String @unique
 
-  Funnel Funnel[]
+  funnels Funnel[]
 }
 
 model Funnel {
@@ -24,7 +24,6 @@ model Funnel {
   
   pages   String[]
 
-  site    Site @relation(fields: [siteId], references: [siteId], onDelete: Cascade)
-  siteId  String
+  dashboard    Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  dashboardId  String
 }
-

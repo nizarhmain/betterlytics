@@ -3,12 +3,14 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { JWT } from "next-auth/jwt"
 import { Session } from "next-auth"
 import { env } from "./env"
+import prisma from "@/lib/postgres"
 
 interface User {
   id: string
   name: string
   email: string
   role: string
+  dashboardId: string;
 }
 
 declare module "next-auth" {
@@ -18,7 +20,12 @@ declare module "next-auth" {
       email?: string | null
       image?: string | null
       role?: string
+      dashboardId?: string;
     }
+  }
+  interface JWT {
+    role?: string;
+    dashboardId?: string;
   }
 }
 
@@ -30,7 +37,6 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials): Promise<User | null> {
-        // For now, we'll use a single admin user from environment variables
         const adminUsername = env.ADMIN_USERNAME
         const adminPassword = env.ADMIN_PASSWORD
 
@@ -42,11 +48,26 @@ export const authOptions: NextAuthOptions = {
           credentials?.username === adminUsername &&
           credentials?.password === adminPassword
         ) {
-          return {
-            id: "1",
-            name: "Admin",
-            email: "admin@localhost",
-            role: "admin",
+
+          try {
+            const dashboard = await prisma.dashboard.upsert({
+              where: { siteId: env.SITE_ID },
+              update: {},
+              create: {
+                siteId: env.SITE_ID,
+              },
+            });
+
+            return {
+              id: "1",
+              name: "Admin",
+              email: "admin@localhost",
+              role: "admin",
+              dashboardId: dashboard.id,
+            }
+          } catch (error) {
+            console.error("Error upserting dashboard during authorization:", error);
+            return null;
           }
         }
 
@@ -65,12 +86,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.role = (user as User).role
+        token.dashboardId = (user as User).dashboardId;
       }
       return token
     },
     async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
-        session.user.role = token.role as string
+        session.user.role = token.role as string;
+        session.user.dashboardId = token.dashboardId as string;
       }
       return session
     },
