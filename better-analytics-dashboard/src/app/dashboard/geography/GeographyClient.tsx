@@ -7,12 +7,16 @@ import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { getWorldMapData } from '@/app/actions/geography';
 import { GeoVisitor } from '@/entities/geography';
 import { alpha2ToAlpha3Code } from '@/utils/countryCodes';
+import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
+import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 
 export default function GeographyClient() {
   const [visitorData, setVisitorData] = useState<GeoVisitor[]>([]);
   const [maxVisitors, setMaxVisitors] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { queryFilters } = useQueryFiltersContext();
 
   const { startDate, endDate } = useTimeRangeContext();
   
@@ -24,7 +28,7 @@ export default function GeographyClient() {
       setError(null);
       
       try {
-        const data = await getWorldMapData({ siteId, startDate, endDate });
+        const data = await getWorldMapData({ siteId, startDate, endDate, queryFilters });
         
         // Convert alpha-2 country codes to alpha-3 for map compatibility with the current geojson data format
         const processedData = data.visitorData.map(visitor => {
@@ -51,7 +55,7 @@ export default function GeographyClient() {
     };
 
     fetchData();
-  }, [siteId, startDate, endDate]);
+  }, [siteId, startDate, endDate, queryFilters]);
   
   return (
     <div className="h-full w-full flex flex-col relative">
@@ -63,7 +67,8 @@ export default function GeographyClient() {
       </div>
       
       <div className="absolute top-4 right-4 z-[1001]">
-        <div className="bg-card shadow-md rounded-md p-2">
+        <div className="flex gap-4 bg-card shadow-md rounded-md p-2">
+          <QueryFiltersSelector />
           <TimeRangeSelector />
         </div>
       </div>

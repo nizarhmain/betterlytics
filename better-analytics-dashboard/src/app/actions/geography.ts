@@ -3,12 +3,14 @@
 import { fetchVisitorsByGeography } from '@/services/geography';
 import { z } from 'zod';
 import { GeoVisitorSchema } from '@/entities/geography';
+import { QueryFilterSchema } from '@/entities/filter';
 
 // Schema for validating the input parameters
 const queryParamsSchema = z.object({
   siteId: z.string(),
   startDate: z.date(),
   endDate: z.date(),
+  queryFilters: QueryFilterSchema.array()
 });
 
 const worldMapResponseSchema = z.object({
@@ -28,10 +30,10 @@ export async function getWorldMapData(
     throw new Error(`Invalid parameters: ${validatedParams.error.message}`);
   }
   
-  const { siteId, startDate, endDate } = validatedParams.data;
+  const { siteId, startDate, endDate, queryFilters } = validatedParams.data;
   
   try {
-    const geoVisitors = await fetchVisitorsByGeography(siteId, startDate, endDate);
+    const geoVisitors = await fetchVisitorsByGeography(siteId, startDate, endDate, queryFilters);
     
     const maxVisitors = Math.max(...geoVisitors.map(d => d.visitors), 1);
     
