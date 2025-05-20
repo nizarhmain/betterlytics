@@ -23,7 +23,7 @@ export default function QueryFiltersSelector() {
         >
           <div className="flex items-center gap-2">
             <FilterIcon className="w-4 h-4" />
-            <span>Filters</span>
+            <span>Filters ({queryFilters.length})</span>
           </div>
           <ChevronDownIcon className={`ml-2 h-4 w-4 shrink-0 opacity-50`} /> 
         </Button>
