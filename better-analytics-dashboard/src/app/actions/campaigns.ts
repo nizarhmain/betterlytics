@@ -18,14 +18,14 @@ import {
   CampaignTermBreakdownItem,
   CampaignLandingPagePerformanceItem,
 } from "@/entities/campaign";
-import { checkAuth } from "@/lib/auth-actions";
+import { requireDashboardAuth } from "@/lib/auth-actions";
 
 export async function fetchCampaignPerformanceAction(
   siteId: string,
   startDate: Date,
   endDate: Date
 ): Promise<CampaignPerformance[]> {
-  await checkAuth();
+  const session = await requireDashboardAuth();
 
   try {
     const performanceData = await fetchCampaignPerformance(
@@ -45,7 +45,7 @@ export async function fetchCampaignSourceBreakdownAction(
   startDate: Date,
   endDate: Date
 ): Promise<CampaignSourceBreakdownItem[]> {
-  await checkAuth();
+  const session = await requireDashboardAuth();
 
   try {
     const breakdownData = await fetchCampaignSourceBreakdown(
@@ -65,7 +65,7 @@ export async function fetchCampaignMediumBreakdownAction(
   startDate: Date,
   endDate: Date
 ): Promise<CampaignMediumBreakdownItem[]> {
-  await checkAuth();
+  const session = await requireDashboardAuth();
 
   try {
     const breakdownData = await fetchCampaignMediumBreakdown(
@@ -85,7 +85,7 @@ export async function fetchCampaignContentBreakdownAction(
   startDate: Date,
   endDate: Date
 ): Promise<CampaignContentBreakdownItem[]> {
-  await checkAuth();
+  const session = await requireDashboardAuth();
 
   try {
     const breakdownData = await fetchCampaignContentBreakdown(
@@ -105,7 +105,7 @@ export async function fetchCampaignTermBreakdownAction(
   startDate: Date,
   endDate: Date
 ): Promise<CampaignTermBreakdownItem[]> {
-  await checkAuth();
+  const session = await requireDashboardAuth();
 
   try {
     const breakdownData = await fetchCampaignTermBreakdown(
@@ -125,7 +125,7 @@ export async function fetchCampaignLandingPagePerformanceAction(
   startDate: Date,
   endDate: Date
 ): Promise<CampaignLandingPagePerformanceItem[]> {
-  await checkAuth();
+  const session = await requireDashboardAuth();
 
   try {
     const performanceData = await fetchCampaignLandingPagePerformance(
@@ -145,7 +145,8 @@ export async function fetchCampaignVisitorTrendAction(
   startDate: Date,
   endDate: Date
 ): Promise<PivotedCampaignVisitorTrendItem[]> {
-  await checkAuth();
+  const session = await requireDashboardAuth();
+
   try {
     return await fetchCampaignVisitorTrend(siteId, startDate, endDate);
   } catch (error) {

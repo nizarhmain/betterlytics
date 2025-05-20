@@ -20,8 +20,8 @@ declare module "next-auth" {
       email?: string | null
       image?: string | null
       role?: string
-      dashboardId?: string;
     }
+    dashboardId?: string;
   }
   interface JWT {
     role?: string;
@@ -93,8 +93,8 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
         session.user.role = token.role as string;
-        session.user.dashboardId = token.dashboardId as string;
       }
+      session.dashboardId = token.dashboardId as string;
       return session
     },
   },

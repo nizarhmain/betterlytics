@@ -1,6 +1,6 @@
 'use server';
 
-import { checkAuth } from "@/lib/auth-actions";
+import { requireDashboardAuth } from "@/lib/auth-actions";
 import { getUserJourneyForSankeyDiagram } from "@/services/userJourney";
 import { SankeyData } from "@/entities/userJourney";
 
@@ -18,6 +18,6 @@ export async function fetchUserJourneyAction(
   maxSteps: number = 3,
   limit: number = 50
 ): Promise<SankeyData> {
-  await checkAuth();
+  const session = await requireDashboardAuth();
   return getUserJourneyForSankeyDiagram(siteId, startDate, endDate, maxSteps, limit);
 }

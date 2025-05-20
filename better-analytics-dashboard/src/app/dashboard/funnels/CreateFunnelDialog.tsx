@@ -17,7 +17,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCallback, useState } from "react";
 import { PlusIcon, Trash2 } from "lucide-react";
-import { useDashboard } from "@/app/dashboard/DashboardProvider";
 
 type Page = {
   value: string;
@@ -34,8 +33,6 @@ function generateTmpId() {
 }
 
 export function CreateFunnelDialog() {
-  const { dashboardId } = useDashboard();
-
   const [ funnel, setFunnel ] = useState<Funnel>({
     name: 'My new funnel',
     pages: [
@@ -50,25 +47,26 @@ export function CreateFunnelDialog() {
 
   const submit = useCallback(() => {
     postFunnelAction(
-      dashboardId,
       funnel.name,
       funnel.pages.map((f) => f.value)
     )
       .then(() => {
         toast.success('Funnel created!');
-        queryClient.invalidateQueries({ queryKey: ['funnels', dashboardId] });
+        queryClient.invalidateQueries({ queryKey: ['funnels'] });
         setOpen(false);
       })
       .catch((error) => {
         console.error("Funnel creation failed:", error);
         toast.error('Funnel creation failed!');
       });
-  }, [funnel, dashboardId, queryClient]);
+  }, [funnel, queryClient]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Create Funnel</Button>
+        <Button variant="outline">
+          Create Funnel
+        </Button>
       </DialogTrigger>
       <DialogContent className="min-w-[80dvw] min-h-[50dvh] bg-gray-50">
         <DialogHeader>

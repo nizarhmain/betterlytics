@@ -2,13 +2,13 @@
 
 import { getReferrerSourceAggregationDataForSite, getReferrerSummaryDataForSite, getReferrerTableDataForSite, getReferrerTrafficTrendBySourceDataForSite } from '@/services/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
-import { checkAuth } from '@/lib/auth-actions';
+import { requireDashboardAuth } from '@/lib/auth-actions';
 
 /**
  * Fetches the referrer distribution data for a site
  */
 export async function fetchReferrerSourceAggregationDataForSite(siteId: string, startDate: Date, endDate: Date) {
-  await checkAuth();
+  const session = await requireDashboardAuth();
 
   try {
     const data = await getReferrerSourceAggregationDataForSite(siteId, startDate, endDate);
@@ -28,7 +28,7 @@ export async function fetchReferrerTrafficTrendBySourceDataForSite(
   endDate: Date,
   granularity: GranularityRangeValues
 ) {
-  await checkAuth();
+  const session = await requireDashboardAuth();
 
   try {
     const data = await getReferrerTrafficTrendBySourceDataForSite(siteId, startDate, endDate, granularity);
@@ -43,7 +43,7 @@ export async function fetchReferrerTrafficTrendBySourceDataForSite(
  * Fetches the summary data for referrers including total count, traffic and bounce rate
  */
 export async function fetchReferrerSummaryDataForSite(siteId: string, startDate: Date, endDate: Date) {
-  await checkAuth();
+  const session = await requireDashboardAuth();
 
   try {
     const data = await getReferrerSummaryDataForSite(siteId, startDate, endDate);
@@ -58,7 +58,7 @@ export async function fetchReferrerSummaryDataForSite(siteId: string, startDate:
  * Fetches detailed referrer data for table display
  */
 export async function fetchReferrerTableDataForSite(siteId: string, startDate: Date, endDate: Date, limit = 100) {
-  await checkAuth();
+  const session = await requireDashboardAuth();
   
   try {
     const data = await getReferrerTableDataForSite(siteId, startDate, endDate, limit);
