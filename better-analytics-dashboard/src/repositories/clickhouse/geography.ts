@@ -1,6 +1,7 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DateTimeString } from '@/types/dates';
 import { GeoVisitor, GeoVisitorSchema } from '@/entities/geography';
+import { safeSql } from '@/lib/safe-sql';
 
 /**
  * Retrieves visitor data aggregated by country code
@@ -10,7 +11,7 @@ export async function getVisitorsByCountry(
   startDate: DateTimeString,
   endDate: DateTimeString
 ): Promise<GeoVisitor[]> {
-  const query = `
+  const query = safeSql`
     SELECT
       country_code,
       uniq(visitor_id) as visitors
@@ -23,8 +24,9 @@ export async function getVisitorsByCountry(
     ORDER BY visitors DESC
   `;
 
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       start: startDate,
       end: endDate,

@@ -9,18 +9,23 @@ import {
 } from '@/entities/devices';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { BAQuery } from '@/lib/ba-query';
+import { QueryFilter } from '@/entities/filter';
+import { safeSql, SQL } from '@/lib/safe-sql';
 
-export async function getDeviceTypeBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<DeviceType[]> {
-  const query = `
+export async function getDeviceTypeBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString, queryFilters: QueryFilter[]): Promise<DeviceType[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+  
+  const query = safeSql`
     SELECT device_type, uniq(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND ${SQL.AND(filters)}
     GROUP BY device_type
     ORDER BY visitors DESC
   `;
-  const result = await clickhouse.query(query, {
-    params: { site_id: siteId, start: startDate, end: endDate },
+  const result = await clickhouse.query(query.taggedSql, {
+    params: { ...query.taggedParams, site_id: siteId, start: startDate, end: endDate },
   }).toPromise() as any[];
   
   const mappedResults = result.map(row => ({

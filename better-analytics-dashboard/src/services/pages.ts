@@ -14,10 +14,10 @@ import { PageAnalytics } from '@/entities/pages';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { QueryFilter } from '@/entities/filter';
 
-export async function getTotalPageViewsForSite(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues): Promise<TotalPageViewsRow[]> {  
+export async function getTotalPageViewsForSite(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<TotalPageViewsRow[]> {  
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  return getTotalPageViews(siteId, formattedStart, formattedEnd, granularity);
+  return getTotalPageViews(siteId, formattedStart, formattedEnd, granularity, queryFilters);
 }
 
 export async function getPageViewsForSite(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues): Promise<DailyPageViewRow[]> {  

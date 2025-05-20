@@ -39,7 +39,8 @@ const granularityMapper = {
  */
 function getGranularitySQLFunctionFromGranularityRange(granularity: GranularityRangeValues) {
   const mappedGranularity = granularityMapper[granularity];
-  return GranularitySchema.parse(mappedGranularity);
+  const validatedGranularity = GranularitySchema.parse(mappedGranularity);
+  return SQL._Unsafe(validatedGranularity);
 }
 
 export const BAQuery = {

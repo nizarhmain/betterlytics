@@ -5,17 +5,18 @@ import { toDateTimeString } from '@/utils/dateFormatters';
 import { DeviceType, BrowserInfo, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema, OperatingSystemInfo, OperatingSystemStats, OperatingSystemStatsSchema, DeviceUsageTrendRow, DeviceUsageTrendRowSchema } from '@/entities/devices';
 import { getDeviceLabel } from '@/constants/deviceTypes';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
+import { QueryFilter } from '@/entities/filter';
 
-export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: Date, endDate: Date): Promise<DeviceType[]> {
-  return getDeviceTypeBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+export async function getDeviceTypeBreakdownForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<DeviceType[]> {
+  return getDeviceTypeBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters);
 }
 
-export async function getDeviceSummaryForSite(siteId: string, startDate: Date, endDate: Date): Promise<DeviceSummary> {
+export async function getDeviceSummaryForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<DeviceSummary> {
   const startDateTime = toDateTimeString(startDate);
   const endDateTime = toDateTimeString(endDate);
 
   const [deviceBreakdown, browserBreakdown, osBreakdown] = await Promise.all([
-    getDeviceTypeBreakdown(siteId, startDateTime, endDateTime),
+    getDeviceTypeBreakdown(siteId, startDateTime, endDateTime, queryFilters),
     getBrowserBreakdown(siteId, startDateTime, endDateTime),
     getOperatingSystemBreakdown(siteId, startDateTime, endDateTime)
   ]);

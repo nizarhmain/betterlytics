@@ -16,6 +16,7 @@ import {
   RawCampaignLandingPagePerformanceItem,
   RawCampaignLandingPagePerformanceArraySchema
 } from "@/entities/campaign";
+import { safeSql, SQL } from '@/lib/safe-sql';
 
 const UTM_DIMENSION_ALIASES = {
   'utm_campaign': 'utm_campaign_name',
@@ -35,9 +36,9 @@ async function getCampaignBreakdownByUTMDimension(
 ): Promise<unknown[]> {
   const dimensionAlias = UTM_DIMENSION_ALIASES[utmDimension];
 
-  const query = `
+  const query = safeSql`
     SELECT
-      s.${utmDimension} AS ${dimensionAlias},
+      s.${SQL._Unsafe(utmDimension)} AS ${SQL._Unsafe(dimensionAlias)},
       COUNT(DISTINCT s.visitor_id) AS total_visitors,
       COUNT(DISTINCT IF(s.session_pageviews = 1, s.session_id, NULL)) AS bounced_sessions,
       COUNT(DISTINCT s.session_id) AS total_sessions,
@@ -47,7 +48,7 @@ async function getCampaignBreakdownByUTMDimension(
       SELECT
         visitor_id,
         session_id,
-        ${utmDimension},
+        ${SQL._Unsafe(utmDimension)},
         dateDiff('second', MIN(timestamp), MAX(timestamp)) AS session_duration_seconds,
         COUNT(*) AS session_pageviews
       FROM analytics.events
@@ -55,15 +56,16 @@ async function getCampaignBreakdownByUTMDimension(
         AND timestamp BETWEEN {startDate:DateTime} AND {endDate:DateTime}
         AND event_type = 1
         AND utm_campaign != ''
-        AND ${utmDimension} != ''
-      GROUP BY visitor_id, session_id, ${utmDimension}
+        AND ${SQL._Unsafe(utmDimension)} != ''
+      GROUP BY visitor_id, session_id, ${SQL._Unsafe(utmDimension)}
     ) s
-    GROUP BY s.${utmDimension}
+    GROUP BY s.${SQL._Unsafe(utmDimension)}
     ORDER BY total_visitors DESC
   `;
 
-  const resultSet = await clickhouse.query(query, {
+  const resultSet = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       siteId: siteId,
       startDate: startDate,
       endDate: endDate,
@@ -148,7 +150,7 @@ export async function getCampaignLandingPagePerformanceData(
   startDate: DateTimeString,
   endDate: DateTimeString
 ): Promise<RawCampaignLandingPagePerformanceItem[]> {
-  const query = `
+  const query = safeSql`
     SELECT
         s.utm_campaign AS utm_campaign_name,
         s.landing_page_url,
@@ -177,8 +179,9 @@ export async function getCampaignLandingPagePerformanceData(
     ORDER BY s.utm_campaign ASC, total_visitors DESC
   `;
 
-  const resultSet = await clickhouse.query(query, {
+  const resultSet = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       siteId: siteId,
       startDate: startDate,
       endDate: endDate,
@@ -193,7 +196,7 @@ export async function getCampaignVisitorTrendData(
   startDate: DateTimeString,
   endDate: DateTimeString
 ): Promise<CampaignTrendRow[]> {
-  const query = `
+  const query = safeSql`
     SELECT
       toDate(timestamp) AS event_date,
       utm_campaign,
@@ -206,8 +209,9 @@ export async function getCampaignVisitorTrendData(
     ORDER BY event_date ASC, utm_campaign ASC
   `;
 
-  const resultSet = await clickhouse.query(query, {
+  const resultSet = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       siteId: siteId,
       startDate: startDate,
       endDate: endDate,

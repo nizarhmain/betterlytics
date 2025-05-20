@@ -10,9 +10,9 @@ import { checkAuth } from "@/lib/auth-actions";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { QueryFilter } from "@/entities/filter";
 
-export async function fetchTotalPageViewsAction(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues): Promise<TotalPageViewsRow[]> {
+export async function fetchTotalPageViewsAction(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<TotalPageViewsRow[]> {
   await checkAuth();
-  return getTotalPageViewsForSite(siteId, startDate, endDate, granularity);
+  return getTotalPageViewsForSite(siteId, startDate, endDate, granularity, queryFilters);
 }
 
 export async function fetchPageViewsAction(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues): Promise<DailyPageViewRow[]> {
@@ -35,8 +35,8 @@ export async function fetchTopPagesAction(siteId: string, startDate: Date, endDa
   return getTopPagesForSite(siteId, startDate, endDate, limit, queryFilters);
 }
 
-export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: Date, endDate: Date) {
+export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
   await checkAuth();
-  return getDeviceTypeBreakdownForSite(siteId, startDate, endDate);
+  return getDeviceTypeBreakdownForSite(siteId, startDate, endDate, queryFilters);
 }
   

@@ -6,8 +6,6 @@ import DeviceTypeChart from "@/components/analytics/DeviceTypeChart";
 import BrowserTable from "@/components/analytics/BrowserTable";
 import OperatingSystemTable from "@/components/analytics/OperatingSystemTable";
 import DeviceUsageTrendChart from "@/components/charts/DeviceUsageTrendChart";
-import { TIME_RANGE_PRESETS, TimeRangeValue } from "@/utils/timeRanges";
-import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from "@/utils/granularityRanges";
 import { 
   fetchDeviceTypeBreakdownAction, 
   fetchDeviceSummaryAction,
@@ -18,20 +16,23 @@ import {
 import { DeviceSummary, OperatingSystemStats, DeviceUsageTrendRow } from "@/entities/devices";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import TimeRangeSelector from '@/components/TimeRangeSelector';
+import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
+import QueryFiltersSelector from '@/components/filters/QueryFiltersSelector';
 
 export default function DevicesClient() {
   const { startDate, endDate, granularity } = useTimeRangeContext();
+  const { queryFilters } = useQueryFiltersContext();
 
   // Fetch device summary
   const { data: deviceSummary, isLoading: summaryLoading } = useQuery<DeviceSummary>({
-    queryKey: ['deviceSummary', 'default-site', startDate, endDate],
-    queryFn: () => fetchDeviceSummaryAction('default-site', startDate, endDate),
+    queryKey: ['deviceSummary', 'default-site', startDate, endDate, queryFilters],
+    queryFn: () => fetchDeviceSummaryAction('default-site', startDate, endDate, queryFilters),
   });
 
   // Fetch device breakdown
   const { data: deviceBreakdown = [], isLoading: deviceBreakdownLoading } = useQuery({
-    queryKey: ['deviceTypeBreakdown', 'default-site', startDate, endDate],
-    queryFn: () => fetchDeviceTypeBreakdownAction('default-site', startDate, endDate),
+    queryKey: ['deviceTypeBreakdown', 'default-site', startDate, endDate, queryFilters],
+    queryFn: () => fetchDeviceTypeBreakdownAction('default-site', startDate, endDate, queryFilters),
   });
 
   // Fetch browser stats
@@ -59,7 +60,10 @@ export default function DevicesClient() {
           <h1 className="text-2xl font-bold text-foreground mb-1">Devices</h1>
           <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
         </div>
-        <TimeRangeSelector />
+        <div className="flex justify-end mb-4 gap-4">
+          <QueryFiltersSelector />
+          <TimeRangeSelector />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

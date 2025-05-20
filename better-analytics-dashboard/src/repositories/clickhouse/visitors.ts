@@ -10,7 +10,7 @@ export async function getUniqueVisitors(siteId: string, startDate: DateString, e
   
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
 
-  const query = `
+  const query = safeSql`
     SELECT
       ${granularityFunc}(timestamp) as date,
       uniq(session_id) as unique_visitors
@@ -22,8 +22,9 @@ export async function getUniqueVisitors(siteId: string, startDate: DateString, e
     LIMIT 10080
   `;
   
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       start: startDate,
       end: endDate,

@@ -30,8 +30,8 @@ export default function DashboardPageClient() {
   });
 
   const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
-    queryKey: ['deviceTypeBreakdown', siteId, startDate, endDate],
-    queryFn: () => fetchDeviceTypeBreakdownAction(siteId, startDate, endDate),
+    queryKey: ['deviceTypeBreakdown', siteId, startDate, endDate, queryFilters],
+    queryFn: () => fetchDeviceTypeBreakdownAction(siteId, startDate, endDate, queryFilters),
   });
 
   return (
@@ -72,7 +72,7 @@ export default function DashboardPageClient() {
           <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
         </div>
         <div className="bg-card rounded-lg p-6 border border-border shadow">
-          <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+          <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
         </div>
       </div>
       

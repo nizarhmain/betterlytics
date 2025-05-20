@@ -7,11 +7,12 @@ import { BAQuery } from '@/lib/ba-query';
 import { safeSql, SQL } from '@/lib/safe-sql';
 import { QueryFilter } from '@/entities/filter';
 
-export async function getTotalPageViews(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<TotalPageViewsRow[]> {
+export async function getTotalPageViews(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<TotalPageViewsRow[]> {
   
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  const filters = BAQuery.getFilterQuery(queryFilters);
   
-  const query = `
+  const query = safeSql`
     SELECT
       ${granularityFunc}(timestamp) as date,
       count() as views
@@ -19,12 +20,14 @@ export async function getTotalPageViews(siteId: string, startDate: DateString, e
     WHERE site_id = {site_id:String}
       AND event_type = 'pageview' 
       AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
+      AND ${SQL.AND(filters)}
     GROUP BY date
     ORDER BY date ASC, views DESC
     LIMIT 10080
   `;
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       start_date: startDate,
       end_date: endDate,
@@ -38,7 +41,7 @@ export async function getPageViews(siteId: string, startDate: DateString, endDat
   
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
   
-  const query = `
+  const query = safeSql`
     SELECT
       ${granularityFunc}(timestamp) as date,
       url,
@@ -51,8 +54,9 @@ export async function getPageViews(siteId: string, startDate: DateString, endDat
     ORDER BY date ASC, views DESC
     LIMIT 10080
   `;
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       start_date: startDate,
       end_date: endDate,
@@ -267,7 +271,7 @@ export async function getPageTrafficTimeSeries(
 ): Promise<TotalPageViewsRow[]> {
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
 
-  const query = `
+  const query = safeSql`
     SELECT
       ${granularityFunc}(timestamp) as date,
       count() as views
@@ -281,8 +285,9 @@ export async function getPageTrafficTimeSeries(
     LIMIT 10080
   `;
 
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       path: path,
       start_date: startDate,
