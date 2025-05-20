@@ -37,20 +37,20 @@ export default function DevicesClient() {
 
   // Fetch browser stats
   const { data: browserStats = [], isLoading: browserStatsLoading } = useQuery({
-    queryKey: ['browserBreakdown', 'default-site', startDate, endDate],
-    queryFn: () => fetchBrowserBreakdownAction('default-site', startDate, endDate),
+    queryKey: ['browserBreakdown', 'default-site', startDate, endDate, queryFilters],
+    queryFn: () => fetchBrowserBreakdownAction('default-site', startDate, endDate, queryFilters),
   });
 
   // Fetch OS stats
   const { data: osStats = [], isLoading: osStatsLoading } = useQuery<OperatingSystemStats[]>({
-    queryKey: ['osBreakdown', 'default-site', startDate, endDate],
-    queryFn: () => fetchOperatingSystemBreakdownAction('default-site', startDate, endDate),
+    queryKey: ['osBreakdown', 'default-site', startDate, endDate, queryFilters],
+    queryFn: () => fetchOperatingSystemBreakdownAction('default-site', startDate, endDate, queryFilters),
   });
 
   // Fetch device usage trend
   const { data: deviceUsageTrend = [], isLoading: deviceUsageTrendLoading } = useQuery<DeviceUsageTrendRow[]>({
-    queryKey: ['deviceUsageTrend', 'default-site', startDate, endDate, granularity],
-    queryFn: () => fetchDeviceUsageTrendAction('default-site', startDate, endDate, granularity),
+    queryKey: ['deviceUsageTrend', 'default-site', startDate, endDate, granularity, queryFilters],
+    queryFn: () => fetchDeviceUsageTrendAction('default-site', startDate, endDate, granularity, queryFilters),
   });
 
   return (

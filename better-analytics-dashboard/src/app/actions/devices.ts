@@ -16,22 +16,23 @@ export async function fetchDeviceSummaryAction(siteId: string, startDate: Date, 
   return getDeviceSummaryForSite(siteId, startDate, endDate, queryFilters);
 }
 
-export async function fetchBrowserBreakdownAction(siteId: string, startDate: Date, endDate: Date): Promise<BrowserStats[]> {
+export async function fetchBrowserBreakdownAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<BrowserStats[]> {
   await checkAuth();
-  return getBrowserBreakdownForSite(siteId, startDate, endDate);
+  return getBrowserBreakdownForSite(siteId, startDate, endDate, queryFilters);
 }
 
-export async function fetchOperatingSystemBreakdownAction(siteId: string, startDate: Date, endDate: Date): Promise<OperatingSystemStats[]> {
+export async function fetchOperatingSystemBreakdownAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<OperatingSystemStats[]> {
   await checkAuth();
-  return getOperatingSystemBreakdownForSite(siteId, startDate, endDate);
+  return getOperatingSystemBreakdownForSite(siteId, startDate, endDate, queryFilters);
 }
 
 export async function fetchDeviceUsageTrendAction(
   siteId: string, 
   startDate: Date, 
   endDate: Date,
-  granularity: GranularityRangeValues
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[]
 ): Promise<DeviceUsageTrendRow[]> {
   await checkAuth();
-  return getDeviceUsageTrendForSite(siteId, startDate, endDate, granularity);
+  return getDeviceUsageTrendForSite(siteId, startDate, endDate, granularity, queryFilters);
 } 

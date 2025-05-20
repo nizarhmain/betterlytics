@@ -17,8 +17,8 @@ export async function getDeviceSummaryForSite(siteId: string, startDate: Date, e
 
   const [deviceBreakdown, browserBreakdown, osBreakdown] = await Promise.all([
     getDeviceTypeBreakdown(siteId, startDateTime, endDateTime, queryFilters),
-    getBrowserBreakdown(siteId, startDateTime, endDateTime),
-    getOperatingSystemBreakdown(siteId, startDateTime, endDateTime)
+    getBrowserBreakdown(siteId, startDateTime, endDateTime, queryFilters),
+    getOperatingSystemBreakdown(siteId, startDateTime, endDateTime, queryFilters)
   ]);
 
   const distinctDeviceCount = deviceBreakdown.length;
@@ -38,8 +38,8 @@ export async function getDeviceSummaryForSite(siteId: string, startDate: Date, e
   return DeviceSummarySchema.parse(summary);
 }
 
-export async function getBrowserBreakdownForSite(siteId: string, startDate: Date, endDate: Date): Promise<BrowserStats[]> {
-  const browserData = await getBrowserBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+export async function getBrowserBreakdownForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<BrowserStats[]> {
+  const browserData = await getBrowserBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters);
   
   // Calculate total visitors for percentage calculation
   const totalVisitors = browserData.reduce((sum, item) => sum + item.visitors, 0);
@@ -53,8 +53,8 @@ export async function getBrowserBreakdownForSite(siteId: string, startDate: Date
   return BrowserStatsSchema.array().parse(statsWithPercentages);
 }
 
-export async function getOperatingSystemBreakdownForSite(siteId: string, startDate: Date, endDate: Date): Promise<OperatingSystemStats[]> {
-  const osData = await getOperatingSystemBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate));
+export async function getOperatingSystemBreakdownForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<OperatingSystemStats[]> {
+  const osData = await getOperatingSystemBreakdown(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters);
   
   const totalVisitors = osData.reduce((sum, item) => sum + item.visitors, 0);
   
@@ -71,9 +71,10 @@ export async function getDeviceUsageTrendForSite(
   siteId: string, 
   startDate: Date, 
   endDate: Date,
-  granularity: GranularityRangeValues
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[]
 ): Promise<DeviceUsageTrendRow[]> {
-  return getDeviceUsageTrend(siteId, toDateTimeString(startDate), toDateTimeString(endDate), granularity);
+  return getDeviceUsageTrend(siteId, toDateTimeString(startDate), toDateTimeString(endDate), granularity, queryFilters);
 }
 
 // Helper to find top item and calculate percentage from a breakdown list

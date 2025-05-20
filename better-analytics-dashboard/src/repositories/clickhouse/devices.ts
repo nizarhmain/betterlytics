@@ -1,6 +1,5 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DateTimeString } from '@/types/dates';
-import { format } from 'date-fns';
 import { 
   DeviceType, DeviceTypeSchema, 
   BrowserInfoSchema, BrowserInfo, 
@@ -36,17 +35,19 @@ export async function getDeviceTypeBreakdown(siteId: string, startDate: DateTime
   return DeviceTypeSchema.array().parse(mappedResults);
 }
 
-export async function getBrowserBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<BrowserInfo[]> {
-  const query = `
+export async function getBrowserBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString, queryFilters: QueryFilter[]): Promise<BrowserInfo[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+  const query = safeSql`
     SELECT browser, uniq(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND ${SQL.AND(filters)}
     GROUP BY browser
     ORDER BY visitors DESC
   `;
-  const result = await clickhouse.query(query, {
-    params: { site_id: siteId, start: startDate, end: endDate },
+  const result = await clickhouse.query(query.taggedSql, {
+    params: { ...query.taggedParams, site_id: siteId, start: startDate, end: endDate },
   }).toPromise() as any[];
   
   const mappedResults = result.map(row => ({
@@ -57,18 +58,20 @@ export async function getBrowserBreakdown(siteId: string, startDate: DateTimeStr
   return BrowserInfoSchema.array().parse(mappedResults);
 } 
 
-export async function getOperatingSystemBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<OperatingSystemInfo[]> {
-  const query = `
+export async function getOperatingSystemBreakdown(siteId: string, startDate: DateTimeString, endDate: DateTimeString, queryFilters: QueryFilter[]): Promise<OperatingSystemInfo[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+  const query = safeSql`
     SELECT os, uniq(visitor_id) as visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND ${SQL.AND(filters)}
     GROUP BY os
     ORDER BY visitors DESC
   `;
   
-  const result = await clickhouse.query(query, {
-    params: { site_id: siteId, start: startDate, end: endDate },
+  const result = await clickhouse.query(query.taggedSql, {
+    params: { ...query.taggedParams, site_id: siteId, start: startDate, end: endDate },
   }).toPromise() as any[];
   
   const mappedResults = result.map(row => ({
@@ -83,11 +86,13 @@ export async function getDeviceUsageTrend(
   siteId: string, 
   startDate: DateTimeString, 
   endDate: DateTimeString,
-  granularity: GranularityRangeValues
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[]
 ): Promise<DeviceUsageTrendRow[]> {
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  const filters = BAQuery.getFilterQuery(queryFilters);
 
-  const query = `
+  const query = safeSql`
     SELECT 
       ${granularityFunc}(timestamp) as date,
       device_type,
@@ -95,12 +100,13 @@ export async function getDeviceUsageTrend(
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND ${SQL.AND(filters)}
     GROUP BY date, device_type
     ORDER BY date ASC, count DESC
   `;
 
-  const result = await clickhouse.query(query, {
-    params: { site_id: siteId, start: startDate, end: endDate },
+  const result = await clickhouse.query(query.taggedSql, {
+    params: { ...query.taggedParams, site_id: siteId, start: startDate, end: endDate },
   }).toPromise() as any[];
   
   const mappedResults = result.map(row => ({
