@@ -1,3 +1,3 @@
 export function generateTempId() {
-  return Math.random().toString(36).substring(2);
+  return new Date().valueOf().toString(36) + Math.random().toString(36).substring(2);
 }

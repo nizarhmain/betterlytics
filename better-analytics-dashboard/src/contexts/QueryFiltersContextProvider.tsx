@@ -2,10 +2,6 @@ import React, { Dispatch, useCallback, useState } from "react";
 import { QueryFilter } from "@/entities/filter";
 import { generateTempId } from "@/utils/temporaryId";
 
-/**
- * This is just a local type adding a temporary id to each Query Filter
- * You can use this directly as a QueryFilter, as it will be stripped later
- */
 type DashboardQueryFilter = QueryFilter & {
   id: string;
 };

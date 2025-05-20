@@ -5,7 +5,6 @@ import { Button } from "../ui/button";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import { QueryFilterInputRow } from "./QueryFilterInputRow";
 
-
 export default function QueryFiltersSelector() {
   const { queryFilters, addQueryFilter, updateQueryFilter, removeQueryFilter } = useQueryFiltersContext();
 

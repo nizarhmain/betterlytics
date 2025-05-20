@@ -5,14 +5,14 @@ import { Dispatch, ReactNode } from "react";
 import { ArrowRightToLineIcon, BatteryIcon, CableIcon, CompassIcon, EarthIcon, ExternalLinkIcon, FileTextIcon, MonitorSmartphoneIcon, ShellIcon, SquareMousePointerIcon, StepBackIcon, SunsetIcon, TabletSmartphoneIcon, TextCursorInputIcon, TextSearchIcon, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 
-type QueryFilterInputRowProps<T> = {
-  onFilterUpdate: Dispatch<QueryFilter & T>;
-  filter: QueryFilter & T;
-  requestRemoval: Dispatch<QueryFilter & T>;
+type QueryFilterInputRowProps<TEntity> = {
+  onFilterUpdate: Dispatch<QueryFilter & TEntity>;
+  filter: QueryFilter & TEntity;
+  requestRemoval: Dispatch<QueryFilter & TEntity>;
   disableDeletion?: boolean;
 };
 
-export function QueryFilterInputRow<T>({ filter, onFilterUpdate, requestRemoval, disableDeletion }: QueryFilterInputRowProps<T>) {
+export function QueryFilterInputRow<TEntity>({ filter, onFilterUpdate, requestRemoval, disableDeletion }: QueryFilterInputRowProps<TEntity>) {
   return (
     <div className="flex justify-between gap-1">
       <Select
