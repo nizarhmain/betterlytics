@@ -8,18 +8,20 @@ import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { useMemo } from 'react';
 import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragmentedGranularityTimeSeriesLineChart';
 import { timeFormat } from 'd3-time-format';
+import { QueryFilter } from '@/entities/filter';
 
 interface VisitorsChartProps {
   siteId: string;
   startDate: Date;
   endDate: Date;
   granularity: GranularityRangeValues;
+  queryFilters: QueryFilter[];
 }
 
-export default function VisitorsChart({ siteId, startDate, endDate, granularity }: VisitorsChartProps) {
+export default function VisitorsChart({ siteId, startDate, endDate, granularity, queryFilters }: VisitorsChartProps) {
   const { data = [], isLoading } = useQuery<DailyUniqueVisitorsRow[]>({
-    queryKey: ['uniqueVisitors', siteId, startDate, endDate, granularity],
-    queryFn: () => fetchUniqueVisitorsAction(siteId, startDate, endDate, granularity),
+    queryKey: ['uniqueVisitors', siteId, startDate, endDate, granularity, queryFilters],
+    queryFn: () => fetchUniqueVisitorsAction(siteId, startDate, endDate, granularity, queryFilters),
   });
 
   const timeSeriesProps = useMemo(() => {

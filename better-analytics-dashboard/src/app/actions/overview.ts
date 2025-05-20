@@ -20,9 +20,9 @@ export async function fetchPageViewsAction(siteId: string, startDate: Date, endD
   return getPageViewsForSite(siteId, startDate, endDate, granularity);
 }
 
-export async function fetchUniqueVisitorsAction(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues): Promise<DailyUniqueVisitorsRow[]> {
+export async function fetchUniqueVisitorsAction(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<DailyUniqueVisitorsRow[]> {
   await checkAuth();
-  return getUniqueVisitorsForSite(siteId, startDate, endDate, granularity);
+  return getUniqueVisitorsForSite(siteId, startDate, endDate, granularity, queryFilters);
 }
 
 export async function fetchSummaryStatsAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {

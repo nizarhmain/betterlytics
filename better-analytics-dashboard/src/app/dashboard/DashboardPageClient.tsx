@@ -69,7 +69,7 @@ export default function DashboardPageClient() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="bg-card rounded-lg p-6 border border-border shadow">
-          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
         </div>
         <div className="bg-card rounded-lg p-6 border border-border shadow">
           <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />

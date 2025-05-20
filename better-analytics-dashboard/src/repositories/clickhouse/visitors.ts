@@ -6,9 +6,10 @@ import { BAQuery } from "@/lib/ba-query";
 import { QueryFilter } from "@/entities/filter";
 import { safeSql, SQL } from "@/lib/safe-sql";
 
-export async function getUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<DailyUniqueVisitorsRow[]> {
+export async function getUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<DailyUniqueVisitorsRow[]> {
   
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  const filters = BAQuery.getFilterQuery(queryFilters);
 
   const query = safeSql`
     SELECT
@@ -17,6 +18,7 @@ export async function getUniqueVisitors(siteId: string, startDate: DateString, e
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND date BETWEEN {start:DateTime} AND {end:DateTime}
+      AND ${SQL.AND(filters)}
     GROUP BY date
     ORDER BY date ASC
     LIMIT 10080

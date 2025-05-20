@@ -11,10 +11,10 @@ import { SummaryStatsSchema } from '@/entities/stats';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { QueryFilter } from '@/entities/filter';
 
-export async function getUniqueVisitorsForSite(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues) {
+export async function getUniqueVisitorsForSite(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]) {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  return getUniqueVisitors(siteId, formattedStart, formattedEnd, granularity);
+  return getUniqueVisitors(siteId, formattedStart, formattedEnd, granularity, queryFilters);
 }
 
 export async function getSummaryStatsForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
