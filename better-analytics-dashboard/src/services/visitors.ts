@@ -6,21 +6,22 @@ import {
   getTotalPageviews,
   getSessionMetrics
 } from '@/repositories/clickhouse';
-import { toDateTimeString, toDateString } from '@/utils/dateFormatters';
+import { toDateTimeString } from '@/utils/dateFormatters';
 import { SummaryStatsSchema } from '@/entities/stats';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
+import { QueryFilter } from '@/entities/filter';
 
-export async function getUniqueVisitorsForSite(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues) {
+export async function getUniqueVisitorsForSite(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]) {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  return getUniqueVisitors(siteId, formattedStart, formattedEnd, granularity);
+  return getUniqueVisitors(siteId, formattedStart, formattedEnd, granularity, queryFilters);
 }
 
-export async function getSummaryStatsForSite(siteId: string, startDate: Date, endDate: Date) {
+export async function getSummaryStatsForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
   const [uniqueVisitors, pageviews, sessionMetrics] = await Promise.all([
-    getTotalUniqueVisitors(siteId, toDateString(startDate), toDateString(endDate)),
-    getTotalPageviews(siteId, toDateTimeString(startDate), toDateTimeString(endDate)),
-    getSessionMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate))
+    getTotalUniqueVisitors(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters),
+    getTotalPageviews(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters),
+    getSessionMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters)
   ]);
 
   const stats = {

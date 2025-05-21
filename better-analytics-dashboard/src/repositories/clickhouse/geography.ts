@@ -1,6 +1,9 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DateTimeString } from '@/types/dates';
 import { GeoVisitor, GeoVisitorSchema } from '@/entities/geography';
+import { safeSql, SQL } from '@/lib/safe-sql';
+import { QueryFilter } from '@/entities/filter';
+import { BAQuery } from '@/lib/ba-query';
 
 /**
  * Retrieves visitor data aggregated by country code
@@ -8,9 +11,11 @@ import { GeoVisitor, GeoVisitorSchema } from '@/entities/geography';
 export async function getVisitorsByCountry(
   siteId: string,
   startDate: DateTimeString,
-  endDate: DateTimeString
+  endDate: DateTimeString,
+  queryFilters: QueryFilter[]
 ): Promise<GeoVisitor[]> {
-  const query = `
+  const filters = BAQuery.getFilterQuery(queryFilters);
+  const query = safeSql`
     SELECT
       country_code,
       uniq(visitor_id) as visitors
@@ -19,12 +24,14 @@ export async function getVisitorsByCountry(
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
       AND country_code IS NOT NULL
       AND country_code != ''
+      AND ${SQL.AND(filters)}
     GROUP BY country_code
     ORDER BY visitors DESC
   `;
 
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       start: startDate,
       end: endDate,

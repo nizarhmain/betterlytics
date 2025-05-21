@@ -20,8 +20,8 @@ export default function DashboardPageClient() {
   const siteId = 'default-site';
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
-    queryKey: ['summaryStats', siteId, startDate, endDate],
-    queryFn: () => fetchSummaryStatsAction(siteId, startDate, endDate),
+    queryKey: ['summaryStats', siteId, startDate, endDate, queryFilters],
+    queryFn: () => fetchSummaryStatsAction(siteId, startDate, endDate, queryFilters),
   });
 
   const { data: topPages, isLoading: topPagesLoading } = useQuery({
@@ -30,8 +30,8 @@ export default function DashboardPageClient() {
   });
 
   const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
-    queryKey: ['deviceTypeBreakdown', siteId, startDate, endDate],
-    queryFn: () => fetchDeviceTypeBreakdownAction(siteId, startDate, endDate),
+    queryKey: ['deviceTypeBreakdown', siteId, startDate, endDate, queryFilters],
+    queryFn: () => fetchDeviceTypeBreakdownAction(siteId, startDate, endDate, queryFilters),
   });
 
   return (
@@ -69,10 +69,10 @@ export default function DashboardPageClient() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="bg-card rounded-lg p-6 border border-border shadow">
-          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
         </div>
         <div className="bg-card rounded-lg p-6 border border-border shadow">
-          <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+          <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
         </div>
       </div>
       

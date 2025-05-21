@@ -5,10 +5,11 @@ import { PageAnalytics } from "@/entities/pages";
 import { checkAuth } from "@/lib/auth-actions";
 import { TotalPageViewsRow } from "@/entities/pageviews";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
+import { QueryFilter } from "@/entities/filter";
 
-export async function fetchPageAnalyticsAction(siteId: string, startDate: Date, endDate: Date): Promise<PageAnalytics[]> {
+export async function fetchPageAnalyticsAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<PageAnalytics[]> {
   await checkAuth();
-  return getPageAnalytics(siteId, startDate, endDate);
+  return getPageAnalytics(siteId, startDate, endDate, queryFilters);
 }
 
 export async function fetchPageDetailAction(siteId: string, path: string, startDate: Date, endDate: Date): Promise<PageAnalytics | null> {

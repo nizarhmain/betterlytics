@@ -7,18 +7,20 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "rec
 import { timeFormat } from "d3-time-format";
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragmentedGranularityTimeSeriesLineChart';
+import { QueryFilter } from '@/entities/filter';
 
 interface PageviewsChartProps {
   siteId: string;
   startDate: Date;
   endDate: Date;
   granularity: GranularityRangeValues;
+  queryFilters: QueryFilter[];
 }
 
-export default function PageviewsChart({ siteId, startDate, endDate, granularity }: PageviewsChartProps) {
+export default function PageviewsChart({ siteId, startDate, endDate, granularity, queryFilters }: PageviewsChartProps) {
   const { data = [], isLoading } = useQuery<TotalPageViewsRow[]>({
-    queryKey: ['pageViews', siteId, startDate, endDate, granularity],
-    queryFn: () => fetchTotalPageViewsAction(siteId, startDate, endDate, granularity),
+    queryKey: ['pageViews', siteId, startDate, endDate, granularity, queryFilters],
+    queryFn: () => fetchTotalPageViewsAction(siteId, startDate, endDate, granularity, queryFilters),
   });
 
   const timeSeriesProps = useMemo(() => {
