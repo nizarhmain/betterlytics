@@ -8,9 +8,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <DashboardProvider>
       <SidebarProvider>
-        <div className="flex min-h-screen bg-background">
-          <BASidebar />
-          <BAMobileSidebarTrigger />
+        <BASidebar />
+        <BAMobileSidebarTrigger />
+        <div className="flex min-h-screen bg-background w-full">
           <main className="flex-1 flex flex-col">
             <div className="flex-1">{children}</div>
           </main>
