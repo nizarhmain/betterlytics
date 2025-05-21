@@ -72,7 +72,7 @@ export function CreateFunnelDialog() {
             Create a new funnel for your website.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="name" className="text-right">
@@ -137,7 +137,7 @@ export function CreateFunnelDialog() {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow flex flex-col col-span-2 text-center">
+          <div className="hidden lg:visible lg:flex bg-white rounded-lg p-4 shadow  flex-col col-span-2 text-center">
             <p>Placeholder</p>
           </div>
         </div>
