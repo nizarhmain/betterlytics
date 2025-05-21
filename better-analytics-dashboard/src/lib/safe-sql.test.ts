@@ -90,4 +90,19 @@ describe("SafeSQL tests", () => {
       expect(actual.taggedParams).toEqual(expected.taggedParams);
     }
   );
+
+  it(
+    "returns the raw sql when SQL._Unsafe is used",
+    () => {
+      const expected = {
+        taggedSql: "SELECT uniq(visitor_id) FROM analytics.events WHERE site_id = 'hello world'",
+        taggedParams: {}
+      };
+      
+      const actual = safeSql`SELECT uniq(visitor_id) FROM analytics.events WHERE site_id = ${SQL._Unsafe("'hello world'")}`;
+
+      expect(actual.taggedSql).toBe(expected.taggedSql);
+      expect(actual.taggedParams).toEqual(expected.taggedParams);
+    }
+  );
 });

@@ -8,6 +8,7 @@ import { getSummaryStatsForSite } from "@/services/visitors";
 import { getUniqueVisitorsForSite } from "@/services/visitors";
 import { checkAuth } from "@/lib/auth-actions";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
+import { QueryFilter } from "@/entities/filter";
 
 export async function fetchTotalPageViewsAction(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues): Promise<TotalPageViewsRow[]> {
   await checkAuth();
@@ -29,9 +30,9 @@ export async function fetchSummaryStatsAction(siteId: string, startDate: Date, e
   return getSummaryStatsForSite(siteId, startDate, endDate);
 }
 
-export async function fetchTopPagesAction(siteId: string, startDate: Date, endDate: Date, limit: number) {
+export async function fetchTopPagesAction(siteId: string, startDate: Date, endDate: Date, limit: number, queryFilters: QueryFilter[]) {
   await checkAuth();
-  return getTopPagesForSite(siteId, startDate, endDate, limit);
+  return getTopPagesForSite(siteId, startDate, endDate, limit, queryFilters);
 }
 
 export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: Date, endDate: Date) {

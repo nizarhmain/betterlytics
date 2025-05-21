@@ -10,9 +10,12 @@ import { formatDuration } from "@/utils/dateFormatters";
 import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
+import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 
 export default function DashboardPageClient() {
   const { granularity, startDate, endDate } = useTimeRangeContext();
+  const { queryFilters } = useQueryFiltersContext();
 
   const siteId = 'default-site';
 
@@ -22,8 +25,8 @@ export default function DashboardPageClient() {
   });
 
   const { data: topPages, isLoading: topPagesLoading } = useQuery({
-    queryKey: ['topPages', siteId, startDate, endDate],
-    queryFn: () => fetchTopPagesAction(siteId, startDate, endDate, 5),
+    queryKey: ['topPages', siteId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTopPagesAction(siteId, startDate, endDate, 5, queryFilters),
   });
 
   const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
@@ -34,6 +37,7 @@ export default function DashboardPageClient() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-end mb-4 gap-4">
+        <QueryFiltersSelector />
         <TimeRangeSelector />
       </div>
       

@@ -4,6 +4,8 @@ import { PageAnalytics, PageAnalyticsSchema } from '@/entities/pages';
 import { DateString, DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { BAQuery } from '@/lib/ba-query';
+import { safeSql } from '@/lib/safe-sql';
+import { QueryFilter } from '@/entities/filter';
 
 export async function getTotalPageViews(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<TotalPageViewsRow[]> {
   
@@ -78,9 +80,12 @@ export async function getTopPages(
   siteId: string,
   startDate: DateTimeString,
   endDate: DateTimeString,
-  limit = 5
+  limit = 5,
+  queryFilters: QueryFilter[] = []
 ): Promise<{ url: string; visitors: number }[]> {
-  const query = `
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
+  const queryResponse = safeSql`
     SELECT
       url,
       uniq(session_id) as visitors
@@ -88,13 +93,15 @@ export async function getTopPages(
     WHERE site_id = {site_id:String}
       AND event_type = 'pageview' 
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND ${filters}
     GROUP BY url
     ORDER BY visitors DESC
     LIMIT {limit:UInt64} 
   `;
 
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(queryResponse.taggedSql, {
     params: {
+      ...queryResponse.taggedParams,
       site_id: siteId,
       start: startDate,
       end: endDate,
