@@ -61,21 +61,5 @@ export default function BASidebar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-    // <aside className="w-56 bg-sidebar border-r border-border h-screen flex flex-col p-4">
-    //   <SidebarHeader />
-    //   <nav className="flex-1">
-    //     <div className="text-xs text-muted-foreground mb-2">Analytics</div>
-    //     <ul className="space-y-1">
-    //       {navItems.map((item) => (
-    //         <li key={item.name}>
-    //           <Link href={item.href} className="flex items-center gap-2 px-2 py-2 rounded hover:bg-accent hover:text-accent-foreground text-foreground text-sm font-medium">
-    //             <span>{item.icon}</span>
-    //             {item.name}
-    //           </Link>
-    //         </li>
-    //       ))}
-    //     </ul>
-    //   </nav>
-    // </aside>
   );
 } 
