@@ -68,19 +68,16 @@ export async function attemptAdminInitialization(
   email: string, 
   password: string
 ): Promise<User | null> {
-  if (email !== env.ADMIN_EMAIL || password !== env.ADMIN_PASSWORD || !env.SITE_ID) {
+  if (email !== env.ADMIN_EMAIL || password !== env.ADMIN_PASSWORD) {
     return null;
   }
 
   const existingAdmin = await findUserByEmail(email);
   if (existingAdmin) {
-    console.log(`Admin setup skipped, user ${email} already exists.`);
     return null;
   }
 
   try {
-    console.log("Creating initial admin user...");
-    
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     const adminUserData: CreateUserData = {
       email,
@@ -91,20 +88,20 @@ export async function attemptAdminInitialization(
     
     const newAdminUser = await createUser(adminUserData);
     
+    const siteId = uuidv4();
+
     const dashboardData: DashboardWriteData = {
-      siteId: env.SITE_ID,
+      siteId,
       userId: newAdminUser.id,
       name: "Default Admin Dashboard"
     };
     
     const dashboard = await upsertDashboard(dashboardData);
     
-    console.log(`Initial admin user ${email} created successfully.`);
-    
     return AuthenticatedUserSchema.parse({
       ...newAdminUser,
       dashboardId: dashboard.id,
-      siteId: dashboard.siteId,
+      siteId,
     });
   } catch (error) {
     console.error("Error during initial admin setup:", error);
