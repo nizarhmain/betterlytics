@@ -12,10 +12,13 @@ import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/over
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
+import { useDictionary } from "@/contexts/DictionaryProvider";
 
 export default function DashboardPageClient() {
   const { granularity, startDate, endDate } = useTimeRangeContext();
   const { queryFilters } = useQueryFiltersContext();
+
+  const dict = useDictionary();  
 
   const siteId = 'default-site';
 
@@ -43,7 +46,7 @@ export default function DashboardPageClient() {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <SummaryCard
-          title="Unique Visitors"
+          title={dict.dashboard.client["Unique visitors"]}
           value={summaryLoading ? '...' : summary?.uniqueVisitors?.toLocaleString() ?? '0'}
           changeText=""
           changeColor="text-green-600"
