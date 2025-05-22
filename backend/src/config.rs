@@ -16,6 +16,7 @@ pub struct Config {
     pub maxmind_license_key: Option<String>,
     pub geoip_db_path: PathBuf,
     pub geoip_update_interval: Duration,
+    pub data_retention_days: i32,
 }
 
 impl Config {
@@ -50,8 +51,12 @@ impl Config {
                 env::var("GEOIP_UPDATE_INTERVAL")
                     .ok()
                     .and_then(|val| val.parse().ok())
-                    .unwrap_or( 24 * 60 * 60)
+                    .unwrap_or(24 * 60 * 60)
             ),
+            data_retention_days: env::var("DATA_RETENTION_DAYS")
+                .unwrap_or_else(|_| "365".to_string())
+                .parse()
+                .unwrap_or(365),
         }
     }
 } 
