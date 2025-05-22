@@ -109,13 +109,22 @@ impl Database {
             return Ok(());
         }
 
-        if self.config.data_retention_days > 0 {
+        if self.config.data_retention_days == -1 {
+            println!("[INFO] Data retention explicitly disabled (data_retention_days = -1). Removing TTL if present.");
+            if let Err(e) = Self::remove_data_retention_policy(&self.client).await {
+                eprintln!("[ERROR] Could not remove data retention policy: {}", e);
+                return Err(e);
+            }
+        } else if self.config.data_retention_days > 0 {
             if let Err(e) = Self::apply_data_retention_policy(&self.client, self.config.data_retention_days).await {
                 eprintln!("[ERROR] Could not apply data retention policy: {}", e);
                 return Err(e);
             }
         } else {
-            println!("[INFO] Data retention policy disabled (data_retention_days = {}).", self.config.data_retention_days);
+            println!(
+                "[WARNING] Invalid value for DATA_RETENTION_DAYS: {}. TTL policy will not be changed. Use a positive integer to set TTL, or -1 to remove TTL.",
+                self.config.data_retention_days
+            );
         }
 
         println!("Database schema validation and TTL setup complete.");
@@ -129,6 +138,14 @@ impl Database {
         );
         client.query(&alter_query).execute().await.map_err(|e| 
             anyhow::anyhow!("Failed to apply data retention policy for analytics.events table: {}.", e)
+        )?;
+        Ok(())
+    }
+
+    async fn remove_data_retention_policy(client: &Client) -> Result<()> {
+        let alter_query = "ALTER TABLE analytics.events REMOVE TTL";
+        client.query(alter_query).execute().await.map_err(|e| 
+            anyhow::anyhow!("Failed to remove data retention policy from analytics.events table: {}.", e)
         )?;
         Ok(())
     }
