@@ -2,7 +2,7 @@
 
 import { checkAuth } from "@/lib/auth-actions";
 import { type Funnel, CreateFunnelSchema, FunnelDetails } from "@/entities/funnels";
-import { createFunnelForSite, getFunnelDetailsById, getFunnelsBySiteId } from "@/services/funnels";
+import { createFunnelForSite, getFunnelDetailsById, getFunnelsBySiteId, getFunnelPreviewData } from "@/services/funnels";
 
 export async function postFunnelAction(siteId: string, name: string, pages: string[]): Promise<Funnel> {
   await checkAuth();
@@ -24,8 +24,20 @@ export async function fetchFunnelDetailsAction(siteId: string, funnelId: string)
   return funnel;
 }
 
-
 export async function fetchFunnelsAction(siteId: string): Promise<FunnelDetails[]> {
   await checkAuth();
   return getFunnelsBySiteId(siteId);
+}
+
+export async function fetchFunnelPreviewAction(
+  siteId: string, 
+  funnelName: string, 
+  pages: string[]
+): Promise<FunnelDetails> {
+  await checkAuth();
+  return getFunnelPreviewData(
+    siteId,
+    funnelName,
+    pages
+  );
 }
