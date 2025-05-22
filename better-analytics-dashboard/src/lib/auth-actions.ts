@@ -16,25 +16,12 @@ export async function requireAuth(): Promise<Session> {
   if (!session?.user) {
     redirect("/auth/signin");
   }
-
-  if (!session?.dashboardId || !session?.siteId) {
-    console.error("Dashboard ID or Site ID missing from session after user authentication.");
-    redirect("/auth/signin");
-  }
   
   return session;
 } 
 
 export async function requireDashboardAuth() {
   const session = await requireAuth();
-
-  if (!session.dashboardId || !session.siteId) {
-    console.log("User authenticated but critical dashboard/site identifiers are missing.");
-    redirect("/auth/signin");
-  }
-  return session as Session & { 
-    user: { role?: string }, 
-    dashboardId: string, 
-    siteId: string 
-  };
+  
+  return session;
 } 

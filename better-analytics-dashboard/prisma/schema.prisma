@@ -50,18 +50,38 @@ model User {
 
   passwordHash String?
   role String?
-  dashboards Dashboard[]
+  
+  dashboardAccess UserDashboard[]
 }
 
 model Dashboard {
   id String @id @default(cuid())
   siteId String @unique
-  name String
+  domain String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  userAccess UserDashboard[]
   funnels Funnel[]
+}
+
+model UserDashboard {
+  id String @id @default(cuid())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  
+  dashboard Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  dashboardId String
+  
+  role String @default("viewer")
+  
+  isDefault Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, dashboardId])
 }
 
 model Funnel {
