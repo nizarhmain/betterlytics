@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { fetchUserJourneyAction } from "@/app/actions/userJourney";
-import UserJourneyChart from "../../../components/analytics/UserJourneyChart";
+import UserJourneyChart from "../../../../components/analytics/UserJourneyChart";
 import { useQuery } from "@tanstack/react-query";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import TimeRangeSelector from "@/components/TimeRangeSelector";

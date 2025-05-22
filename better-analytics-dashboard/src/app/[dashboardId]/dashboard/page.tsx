@@ -3,12 +3,18 @@ import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import DashboardPageClient from "./DashboardPageClient"
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  params: Promise<{ dashboardId: string }>;
+}
+
+export default async function DashboardPage({ params }: DashboardPageProps) {
   const session = await getServerSession(authOptions)
 
   if (!session) {
     redirect("/")
   }
 
-  return <DashboardPageClient/>
+  const { dashboardId } = await params;
+
+  return <DashboardPageClient dashboardId={dashboardId} />
 } 

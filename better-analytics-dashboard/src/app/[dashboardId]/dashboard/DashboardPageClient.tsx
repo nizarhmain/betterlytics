@@ -11,7 +11,11 @@ import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 
-export default function DashboardPageClient() {
+type DashboardPageClientProps = {
+  dashboardId: string;
+}
+
+export default function DashboardPageClient({ dashboardId }: DashboardPageClientProps) {
   const { granularity, startDate, endDate } = useTimeRangeContext();
 
   const siteId = 'default-site';

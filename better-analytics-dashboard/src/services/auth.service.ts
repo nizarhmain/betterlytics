@@ -3,7 +3,7 @@ import { findUserByEmail, createUser } from '@/repositories/postgres/user';
 import { findFirstDashboardByUserId, upsertDashboard } from '@/repositories/postgres/dashboard';
 import { env } from '@/lib/env';
 import type { User } from 'next-auth';
-import { CreateUserData, AuthenticatedUserSchema, LoginUserData } from '@/entities/user';
+import { CreateUserData, AuthenticatedUserSchema, LoginUserData, UserSchema } from '@/entities/user';
 import { DashboardWriteData } from '@/entities/dashboard';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -26,33 +26,33 @@ export async function verifyCredentials(loginData: LoginUserData): Promise<User 
     return null;
   }
 
-  let dashboard = await findFirstDashboardByUserId(dbUser.id);
+  // let dashboard = await findFirstDashboardByUserId(dbUser.id);
 
-  if (!dashboard) {
-    const siteId = uuidv4();
+  // if (!dashboard) {
+  //   const siteId = uuidv4();
     
-    const dashboardName = `${dbUser.name || 'User'}'s Dashboard`;
+  //   const dashboardName = `${dbUser.name || 'User'}'s Dashboard`;
     
-    const dashboardData: DashboardWriteData = {
-      siteId,
-      userId: dbUser.id,
-      name: dashboardName
-    };
+  //   const dashboardData: DashboardWriteData = {
+  //     siteId,
+  //     userId: dbUser.id,
+  //     name: dashboardName
+  //   };
     
-    dashboard = await upsertDashboard(dashboardData);
-    console.log(`Created new dashboard with siteId ${siteId} for user ${dbUser.email}`);
-  }
+  //   dashboard = await upsertDashboard(dashboardData);
+  //   console.log(`Created new dashboard with siteId ${siteId} for user ${dbUser.email}`);
+  // }
 
-  if (!dashboard) {
-    console.error(`User ${dbUser.email} authenticated but has no accessible dashboard.`);
-    return null;
-  }
+  // if (!dashboard) {
+  //   console.error(`User ${dbUser.email} authenticated but has no accessible dashboard.`);
+  //   return null;
+  // }
 
   try {
-    return AuthenticatedUserSchema.parse({
+    return UserSchema.parse({
       ...dbUser,
-      dashboardId: dashboard.id,
-      siteId: dashboard.siteId,
+      // dashboardId: dashboard.id,
+      // siteId: dashboard.siteId,
     });
   } catch (error) {
     console.error("Error validating authenticated user data:", error);
@@ -90,17 +90,17 @@ export async function attemptAdminInitialization(
     
     const siteId = uuidv4();
 
-    const dashboardData: DashboardWriteData = {
-      siteId,
-      userId: newAdminUser.id,
-      name: "Default Admin Dashboard"
-    };
+    // const dashboardData: DashboardWriteData = {
+    //   siteId,
+    //   userId: newAdminUser.id,
+    //   name: "Default Admin Dashboard"
+    // };
     
-    const dashboard = await upsertDashboard(dashboardData);
+    // const dashboard = await upsertDashboard(dashboardData);
     
-    return AuthenticatedUserSchema.parse({
+    return UserSchema.parse({
       ...newAdminUser,
-      dashboardId: dashboard.id,
+      // dashboardId: dashboard.id,
       siteId,
     });
   } catch (error) {
