@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCallback, useState } from "react";
 import { PlusIcon, Trash2 } from "lucide-react";
+import { generateTempId } from "@/utils/temporaryId";
 
 type Page = {
   value: string;
@@ -28,17 +29,13 @@ type Funnel = {
   pages: Page[];
 };
 
-function generateTmpId() {
-  return Math.random().toString(36).substring(2);
-}
-
 export function CreateFunnelDialog() {
 
   const [ funnel, setFunnel ] = useState<Funnel>({
     name: 'My new funnel',
     pages: [
-      { key: generateTmpId(), value: '' },
-      { key: generateTmpId(), value: '' },
+      { key: generateTempId(), value: '' },
+      { key: generateTempId(), value: '' },
     ]
   });
 
@@ -130,7 +127,7 @@ export function CreateFunnelDialog() {
                 }
                 <Button
                   className="size-8 rounded-full"
-                  onClick={() => setFunnel((prev) => ({ ...prev, pages: [ ...prev.pages, { key: generateTmpId(), value: '' }] }))}
+                  onClick={() => setFunnel((prev) => ({ ...prev, pages: [ ...prev.pages, { key: generateTempId(), value: '' }] }))}
                 >
                   <PlusIcon />
                 </Button>

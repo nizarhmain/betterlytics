@@ -3,8 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import SummaryCard from "@/components/SummaryCard";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
-import { SummaryStats } from '@/entities/stats';
-import { fetchSummaryStatsAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { EventTypeRow } from "@/entities/events";
 import { fetchCustomEventsOverviewAction } from "@/app/actions/events";
@@ -12,11 +10,6 @@ import EventsTable from "@/components/analytics/EventsTypeTable";
 
 export default function EventsClient() {
   const { startDate, endDate } = useTimeRangeContext();
-
-  const { data: summary, isLoading: summaryLoading } = useQuery<SummaryStats>({
-    queryKey: ['summaryStats', 'default-site', startDate, endDate],
-    queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate),
-  });
 
   const { data: events = [], isLoading: eventsLoading } = useQuery<EventTypeRow[]>({
     queryKey: ['customEvents', 'default-site', startDate, endDate],
@@ -30,7 +23,9 @@ export default function EventsClient() {
           <h1 className="text-2xl font-bold text-foreground mb-1">Events</h1>
           <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
         </div>
-        <TimeRangeSelector />
+        <div className="flex justify-end gap-4">
+          <TimeRangeSelector />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

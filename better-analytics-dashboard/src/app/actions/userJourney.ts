@@ -3,6 +3,7 @@
 import { checkAuth } from "@/lib/auth-actions";
 import { getUserJourneyForSankeyDiagram } from "@/services/userJourney";
 import { SankeyData } from "@/entities/userJourney";
+import { QueryFilter } from "@/entities/filter";
 
 /**
  * Fetch user journey data for Sankey diagram visualization
@@ -16,8 +17,9 @@ export async function fetchUserJourneyAction(
   startDate: Date, 
   endDate: Date, 
   maxSteps: number = 3,
-  limit: number = 50
+  limit: number = 50,
+  queryFilters: QueryFilter[]
 ): Promise<SankeyData> {
   await checkAuth();
-  return getUserJourneyForSankeyDiagram(siteId, startDate, endDate, maxSteps, limit);
+  return getUserJourneyForSankeyDiagram(siteId, startDate, endDate, maxSteps, limit, queryFilters);
 }

@@ -1,9 +1,10 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DateTimeString } from '@/types/dates';
 import { EventTypeRow, EventTypeRowSchema } from '@/entities/events';
+import { safeSql } from '@/lib/safe-sql';
 
 export async function getCustomEventsOverview(siteId: string, startDate: DateTimeString, endDate: DateTimeString): Promise<EventTypeRow[]> {
-  const query = `
+  const query = safeSql`
     SELECT
       custom_event_name as event_name,
       count() as count
@@ -16,8 +17,9 @@ export async function getCustomEventsOverview(siteId: string, startDate: DateTim
     ORDER BY count DESC
     LIMIT 100
   `;
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       start_date: startDate,
       end_date: endDate,

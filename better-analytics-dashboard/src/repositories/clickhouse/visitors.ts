@@ -1,28 +1,32 @@
-import { z } from "zod";
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyUniqueVisitorsRow, DailyUniqueVisitorsRowSchema } from '@/entities/visitors';
 import { DateString, DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { BAQuery } from "@/lib/ba-query";
+import { QueryFilter } from "@/entities/filter";
+import { safeSql, SQL } from "@/lib/safe-sql";
 
-export async function getUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues): Promise<DailyUniqueVisitorsRow[]> {
+export async function getUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<DailyUniqueVisitorsRow[]> {
   
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  const filters = BAQuery.getFilterQuery(queryFilters);
 
-  const query = `
+  const query = safeSql`
     SELECT
       ${granularityFunc}(timestamp) as date,
       uniq(session_id) as unique_visitors
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND date BETWEEN {start:DateTime} AND {end:DateTime}
+      AND ${SQL.AND(filters)}
     GROUP BY date
     ORDER BY date ASC
     LIMIT 10080
   `;
   
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(query.taggedSql, {
     params: {
+      ...query.taggedParams,
       site_id: siteId,
       start: startDate,
       end: endDate,
@@ -34,17 +38,22 @@ export async function getUniqueVisitors(siteId: string, startDate: DateString, e
 export async function getTotalUniqueVisitors(
   siteId: string,
   startDate: DateString,
-  endDate: DateString
+  endDate: DateString,
+  queryFilters: QueryFilter[]
 ): Promise<number> {
-  const query = `
+  const filters = BAQuery.getFilterQuery(queryFilters);
+  
+  const queryResponse = safeSql`
     SELECT uniq(session_id) as unique_sessions
     FROM analytics.events
     WHERE site_id = {site_id:String}
-      AND timestamp BETWEEN toDate({start:Date}) AND toDate({end:Date})
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND ${SQL.AND(filters)}
   `;
 
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(queryResponse.taggedSql, {
     params: {
+      ...queryResponse.taggedParams,
       site_id: siteId,
       start: startDate,
       end: endDate,
@@ -56,14 +65,17 @@ export async function getTotalUniqueVisitors(
 export async function getSessionMetrics(
   siteId: string,
   startDate: DateTimeString,
-  endDate: DateTimeString
+  endDate: DateTimeString,
+  queryFilters: QueryFilter[]
 ): Promise<{
   total_sessions: number;
   multi_page_sessions: number;
   total_duration: number;
   avg_duration: number;
 }> {
-  const query = `
+  const filters = BAQuery.getFilterQuery(queryFilters);
+  
+  const queryResponse = safeSql`
     WITH session_data AS (
       SELECT
         session_id,
@@ -75,6 +87,7 @@ export async function getSessionMetrics(
       FROM analytics.events
       WHERE site_id = {site_id:String}
         AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+        AND ${SQL.AND(filters)}
       GROUP BY session_id
     )
     SELECT 
@@ -85,8 +98,9 @@ export async function getSessionMetrics(
     FROM session_data
   `;
   
-  const result = await clickhouse.query(query, {
+  const result = await clickhouse.query(queryResponse.taggedSql, {
     params: {
+      ...queryResponse.taggedParams,
       site_id: siteId,
       start: startDate,
       end: endDate

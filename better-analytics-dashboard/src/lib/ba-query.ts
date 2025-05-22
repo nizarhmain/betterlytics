@@ -1,5 +1,29 @@
+"server only";
+
+import { QueryFilter, QueryFilterSchema } from "@/entities/filter";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { z } from "zod";
+import { safeSql, SQL } from "./safe-sql";
+
+/**
+ * Build query filters using `safeSql`
+ */
+function getFilterQuery(queryFilters: QueryFilter[]) {
+  const nonEmptyFilters = queryFilters
+    .filter((filter) => Boolean(filter.column) && Boolean(filter.operator) && Boolean(filter.value));
+
+  const filters = QueryFilterSchema.array().parse(nonEmptyFilters);
+
+  if (filters.length === 0) {
+    return [safeSql`1=1`];
+  }
+
+  return filters
+    .map(({ column, operator, value }, index) => {
+      return safeSql`${SQL._Unsafe(column)} ${SQL._Unsafe(operator)} ${SQL.String({ [`query_filter_${index}`]: value })}`
+    });
+}
+
 
 // Utility for granularity
 const GranularitySchema = z.enum(["toStartOfDay", "toStartOfHour", "toStartOfMinute"]);
@@ -15,9 +39,11 @@ const granularityMapper = {
  */
 function getGranularitySQLFunctionFromGranularityRange(granularity: GranularityRangeValues) {
   const mappedGranularity = granularityMapper[granularity];
-  return GranularitySchema.parse(mappedGranularity);
+  const validatedGranularity = GranularitySchema.parse(mappedGranularity);
+  return SQL._Unsafe(validatedGranularity);
 }
 
 export const BAQuery = {
-  getGranularitySQLFunctionFromGranularityRange
+  getGranularitySQLFunctionFromGranularityRange,
+  getFilterQuery
 }

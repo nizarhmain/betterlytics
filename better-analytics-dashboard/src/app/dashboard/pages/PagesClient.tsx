@@ -9,18 +9,21 @@ import { fetchSummaryStatsAction } from "@/app/actions/overview";
 import { fetchPageAnalyticsAction } from "@/app/actions/pages";
 import { PageAnalytics } from "@/entities/pages";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
+import QueryFiltersSelector from '@/components/filters/QueryFiltersSelector';
 
 export default function PagesClient() {
   const { startDate, endDate } = useTimeRangeContext();
+  const { queryFilters } = useQueryFiltersContext();
 
   const { data: summary, isLoading: summaryLoading } = useQuery<SummaryStats>({
-    queryKey: ['summaryStats', 'default-site', startDate, endDate],
-    queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate),
+    queryKey: ['summaryStats', 'default-site', startDate, endDate, queryFilters],
+    queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate, queryFilters),
   });
 
   const { data: pages = [], isLoading: pagesLoading } = useQuery<PageAnalytics[]>({
-    queryKey: ['pageAnalytics', 'default-site', startDate, endDate],
-    queryFn: () => fetchPageAnalyticsAction('default-site', startDate, endDate),
+    queryKey: ['pageAnalytics', 'default-site', startDate, endDate, queryFilters],
+    queryFn: () => fetchPageAnalyticsAction('default-site', startDate, endDate, queryFilters),
   });
 
   return (
@@ -30,7 +33,10 @@ export default function PagesClient() {
           <h1 className="text-2xl font-bold text-foreground mb-1">Pages</h1>
           <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
         </div>
-        <TimeRangeSelector />
+        <div className="flex justify-end gap-4">
+          <QueryFiltersSelector />
+          <TimeRangeSelector />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
