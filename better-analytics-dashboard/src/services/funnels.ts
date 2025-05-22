@@ -14,25 +14,37 @@ export async function getFunnelsBySiteId(siteId: string): Promise<FunnelDetails[
       funnels.map(async (funnel: Funnel) => (
         FunnelDetailsSchema.parse({
           ...funnel,
-          visitors: await ClickhouseFunnelRepository.getFunnelDetails(siteId, funnel.pages)
+          visitors: await ClickhouseFunnelRepository.getFunnelDetails(
+            siteId, 
+            funnel.pages, 
+            funnel.isStrict
+          )
         })
       ))
   );
   return funnelsDetails;
 }
 
-export async function getFunnelDetailsById(siteId: string, funnelId: string): Promise<FunnelDetails | null> {
+export async function getFunnelDetailsById(
+  siteId: string, 
+  funnelId: string
+): Promise<FunnelDetails | null> {
   const funnel = await PostgresFunnelRepository.getFunnelById(funnelId);
 
   if (funnel === null) {
     return null;
   }
-
-  const visitors = await ClickhouseFunnelRepository.getFunnelDetails(siteId, funnel.pages);
+  
+  const visitors = await ClickhouseFunnelRepository.getFunnelDetails(
+    siteId, 
+    funnel.pages, 
+    funnel.isStrict
+  );
 
   return FunnelDetailsSchema.parse({
     ...funnel,
-    visitors
+    visitors,
+    isStrict: funnel.isStrict
   });
 }
 
@@ -44,6 +56,7 @@ export async function getFunnelPreviewData(
   siteId: string,
   funnelName: string,
   pages: string[],
+  isStrict: boolean,
 ): Promise<FunnelDetails> {
   
   const endDate = endOfHour(new Date());
@@ -53,6 +66,7 @@ export async function getFunnelPreviewData(
   const visitors = await ClickhouseFunnelRepository.getFunnelDetails(
     siteId,
     pages,
+    isStrict,
     toDateTimeString(startDate),
     toDateTimeString(endDate),
     queryFilters
@@ -63,5 +77,6 @@ export async function getFunnelPreviewData(
     name: funnelName,
     pages,
     visitors,
+    isStrict
   });
 }

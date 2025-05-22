@@ -8,9 +8,10 @@ import { DateTimeString } from '@/types/dates';
 export async function getFunnelDetails(
   siteId: string,
   pages: string[],
+  isStrict: boolean,
   startDate?: DateTimeString, 
   endDate?: DateTimeString, 
-  queryFilters?: QueryFilter[] 
+  queryFilters?: QueryFilter[]
 ): Promise<number[]> {
 
   const urlPagesEqualityChecks = pages
@@ -25,6 +26,15 @@ export async function getFunnelDetails(
     whereConditions.push(safeSql`timestamp BETWEEN ${SQL.DateTime({ query_start_date: startDate })} AND ${SQL.DateTime({ query_end_date: endDate })}`);
   }
 
+  const windowDurationSeconds = 24 * 60 * 60;
+  let funnelWindowFunctionDefinition;
+
+  if (isStrict) {
+    funnelWindowFunctionDefinition = safeSql`windowFunnel(${SQL.UInt32({ windowDuration: windowDurationSeconds })}, 'strict_order')`;
+  } else {
+    funnelWindowFunctionDefinition = safeSql`windowFunnel(${SQL.UInt32({ windowDuration: windowDurationSeconds })})`;
+  }
+
   const parsedFilters = BAQuery.getFilterQuery(queryFilters || []);
   whereConditions.push(SQL.AND(parsedFilters));
 
@@ -32,10 +42,7 @@ export async function getFunnelDetails(
     WITH
       baseFunnel AS (
           SELECT
-              windowFunnel(24*60*60)(
-                  timestamp,
-                  ${SQL.SEPARATOR(urlPagesEqualityChecks)}
-              ) AS level
+              ${funnelWindowFunctionDefinition}(timestamp, ${SQL.SEPARATOR(urlPagesEqualityChecks)}) AS level
           FROM analytics.events
           WHERE ${SQL.AND(whereConditions)} 
           GROUP BY visitor_id

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import { useCallback, useState, useMemo } from "react";
 import { PlusIcon, Trash2 } from "lucide-react";
 import { generateTempId } from "@/utils/temporaryId";
@@ -31,6 +32,7 @@ type Page = {
 type Funnel = {
   name: string;
   pages: Page[];
+  isStrict: boolean;
 };
 
 export function CreateFunnelDialog() {
@@ -40,7 +42,8 @@ export function CreateFunnelDialog() {
     pages: [
       { key: generateTempId(), value: '' },
       { key: generateTempId(), value: '' },
-    ]
+    ],
+    isStrict: true,
   });
 
   const [ open, setOpen ] = useState<boolean>(false);
@@ -58,26 +61,27 @@ export function CreateFunnelDialog() {
   const isPreviewEnabled = debouncedFunnelName.trim() !== '' && debouncedFunnelPages.length >= 2;
 
   const { data: funnelPreviewData, isLoading: isPreviewLoading } = useQuery<FunnelDetails>({
-    queryKey: ['funnelPreview', siteId, debouncedFunnelName, debouncedFunnelPages.join(',')],
+    queryKey: ['funnelPreview', siteId, debouncedFunnelName, debouncedFunnelPages.join(','), funnel.isStrict],
     queryFn: async () => {
-      return fetchFunnelPreviewAction(siteId, debouncedFunnelName, debouncedFunnelPages);
+      return fetchFunnelPreviewAction(siteId, debouncedFunnelName, debouncedFunnelPages, funnel.isStrict);
     },
     enabled: isPreviewEnabled,
   });
   
   const submit = useCallback(() => {
     postFunnelAction(
-      'default-site',
+      siteId,
       funnel.name,
-      funnel.pages.map((f) => f.value)
+      funnel.pages.map((f) => f.value),
+      funnel.isStrict
     )
       .then(() => {
         toast.success('Funnel created!');
-        queryClient.invalidateQueries({ queryKey: ['funnels', 'default-site'] });
+        queryClient.invalidateQueries({ queryKey: ['funnels', siteId] });
         setOpen(false);
       })
       .catch(() => toast.error('Funnel creation failed!'));
-  }, [funnel, queryClient]);
+  }, [funnel, queryClient, siteId]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -106,6 +110,16 @@ export function CreateFunnelDialog() {
                   onChange={
                     (evt) => setFunnel((prev) => ({...prev, name: evt.target.value}))
                   }
+                />
+              </div>
+              <div className="flex flex-col items-center space-y-1 pt-1">
+                <Label htmlFor="strict-mode" className="text-xs whitespace-nowrap">
+                  Strict Mode
+                </Label>
+                <Switch
+                  id="strict-mode"
+                  checked={funnel.isStrict}
+                  onCheckedChange={(checked: boolean) => setFunnel((prev) => ({ ...prev, isStrict: checked }))}
                 />
               </div>
               <div className="mt-auto">

@@ -1,4 +1,4 @@
-import { CreateFunnel, FunnelSchema } from "@/entities/funnels";
+import { CreateFunnel, Funnel, FunnelSchema } from "@/entities/funnels";
 import prisma from "@/lib/postgres";
 
 export async function getFunnelsBySiteId(siteId: string) {
@@ -7,7 +7,7 @@ export async function getFunnelsBySiteId(siteId: string) {
     where: { siteId }
   });
 
-  return funnels.map((funnel) => FunnelSchema.parse(funnel));
+  return funnels.map((funnel: Funnel) => FunnelSchema.parse(funnel));
 }
 
 export async function getFunnelById(id: string) {
@@ -30,6 +30,7 @@ export async function createFunnel(funnel: CreateFunnel) {
       name: funnel.name,
       pages: funnel.pages,
       siteId: funnel.siteId,
+      isStrict: funnel.isStrict
     }
   });
 

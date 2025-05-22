@@ -4,6 +4,7 @@ export const FunnelSchema = z.object({
   id: z.string(),
   name: z.string(),
   pages: z.string().array(),
+  isStrict: z.boolean(),
 });
 
 export const FunnelDetailsSchema = FunnelSchema.extend({
@@ -14,6 +15,7 @@ export const CreateFunnelSchema = z.object({
   name: z.string(),
   pages: z.string().array(),
   siteId: z.string(),
+  isStrict: z.boolean(),
 });
 
 export type Funnel = z.infer<typeof FunnelSchema>;
