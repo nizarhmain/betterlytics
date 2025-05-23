@@ -1,11 +1,11 @@
 import * as bcrypt from 'bcrypt';
 import { findUserByEmail, createUser } from '@/repositories/postgres/user';
-import { findFirstDashboardByUserId, upsertDashboard } from '@/repositories/postgres/dashboard';
+import { findDashboardById, findUserDashboard } from '@/repositories/postgres/dashboard';
 import { env } from '@/lib/env';
 import type { User } from 'next-auth';
-import { CreateUserData, AuthenticatedUserSchema, LoginUserData, UserSchema } from '@/entities/user';
-import { DashboardWriteData } from '@/entities/dashboard';
+import { CreateUserData, LoginUserData, UserSchema } from '@/entities/user';
 import { v4 as uuidv4 } from 'uuid';
+import { AuthContext, AuthContextSchema } from '@/entities/authContext';
 
 const SALT_ROUNDS = 10;
 
@@ -25,28 +25,6 @@ export async function verifyCredentials(loginData: LoginUserData): Promise<User 
   if (!passwordIsValid) {
     return null;
   }
-
-  // let dashboard = await findFirstDashboardByUserId(dbUser.id);
-
-  // if (!dashboard) {
-  //   const siteId = uuidv4();
-    
-  //   const dashboardName = `${dbUser.name || 'User'}'s Dashboard`;
-    
-  //   const dashboardData: DashboardWriteData = {
-  //     siteId,
-  //     userId: dbUser.id,
-  //     name: dashboardName
-  //   };
-    
-  //   dashboard = await upsertDashboard(dashboardData);
-  //   console.log(`Created new dashboard with siteId ${siteId} for user ${dbUser.email}`);
-  // }
-
-  // if (!dashboard) {
-  //   console.error(`User ${dbUser.email} authenticated but has no accessible dashboard.`);
-  //   return null;
-  // }
 
   try {
     return UserSchema.parse({
@@ -89,14 +67,6 @@ export async function attemptAdminInitialization(
     const newAdminUser = await createUser(adminUserData);
     
     const siteId = uuidv4();
-
-    // const dashboardData: DashboardWriteData = {
-    //   siteId,
-    //   userId: newAdminUser.id,
-    //   name: "Default Admin Dashboard"
-    // };
-    
-    // const dashboard = await upsertDashboard(dashboardData);
     
     return UserSchema.parse({
       ...newAdminUser,
@@ -108,3 +78,20 @@ export async function attemptAdminInitialization(
     return null;
   }
 } 
+
+export async function authorizeUserDashboard(
+  userId: string,
+  dashboardId: string
+): Promise<AuthContext> {
+  const userDashboard = await findUserDashboard({ userId, dashboardId });
+  const dashboard = await findDashboardById(userDashboard.dashboardId);
+
+  const context: AuthContext = {
+    role: userDashboard.role,
+    userId: userDashboard.userId,
+    dashboardId: dashboard.id,
+    siteId: dashboard.siteId
+  };
+
+  return AuthContextSchema.parse(context);
+}
