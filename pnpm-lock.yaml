@@ -92,6 +92,12 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      country-flag-icons:
+        specifier: ^1.5.19
+        version: 1.5.19
+      country-flags-icons:
+        specifier: ^0.0.0
+        version: 0.0.0
       d3-scale:
         specifier: ^4.0.2
         version: 4.0.2
@@ -1699,7 +1705,6 @@ packages:
 
   clickhouse@2.6.0:
     resolution: {integrity: sha512-HC5OV99GJOup4qZsTuWWPpXlj+847Z0OeygDU2x22rNYost0V/vWapzFWYZdV/5iRbGMrhFQPOyQEzmGvoaWRQ==}
-    bundledDependencies: []
 
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
@@ -1739,6 +1744,12 @@ packages:
 
   core-util-is@1.0.2:
     resolution: {integrity: sha512-3lqz5YjWTYnW6dlDa5TLaTCcShfar1e40rmcJVwCBJC6mWlFuj0eCHIElmG1g5kyuJ/GD+8Wn4FFCcz4gJPfaQ==}
+
+  country-flag-icons@1.5.19:
+    resolution: {integrity: sha512-D/ZkRyj+ywJC6b2IrAN3/tpbReMUqmuRLlcKFoY/o0+EPQN9Ev/e8tV+D3+9scvu/tarxwLErNwS73C3yzxs/g==}
+
+  country-flags-icons@0.0.0:
+    resolution: {integrity: sha512-lL/DZHHL4dP9IJgyC+7UD91UGb7HGaMBGJad6z3phWAyRj7y2HusvCkdV3y0lLe7u923KgiUQKBpWsc+SgfsDQ==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -4695,6 +4706,10 @@ snapshots:
   cookie@0.7.2: {}
 
   core-util-is@1.0.2: {}
+
+  country-flag-icons@1.5.19: {}
+
+  country-flags-icons@0.0.0: {}
 
   cross-spawn@7.0.6:
     dependencies:

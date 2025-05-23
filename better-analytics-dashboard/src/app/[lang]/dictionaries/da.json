@@ -1,14 +1,14 @@
 {
-  "dashboard": { 
+  "dashboard": {
     "client": {
-      "Unique visitors": "Unique Visitors",
-      "Total pageviews": "Total Page Views",
-      "bounceRate": "Bounce Rate",
-      "avgVisitDuration": "Avg. Visit Duration"
+      "Unique visitors": "Unikke besøgende",
+      "Total pageviews": "Samlede sidevisninger",
+      "bounceRate": "Afvisningsprocent",
+      "avgVisitDuration": "Gennemsnitlig besøgstid"
     }
   },
   "misc": {
-    "loading": "Loading...",
-    "error": "Error"
+    "loading": "Indlæser...",
+    "error": "Der opstod en fejl"
   }
 }

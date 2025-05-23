@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { LayoutDashboard, FileText, Smartphone, CircleDot, Globe, Link2, Funnel, DollarSign } from "lucide-react";
 import { SidebarHeader } from "./SidebarHeader";
+import { LanguageSelect } from "@/components/LanguageSelect";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: <LayoutDashboard size={18} /> },
   //{ name: "Realtime", href: "/dashboard/realtime", icon: <BarChart size={18} /> },
   { name: "Pages", href: "/dashboard/pages", icon: <FileText size={18} /> },
   { name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
-  //{ name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
-  //{ name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
   { name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
   { name: "User Journey", href: "/dashboard/user-journey", icon: <CircleDot size={18} /> },
   { name: "Funnels", href: "/dashboard/funnels", icon: <Funnel size={18} /> },
@@ -34,6 +33,7 @@ export default function Sidebar() {
           ))}
         </ul>
       </nav>
+      <LanguageSelect className="mt-auto ml-auto" /> 
     </aside>
   );
 } 
