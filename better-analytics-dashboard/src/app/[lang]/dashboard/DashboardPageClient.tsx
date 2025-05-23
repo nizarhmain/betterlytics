@@ -52,18 +52,18 @@ export default function DashboardPageClient() {
           changeColor="text-green-600"
         />
         <SummaryCard
-          title="Total Pageviews"
+          title={dict.dashboard.client["Total pageviews"]}
           value={summaryLoading ? '...' : summary?.pageviews?.toLocaleString() ?? '0'}
           changeText=""
           changeColor="text-red-600"
         />
         <SummaryCard
-          title="Bounce Rate"
+          title={dict.dashboard.client.bounceRate}
           value={summaryLoading ? '...' : summary?.bounceRate !== undefined ? `${summary.bounceRate}%` : '0%'}
           changeText=""
         />
         <SummaryCard
-          title="Avg. Visit Duration"
+          title={dict.dashboard.client.avgVisitDuration}
           value={summaryLoading ? '...' : formatDuration(summary?.avgVisitDuration ?? 0)}
           changeText=""
           changeColor="text-green-600"
@@ -82,14 +82,14 @@ export default function DashboardPageClient() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="bg-card rounded-lg p-6 border border-border shadow">
           {topPagesLoading ? (
-            <div className="text-center p-8 text-muted-foreground">Loading...</div>
+            <div className="text-center p-8 text-muted-foreground">{dict.misc.loading}</div>
           ) : (
             <TopPagesTable pages={topPages ?? []} />
           )}
         </div>
         <div className="bg-card rounded-lg p-6 border border-border shadow">
           {deviceBreakdownLoading ? (
-            <div className="text-center p-8 text-muted-foreground">Loading...</div>
+            <div className="text-center p-8 text-muted-foreground">{dict.misc.loading}</div>
           ) : (
             <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />
           )}
