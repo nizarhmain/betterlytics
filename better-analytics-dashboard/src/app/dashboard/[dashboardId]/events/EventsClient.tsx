@@ -5,7 +5,7 @@ import SummaryCard from "@/components/SummaryCard";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { EventTypeRow } from "@/entities/events";
-import { fetchCustomEventsOverviewAction } from "@/app/actions/events";
+import { actions } from "@/app/actions/dashboard";
 import EventsTable from "@/components/analytics/EventsTypeTable";
 
 export default function EventsClient() {
@@ -13,7 +13,7 @@ export default function EventsClient() {
 
   const { data: events = [], isLoading: eventsLoading } = useQuery<EventTypeRow[]>({
     queryKey: ['customEvents', 'default-site', startDate, endDate],
-    queryFn: () => fetchCustomEventsOverviewAction('default-site', startDate, endDate),
+    queryFn: () => actions.fetchCustomEventsOverviewAction('default-site', startDate, endDate),
   });
 
   return (

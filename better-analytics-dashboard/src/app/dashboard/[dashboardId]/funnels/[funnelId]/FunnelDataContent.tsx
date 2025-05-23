@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchFunnelDetailsAction } from "@/app/actions/funnels";
+import { fetchFunnelDetailsAction } from "@/app/actions/authenticated/funnels";
 import { FunnelDetails } from "@/entities/funnels";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
