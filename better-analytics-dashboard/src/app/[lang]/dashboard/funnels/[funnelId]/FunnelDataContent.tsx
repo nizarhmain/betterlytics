@@ -30,8 +30,12 @@ export function FunnelDataContent({ funnelId }: FunnelDataContentProps) {
   }
 
   return (
-    <div className="bg-white border-1 p-5 rounded-md grid grid-cols-3 gap-6">
-      <div className="col-span-2 text-sm font-semibold">
+    <div className="bg-white border-1 p-5 rounded-md grid lg:grid-cols-3 gap-6">
+      <div className="col-span-3 lg:col-span-2 text-sm font-semibold">
+        <div className="flex items-center gap-3 mb-3">
+          <h1 className="text-xl font-semibold">{funnel.name}</h1>
+          <Badge className="rounded-full h-[50%] mt-1 text-gray-800" variant='outline'>{funnelData.steps.length} steps</Badge>  
+        </div>
         {
           funnelData
             .steps
@@ -69,11 +73,7 @@ export function FunnelDataContent({ funnelId }: FunnelDataContentProps) {
             ))
         }
       </div>
-      <div className="col-span-1 text-sm border-l-1 pl-3 ">
-        <div className="flex items-center gap-3 mb-3">
-          <h1 className="text-xl font-semibold">{funnel.name}</h1>
-          <Badge className="rounded-full h-[50%] mt-1 text-gray-800" variant='outline'>{funnelData.steps.length} steps</Badge>  
-        </div>
+      <div className="col-span-3 lg:col-span-1 text-sm lg:border-l-1 pl-3 ">
         <div className="flex flex-col gap-3 bg-gray-200 p-4 rounded-lg">
           <SummaryCard
             title="Overall conversion"
@@ -92,7 +92,7 @@ export function FunnelDataContent({ funnelId }: FunnelDataContentProps) {
           />
           <SummaryCard
             title="Biggest drop-off"
-            value={<span className="text-sm flex text-ellipsis overflow-hidden">{funnelData.biggestDropOff.pageStep[0]} <ArrowRight size="18px" /> {funnelData.biggestDropOff.pageStep[1]}</span>}
+            value={<span className="text-sm flex text-ellipsis overflow-hidden overflow-x-auto">{funnelData.biggestDropOff.pageStep[0]} <ArrowRight className="min-w-[1rem] max-w-[1rem] mx-1" /> {funnelData.biggestDropOff.pageStep[1]}</span>}
             changeText={`${funnelData.biggestDropOff.dropoffCount} users (${Math.floor(100 * funnelData.biggestDropOff.dropoffRatio)}%)`}
             changeColor="text-orange-600"
           />

@@ -28,7 +28,7 @@ export default function QueryFiltersSelector() {
           <ChevronDownIcon className={`ml-2 h-4 w-4 shrink-0 opacity-50`} /> 
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[540px] p-4 space-y-4 shadow-2xl" align="end">
+      <PopoverContent className="w-[540px] p-4 space-y-4 shadow-2xl z-[1002]" align="end">
         {
           queryFilters.length > 0 ? (
             <>

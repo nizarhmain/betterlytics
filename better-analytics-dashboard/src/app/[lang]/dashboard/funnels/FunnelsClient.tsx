@@ -26,32 +26,31 @@ export default function FunnelsClient() {
       {
         funnelsData
           .map((funnel) => (
-            <div key={funnel.id} className='grid grid-cols-5 bg-white p-3 rounded-md shadow mb-5'>
-              <div className="flex col-span-1 gap-2">
+            <div key={funnel.id} className='grid grid-cols-4 grid-rows-5 md:grid-rows-2 gap-2 bg-white p-3 rounded-md shadow mb-5'>
+              <div className="flex col-span-3 gap-2">
                 <h1 className="text-xl font-semibold">{funnel.name}</h1>
-                <Badge className="rounded-full mt-0.5 text-gray-800" variant='outline'>{funnel.steps.length} steps</Badge>  
+                <Badge className="rounded-full mt-0.5 text-gray-800 h-[1.5rem]" variant='outline'>{funnel.steps.length} steps</Badge>  
               </div>
-              <div className='grid col-span-3 grid-cols-4 gap-2'>
+              <div className='col-span-1 flex justify-end'>
+                <Link className='text-right mr-2' href={`/dashboard/funnels/${funnel.id}`}><ArrowRightCircleIcon /></Link>
+              </div>
+              <div className='col-span-4 row-span-4 md:row-span-1 grid md:grid-cols-4 gap-2'>
                 <InlineDataDisplay
-                  title={'conversion rate'}
+                  title={'Conversion rate'}
                   value={`${Math.floor(100 * funnel.conversionRate)}%`}
                 />
                 <InlineDataDisplay
-                  title={'completed'}
+                  title={'Completed'}
                   value={funnel.visitorCount.min}
                 />
                 <InlineDataDisplay
-                  title={'total users'}
+                  title={'Total users'}
                   value={funnel.visitorCount.max}
                 />
                 <InlineDataDisplay
-                  title={'- largest drop-off'}
+                  title={'Largest drop-off'}
                   value={`${Math.floor(100 * funnel.biggestDropOff.dropoffRatio)}%`}
                 />
-              </div>
-
-              <div className='col-span-1 flex justify-end'>
-                <Link className='text-right mr-2' href={`/dashboard/funnels/${funnel.id}`}><ArrowRightCircleIcon /></Link>
               </div>
             </div>
           ))
@@ -66,9 +65,9 @@ type InlineDataDisplayProps = {
 }
 function InlineDataDisplay({ title, value }: InlineDataDisplayProps) {
   return (
-    <div className='flex justify-center gap-2 place-items-center border-1 px-2 rounded-md shadow'>
-      <p className='text-lg font-semibold'>{value}</p>
-      <h4 className='text-gray-700'>{title}</h4>
+    <div className='grid grid-cols-3 align-middle items-center md:place-items-center border-1 px-2 rounded-md shadow'>
+      <h4 className='text-gray-700 text-sm ml-4 col-span-2 md:ml-0'>{title}:</h4>
+      <p className='font-semibold'>{value}</p>
     </div>
   )
 }

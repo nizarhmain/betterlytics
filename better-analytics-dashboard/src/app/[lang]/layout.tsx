@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
-import { getDictionary } from "./dictionaries";
+import { getDictionary, SupportedLanguages } from "./dictionaries";
 
 import Providers from "@/app/[lang]/Providers";
 import "./globals.css";
@@ -24,9 +24,8 @@ export const metadata: Metadata = {
 
 type RootLayoutParams = {
   children: ReactNode,
-  params: Promise<{lang: 'en' | 'da'}>
+  params: Promise<{lang: SupportedLanguages}>
 }
-
 
 export default async function RootLayout({
   children,

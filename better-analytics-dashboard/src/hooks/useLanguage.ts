@@ -1,4 +1,4 @@
-import { DEFAULT_LANGUAGE, SupportedLanguages } from '@/app/[lang]/dictionaries';
+import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, SupportedLanguages } from '@/app/[lang]/dictionaries';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export function useLanguage() {
@@ -6,7 +6,13 @@ export function useLanguage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const pathLang = pathname?.split('/')[1];
+  const currentLanguage = SUPPORTED_LANGUAGES.includes(pathLang as SupportedLanguages)
+    ? (pathLang as SupportedLanguages)
+    : DEFAULT_LANGUAGE;
+
   function setLanguage(newLanguage: SupportedLanguages) {
+    console.log("Received: ", newLanguage)
     if (!pathname) return;
 
     const segments = pathname.split('/');
@@ -15,12 +21,12 @@ export function useLanguage() {
 
     const queryString = searchParams.toString();
     const fullPath = `${newPath}${queryString ? `?${queryString}` : ''}`;
-
+    console.log("Pushing: ", fullPath);
     router.push(fullPath);
   }
 
   return {
     setLanguage,
-    currentLanguage: (pathname?.split('/')[1] || DEFAULT_LANGUAGE) as SupportedLanguages,
+    currentLanguage,
   };
 }

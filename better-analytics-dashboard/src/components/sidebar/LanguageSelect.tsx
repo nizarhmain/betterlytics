@@ -12,6 +12,8 @@ import * as React from 'react';
 import { SUPPORTED_LANGUAGES, SupportedLanguages } from '@/app/[lang]/dictionaries';
 import { FlagIcon, type FlagIconProps } from '@/components/FlagIcon';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useSidebar } from '../ui/sidebar';
+import { cn } from '@/lib/utils';
 
 type LanguageSelectProps = Omit<React.ComponentProps<typeof SelectTrigger>, 'children'> & {
   selectProps?: React.ComponentProps<typeof Select>;
@@ -24,15 +26,16 @@ const LANGUAGE_TO_COUNTRYCODE = {
 
 export function LanguageSelect({ className, style, selectProps }: LanguageSelectProps) {
   const { currentLanguage, setLanguage } = useLanguage();
+  const { open } = useSidebar();
 
   return (
     <Select value={currentLanguage} onValueChange={setLanguage} {...selectProps}>
-      <SelectTrigger className={className} style={style}>
+      <SelectTrigger className={cn(className, !open && "[&>svg:last-child]:hidden" )} style={style}>
         <SelectValue>
           {currentLanguage && (
             <div className="flex items-center gap-2 p-0 m-0">
               <FlagIcon countryCode={LANGUAGE_TO_COUNTRYCODE[currentLanguage]} className="w-4 h-4"/>
-              {currentLanguage.toUpperCase()}
+              <span className={cn(!open && "hidden")}>{currentLanguage.toUpperCase()}</span>
             </div>
           )}
         </SelectValue>
@@ -42,7 +45,7 @@ export function LanguageSelect({ className, style, selectProps }: LanguageSelect
           <SelectItem key={lang} value={lang}>
             <div className="flex items-center gap-2 p-0 m-0">
               <FlagIcon countryCode={LANGUAGE_TO_COUNTRYCODE[lang]} className="w-4 h-4" />
-              {lang.toUpperCase()}
+              <span>{lang.toUpperCase()}</span>
             </div>
           </SelectItem>
         ))}

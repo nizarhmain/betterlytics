@@ -3,11 +3,13 @@
 import { useTheme } from "next-themes"
 import { Sun, Moon } from "lucide-react"
 import { useEffect, useState } from "react"
+import { cn } from "@/lib/utils"
+import { useSidebar } from "./ui/sidebar"
 
-export function ThemeSwitcher() {
+export function ThemeSwitcher( { className, ...props }: React.ComponentProps<"button">) {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
-
+  
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -20,8 +22,9 @@ export function ThemeSwitcher() {
   return (
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-1 rounded-md hover:bg-accent"
+      className={cn("p-1 rounded-md hover:bg-accent", className)}
       aria-label="Toggle theme"
+      {...props}
     >
       {theme === "dark" ? (
         <Sun size={18} className="text-primary" />
