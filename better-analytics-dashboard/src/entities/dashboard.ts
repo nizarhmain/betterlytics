@@ -3,15 +3,14 @@ import { z } from "zod";
 export const DashboardSchema = z.object({
   id: z.string(),
   siteId: z.string(),
-  name: z.string(),
-  userId: z.string(),
+  domain: z.string(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
 
 export const DashboardWriteSchema = z.object({
   siteId: z.string(),
-  name: z.string(),
+  domain: z.string(),
   userId: z.string(),
 });
 

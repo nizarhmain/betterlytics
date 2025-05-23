@@ -17,21 +17,25 @@ import BASidebarCollapsibleSignOutButton from "./BASidebarCollapsibleSignOutButt
 import SettingsButton from "../SettingsButton";
 
 const navItems = [
-  { name: "Overview", href: "/dashboard", icon: <LayoutDashboard size={18} /> },
+  { name: "Overview", href: "", icon: <LayoutDashboard size={18} /> },
   //{ name: "Realtime", href: "/dashboard/realtime", icon: <BarChart size={18} /> },
-  { name: "Pages", href: "/dashboard/pages", icon: <FileText size={18} /> },
-  { name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
+  { name: "Pages", href: "pages", icon: <FileText size={18} /> },
+  { name: "Referrers", href: "referrers", icon: <Link2 size={18} /> },
   //{ name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
   //{ name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
-  { name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
-  { name: "User Journey", href: "/dashboard/user-journey", icon: <CircleDot size={18} /> },
-  { name: "Funnels", href: "/dashboard/funnels", icon: <Funnel size={18} /> },
-  { name: "Devices", href: "/dashboard/devices", icon: <Smartphone size={18} /> },
-  { name: "Campaigns", href: "/dashboard/campaign", icon: <DollarSign size={18} /> },
-  { name: "Events", href: "/dashboard/events", icon: <CircleDot size={18} /> },
+  { name: "Geography", href: "geography", icon: <Globe size={18} /> },
+  { name: "User Journey", href: "user-journey", icon: <CircleDot size={18} /> },
+  { name: "Funnels", href: "funnels", icon: <Funnel size={18} /> },
+  { name: "Devices", href: "devices", icon: <Smartphone size={18} /> },
+  { name: "Campaigns", href: "campaign", icon: <DollarSign size={18} /> },
+  { name: "Events", href: "events", icon: <CircleDot size={18} /> },
 ];
 
-export default function BASidebar() {
+type BASidebarProps = {
+  dashboardId: string;
+};
+
+export default async function BASidebar({ dashboardId }: BASidebarProps) {
   return (
     <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader>
@@ -45,7 +49,7 @@ export default function BASidebar() {
                 {navItems.map((item) => (
                   <SidebarMenuItem key={item.name}>
                     <SidebarMenuButton asChild>
-                      <Link href={item.href}>
+                      <Link href={`/dashboard/${dashboardId}/${item.href}`}>
                         <span>{item.icon}</span>
                         <span>{item.name}</span>
                       </Link>

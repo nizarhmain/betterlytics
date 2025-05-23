@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import DevicesClient from "@/app/[dashboardId]/dashboard/devices/DevicesClient";
+import DevicesClient from "./DevicesClient";
 
 export default async function DevicesPage() {
   const session = await getServerSession(authOptions);

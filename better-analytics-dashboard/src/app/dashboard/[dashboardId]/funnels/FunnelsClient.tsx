@@ -20,10 +20,6 @@ export default function FunnelsClient() {
 
   return (
     <div className="p-4 md:p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Funnels</h1>
-        <CreateFunnelDialog />
-      </div>
       {
         funnelsData.length === 0 && (
           <div className="text-center text-gray-500">
