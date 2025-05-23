@@ -6,6 +6,8 @@ import UserJourneyChart from "../../../../components/analytics/UserJourneyChart"
 import { useQuery } from "@tanstack/react-query";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
+import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
+import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
 const JOURNEY_OPTIONS = [5, 10, 20, 50, 100];
@@ -15,20 +17,20 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
     const [numberOfJourneys, setNumberOfJourneys] = useState<number>(10);
 
     const { startDate, endDate } = useTimeRangeContext();
+    const { queryFilters } = useQueryFiltersContext();
 
     const { data: journeyData, isLoading, error } = useQuery({
-      queryKey: ['userJourney', siteId, startDate, endDate, numberOfSteps, numberOfJourneys],
+      queryKey: ['userJourney', siteId, startDate, endDate, numberOfSteps, numberOfJourneys, queryFilters],
       queryFn: () => {
         return fetchUserJourneyAction(
           siteId,
           startDate,
           endDate,
           numberOfSteps,
-          numberOfJourneys
+          numberOfJourneys,
+          queryFilters
         );
-      },
-      staleTime: 5 * 60 * 1000,
-      gcTime: 30 * 60 * 1000
+      }
     });
 
     const errorMessage = error instanceof Error ? error.message : "Failed to fetch journey data";
@@ -67,7 +69,10 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
                   ))}
                 </select>
               </div>
-              <TimeRangeSelector />
+              <div className="flex gap-2">
+                <QueryFiltersSelector />
+                <TimeRangeSelector />
+              </div>
             </div>
           </div>
           

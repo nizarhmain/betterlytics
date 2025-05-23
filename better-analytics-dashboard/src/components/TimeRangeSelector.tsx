@@ -186,7 +186,7 @@ export default function TimeRangeSelector({ className = "" }: { className?: stri
           <ChevronDownIcon className={`ml-2 h-4 w-4 shrink-0 opacity-50`} /> 
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-96 p-6 space-y-6" align="end">
+      <PopoverContent className="w-96 p-6 space-y-6 z-[1002]" align="end">
         <div>
           <h3 className="text-sm font-medium text-gray-500 mb-2">Quick select</h3>
           <div className="grid grid-cols-2 gap-2">

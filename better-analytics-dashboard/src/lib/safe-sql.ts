@@ -90,6 +90,13 @@ export const SQL = {
   DateTime: asType<string>("DateTime"),
   UInt32Array: asType<Array<number>>("Array(UInt32)"),
 
+  /**
+   * WARNING - THIS WILL FORCE INJECT THE GIVEN STRING INTO THE FINAL SQL. USE WITH GREAT CARE.\
+   * ZOD VALIDATE BEFORE USING THIS TO PREVENT SQL INJECTION.\
+   * Note - remember to add "extras" manually, such as quotation marks around strings, etc. 
+   */
+  _Unsafe: unsafeAsRawSQL(),
+
   // List helpers
   AND: asJoin(" AND "),
   OR: asJoin(" OR "),
@@ -128,6 +135,16 @@ function asType<T>(kind: string): (variable: SQLVariable<T>) => SQLTaggedExpress
     }
   }
 }
+
+function unsafeAsRawSQL(): (unsafeSql: string) => SQLTaggedExpression {
+  return (unsafeSql) => {
+    return {
+      taggedSql: unsafeSql,
+      taggedParams: {}
+    }
+  }
+}
+
 type SQLVariable<T> = {
   [param: string]: T;
 }

@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCallback, useState } from "react";
 import { PlusIcon, Trash2 } from "lucide-react";
+import { generateTempId } from "@/utils/temporaryId";
 
 type Page = {
   value: string;
@@ -28,16 +29,12 @@ type Funnel = {
   pages: Page[];
 };
 
-function generateTmpId() {
-  return Math.random().toString(36).substring(2);
-}
-
 export function CreateFunnelDialog() {
   const [ funnel, setFunnel ] = useState<Funnel>({
     name: 'My new funnel',
     pages: [
-      { key: generateTmpId(), value: '' },
-      { key: generateTmpId(), value: '' },
+      { key: generateTempId(), value: '' },
+      { key: generateTempId(), value: '' },
     ]
   });
 
@@ -75,7 +72,7 @@ export function CreateFunnelDialog() {
             Create a new funnel for your website.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="name" className="text-right">
@@ -133,14 +130,14 @@ export function CreateFunnelDialog() {
                 }
                 <Button
                   className="size-8 rounded-full"
-                  onClick={() => setFunnel((prev) => ({ ...prev, pages: [ ...prev.pages, { key: generateTmpId(), value: '' }] }))}
+                  onClick={() => setFunnel((prev) => ({ ...prev, pages: [ ...prev.pages, { key: generateTempId(), value: '' }] }))}
                 >
                   <PlusIcon />
                 </Button>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-4 shadow flex flex-col col-span-2 text-center">
+          <div className="hidden lg:visible lg:flex bg-white rounded-lg p-4 shadow  flex-col col-span-2 text-center">
             <p>Placeholder</p>
           </div>
         </div>

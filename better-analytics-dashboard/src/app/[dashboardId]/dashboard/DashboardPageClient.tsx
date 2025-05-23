@@ -10,6 +10,8 @@ import { formatDuration } from "@/utils/dateFormatters";
 import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
+import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 
 type DashboardPageClientProps = {
   dashboardId: string;
@@ -17,27 +19,29 @@ type DashboardPageClientProps = {
 
 export default function DashboardPageClient({ dashboardId }: DashboardPageClientProps) {
   const { granularity, startDate, endDate } = useTimeRangeContext();
+  const { queryFilters } = useQueryFiltersContext();
 
   const siteId = 'default-site';
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
-    queryKey: ['summaryStats', siteId, startDate, endDate],
-    queryFn: () => fetchSummaryStatsAction(siteId, startDate, endDate),
+    queryKey: ['summaryStats', siteId, startDate, endDate, queryFilters],
+    queryFn: () => fetchSummaryStatsAction(siteId, startDate, endDate, queryFilters),
   });
 
   const { data: topPages, isLoading: topPagesLoading } = useQuery({
-    queryKey: ['topPages', siteId, startDate, endDate],
-    queryFn: () => fetchTopPagesAction(siteId, startDate, endDate, 5),
+    queryKey: ['topPages', siteId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTopPagesAction(siteId, startDate, endDate, 5, queryFilters),
   });
 
   const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
-    queryKey: ['deviceTypeBreakdown', siteId, startDate, endDate],
-    queryFn: () => fetchDeviceTypeBreakdownAction(siteId, startDate, endDate),
+    queryKey: ['deviceTypeBreakdown', siteId, startDate, endDate, queryFilters],
+    queryFn: () => fetchDeviceTypeBreakdownAction(siteId, startDate, endDate, queryFilters),
   });
 
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-end mb-4 gap-4">
+        <QueryFiltersSelector />
         <TimeRangeSelector />
       </div>
       
@@ -69,10 +73,10 @@ export default function DashboardPageClient({ dashboardId }: DashboardPageClient
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="bg-card rounded-lg p-6 border border-border shadow">
-          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
         </div>
         <div className="bg-card rounded-lg p-6 border border-border shadow">
-          <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} />
+          <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
         </div>
       </div>
       
