@@ -20,7 +20,7 @@ type LanguageSelectProps = Omit<React.ComponentProps<typeof SelectTrigger>, 'chi
 };
 
 const LANGUAGE_TO_COUNTRYCODE = {
-  en: 'GB', 
+  en: 'GB',
   da: 'DK',
 } satisfies Record<SupportedLanguages, FlagIconProps['countryCode']>;
 
@@ -30,11 +30,11 @@ export function LanguageSelect({ className, style, selectProps }: LanguageSelect
 
   return (
     <Select value={currentLanguage} onValueChange={setLanguage} {...selectProps}>
-      <SelectTrigger className={cn(className, !open && "[&>svg:last-child]:hidden" )} style={style}>
+      <SelectTrigger className={cn(className, !open && "[&>svg:last-child]:hidden")} style={style}>
         <SelectValue>
           {currentLanguage && (
             <div className="flex items-center gap-2 p-0 m-0">
-              <FlagIcon countryCode={LANGUAGE_TO_COUNTRYCODE[currentLanguage]} className="w-4 h-4"/>
+              <FlagIcon countryCode={LANGUAGE_TO_COUNTRYCODE[currentLanguage]} className="w-4 h-4" />
               <span className={cn(!open && "hidden")}>{currentLanguage.toUpperCase()}</span>
             </div>
           )}
