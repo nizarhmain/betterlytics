@@ -1,3 +1,4 @@
+"use server"
 
 import { PublicAuthAction, withDashboardAuthContext } from './auth'
 import * as authenticated from './authenticated'

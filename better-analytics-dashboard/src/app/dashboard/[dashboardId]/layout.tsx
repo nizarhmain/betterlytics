@@ -12,7 +12,7 @@ export default async function DashboardLayout({ children, params }: DashboardLay
   const { dashboardId } = await params;
 
   return (
-    <DashboardProvider>
+    <DashboardProvider dashboardId={dashboardId}>
       <SidebarProvider>
         <BASidebar dashboardId={dashboardId} />
         <BAMobileSidebarTrigger />
