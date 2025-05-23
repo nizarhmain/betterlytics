@@ -12,7 +12,6 @@ export function useLanguage() {
     : DEFAULT_LANGUAGE;
 
   function setLanguage(newLanguage: SupportedLanguages) {
-    console.log("Received: ", newLanguage)
     if (!pathname) return;
 
     const segments = pathname.split('/');
@@ -21,7 +20,6 @@ export function useLanguage() {
 
     const queryString = searchParams.toString();
     const fullPath = `${newPath}${queryString ? `?${queryString}` : ''}`;
-    console.log("Pushing: ", fullPath);
     router.push(fullPath);
   }
 
