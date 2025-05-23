@@ -13,11 +13,7 @@ import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 
-type DashboardPageClientProps = {
-  dashboardId: string;
-}
-
-export default function DashboardPageClient({ dashboardId }: DashboardPageClientProps) {
+export default function DashboardPageClient() {
   const { granularity, startDate, endDate } = useTimeRangeContext();
   const { queryFilters } = useQueryFiltersContext();
 
