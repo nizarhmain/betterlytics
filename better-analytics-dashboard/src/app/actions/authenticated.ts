@@ -186,3 +186,143 @@ export async function fetchFunnelsAction(dashboardId: string, ...args: GetAuthRe
     throw new Error('An error occurred');
   }
 }
+
+export async function getWorldMapData(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.getWorldMapData>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.getWorldMapData(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "getWorldMapData:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchTotalPageViewsAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchTotalPageViewsAction>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchTotalPageViewsAction(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchTotalPageViewsAction:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchPageViewsAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchPageViewsAction>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchPageViewsAction(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchPageViewsAction:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchUniqueVisitorsAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchUniqueVisitorsAction>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchUniqueVisitorsAction(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchUniqueVisitorsAction:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchSummaryStatsAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchSummaryStatsAction>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchSummaryStatsAction(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchSummaryStatsAction:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchTopPagesAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchTopPagesAction>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchTopPagesAction(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchTopPagesAction:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchPageAnalyticsAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchPageAnalyticsAction>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchPageAnalyticsAction(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchPageAnalyticsAction:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchPageDetailAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchPageDetailAction>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchPageDetailAction(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchPageDetailAction:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchPageTrafficTimeSeriesAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchPageTrafficTimeSeriesAction>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchPageTrafficTimeSeriesAction(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchPageTrafficTimeSeriesAction:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchReferrerSourceAggregationDataForSite(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchReferrerSourceAggregationDataForSite>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchReferrerSourceAggregationDataForSite(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchReferrerSourceAggregationDataForSite:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchReferrerTrafficTrendBySourceDataForSite(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchReferrerTrafficTrendBySourceDataForSite>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchReferrerTrafficTrendBySourceDataForSite(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchReferrerTrafficTrendBySourceDataForSite:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchReferrerSummaryDataForSite(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchReferrerSummaryDataForSite>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchReferrerSummaryDataForSite(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchReferrerSummaryDataForSite:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchReferrerTableDataForSite(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchReferrerTableDataForSite>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchReferrerTableDataForSite(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchReferrerTableDataForSite:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
+export async function fetchUserJourneyAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchUserJourneyAction>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchUserJourneyAction(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchUserJourneyAction:"', e);
+    throw new Error('An error occurred');
+  }
+}

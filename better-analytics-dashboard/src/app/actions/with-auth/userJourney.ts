@@ -1,9 +1,9 @@
-'use server';
+'server only';
 
-import { requireDashboardAuth } from "@/lib/auth-actions";
 import { getUserJourneyForSankeyDiagram } from "@/services/userJourney";
 import { SankeyData } from "@/entities/userJourney";
 import { QueryFilter } from "@/entities/filter";
+import { AuthContext } from "@/entities/authContext";
 
 /**
  * Fetch user journey data for Sankey diagram visualization
@@ -13,13 +13,12 @@ import { QueryFilter } from "@/entities/filter";
  * maxSteps is the number of steps in the journey (e.g., maxSteps=3 shows A→B→C)
  */
 export async function fetchUserJourneyAction(
-  siteId: string, 
+  ctx: AuthContext, 
   startDate: Date, 
   endDate: Date, 
   maxSteps: number = 3,
   limit: number = 50,
   queryFilters: QueryFilter[]
 ): Promise<SankeyData> {
-  await requireDashboardAuth();
-  return getUserJourneyForSankeyDiagram(siteId, startDate, endDate, maxSteps, limit, queryFilters);
+  return getUserJourneyForSankeyDiagram(ctx.siteId, startDate, endDate, maxSteps, limit, queryFilters);
 }

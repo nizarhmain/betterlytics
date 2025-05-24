@@ -1,9 +1,10 @@
-'use server';
+'server only';
 
 import { fetchVisitorsByGeography } from '@/services/geography';
 import { z } from 'zod';
 import { GeoVisitorSchema } from '@/entities/geography';
 import { QueryFilterSchema } from '@/entities/filter';
+import { AuthContext } from '@/entities/authContext';
 
 // Schema for validating the input parameters
 const queryParamsSchema = z.object({
@@ -22,9 +23,10 @@ const worldMapResponseSchema = z.object({
  * Server action to fetch geographic visitor data
  */
 export async function getWorldMapData(
-  params: z.infer<typeof queryParamsSchema>
+  ctx: AuthContext,
+  params: Omit<z.infer<typeof queryParamsSchema>, 'siteId'>
 ): Promise<z.infer<typeof worldMapResponseSchema>> {
-  const validatedParams = queryParamsSchema.safeParse(params);
+  const validatedParams = queryParamsSchema.safeParse({ ...params, siteId: ctx.siteId});
   
   if (!validatedParams.success) {
     throw new Error(`Invalid parameters: ${validatedParams.error.message}`);

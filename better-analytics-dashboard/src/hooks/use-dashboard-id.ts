@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 
 export function useDashboardId() {
-  const { query } = useRouter();
-  return query.dashboardId as string;
+  const params = useParams();
+  return params.dashboardId as string;
 }

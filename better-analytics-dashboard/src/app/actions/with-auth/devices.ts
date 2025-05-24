@@ -2,7 +2,6 @@
 
 import { getDeviceTypeBreakdownForSite, getBrowserBreakdownForSite, getDeviceSummaryForSite, getOperatingSystemBreakdownForSite, getDeviceUsageTrendForSite } from "@/services/devices";
 import { DeviceType, BrowserStats, DeviceSummary, OperatingSystemStats, DeviceUsageTrendRow } from "@/entities/devices";
-import { requireDashboardAuth } from "@/lib/auth-actions";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { QueryFilter } from "@/entities/filter";
 import { AuthContext } from "@/entities/authContext";
@@ -30,6 +29,5 @@ export async function fetchDeviceUsageTrendAction(
   granularity: GranularityRangeValues,
   queryFilters: QueryFilter[]
 ): Promise<DeviceUsageTrendRow[]> {
-  await requireDashboardAuth();
   return getDeviceUsageTrendForSite(ctx.siteId, startDate, endDate, granularity, queryFilters);
 } 

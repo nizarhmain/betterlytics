@@ -33,7 +33,6 @@ try {
     }
   })
 
-  const seenFunctions = new Set();
   functions.forEach((func) => {
     const fileName = func.getSourceFile().getBaseName();
     const functionName = func.getName();
@@ -41,10 +40,6 @@ try {
 
     if (functionName === undefined) {
       throw `Anonymous functions are not allow - found on in "${fileName}"`;
-    }
-
-    if (seenFunctions.has(functionName)) {
-      throw `Duplicate function names are not allow - found "${functionName}"`;
     }
 
     if (functionParams.length < 1 || functionParams[0].getType().getText() !== 'AuthContext') {
