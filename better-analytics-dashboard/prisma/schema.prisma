@@ -21,7 +21,7 @@ model Funnel {
   id String @id @default(cuid())
 
   name    String
-  
+  isStrict Boolean @default(true)
   pages   String[]
 
   site    Site @relation(fields: [siteId], references: [siteId], onDelete: Cascade)

@@ -2,19 +2,28 @@
 
 import { checkAuth } from "@/lib/auth-actions";
 import { type Funnel, CreateFunnelSchema, FunnelDetails } from "@/entities/funnels";
-import { createFunnelForSite, getFunnelDetailsById, getFunnelsBySiteId } from "@/services/funnels";
+import { createFunnelForSite, getFunnelDetailsById, getFunnelsBySiteId, getFunnelPreviewData } from "@/services/funnels";
 
-export async function postFunnelAction(siteId: string, name: string, pages: string[]): Promise<Funnel> {
+export async function postFunnelAction(
+  siteId: string, 
+  name: string, 
+  pages: string[], 
+  isStrict: boolean
+): Promise<Funnel> {
   await checkAuth();
   const funnel = CreateFunnelSchema.parse({
     siteId,
     name,
-    pages
+    pages,
+    isStrict
   });
   return createFunnelForSite(funnel);
 }
 
-export async function fetchFunnelDetailsAction(siteId: string, funnelId: string): Promise<FunnelDetails> {
+export async function fetchFunnelDetailsAction(
+  siteId: string, 
+  funnelId: string, 
+): Promise<FunnelDetails> {
   await checkAuth();
   const funnel = await getFunnelDetailsById(siteId, funnelId);
   if (funnel === null) {
@@ -24,8 +33,22 @@ export async function fetchFunnelDetailsAction(siteId: string, funnelId: string)
   return funnel;
 }
 
-
 export async function fetchFunnelsAction(siteId: string): Promise<FunnelDetails[]> {
   await checkAuth();
   return getFunnelsBySiteId(siteId);
+}
+
+export async function fetchFunnelPreviewAction(
+  siteId: string, 
+  funnelName: string, 
+  pages: string[],
+  isStrict: boolean
+): Promise<FunnelDetails> {
+  await checkAuth();
+  return getFunnelPreviewData(
+    siteId,
+    funnelName,
+    pages,
+    isStrict
+  );
 }

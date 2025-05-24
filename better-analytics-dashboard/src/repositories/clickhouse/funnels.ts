@@ -1,29 +1,52 @@
 import { z } from 'zod';
 import { clickhouse } from '@/lib/clickhouse';
 import { SQL, safeSql } from '@/lib/safe-sql';
+import { type QueryFilter } from '@/entities/filter';
+import { BAQuery } from '@/lib/ba-query';
+import { DateTimeString } from '@/types/dates';
 
-export async function getFunnelDetails(siteId: string, pages: string[]): Promise<number[]> {
+export async function getFunnelDetails(
+  siteId: string,
+  pages: string[],
+  isStrict: boolean,
+  startDate?: DateTimeString, 
+  endDate?: DateTimeString, 
+  queryFilters?: QueryFilter[]
+): Promise<number[]> {
 
   const urlPagesEqualityChecks = pages
     .map((page, index) => SQL.String({ [`page_${index}`]: page }))
     .map((page) => safeSql`url = ${page}`);
 
-  const levelsArray = new Array(pages.length).fill(0).map((_, i) => i+1);
+  const levelsArray = new Array(pages.length).fill(0).map((_, i) => i + 1);
+
+  const whereConditions = [safeSql`site_id = ${SQL.String({ siteId })}`];
+
+  if (startDate && endDate) {
+    whereConditions.push(safeSql`timestamp BETWEEN ${SQL.DateTime({ query_start_date: startDate })} AND ${SQL.DateTime({ query_end_date: endDate })}`);
+  }
+
+  const windowDurationSeconds = 24 * 60 * 60;
+  let funnelWindowFunctionDefinition;
+
+  if (isStrict) {
+    funnelWindowFunctionDefinition = safeSql`windowFunnel(${SQL.UInt32({ windowDuration: windowDurationSeconds })}, 'strict_order')`;
+  } else {
+    funnelWindowFunctionDefinition = safeSql`windowFunnel(${SQL.UInt32({ windowDuration: windowDurationSeconds })})`;
+  }
+
+  const parsedFilters = BAQuery.getFilterQuery(queryFilters || []);
+  whereConditions.push(SQL.AND(parsedFilters));
 
   const sql = safeSql`
     WITH
-      -- Base pages funnel results
       baseFunnel AS (
           SELECT
-              windowFunnel(24*60*60)(
-                  timestamp,
-                  ${SQL.SEPARATOR(urlPagesEqualityChecks)}
-              ) AS level
+              ${funnelWindowFunctionDefinition}(timestamp, ${SQL.SEPARATOR(urlPagesEqualityChecks)}) AS level
           FROM analytics.events
-          WHERE site_id = ${SQL.String({siteId})}
+          WHERE ${SQL.AND(whereConditions)} 
           GROUP BY visitor_id
       ),
-      -- Aggregate by level
       funnelCounts AS (
           SELECT
               level,
@@ -31,11 +54,9 @@ export async function getFunnelDetails(siteId: string, pages: string[]): Promise
           FROM baseFunnel
           GROUP BY level
       ),
-      -- Static funnel levels
       levels AS (
-          SELECT arrayJoin(${SQL.UInt32Array({ levelsArray })}) AS level
+          SELECT arrayJoin(${SQL.UInt32Array({ levels_array: levelsArray })}) AS level
       ),
-      -- Left join counts with all levels
       joined AS (
           SELECT
               levels.level,
@@ -43,7 +64,6 @@ export async function getFunnelDetails(siteId: string, pages: string[]): Promise
           FROM levels
           LEFT JOIN funnelCounts USING (level)
       )
-    -- Cumulative aggregation on joined data
     SELECT
         sum(count) OVER (ORDER BY level DESC) AS count
     FROM joined
@@ -52,7 +72,7 @@ export async function getFunnelDetails(siteId: string, pages: string[]): Promise
 
   const result = await clickhouse.query(
     sql.taggedSql,
-    { params: sql.taggedParams }
+    { params: sql.taggedParams } 
   ).toPromise() as any[];
 
   return result.map((res) => z.number().parse(res.count));
