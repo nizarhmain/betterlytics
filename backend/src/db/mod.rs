@@ -1,12 +1,12 @@
 use anyhow::Result;
 use clickhouse::{error::Error as ClickHouseError, Client};
-use std::env;
 use std::sync::Arc;
 use std::time::Duration;
 
 use tokio::sync::mpsc::{self, error::TryRecvError, Receiver};
 use tokio::time::timeout;
 
+use crate::config::Config;
 use crate::processing::ProcessedEvent;
 
 mod models;
@@ -23,24 +23,24 @@ const INSERTER_MAX_BYTES: u64 = 50 * 1024 * 1024;
 pub struct Database {
     client: Client,
     event_tx: mpsc::Sender<ProcessedEvent>,
+    config: Arc<Config>,
 }
 
 pub type SharedDatabase = Arc<Database>;
 
 impl Database {
-    pub async fn new() -> Result<Self> {
-        let client = Self::create_client().await?;
+    pub async fn new(config: Arc<Config>) -> Result<Self> {
+        let client = Self::create_client(config.clone()).await?;
         let (event_tx, event_rx) = Self::create_channels();
         let worker_senders = Self::spawn_inserter_workers(client.clone());
         Self::spawn_dispatcher(event_rx, worker_senders);
 
-        Ok(Self { client, event_tx })
+        Ok(Self { client, event_tx, config })
     }
 
-    async fn create_client() -> Result<Client> {
-        let database_url = env::var("CLICKHOUSE_URL").unwrap_or_else(|_| "http://localhost:8123".to_string());
-        println!("Creating ClickHouse client with URL: {}", database_url);
-        let client = Client::default().with_url(&database_url);
+    async fn create_client(config: Arc<Config>) -> Result<Client> {
+        println!("Creating ClickHouse client with URL: {}", &config.clickhouse_url);
+        let client = Client::default().with_url(&config.clickhouse_url);
         println!("ClickHouse client created successfully");
         Ok(client)
     }
@@ -109,7 +109,44 @@ impl Database {
             return Ok(());
         }
 
-        println!("Database schema validation successful");
+        if self.config.data_retention_days == -1 {
+            println!("[INFO] Data retention explicitly disabled (data_retention_days = -1). Removing TTL if present.");
+            if let Err(e) = Self::remove_data_retention_policy(&self.client).await {
+                eprintln!("[ERROR] Could not remove data retention policy: {}", e);
+                return Err(e);
+            }
+        } else if self.config.data_retention_days > 0 {
+            if let Err(e) = Self::apply_data_retention_policy(&self.client, self.config.data_retention_days).await {
+                eprintln!("[ERROR] Could not apply data retention policy: {}", e);
+                return Err(e);
+            }
+        } else {
+            println!(
+                "[WARNING] Invalid value for DATA_RETENTION_DAYS: {}. TTL policy will not be changed. Use a positive integer to set TTL, or -1 to remove TTL.",
+                self.config.data_retention_days
+            );
+        }
+
+        println!("Database schema validation and TTL setup complete.");
+        Ok(())
+    }
+
+    async fn apply_data_retention_policy(client: &Client, data_retention_days: i32) -> Result<()> {
+        let alter_query = format!(
+            "ALTER TABLE analytics.events MODIFY TTL timestamp + INTERVAL {} DAY",
+            data_retention_days
+        );
+        client.query(&alter_query).execute().await.map_err(|e| 
+            anyhow::anyhow!("Failed to apply data retention policy for analytics.events table: {}.", e)
+        )?;
+        Ok(())
+    }
+
+    async fn remove_data_retention_policy(client: &Client) -> Result<()> {
+        let alter_query = "ALTER TABLE analytics.events REMOVE TTL";
+        client.query(alter_query).execute().await.map_err(|e| 
+            anyhow::anyhow!("Failed to remove data retention policy from analytics.events table: {}.", e)
+        )?;
         Ok(())
     }
 

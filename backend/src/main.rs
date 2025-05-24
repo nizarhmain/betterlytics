@@ -52,7 +52,7 @@ async fn main() {
 
     let _updater_handle = tokio::spawn(Arc::clone(&updater).run());
 
-    let db = Database::new().await.expect("Failed to initialize database");
+    let db = Database::new(config.clone()).await.expect("Failed to initialize database");
     db.validate_schema().await.expect("Invalid database schema");
     let db = Arc::new(db);
 

@@ -1,22 +1,30 @@
 'use server';
 
-import { type Funnel, CreateFunnelSchema, FunnelDetails, CreateFunnel } from "@/entities/funnels";
-import { createFunnelForDashboard, getFunnelDetailsById, getFunnelsByDashboardId } from "@/services/funnels";
+import { type Funnel, CreateFunnelSchema, FunnelDetails } from "@/entities/funnels";
+import { createFunnelForDashboard, getFunnelDetailsById, getFunnelPreviewData, getFunnelsByDashboardId } from "@/services/funnels";
 import { withDashboardAuthContext } from "./using-context-auth";
 import { AuthContext } from "@/entities/authContext";
 
-export const postFunnelAction = withDashboardAuthContext(async (ctx: AuthContext, name: string, pages: string[]): Promise<Funnel> => {
-  const funnelDataToParse: CreateFunnel = {
-    dashboardId: ctx.dashboardId,
+export const postFunnelAction = withDashboardAuthContext(async (
+  ctx: AuthContext, 
+  name: string, 
+  pages: string[], 
+  isStrict: boolean
+): Promise<Funnel> => {
+  const funnel = CreateFunnelSchema.parse({
+    siteId: ctx.siteId,
     name,
-    pages
-  };
-  const funnel = CreateFunnelSchema.parse(funnelDataToParse);
+    pages,
+    isStrict
+  });
   return createFunnelForDashboard(funnel);
-})
+});
 
-export const fetchFunnelDetailsAction = withDashboardAuthContext(async (ctx: AuthContext, funnelId: string): Promise<FunnelDetails> => {
-  const funnel = await getFunnelDetailsById(ctx.dashboardId, funnelId);
+export const fetchFunnelDetailsAction = withDashboardAuthContext(async (
+  ctx: AuthContext, 
+  funnelId: string, 
+): Promise<FunnelDetails> => {
+  const funnel = await getFunnelDetailsById(ctx.siteId, funnelId);
   if (funnel === null) {
     throw new Error('Funnel not found');
   };
@@ -25,5 +33,19 @@ export const fetchFunnelDetailsAction = withDashboardAuthContext(async (ctx: Aut
 })
 
 export const fetchFunnelsAction = withDashboardAuthContext(async (ctx: AuthContext): Promise<FunnelDetails[]> => {
-  return getFunnelsByDashboardId(ctx.dashboardId);
-})
+  return getFunnelsByDashboardId(ctx.dashboardId, ctx.siteId);
+});
+
+export const fetchFunnelPreviewAction = withDashboardAuthContext(async (
+  ctx: AuthContext, 
+  funnelName: string, 
+  pages: string[],
+  isStrict: boolean
+): Promise<FunnelDetails> => {
+  return getFunnelPreviewData(
+    ctx.siteId,
+    funnelName,
+    pages,
+    isStrict
+  );
+});

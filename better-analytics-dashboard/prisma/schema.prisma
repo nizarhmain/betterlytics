@@ -88,7 +88,7 @@ model Funnel {
   id String @id @default(cuid())
 
   name    String
-  
+  isStrict Boolean @default(true)
   pages   String[]
 
   dashboard    Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)

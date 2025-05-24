@@ -15,14 +15,13 @@ import {
 } from "@/components/ui/sidebar";
 import BASidebarCollapsibleSignOutButton from "./BASidebarCollapsibleSignOutButton";
 import SettingsButton from "../SettingsButton";
+import { IntegrationButton } from "@/components/integration/IntegrationButton";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const navItems = [
   { name: "Overview", href: "", icon: <LayoutDashboard size={18} /> },
-  //{ name: "Realtime", href: "/dashboard/realtime", icon: <BarChart size={18} /> },
   { name: "Pages", href: "pages", icon: <FileText size={18} /> },
   { name: "Referrers", href: "referrers", icon: <Link2 size={18} /> },
-  //{ name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
-  //{ name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
   { name: "Geography", href: "geography", icon: <Globe size={18} /> },
   { name: "User Journey", href: "user-journey", icon: <CircleDot size={18} /> },
   { name: "Funnels", href: "funnels", icon: <Funnel size={18} /> },
@@ -62,10 +61,9 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <div className="pt-4 mt-4 border-t border-border">
-            <div className="text-xs text-muted-foreground mb-2">Configuration</div>
-            <SettingsButton />
-          </div>
+          <SettingsButton />
+          <ThemeSwitcher />
+          <IntegrationButton />
           <BASidebarCollapsibleSignOutButton />
         </SidebarMenu>
       </SidebarFooter>
