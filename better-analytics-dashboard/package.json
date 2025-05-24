@@ -9,7 +9,7 @@
     "lint": "next lint",
     "dashboard-unit-tests": "vitest run",
     "migrate": "pnpx prisma migrate dev",
-    "generate-prisma": "pnpx prisma generate && tsx ./auth-action-gen/auto-gen-auth-actions.ts",
+    "generate-prisma": "pnpx prisma generate",
     "generate-auth-actions": "tsx ./auth-action-gen/auto-gen-auth-actions.ts",
     "seed": "pnpx prisma db seed"
   },
