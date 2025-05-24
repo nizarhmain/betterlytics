@@ -4,7 +4,7 @@ import { fetchVisitorsByGeography } from '@/services/geography';
 import { z } from 'zod';
 import { GeoVisitorSchema } from '@/entities/geography';
 import { QueryFilterSchema } from '@/entities/filter';
-import { AuthContext } from '@/entities/authContext';
+import { usingAuthContext } from "./using-context-auth";
 
 // Schema for validating the input parameters
 const queryParamsSchema = z.object({
@@ -23,9 +23,10 @@ const worldMapResponseSchema = z.object({
  * Server action to fetch geographic visitor data
  */
 export async function getWorldMapData(
-  ctx: AuthContext,
+  dashboardId: string,
   params: Omit<z.infer<typeof queryParamsSchema>, 'siteId'>
 ): Promise<z.infer<typeof worldMapResponseSchema>> {
+  const ctx = await usingAuthContext(dashboardId);
   const validatedParams = queryParamsSchema.safeParse({ ...params, siteId: ctx.siteId});
   
   if (!validatedParams.success) {

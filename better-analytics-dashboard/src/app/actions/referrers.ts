@@ -2,13 +2,14 @@
 
 import { getReferrerSourceAggregationDataForSite, getReferrerSummaryDataForSite, getReferrerTableDataForSite, getReferrerTrafficTrendBySourceDataForSite } from '@/services/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
-import { AuthContext } from '@/entities/authContext';
+import { usingAuthContext } from "./using-context-auth";
 
 /**
  * Fetches the referrer distribution data for a site
  */
-export async function fetchReferrerSourceAggregationDataForSite(ctx: AuthContext, startDate: Date, endDate: Date) {
+export async function fetchReferrerSourceAggregationDataForSite(dashboardId: string, startDate: Date, endDate: Date) {
   try {
+    const ctx = await usingAuthContext(dashboardId);
     const data = await getReferrerSourceAggregationDataForSite(ctx.siteId, startDate, endDate);
     return { data };
   } catch (error) {
@@ -21,12 +22,13 @@ export async function fetchReferrerSourceAggregationDataForSite(ctx: AuthContext
  * Fetches the referrer traffic trend data grouped by source type for a site with specified granularity
  */
 export async function fetchReferrerTrafficTrendBySourceDataForSite(
-  ctx: AuthContext, 
+  dashboardId: string, 
   startDate: Date, 
   endDate: Date,
   granularity: GranularityRangeValues
 ) {
   try {
+    const ctx = await usingAuthContext(dashboardId);
     const data = await getReferrerTrafficTrendBySourceDataForSite(ctx.siteId, startDate, endDate, granularity);
     return { data };
   } catch (error) {
@@ -38,8 +40,9 @@ export async function fetchReferrerTrafficTrendBySourceDataForSite(
 /**
  * Fetches the summary data for referrers including total count, traffic and bounce rate
  */
-export async function fetchReferrerSummaryDataForSite(ctx: AuthContext, startDate: Date, endDate: Date) {
+export async function fetchReferrerSummaryDataForSite(dashboardId: string, startDate: Date, endDate: Date) {
   try {
+    const ctx = await usingAuthContext(dashboardId);
     const data = await getReferrerSummaryDataForSite(ctx.siteId, startDate, endDate);
     return { data };
   } catch (error) {
@@ -51,8 +54,9 @@ export async function fetchReferrerSummaryDataForSite(ctx: AuthContext, startDat
 /**
  * Fetches detailed referrer data for table display
  */
-export async function fetchReferrerTableDataForSite(ctx: AuthContext, startDate: Date, endDate: Date, limit = 100) {  
+export async function fetchReferrerTableDataForSite(dashboardId: string, startDate: Date, endDate: Date, limit = 100) {  
   try {
+    const ctx = await usingAuthContext(dashboardId);
     const data = await getReferrerTableDataForSite(ctx.siteId, startDate, endDate, limit);
     return { data };
   } catch (error) {

@@ -2,13 +2,13 @@
 
 import { type Funnel, CreateFunnelSchema, FunnelDetails, CreateFunnel } from "@/entities/funnels";
 import { createFunnelForDashboard, getFunnelDetailsById, getFunnelsByDashboardId } from "@/services/funnels";
-import { AuthContext } from "@/entities/authContext";
+import { usingAuthContext } from "./using-context-auth";
 
-export async function postFunnelAction(ctx: AuthContext, name: string, pages: string[]): Promise<Funnel> {
-  const dashboardId = ctx.dashboardId;
+export async function postFunnelAction(dashboardId: string, name: string, pages: string[]): Promise<Funnel> {
+  const ctx = await usingAuthContext(dashboardId);
 
   const funnelDataToParse: CreateFunnel = {
-    dashboardId,
+    dashboardId: ctx.dashboardId,
     name,
     pages
   };
@@ -16,7 +16,8 @@ export async function postFunnelAction(ctx: AuthContext, name: string, pages: st
   return createFunnelForDashboard(funnel);
 }
 
-export async function fetchFunnelDetailsAction(ctx: AuthContext, funnelId: string): Promise<FunnelDetails> {
+export async function fetchFunnelDetailsAction(dashboardId: string, funnelId: string): Promise<FunnelDetails> {
+  const ctx = await usingAuthContext(dashboardId);
   const funnel = await getFunnelDetailsById(ctx.dashboardId, funnelId);
   if (funnel === null) {
     throw new Error('Funnel not found');
@@ -25,6 +26,7 @@ export async function fetchFunnelDetailsAction(ctx: AuthContext, funnelId: strin
   return funnel;
 }
 
-export async function fetchFunnelsAction(ctx: AuthContext): Promise<FunnelDetails[]> {
+export async function fetchFunnelsAction(dashboardId: string): Promise<FunnelDetails[]> {
+  const ctx = await usingAuthContext(dashboardId);
   return getFunnelsByDashboardId(ctx.dashboardId);
 }
