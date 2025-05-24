@@ -18,33 +18,30 @@ import {
   CampaignTermBreakdownItem,
   CampaignLandingPagePerformanceItem,
 } from "@/entities/campaign";
-import { usingAuthContext } from "./using-context-auth";
+import { withDashboardAuthContext } from "./using-context-auth";
+import { AuthContext } from "@/entities/authContext";
 
-export async function fetchCampaignPerformanceAction(
-  dashboardId: string,
-  startDate: Date,
-  endDate: Date
-): Promise<CampaignPerformance[]> {
-  const ctx = await usingAuthContext(dashboardId);
-  try {
-    const performanceData = await fetchCampaignPerformance(
-      ctx.siteId,
-      startDate,
-      endDate
-    );
-    return performanceData;
-  } catch (error) {
-    console.error("Error in fetchCampaignPerformanceAction:", error);
-    return [];
+export const fetchCampaignPerformanceAction = withDashboardAuthContext(
+  async (ctx: AuthContext, startDate: Date, endDate: Date): Promise<CampaignPerformance[]> => {
+    try {
+      const performanceData = await fetchCampaignPerformance(
+        ctx.siteId,
+        startDate,
+        endDate
+      );
+      return performanceData;
+    } catch (error) {
+      console.error("Error in fetchCampaignPerformanceAction:", error);
+      return [];
+    }
   }
-}
+);
 
-export async function fetchCampaignSourceBreakdownAction(
-  dashboardId: string,
+export const fetchCampaignSourceBreakdownAction = withDashboardAuthContext(async (
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
-): Promise<CampaignSourceBreakdownItem[]> {
-  const ctx = await usingAuthContext(dashboardId);
+): Promise<CampaignSourceBreakdownItem[]> => {
   try {
     const breakdownData = await fetchCampaignSourceBreakdown(
       ctx.siteId,
@@ -56,14 +53,13 @@ export async function fetchCampaignSourceBreakdownAction(
     console.error("Error in fetchCampaignSourceBreakdownAction:", error);
     return [];
   }
-}
+})
 
-export async function fetchCampaignMediumBreakdownAction(
-  dashboardId: string,
+export const fetchCampaignMediumBreakdownAction = withDashboardAuthContext(async (
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
-): Promise<CampaignMediumBreakdownItem[]> {
-  const ctx = await usingAuthContext(dashboardId);
+): Promise<CampaignMediumBreakdownItem[]> => {
   try {
     const breakdownData = await fetchCampaignMediumBreakdown(
       ctx.siteId,
@@ -75,14 +71,13 @@ export async function fetchCampaignMediumBreakdownAction(
     console.error("Error in fetchCampaignMediumBreakdownAction:", error);
     return [];
   }
-}
+});
 
-export async function fetchCampaignContentBreakdownAction(
-  dashboardId: string,
+export const fetchCampaignContentBreakdownAction = withDashboardAuthContext(async (
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
-): Promise<CampaignContentBreakdownItem[]> {
-  const ctx = await usingAuthContext(dashboardId);
+): Promise<CampaignContentBreakdownItem[]> => {
   try {
     const breakdownData = await fetchCampaignContentBreakdown(
       ctx.siteId,
@@ -94,14 +89,13 @@ export async function fetchCampaignContentBreakdownAction(
     console.error("Error in fetchCampaignContentBreakdownAction:", error);
     return [];
   }
-}
+});
 
-export async function fetchCampaignTermBreakdownAction(
-  dashboardId: string,
+export const fetchCampaignTermBreakdownAction = withDashboardAuthContext(async (
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
-): Promise<CampaignTermBreakdownItem[]> {
-  const ctx = await usingAuthContext(dashboardId);
+): Promise<CampaignTermBreakdownItem[]> => {
   try {
     const breakdownData = await fetchCampaignTermBreakdown(
       ctx.siteId,
@@ -113,14 +107,13 @@ export async function fetchCampaignTermBreakdownAction(
     console.error("Error in fetchCampaignTermBreakdownAction:", error);
     return [];
   }
-}
+});
 
-export async function fetchCampaignLandingPagePerformanceAction(
-  dashboardId: string,
+export const fetchCampaignLandingPagePerformanceAction = withDashboardAuthContext(async (
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
-): Promise<CampaignLandingPagePerformanceItem[]> {
-  const ctx = await usingAuthContext(dashboardId);
+): Promise<CampaignLandingPagePerformanceItem[]> => {
   try {
     const performanceData = await fetchCampaignLandingPagePerformance(
       ctx.siteId,
@@ -132,18 +125,17 @@ export async function fetchCampaignLandingPagePerformanceAction(
     console.error("Error in fetchCampaignLandingPagePerformanceAction:", error);
     return [];
   }
-}
+});
 
-export async function fetchCampaignVisitorTrendAction(
-  dashboardId: string,
+export const fetchCampaignVisitorTrendAction = withDashboardAuthContext(async (
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
-): Promise<PivotedCampaignVisitorTrendItem[]> {
-  const ctx = await usingAuthContext(dashboardId);
+): Promise<PivotedCampaignVisitorTrendItem[]> => {
   try {
     return await fetchCampaignVisitorTrend(ctx.siteId, startDate, endDate);
   } catch (error) {
     console.error("Error in fetchCampaignVisitorTrendAction:", error);
     return [];
   }
-} 
+})

@@ -3,7 +3,8 @@
 import { getUserJourneyForSankeyDiagram } from "@/services/userJourney";
 import { SankeyData } from "@/entities/userJourney";
 import { QueryFilter } from "@/entities/filter";
-import { usingAuthContext } from "./using-context-auth";
+import { withDashboardAuthContext } from "./using-context-auth";
+import { AuthContext } from "@/entities/authContext";
 
 /**
  * Fetch user journey data for Sankey diagram visualization
@@ -12,14 +13,13 @@ import { usingAuthContext } from "./using-context-auth";
  * showing the exact paths users take through a site.
  * maxSteps is the number of steps in the journey (e.g., maxSteps=3 shows A→B→C)
  */
-export async function fetchUserJourneyAction(
-  dashboardId: string, 
+export const fetchUserJourneyAction = withDashboardAuthContext(async (
+  ctx: AuthContext, 
   startDate: Date, 
   endDate: Date, 
   maxSteps: number = 3,
   limit: number = 50,
   queryFilters: QueryFilter[]
-): Promise<SankeyData> {
-  const ctx = await usingAuthContext(dashboardId);
+): Promise<SankeyData> => {
   return getUserJourneyForSankeyDiagram(ctx.siteId, startDate, endDate, maxSteps, limit, queryFilters);
-}
+});

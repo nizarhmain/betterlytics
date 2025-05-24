@@ -7,29 +7,25 @@ import { getSummaryStatsForSite } from "@/services/visitors";
 import { getUniqueVisitorsForSite } from "@/services/visitors";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { QueryFilter } from "@/entities/filter";
-import { usingAuthContext } from "./using-context-auth";
+import { withDashboardAuthContext } from "./using-context-auth";
+import { AuthContext } from "@/entities/authContext";
 
-export async function fetchTotalPageViewsAction(dashboardId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<TotalPageViewsRow[]> {
-  const ctx = await usingAuthContext(dashboardId);
+export const fetchTotalPageViewsAction = withDashboardAuthContext(async (ctx: AuthContext, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<TotalPageViewsRow[]> => {
   return getTotalPageViewsForSite(ctx.siteId, startDate, endDate, granularity, queryFilters);
-}
+});
 
-export async function fetchPageViewsAction(dashboardId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues): Promise<DailyPageViewRow[]> {
-  const ctx = await usingAuthContext(dashboardId);
+export const fetchPageViewsAction = withDashboardAuthContext(async (ctx: AuthContext, startDate: Date, endDate: Date, granularity: GranularityRangeValues): Promise<DailyPageViewRow[]> => {
   return getPageViewsForSite(ctx.siteId, startDate, endDate, granularity);
-}
+});
 
-export async function fetchUniqueVisitorsAction(dashboardId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<DailyUniqueVisitorsRow[]> {
-  const ctx = await usingAuthContext(dashboardId);
+export const fetchUniqueVisitorsAction = withDashboardAuthContext(async (ctx: AuthContext, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<DailyUniqueVisitorsRow[]> => {
   return getUniqueVisitorsForSite(ctx.siteId, startDate, endDate, granularity, queryFilters);
-}
+});
 
-export async function fetchSummaryStatsAction(dashboardId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
-  const ctx = await usingAuthContext(dashboardId);
+export const fetchSummaryStatsAction = withDashboardAuthContext(async (ctx: AuthContext, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) => {
   return getSummaryStatsForSite(ctx.siteId, startDate, endDate, queryFilters);
-}
+});
 
-export async function fetchTopPagesAction(dashboardId: string, startDate: Date, endDate: Date, limit: number, queryFilters: QueryFilter[]) {
-  const ctx = await usingAuthContext(dashboardId);
+export const fetchTopPagesAction = withDashboardAuthContext(async (ctx: AuthContext, startDate: Date, endDate: Date, limit: number, queryFilters: QueryFilter[]) => {
   return getTopPagesForSite(ctx.siteId, startDate, endDate, limit, queryFilters);
-}
+});

@@ -4,35 +4,35 @@ import { getDeviceTypeBreakdownForSite, getBrowserBreakdownForSite, getDeviceSum
 import { DeviceType, BrowserStats, DeviceSummary, OperatingSystemStats, DeviceUsageTrendRow } from "@/entities/devices";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { QueryFilter } from "@/entities/filter";
-import { usingAuthContext } from "./using-context-auth";
+import { withDashboardAuthContext } from "./using-context-auth";
+import { AuthContext } from "@/entities/authContext";
 
-export async function fetchDeviceTypeBreakdownAction(dashboardId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<DeviceType[]> {
-  const ctx = await usingAuthContext(dashboardId);
+export const fetchDeviceTypeBreakdownAction = withDashboardAuthContext(
+  async (ctx: AuthContext, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<DeviceType[]> => {
   return getDeviceTypeBreakdownForSite(ctx.siteId, startDate, endDate, queryFilters);
-}
+});
 
-export async function fetchDeviceSummaryAction(dashboardId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<DeviceSummary> {
-  const ctx = await usingAuthContext(dashboardId);
+export const fetchDeviceSummaryAction = withDashboardAuthContext(
+  async (ctx: AuthContext, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<DeviceSummary> => {
   return getDeviceSummaryForSite(ctx.siteId, startDate, endDate, queryFilters);
-}
+});
 
-export async function fetchBrowserBreakdownAction(dashboardId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<BrowserStats[]> {
-  const ctx = await usingAuthContext(dashboardId);
+export const fetchBrowserBreakdownAction = withDashboardAuthContext(
+  async (ctx: AuthContext, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<BrowserStats[]> => {
   return getBrowserBreakdownForSite(ctx.siteId, startDate, endDate, queryFilters);
-}
+});
 
-export async function fetchOperatingSystemBreakdownAction(dashboardId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<OperatingSystemStats[]> {
-  const ctx = await usingAuthContext(dashboardId);
+export const fetchOperatingSystemBreakdownAction = withDashboardAuthContext(
+  async (ctx: AuthContext, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<OperatingSystemStats[]> => {
   return getOperatingSystemBreakdownForSite(ctx.siteId, startDate, endDate, queryFilters);
-}
+});
 
-export async function fetchDeviceUsageTrendAction(
-  dashboardId: string,
+export const fetchDeviceUsageTrendAction = withDashboardAuthContext(async (
+  ctx: AuthContext,
   startDate: Date, 
   endDate: Date,
   granularity: GranularityRangeValues,
   queryFilters: QueryFilter[]
-): Promise<DeviceUsageTrendRow[]> {
-  const ctx = await usingAuthContext(dashboardId);
+): Promise<DeviceUsageTrendRow[]> => {
   return getDeviceUsageTrendForSite(ctx.siteId, startDate, endDate, granularity, queryFilters);
-} 
+});

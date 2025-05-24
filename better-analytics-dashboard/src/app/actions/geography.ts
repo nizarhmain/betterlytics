@@ -4,7 +4,8 @@ import { fetchVisitorsByGeography } from '@/services/geography';
 import { z } from 'zod';
 import { GeoVisitorSchema } from '@/entities/geography';
 import { QueryFilterSchema } from '@/entities/filter';
-import { usingAuthContext } from "./using-context-auth";
+import { withDashboardAuthContext } from "./using-context-auth";
+import { AuthContext } from '@/entities/authContext';
 
 // Schema for validating the input parameters
 const queryParamsSchema = z.object({
@@ -22,11 +23,10 @@ const worldMapResponseSchema = z.object({
 /**
  * Server action to fetch geographic visitor data
  */
-export async function getWorldMapData(
-  dashboardId: string,
+export const getWorldMapData = withDashboardAuthContext(async (
+  ctx: AuthContext,
   params: Omit<z.infer<typeof queryParamsSchema>, 'siteId'>
-): Promise<z.infer<typeof worldMapResponseSchema>> {
-  const ctx = await usingAuthContext(dashboardId);
+): Promise<z.infer<typeof worldMapResponseSchema>> => {
   const validatedParams = queryParamsSchema.safeParse({ ...params, siteId: ctx.siteId});
   
   if (!validatedParams.success) {
@@ -48,4 +48,4 @@ export async function getWorldMapData(
     console.error('Error fetching visitor map data:', error);
     throw new Error('Failed to fetch visitor map data');
   }
-} 
+});
