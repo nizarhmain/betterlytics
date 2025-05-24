@@ -7,31 +7,30 @@ import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useQuery } from '@tanstack/react-query';
 import { formatDuration } from "@/utils/dateFormatters";
-import { fetchDeviceTypeBreakdownAction } from "@/app/actions/authenticated";
-import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
+import { fetchDeviceTypeBreakdownAction, fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/authenticated";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 export default function DashboardPageClient() {
+  const dashboardId = useDashboardId();
   const { granularity, startDate, endDate } = useTimeRangeContext();
   const { queryFilters } = useQueryFiltersContext();
 
-  const siteId = 'default-site';
-
   const { data: summary, isLoading: summaryLoading } = useQuery({
-    queryKey: ['summaryStats', siteId, startDate, endDate, queryFilters],
-    queryFn: () => fetchSummaryStatsAction(siteId, startDate, endDate, queryFilters),
+    queryKey: ['summaryStats', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchSummaryStatsAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   const { data: topPages, isLoading: topPagesLoading } = useQuery({
-    queryKey: ['topPages', siteId, startDate, endDate, queryFilters],
-    queryFn: () => fetchTopPagesAction(siteId, startDate, endDate, 5, queryFilters),
+    queryKey: ['topPages', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTopPagesAction(dashboardId, startDate, endDate, 5, queryFilters),
   });
 
   const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
-    queryKey: ['deviceTypeBreakdown', siteId, startDate, endDate, queryFilters],
-    queryFn: () => fetchDeviceTypeBreakdownAction(siteId, startDate, endDate, queryFilters),
+    queryKey: ['deviceTypeBreakdown', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchDeviceTypeBreakdownAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   return (
@@ -69,10 +68,10 @@ export default function DashboardPageClient() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="bg-card rounded-lg p-6 border border-border shadow">
-          <VisitorsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
+          <VisitorsChart startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
         </div>
         <div className="bg-card rounded-lg p-6 border border-border shadow">
-          <PageviewsChart siteId="default-site" startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
+          <PageviewsChart startDate={startDate} endDate={endDate} granularity={granularity} queryFilters={queryFilters} />
         </div>
       </div>
       

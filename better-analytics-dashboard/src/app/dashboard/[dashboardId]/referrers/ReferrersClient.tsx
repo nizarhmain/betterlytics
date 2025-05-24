@@ -11,7 +11,7 @@ import {
   fetchReferrerSummaryDataForSite,
   fetchReferrerTableDataForSite,
   fetchReferrerTrafficTrendBySourceDataForSite
-} from "@/app/actions/referrers";
+} from "@/app/actions/authenticated";
 import { 
   ReferrerSourceAggregation, 
   ReferrerSummary,
@@ -20,8 +20,10 @@ import {
 } from "@/entities/referrers";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { formatPercentage } from "@/utils/formatters";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 export default function ReferrersClient() {
+  const dashboardId = useDashboardId();
   const [distributionData, setDistributionData] = useState<ReferrerSourceAggregation[] | undefined>(undefined);
   const [trendBySourceData, setTrendBySourceData] = useState<ReferrerTrafficBySourceRow[] | undefined>(undefined);
   const [summaryData, setSummaryData] = useState<ReferrerSummary | undefined>(undefined);
@@ -29,17 +31,15 @@ export default function ReferrersClient() {
   const [loading, setLoading] = useState(true);
   const { granularity, startDate, endDate } = useTimeRangeContext();
   
-  const siteId = 'default-site';
-
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       try {
         const [distributionResult, trendBySourceResult, summaryResult, tableResult] = await Promise.all([
-          fetchReferrerSourceAggregationDataForSite(siteId, startDate, endDate),
-          fetchReferrerTrafficTrendBySourceDataForSite(siteId, startDate, endDate, granularity),
-          fetchReferrerSummaryDataForSite(siteId, startDate, endDate),
-          fetchReferrerTableDataForSite(siteId, startDate, endDate)
+          fetchReferrerSourceAggregationDataForSite(dashboardId, startDate, endDate),
+          fetchReferrerTrafficTrendBySourceDataForSite(dashboardId, startDate, endDate, granularity),
+          fetchReferrerSummaryDataForSite(dashboardId, startDate, endDate),
+          fetchReferrerTableDataForSite(dashboardId, startDate, endDate)
         ]);
         
         setDistributionData(distributionResult.data);
@@ -54,7 +54,7 @@ export default function ReferrersClient() {
     }
     
     loadData();
-  }, [startDate, endDate, granularity, siteId]);
+  }, [startDate, endDate, granularity, dashboardId]);
 
   return (
     <div className="p-6 space-y-6">

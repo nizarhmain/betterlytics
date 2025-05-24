@@ -1,26 +1,27 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { fetchTotalPageViewsAction } from '@/app/actions/overview';
+import { fetchTotalPageViewsAction } from '@/app/actions/authenticated';
 import { TotalPageViewsRow } from "@/entities/pageviews";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { timeFormat } from "d3-time-format";
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragmentedGranularityTimeSeriesLineChart';
 import { QueryFilter } from '@/entities/filter';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 interface PageviewsChartProps {
-  siteId: string;
   startDate: Date;
   endDate: Date;
   granularity: GranularityRangeValues;
   queryFilters: QueryFilter[];
 }
 
-export default function PageviewsChart({ siteId, startDate, endDate, granularity, queryFilters }: PageviewsChartProps) {
+export default function PageviewsChart({ startDate, endDate, granularity, queryFilters }: PageviewsChartProps) {
+  const dashboardId = useDashboardId();
   const { data = [], isLoading } = useQuery<TotalPageViewsRow[]>({
-    queryKey: ['pageViews', siteId, startDate, endDate, granularity, queryFilters],
-    queryFn: () => fetchTotalPageViewsAction(siteId, startDate, endDate, granularity, queryFilters),
+    queryKey: ['pageViews', dashboardId, startDate, endDate, granularity, queryFilters],
+    queryFn: () => fetchTotalPageViewsAction(dashboardId, startDate, endDate, granularity, queryFilters),
   });
 
   const timeSeriesProps = useMemo(() => {

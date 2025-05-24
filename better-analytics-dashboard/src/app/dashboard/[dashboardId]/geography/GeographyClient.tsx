@@ -4,13 +4,15 @@ import { useEffect, useState } from "react";
 import LeafletMap from '@/components/LeafletMap';
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { getWorldMapData } from '@/app/actions/geography';
+import { getWorldMapData } from '@/app/actions/authenticated';
 import { GeoVisitor } from '@/entities/geography';
 import { alpha2ToAlpha3Code } from '@/utils/countryCodes';
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 export default function GeographyClient() {
+  const dashboardId = useDashboardId();
   const [visitorData, setVisitorData] = useState<GeoVisitor[]>([]);
   const [maxVisitors, setMaxVisitors] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -28,7 +30,7 @@ export default function GeographyClient() {
       setError(null);
       
       try {
-        const data = await getWorldMapData({ siteId, startDate, endDate, queryFilters });
+        const data = await getWorldMapData(dashboardId, {startDate, endDate, queryFilters });
         
         // Convert alpha-2 country codes to alpha-3 for map compatibility with the current geojson data format
         const processedData = data.visitorData.map(visitor => {

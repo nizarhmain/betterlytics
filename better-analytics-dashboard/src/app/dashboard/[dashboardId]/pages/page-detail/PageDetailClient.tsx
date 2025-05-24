@@ -5,28 +5,30 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import SummaryCard from "@/components/SummaryCard";
-import { fetchPageDetailAction, fetchPageTrafficTimeSeriesAction } from "@/app/actions/pages";
+import { fetchPageDetailAction, fetchPageTrafficTimeSeriesAction } from "@/app/actions/authenticated";
 import { PageAnalytics } from "@/entities/pages";
 import { formatDuration } from "@/utils/dateFormatters";
 import PageTrafficChart from "@/components/PageTrafficChart";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { TotalPageViewsRow } from "@/entities/pageviews";
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 interface PageDetailClientProps {
   path: string;
 }
 
 export default function PageDetailClient({ path }: PageDetailClientProps) {
+  const dashboardId = useDashboardId();
   const { startDate, endDate, granularity } = useTimeRangeContext();
 
   const { data: pageDetail, isLoading: isLoadingPageDetail } = useQuery<PageAnalytics | null>({
-    queryKey: ['pageDetail', 'default-site', path, startDate, endDate],
-    queryFn: () => fetchPageDetailAction('default-site', path, startDate, endDate),
+    queryKey: ['pageDetail', dashboardId, path, startDate, endDate],
+    queryFn: () => fetchPageDetailAction(dashboardId, path, startDate, endDate),
   });
 
   const { data: pageTrafficData = [] as TotalPageViewsRow[], isLoading: isLoadingPageTraffic } = useQuery<TotalPageViewsRow[]>({
-    queryKey: ['pageTraffic', 'default-site', path, startDate, endDate, granularity],
-    queryFn: () => fetchPageTrafficTimeSeriesAction('default-site', path, startDate, endDate, granularity),
+    queryKey: ['pageTraffic', dashboardId, path, startDate, endDate, granularity],
+    queryFn: () => fetchPageTrafficTimeSeriesAction(dashboardId, path, startDate, endDate, granularity),
   });
 
   const displayTitle = path;

@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { useCallback, useState } from "react";
 import { PlusIcon, Trash2 } from "lucide-react";
 import { generateTempId } from "@/utils/temporaryId";
-import { actions } from "@/app/actions/dashboard";
+import { postFunnelAction } from "@/app/actions/authenticated";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 type Page = {
@@ -45,7 +45,7 @@ export function CreateFunnelDialog() {
   const queryClient = useQueryClient()
 
   const submit = useCallback(() => {
-    actions.postFunnelAction(
+    postFunnelAction(
       dashboardId,
       funnel.name,
       funnel.pages.map((f) => f.value)

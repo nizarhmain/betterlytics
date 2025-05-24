@@ -9,8 +9,6 @@ export default async function UserJourneyPage() {
   if (!session) {
     redirect("/");
   }
-
-  const siteId = "default-site";
   
-  return <UserJourneyClient siteId={siteId} />;
+  return <UserJourneyClient />;
 } 

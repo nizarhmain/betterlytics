@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { FunnelDetails } from "@/entities/funnels";
-import { actions } from "@/app/actions/dashboard";
+import { fetchFunnelsAction } from "@/app/actions/authenticated";
 import { Badge } from '@/components/ui/badge';
 import { ReactNode, useMemo } from 'react';
 import { analyzeFunnel } from './analytics';
@@ -14,7 +14,7 @@ export default function FunnelsClient() {
   const dashboardId = useDashboardId();
   const { data: funnels = [] } = useQuery<FunnelDetails[]>({
     queryKey: ['funnels', dashboardId],
-    queryFn: () => actions.fetchFunnelsAction(dashboardId),
+    queryFn: () => fetchFunnelsAction(dashboardId),
   });
 
   const funnelsData = useMemo(() => funnels.map((funnel) => analyzeFunnel(funnel)), [funnels]);
@@ -38,7 +38,7 @@ export default function FunnelsClient() {
                 <Badge className="rounded-full mt-0.5 text-gray-800 h-[1.5rem]" variant='outline'>{funnel.steps.length} steps</Badge>  
               </div>
               <div className='col-span-1 flex justify-end'>
-                <Link className='text-right mr-2' href={`/dashboard/funnels/${funnel.id}`}><ArrowRightCircleIcon /></Link>
+                <Link className='text-right mr-2' href={`/dashboard/${dashboardId}/funnels/${funnel.id}`}><ArrowRightCircleIcon /></Link>
               </div>
               <div className='col-span-4 row-span-4 md:row-span-1 grid md:grid-cols-4 gap-2'>
                 <InlineDataDisplay

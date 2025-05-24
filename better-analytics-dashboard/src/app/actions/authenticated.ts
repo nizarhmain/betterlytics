@@ -317,6 +317,16 @@ export async function fetchReferrerTableDataForSite(dashboardId: string, ...args
   }
 }
 
+export async function fetchSiteId(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchSiteId>) {
+  const context = await usingAuthContext(dashboardId);
+  try {
+    return await authenticated.fetchSiteId(context, ...args);
+  } catch (e) {
+    console.error('An error occured in "fetchSiteId:"', e);
+    throw new Error('An error occurred');
+  }
+}
+
 export async function fetchUserJourneyAction(dashboardId: string, ...args: GetAuthRestProps<typeof authenticated.fetchUserJourneyAction>) {
   const context = await usingAuthContext(dashboardId);
   try {

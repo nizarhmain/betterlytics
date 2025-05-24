@@ -9,7 +9,7 @@ import SummaryCard from "@/components/SummaryCard";
 import { ArrowRight } from "lucide-react";
 import { analyzeFunnel } from "../analytics";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
-import { actions } from "@/app/actions/dashboard";
+import { fetchFunnelDetailsAction } from "@/app/actions/authenticated";
 
 type FunnelDataContentProps = {
   funnelId: string;
@@ -18,8 +18,8 @@ type FunnelDataContentProps = {
 export function FunnelDataContent({ funnelId }: FunnelDataContentProps) {
   const dashboardId = useDashboardId();
   const { data: funnel, isLoading: funnelLoading } = useQuery<FunnelDetails>({
-    queryKey: ['funnel', funnelId],
-    queryFn: () => actions.fetchFunnelDetailsAction(dashboardId, funnelId),
+    queryKey: ['funnel', dashboardId, funnelId],
+    queryFn: () => fetchFunnelDetailsAction(dashboardId, funnelId),
   });
 
   const funnelData = useMemo(() => {

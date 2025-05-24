@@ -5,25 +5,26 @@ import SummaryCard from "@/components/SummaryCard";
 import PagesTable from "@/components/analytics/PagesTable";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { SummaryStats } from '@/entities/stats';
-import { fetchSummaryStatsAction } from "@/app/actions/overview";
-import { fetchPageAnalyticsAction } from "@/app/actions/pages";
+import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from "@/app/actions/authenticated";
 import { PageAnalytics } from "@/entities/pages";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import QueryFiltersSelector from '@/components/filters/QueryFiltersSelector';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 export default function PagesClient() {
+  const dashboardId = useDashboardId();
   const { startDate, endDate } = useTimeRangeContext();
   const { queryFilters } = useQueryFiltersContext();
 
   const { data: summary, isLoading: summaryLoading } = useQuery<SummaryStats>({
-    queryKey: ['summaryStats', 'default-site', startDate, endDate, queryFilters],
-    queryFn: () => fetchSummaryStatsAction('default-site', startDate, endDate, queryFilters),
+    queryKey: ['summaryStats', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchSummaryStatsAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   const { data: pages = [], isLoading: pagesLoading } = useQuery<PageAnalytics[]>({
-    queryKey: ['pageAnalytics', 'default-site', startDate, endDate, queryFilters],
-    queryFn: () => fetchPageAnalyticsAction('default-site', startDate, endDate, queryFilters),
+    queryKey: ['pageAnalytics', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchPageAnalyticsAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   return (

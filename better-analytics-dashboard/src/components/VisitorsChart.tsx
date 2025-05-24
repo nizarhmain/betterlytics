@@ -1,27 +1,27 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
-import { fetchUniqueVisitorsAction } from '@/app/actions/overview';
+import { fetchUniqueVisitorsAction } from '@/app/actions/authenticated';
 import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { TimeGrouping } from '@/utils/timeRanges';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { useMemo } from 'react';
 import { useFragmentedGranularityTimeSeriesLineChart } from '@/hooks/useFragmentedGranularityTimeSeriesLineChart';
 import { timeFormat } from 'd3-time-format';
 import { QueryFilter } from '@/entities/filter';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 interface VisitorsChartProps {
-  siteId: string;
   startDate: Date;
   endDate: Date;
   granularity: GranularityRangeValues;
   queryFilters: QueryFilter[];
 }
 
-export default function VisitorsChart({ siteId, startDate, endDate, granularity, queryFilters }: VisitorsChartProps) {
+export default function VisitorsChart({ startDate, endDate, granularity, queryFilters }: VisitorsChartProps) {
+  const dashboardId = useDashboardId();
   const { data = [], isLoading } = useQuery<DailyUniqueVisitorsRow[]>({
-    queryKey: ['uniqueVisitors', siteId, startDate, endDate, granularity, queryFilters],
-    queryFn: () => fetchUniqueVisitorsAction(siteId, startDate, endDate, granularity, queryFilters),
+    queryKey: ['uniqueVisitors', dashboardId, startDate, endDate, granularity, queryFilters],
+    queryFn: () => fetchUniqueVisitorsAction(dashboardId, startDate, endDate, granularity, queryFilters),
   });
 
   const timeSeriesProps = useMemo(() => {
