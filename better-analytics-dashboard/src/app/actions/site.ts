@@ -1,4 +1,4 @@
-'server only';
+'use server';
 import { usingAuthContext } from "./using-context-auth";
 
 export async function fetchSiteId(dashboardId: string): Promise<string> {

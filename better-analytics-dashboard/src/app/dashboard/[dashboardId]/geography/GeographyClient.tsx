@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import LeafletMap from '@/components/LeafletMap';
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { getWorldMapData } from '@/app/actions/authenticated';
+import { getWorldMapData } from '@/app/actions';
 import { GeoVisitor } from '@/entities/geography';
 import { alpha2ToAlpha3Code } from '@/utils/countryCodes';
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";

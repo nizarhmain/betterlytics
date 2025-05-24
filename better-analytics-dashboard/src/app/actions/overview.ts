@@ -1,4 +1,4 @@
-'server only';
+'use server';
 
 import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { DailyPageViewRow, TotalPageViewsRow } from "@/entities/pageviews";

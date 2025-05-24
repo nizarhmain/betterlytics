@@ -9,7 +9,7 @@ import SummaryCard from "@/components/SummaryCard";
 import { ArrowRight } from "lucide-react";
 import { analyzeFunnel } from "../analytics";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
-import { fetchFunnelDetailsAction } from "@/app/actions/authenticated";
+import { fetchFunnelDetailsAction } from "@/app/actions";
 
 type FunnelDataContentProps = {
   funnelId: string;

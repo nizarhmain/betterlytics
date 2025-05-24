@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { fetchUserJourneyAction } from "@/app/actions/authenticated";
+import { fetchUserJourneyAction } from "@/app/actions";
 import UserJourneyChart from "../../../../components/analytics/UserJourneyChart";
 import { useQuery } from "@tanstack/react-query";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";

@@ -11,7 +11,7 @@ import {
   fetchReferrerSummaryDataForSite,
   fetchReferrerTableDataForSite,
   fetchReferrerTrafficTrendBySourceDataForSite
-} from "@/app/actions/authenticated";
+} from "@/app/actions";
 import { 
   ReferrerSourceAggregation, 
   ReferrerSummary,

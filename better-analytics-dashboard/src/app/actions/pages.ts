@@ -1,4 +1,4 @@
-'server only';
+'use server';
 
 import { getPageAnalytics, getPageDetail, getPageTrafficForTimePeriod } from "@/services/pages";
 import { PageAnalytics } from "@/entities/pages";

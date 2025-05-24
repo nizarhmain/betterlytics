@@ -1,4 +1,4 @@
-'server only';
+'use server';
 
 import { getUserJourneyForSankeyDiagram } from "@/services/userJourney";
 import { SankeyData } from "@/entities/userJourney";

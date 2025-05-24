@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { useCallback, useState } from "react";
 import { PlusIcon, Trash2 } from "lucide-react";
 import { generateTempId } from "@/utils/temporaryId";
-import { postFunnelAction } from "@/app/actions/authenticated";
+import { postFunnelAction } from "@/app/actions";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 type Page = {

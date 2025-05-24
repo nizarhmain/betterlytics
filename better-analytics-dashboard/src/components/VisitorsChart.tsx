@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
-import { fetchUniqueVisitorsAction } from '@/app/actions/authenticated';
+import { fetchUniqueVisitorsAction } from '@/app/actions';
 import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { GranularityRangeValues } from '@/utils/granularityRanges';

@@ -5,7 +5,7 @@ import SummaryCard from "@/components/SummaryCard";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { EventTypeRow } from "@/entities/events";
-import { fetchCustomEventsOverviewAction } from "@/app/actions/authenticated";
+import { fetchCustomEventsOverviewAction } from "@/app/actions";
 import EventsTable from "@/components/analytics/EventsTypeTable";
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 

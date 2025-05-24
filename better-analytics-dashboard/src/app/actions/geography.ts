@@ -1,4 +1,4 @@
-'server only';
+'use server';
 
 import { fetchVisitorsByGeography } from '@/services/geography';
 import { z } from 'zod';

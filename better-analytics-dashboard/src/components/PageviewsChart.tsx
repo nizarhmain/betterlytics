@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { fetchTotalPageViewsAction } from '@/app/actions/authenticated';
+import { fetchTotalPageViewsAction } from '@/app/actions';
 import { TotalPageViewsRow } from "@/entities/pageviews";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { timeFormat } from "d3-time-format";

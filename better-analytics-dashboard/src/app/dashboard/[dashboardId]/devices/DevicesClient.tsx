@@ -17,7 +17,7 @@ import {
   fetchBrowserBreakdownAction,
   fetchOperatingSystemBreakdownAction,
   fetchDeviceUsageTrendAction
-} from '@/app/actions/authenticated';
+} from '@/app/actions';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 export default function DevicesClient() {

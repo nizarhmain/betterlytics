@@ -1,4 +1,4 @@
-'server only';
+'use server';
 
 import { getReferrerSourceAggregationDataForSite, getReferrerSummaryDataForSite, getReferrerTableDataForSite, getReferrerTrafficTrendBySourceDataForSite } from '@/services/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';

@@ -1,4 +1,4 @@
-'server only';
+'use server';
 
 import { type EventTypeRow } from "@/entities/events";
 import { usingAuthContext } from "./using-context-auth";

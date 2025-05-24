@@ -10,7 +10,7 @@ import {
   fetchCampaignContentBreakdownAction,
   fetchCampaignTermBreakdownAction,
   fetchCampaignLandingPagePerformanceAction
-} from "@/app/actions/authenticated";
+} from "@/app/actions";
 import {
   CampaignPerformance,
   CampaignSourceBreakdownItem,

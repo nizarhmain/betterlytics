@@ -5,7 +5,7 @@ import { TimeRangeContextProvider } from "@/contexts/TimeRangeContextProvider";
 import { QueryFiltersContextProvider } from "@/contexts/QueryFiltersContextProvider";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSiteId } from "@/app/actions/authenticated";
+import { fetchSiteId } from "@/app/actions";
 
 type DashboardProviderProps = {
   children: React.ReactNode;

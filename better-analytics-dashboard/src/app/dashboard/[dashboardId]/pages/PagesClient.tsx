@@ -5,7 +5,7 @@ import SummaryCard from "@/components/SummaryCard";
 import PagesTable from "@/components/analytics/PagesTable";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { SummaryStats } from '@/entities/stats';
-import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from "@/app/actions/authenticated";
+import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from "@/app/actions";
 import { PageAnalytics } from "@/entities/pages";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';

@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import SummaryCard from "@/components/SummaryCard";
-import { fetchPageDetailAction, fetchPageTrafficTimeSeriesAction } from "@/app/actions/authenticated";
+import { fetchPageDetailAction, fetchPageTrafficTimeSeriesAction } from "@/app/actions";
 import { PageAnalytics } from "@/entities/pages";
 import { formatDuration } from "@/utils/dateFormatters";
 import PageTrafficChart from "@/components/PageTrafficChart";
