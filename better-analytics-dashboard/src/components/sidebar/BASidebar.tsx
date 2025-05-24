@@ -14,14 +14,14 @@ import {
   SidebarMenuItem
 } from "@/components/ui/sidebar";
 import BASidebarCollapsibleSignOutButton from "./BASidebarCollapsibleSignOutButton";
+import { IntegrationButton } from "@/components/integration/IntegrationButton";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: <LayoutDashboard size={18} /> },
   //{ name: "Realtime", href: "/dashboard/realtime", icon: <BarChart size={18} /> },
   { name: "Pages", href: "/dashboard/pages", icon: <FileText size={18} /> },
   { name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
-  //{ name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
-  //{ name: "Referrers", href: "/dashboard/referrers", icon: <Link2 size={18} /> },
   { name: "Geography", href: "/dashboard/geography", icon: <Globe size={18} /> },
   { name: "User Journey", href: "/dashboard/user-journey", icon: <CircleDot size={18} /> },
   { name: "Funnels", href: "/dashboard/funnels", icon: <Funnel size={18} /> },
@@ -57,6 +57,8 @@ export default function BASidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <ThemeSwitcher />
+          <IntegrationButton />
           <BASidebarCollapsibleSignOutButton />
         </SidebarMenu>
       </SidebarFooter>
