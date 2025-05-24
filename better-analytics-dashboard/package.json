@@ -9,7 +9,8 @@
     "lint": "next lint",
     "dashboard-unit-tests": "vitest run",
     "migrate": "pnpx prisma migrate dev",
-    "generate": "pnpx prisma generate",
+    "generate-prisma": "pnpx prisma generate && tsx ./auth-action-gen/auto-gen-auth-actions.ts",
+    "generate-auth-actions": "tsx ./auth-action-gen/auto-gen-auth-actions.ts",
     "seed": "pnpx prisma db seed"
   },
   "prisma": {
@@ -77,6 +78,7 @@
     "eslint-config-next": "15.3.1",
     "prisma": "^6.8.2",
     "tailwindcss": "^4",
+    "ts-morph": "^26.0.0",
     "tsx": "^4.19.3",
     "tw-animate-css": "^1.2.8",
     "typescript": "^5",

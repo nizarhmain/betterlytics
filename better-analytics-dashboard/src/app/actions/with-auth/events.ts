@@ -1,8 +1,8 @@
-'use server';
+'server only';
 
-import { EventTypeRow } from "@/entities/events";
+import { type EventTypeRow } from "@/entities/events";
+import { type AuthContext } from "@/entities/authContext";
 import { getCustomEventsOverviewForSite } from "@/services/events";
-import { AuthContext } from "@/entities/authContext";
 
 export async function fetchCustomEventsOverviewAction(ctx: AuthContext, startDate: Date, endDate: Date): Promise<EventTypeRow[]> {
   return getCustomEventsOverviewForSite(ctx.siteId, startDate, endDate);

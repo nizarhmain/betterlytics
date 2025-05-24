@@ -1,4 +1,4 @@
-"use server";
+'server only';
 
 import {
   fetchCampaignPerformance,
@@ -18,7 +18,6 @@ import {
   CampaignTermBreakdownItem,
   CampaignLandingPagePerformanceItem,
 } from "@/entities/campaign";
-import { requireDashboardAuth } from "@/lib/auth-actions";
 import { AuthContext } from "@/entities/authContext";
 
 export async function fetchCampaignPerformanceAction(

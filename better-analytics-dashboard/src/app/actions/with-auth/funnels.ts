@@ -1,6 +1,5 @@
-'use server';
+'server only';
 
-import { requireDashboardAuth } from "@/lib/auth-actions";
 import { type Funnel, CreateFunnelSchema, FunnelDetails, CreateFunnel } from "@/entities/funnels";
 import { createFunnelForDashboard, getFunnelDetailsById, getFunnelsByDashboardId } from "@/services/funnels";
 import { AuthContext } from "@/entities/authContext";
