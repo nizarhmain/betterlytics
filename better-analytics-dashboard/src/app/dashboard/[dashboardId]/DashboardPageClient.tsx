@@ -7,7 +7,7 @@ import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useQuery } from '@tanstack/react-query';
 import { formatDuration } from "@/utils/dateFormatters";
-import { fetchDeviceTypeBreakdownAction } from "@/app/actions/devices";
+import { fetchDeviceTypeBreakdownAction } from "@/app/actions/authenticated/devices";
 import { fetchSummaryStatsAction, fetchTopPagesAction } from "@/app/actions/overview";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";

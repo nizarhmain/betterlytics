@@ -2,7 +2,6 @@
 
 import { toast } from "sonner";
 import { useQueryClient } from '@tanstack/react-query';
-import { postFunnelAction } from "@/app/actions/authenticated/funnels";
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,6 +17,8 @@ import { Label } from "@/components/ui/label"
 import { useCallback, useState } from "react";
 import { PlusIcon, Trash2 } from "lucide-react";
 import { generateTempId } from "@/utils/temporaryId";
+import { actions } from "@/app/actions/dashboard";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 type Page = {
   value: string;
@@ -30,6 +31,7 @@ type Funnel = {
 };
 
 export function CreateFunnelDialog() {
+  const dashboardId = useDashboardId();
   const [ funnel, setFunnel ] = useState<Funnel>({
     name: 'My new funnel',
     pages: [
@@ -43,7 +45,8 @@ export function CreateFunnelDialog() {
   const queryClient = useQueryClient()
 
   const submit = useCallback(() => {
-    postFunnelAction(
+    actions.postFunnelAction(
+      dashboardId,
       funnel.name,
       funnel.pages.map((f) => f.value)
     )

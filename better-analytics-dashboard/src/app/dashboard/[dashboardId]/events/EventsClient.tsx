@@ -5,14 +5,17 @@ import SummaryCard from "@/components/SummaryCard";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { EventTypeRow } from "@/entities/events";
-import { test } from "@/app/actions/dashboard";
+import { actions } from "@/app/actions/dashboard";
 import EventsTable from "@/components/analytics/EventsTypeTable";
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 export default function EventsClient() {
   const { startDate, endDate } = useTimeRangeContext();
+  const dashboardId = useDashboardId();
 
   const { data: events = [], isLoading: eventsLoading } = useQuery<EventTypeRow[]>({
-    queryKey: [test()],
+    queryKey: ['customEvents', dashboardId, startDate, endDate],
+    queryFn: () => actions.fetchCustomEventsOverviewAction(dashboardId, startDate, endDate)
   });
 
   return (

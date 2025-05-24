@@ -2,22 +2,24 @@
 
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchFunnelDetailsAction } from "@/app/actions/authenticated/funnels";
 import { FunnelDetails } from "@/entities/funnels";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import SummaryCard from "@/components/SummaryCard";
 import { ArrowRight } from "lucide-react";
 import { analyzeFunnel } from "../analytics";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
+import { actions } from "@/app/actions/dashboard";
 
 type FunnelDataContentProps = {
   funnelId: string;
 };
 
 export function FunnelDataContent({ funnelId }: FunnelDataContentProps) {
+  const dashboardId = useDashboardId();
   const { data: funnel, isLoading: funnelLoading } = useQuery<FunnelDetails>({
     queryKey: ['funnel', funnelId],
-    queryFn: () => fetchFunnelDetailsAction(funnelId),
+    queryFn: () => actions.fetchFunnelDetailsAction(dashboardId, funnelId),
   });
 
   const funnelData = useMemo(() => {

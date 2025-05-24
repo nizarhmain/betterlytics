@@ -6,51 +6,47 @@ import DeviceTypeChart from "@/components/analytics/DeviceTypeChart";
 import BrowserTable from "@/components/analytics/BrowserTable";
 import OperatingSystemTable from "@/components/analytics/OperatingSystemTable";
 import DeviceUsageTrendChart from "@/components/charts/DeviceUsageTrendChart";
-import { 
-  fetchDeviceTypeBreakdownAction, 
-  fetchDeviceSummaryAction,
-  fetchBrowserBreakdownAction,
-  fetchOperatingSystemBreakdownAction,
-  fetchDeviceUsageTrendAction
-} from "@/app/actions/devices";
 import { DeviceSummary, OperatingSystemStats, DeviceUsageTrendRow } from "@/entities/devices";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import TimeRangeSelector from '@/components/TimeRangeSelector';
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import QueryFiltersSelector from '@/components/filters/QueryFiltersSelector';
+import { actions } from '@/app/actions/dashboard';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 export default function DevicesClient() {
+  const dashboardId = useDashboardId();
   const { startDate, endDate, granularity } = useTimeRangeContext();
   const { queryFilters } = useQueryFiltersContext();
 
   // Fetch device summary
   const { data: deviceSummary, isLoading: summaryLoading } = useQuery<DeviceSummary>({
-    queryKey: ['deviceSummary', 'default-site', startDate, endDate, queryFilters],
-    queryFn: () => fetchDeviceSummaryAction('default-site', startDate, endDate, queryFilters),
+    queryKey: ['deviceSummary', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => actions.fetchDeviceSummaryAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   // Fetch device breakdown
   const { data: deviceBreakdown = [], isLoading: deviceBreakdownLoading } = useQuery({
-    queryKey: ['deviceTypeBreakdown', 'default-site', startDate, endDate, queryFilters],
-    queryFn: () => fetchDeviceTypeBreakdownAction('default-site', startDate, endDate, queryFilters),
+    queryKey: ['deviceTypeBreakdown', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => actions.fetchDeviceTypeBreakdownAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   // Fetch browser stats
   const { data: browserStats = [], isLoading: browserStatsLoading } = useQuery({
-    queryKey: ['browserBreakdown', 'default-site', startDate, endDate, queryFilters],
-    queryFn: () => fetchBrowserBreakdownAction('default-site', startDate, endDate, queryFilters),
+    queryKey: ['browserBreakdown', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => actions.fetchBrowserBreakdownAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   // Fetch OS stats
   const { data: osStats = [], isLoading: osStatsLoading } = useQuery<OperatingSystemStats[]>({
-    queryKey: ['osBreakdown', 'default-site', startDate, endDate, queryFilters],
-    queryFn: () => fetchOperatingSystemBreakdownAction('default-site', startDate, endDate, queryFilters),
+    queryKey: ['osBreakdown', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => actions.fetchOperatingSystemBreakdownAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   // Fetch device usage trend
   const { data: deviceUsageTrend = [], isLoading: deviceUsageTrendLoading } = useQuery<DeviceUsageTrendRow[]>({
-    queryKey: ['deviceUsageTrend', 'default-site', startDate, endDate, granularity, queryFilters],
-    queryFn: () => fetchDeviceUsageTrendAction('default-site', startDate, endDate, granularity, queryFilters),
+    queryKey: ['deviceUsageTrend', dashboardId, startDate, endDate, granularity, queryFilters],
+    queryFn: () => actions.fetchDeviceUsageTrendAction(dashboardId, startDate, endDate, granularity, queryFilters),
   });
 
   return (

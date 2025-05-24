@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from '@tanstack/react-query';
-import {
-  fetchCampaignPerformanceAction,
-  fetchCampaignSourceBreakdownAction,
-  fetchCampaignVisitorTrendAction,
-  fetchCampaignMediumBreakdownAction,
-  fetchCampaignContentBreakdownAction,
-  fetchCampaignTermBreakdownAction,
-  fetchCampaignLandingPagePerformanceAction,
-} from "@/app/actions/campaigns";
+import { actions } from "@/app/actions/dashboard";
 import {
   CampaignPerformance,
   CampaignSourceBreakdownItem,
@@ -27,46 +19,48 @@ import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import CampaignPieChart, { CampaignDataKey } from "@/components/analytics/CampaignPieChart";
 import CampaignEngagementTable from "@/components/analytics/CampaignEngagementTable";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 type TabValue = "overview" | "utmBreakdowns" | "landingPages";
 
 export default function CampaignClient() {
+  const dashboardId = useDashboardId();
   const { startDate, endDate } = useTimeRangeContext();
   const [activeTab, setActiveTab] = useState<TabValue>("overview");
 
   const { data: campaignPerformance = [], isLoading: campaignPerformanceLoading } = useQuery<CampaignPerformance[]>({
-    queryKey: ['campaignPerformance', 'default-site', startDate, endDate],
-    queryFn: () => fetchCampaignPerformanceAction('default-site', startDate, endDate),
+    queryKey: ['campaignPerformance', dashboardId, startDate, endDate],
+    queryFn: () => actions.fetchCampaignPerformanceAction(dashboardId, startDate, endDate),
   });
 
   const { data: sourceBreakdown = [], isLoading: sourceBreakdownLoading } = useQuery<CampaignSourceBreakdownItem[]>({
-    queryKey: ['campaignSourceBreakdown', 'default-site', startDate, endDate],
-    queryFn: () => fetchCampaignSourceBreakdownAction('default-site', startDate, endDate),
+    queryKey: ['campaignSourceBreakdown', dashboardId, startDate, endDate],
+    queryFn: () => actions.fetchCampaignSourceBreakdownAction(dashboardId, startDate, endDate),
   });
 
   const { data: visitorTrend = [], isLoading: visitorTrendLoading } = useQuery<PivotedCampaignVisitorTrendItem[]>({
-    queryKey: ['campaignVisitorTrend', 'default-site', startDate, endDate],
-    queryFn: () => fetchCampaignVisitorTrendAction('default-site', startDate, endDate),
+    queryKey: ['campaignVisitorTrend', dashboardId, startDate, endDate],
+    queryFn: () => actions.fetchCampaignVisitorTrendAction(dashboardId, startDate, endDate),
   });
 
   const { data: mediumBreakdown = [], isLoading: mediumBreakdownLoading } = useQuery<CampaignMediumBreakdownItem[]>({
-    queryKey: ['campaignMediumBreakdown', 'default-site', startDate, endDate],
-    queryFn: () => fetchCampaignMediumBreakdownAction('default-site', startDate, endDate),
+    queryKey: ['campaignMediumBreakdown', dashboardId, startDate, endDate],
+    queryFn: () => actions.fetchCampaignMediumBreakdownAction(dashboardId, startDate, endDate),
   });
 
   const { data: contentBreakdown = [], isLoading: contentBreakdownLoading } = useQuery<CampaignContentBreakdownItem[]>({
-    queryKey: ['campaignContentBreakdown', 'default-site', startDate, endDate],
-    queryFn: () => fetchCampaignContentBreakdownAction('default-site', startDate, endDate),
+    queryKey: ['campaignContentBreakdown', dashboardId, startDate, endDate],
+    queryFn: () => actions.fetchCampaignContentBreakdownAction(dashboardId, startDate, endDate),
   });
 
   const { data: termBreakdown = [], isLoading: termBreakdownLoading } = useQuery<CampaignTermBreakdownItem[]>({
-    queryKey: ['campaignTermBreakdown', 'default-site', startDate, endDate],
-    queryFn: () => fetchCampaignTermBreakdownAction('default-site', startDate, endDate),
+    queryKey: ['campaignTermBreakdown', dashboardId, startDate, endDate],
+    queryFn: () => actions.fetchCampaignTermBreakdownAction(dashboardId, startDate, endDate),
   });
 
   const { data: landingPagePerformance = [], isLoading: landingPagePerformanceLoading } = useQuery<CampaignLandingPagePerformanceItem[]>({
-    queryKey: ['campaignLandingPagePerformance', 'default-site', startDate, endDate],
-    queryFn: () => fetchCampaignLandingPagePerformanceAction('default-site', startDate, endDate),
+    queryKey: ['campaignLandingPagePerformance', dashboardId, startDate, endDate],
+    queryFn: () => actions.fetchCampaignLandingPagePerformanceAction(dashboardId, startDate, endDate),
   });
 
   const renderTabButton = (tabValue: TabValue, label: string) => (

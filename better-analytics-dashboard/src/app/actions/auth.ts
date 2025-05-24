@@ -9,7 +9,11 @@ export function withDashboardAuthContext<Args extends Array<unknown> = unknown[]
     const session = await requireDashboardAuth();
     const context = await authorizeUserDashboard(session.user.id, dashboardId);
 
-    return action(context, ...args);
+    try {
+      return await action(context, ...args);
+    } catch {
+      throw new Error('En error occured');
+    }
   }
 }
 

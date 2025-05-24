@@ -2,18 +2,19 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { FunnelDetails } from "@/entities/funnels";
-import { fetchFunnelsAction } from "@/app/actions/authenticated/funnels";
+import { actions } from "@/app/actions/dashboard";
 import { Badge } from '@/components/ui/badge';
 import { ReactNode, useMemo } from 'react';
 import { analyzeFunnel } from './analytics';
 import Link from 'next/link';
 import { ArrowRightCircleIcon } from 'lucide-react';
-import { CreateFunnelDialog } from './CreateFunnelDialog';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 export default function FunnelsClient() {
+  const dashboardId = useDashboardId();
   const { data: funnels = [] } = useQuery<FunnelDetails[]>({
-    queryKey: ['funnels'],
-    queryFn: () => fetchFunnelsAction(),
+    queryKey: ['funnels', dashboardId],
+    queryFn: () => actions.fetchFunnelsAction(dashboardId),
   });
 
   const funnelsData = useMemo(() => funnels.map((funnel) => analyzeFunnel(funnel)), [funnels]);

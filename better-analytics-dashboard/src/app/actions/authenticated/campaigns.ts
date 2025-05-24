@@ -19,17 +19,16 @@ import {
   CampaignLandingPagePerformanceItem,
 } from "@/entities/campaign";
 import { requireDashboardAuth } from "@/lib/auth-actions";
+import { AuthContext } from "@/entities/authContext";
 
 export async function fetchCampaignPerformanceAction(
-  siteId: string,
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
 ): Promise<CampaignPerformance[]> {
-  const session = await requireDashboardAuth();
-
   try {
     const performanceData = await fetchCampaignPerformance(
-      siteId,
+      ctx.siteId,
       startDate,
       endDate
     );
@@ -41,15 +40,13 @@ export async function fetchCampaignPerformanceAction(
 }
 
 export async function fetchCampaignSourceBreakdownAction(
-  siteId: string,
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
 ): Promise<CampaignSourceBreakdownItem[]> {
-  const session = await requireDashboardAuth();
-
   try {
     const breakdownData = await fetchCampaignSourceBreakdown(
-      siteId,
+      ctx.siteId,
       startDate,
       endDate
     );
@@ -61,15 +58,13 @@ export async function fetchCampaignSourceBreakdownAction(
 }
 
 export async function fetchCampaignMediumBreakdownAction(
-  siteId: string,
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
 ): Promise<CampaignMediumBreakdownItem[]> {
-  const session = await requireDashboardAuth();
-
   try {
     const breakdownData = await fetchCampaignMediumBreakdown(
-      siteId,
+      ctx.siteId,
       startDate,
       endDate
     );
@@ -81,15 +76,13 @@ export async function fetchCampaignMediumBreakdownAction(
 }
 
 export async function fetchCampaignContentBreakdownAction(
-  siteId: string,
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
 ): Promise<CampaignContentBreakdownItem[]> {
-  const session = await requireDashboardAuth();
-
   try {
     const breakdownData = await fetchCampaignContentBreakdown(
-      siteId,
+      ctx.siteId,
       startDate,
       endDate
     );
@@ -101,15 +94,13 @@ export async function fetchCampaignContentBreakdownAction(
 }
 
 export async function fetchCampaignTermBreakdownAction(
-  siteId: string,
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
 ): Promise<CampaignTermBreakdownItem[]> {
-  const session = await requireDashboardAuth();
-
   try {
     const breakdownData = await fetchCampaignTermBreakdown(
-      siteId,
+      ctx.siteId,
       startDate,
       endDate
     );
@@ -121,15 +112,13 @@ export async function fetchCampaignTermBreakdownAction(
 }
 
 export async function fetchCampaignLandingPagePerformanceAction(
-  siteId: string,
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
 ): Promise<CampaignLandingPagePerformanceItem[]> {
-  const session = await requireDashboardAuth();
-
   try {
     const performanceData = await fetchCampaignLandingPagePerformance(
-      siteId,
+      ctx.siteId,
       startDate,
       endDate
     );
@@ -141,14 +130,12 @@ export async function fetchCampaignLandingPagePerformanceAction(
 }
 
 export async function fetchCampaignVisitorTrendAction(
-  siteId: string,
+  ctx: AuthContext,
   startDate: Date,
   endDate: Date
 ): Promise<PivotedCampaignVisitorTrendItem[]> {
-  const session = await requireDashboardAuth();
-
   try {
-    return await fetchCampaignVisitorTrend(siteId, startDate, endDate);
+    return await fetchCampaignVisitorTrend(ctx.siteId, startDate, endDate);
   } catch (error) {
     console.error("Error in fetchCampaignVisitorTrendAction:", error);
     return [];
