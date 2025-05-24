@@ -1,5 +1,3 @@
-'use server';
-
 export * from './campaigns';
 export * from './createDashboard';
 export * from './devices';
