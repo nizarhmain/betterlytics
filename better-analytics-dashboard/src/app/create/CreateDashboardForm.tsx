@@ -40,7 +40,7 @@ export default function CreateDashboardForm() {
           type="text"
           onChange={(evt) => setDomain(evt.target.value)}
           value={domain}
-          className="!bg-white text-black"
+          className="bg-muted-foreground border-background"
           placeholder="betterlytics.io"
         />
       </div>

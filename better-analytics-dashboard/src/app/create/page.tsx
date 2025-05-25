@@ -13,12 +13,12 @@ export default async function CreateDashboardPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="max-w-md w-full space-y-8 p-8 bg-foreground rounded-lg shadow">
+      <div className="max-w-md w-full space-y-8 p-8 bg-muted rounded-lg shadow">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-background">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
             Better Analytics
           </h2>
-          <p className="mt-2 text-center text-sm text-background">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Create dashboard
           </p>
         </div>
