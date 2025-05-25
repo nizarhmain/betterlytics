@@ -9,7 +9,7 @@
 [![Pull Requests](https://img.shields.io/github/issues-pr/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/pulls)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-[🚀 Quick Start](#quick-start) • [💻 Development](#development-workflow) • [🧪 Testing](#testing) • [📝 Guidelines](#code-style) • [🔄 Pull Requests](#pull-request-process)
+[🚀 Quick Start](#-quick-start) • [🛠️ Development](#️-development-workflow) • [🧪 Testing](#-testing) • [📝 Code Style](#-code-style) • [🔄 Pull Requests](#-pull-request-process) • [🐛 Issues](#-issue-guidelines-not-strictly-required-to-adhere-to-yet) • [🆘 Help](#-getting-help)
 
 </div>
 

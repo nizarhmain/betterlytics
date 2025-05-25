@@ -13,7 +13,7 @@
 [![ClickHouse](https://img.shields.io/badge/ClickHouse-FFCC01?style=flat&logo=clickhouse&logoColor=black)](https://clickhouse.com/) [![PostgreSQL](https://img.shields.io/badge/postgresql-%23316192.svg?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/) [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 
 
-[🚀 Quick Start](#getting-started) • [📖 Documentation](#project-structure) • [🤝 Contributing](#contributing) • [📄 License](#license)
+[🚀 Getting Started](#-getting-started) • [📸 Dashboard](#-dashboard-preview) • [⚡ Benchmarks](#-performance-benchmarks) • [🗺️ Roadmap](#️-roadmap) • [👥 Community](#-community)
 
 </div>
 

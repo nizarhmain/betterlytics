@@ -9,7 +9,7 @@
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
 
-[🚀 Quick Setup](#quick-setup) • [📋 Prerequisites](#prerequisites) • [🔧 Detailed Setup](#detailed-setup) • [🐳 Docker](#docker-setup)
+[🚀 Quick Setup](#-quick-setup) • [📋 Prerequisites](#-prerequisites) • [🔧 Detailed Setup](#-detailed-setup) • [🐳 Docker](#-docker-setup)
 
 </div>
 
