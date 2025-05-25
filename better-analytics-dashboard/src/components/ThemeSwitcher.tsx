@@ -4,9 +4,8 @@ import { useTheme } from "next-themes"
 import { Sun, Moon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
-import { useSidebar } from "./ui/sidebar"
 
-export function ThemeSwitcher( { className, ...props }: React.ComponentProps<"button">) {
+export function ThemeSwitcher( { className, ...props }: Omit<React.ComponentProps<"button">, "onClick">) {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
   

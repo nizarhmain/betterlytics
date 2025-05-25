@@ -15,8 +15,9 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { useSidebar } from '../ui/sidebar';
 import { cn } from '@/lib/utils';
 
-type LanguageSelectProps = Omit<React.ComponentProps<typeof SelectTrigger>, 'children'> & {
-  selectProps?: React.ComponentProps<typeof Select>;
+type LanguageSelectProps = {
+  className?: string;
+  style?: React.CSSProperties;
 };
 
 const LANGUAGE_TO_COUNTRYCODE = {
@@ -24,12 +25,12 @@ const LANGUAGE_TO_COUNTRYCODE = {
   da: 'DK',
 } satisfies Record<SupportedLanguages, FlagIconProps['countryCode']>;
 
-export function LanguageSelect({ className, style, selectProps }: LanguageSelectProps) {
+export function LanguageSelect({ className, style }: LanguageSelectProps) {
   const { currentLanguage, setLanguage } = useLanguage();
   const { open } = useSidebar();
 
   return (
-    <Select value={currentLanguage} onValueChange={setLanguage} {...selectProps}>
+    <Select value={currentLanguage} onValueChange={setLanguage}>
       <SelectTrigger className={cn(className, !open && "[&>svg:last-child]:hidden")} style={style}>
         <SelectValue>
           {currentLanguage && (
