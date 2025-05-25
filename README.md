@@ -178,15 +178,3 @@ The AGPL-3.0 license means:
 - The software comes with no warranty
 
 This license ensures that the software remains free and open source, and that any improvements or modifications to it are also shared with the community.
-
-## References
-
-### Articles relevant to performance:
-https://www.highlight.io/blog/lw5-clickhouse-performance-optimization
-https://clickhouse.com/docs/operations/overview
-https://clickhouse.com/docs/guides/inserting-data
-https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse
-https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse#data-needs-to-be-batched-for-optimal-performance
-
-### Kafka:
-https://clickhouse.com/docs/integrations/kafka/clickhouse-kafka-connect-sink

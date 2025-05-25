@@ -270,6 +270,28 @@ docker-compose logs -f postgres
 - **Discussions**: Use GitHub discussions for questions
 - **Email**: Contact maintainers directly for security issues
 
+## Technical Resources
+
+### Performance Optimization
+- [ClickHouse Performance Optimization](https://www.highlight.io/blog/lw5-clickhouse-performance-optimization)
+- [ClickHouse Operations Overview](https://clickhouse.com/docs/operations/overview)
+- [ClickHouse Data Insertion Guide](https://clickhouse.com/docs/guides/inserting-data)
+- [Asynchronous Data Inserts in ClickHouse](https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse)
+- [Data Batching for Optimal Performance](https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse#data-needs-to-be-batched-for-optimal-performance)
+
+### Integrations
+- [ClickHouse Kafka Connect Sink](https://clickhouse.com/docs/integrations/kafka/clickhouse-kafka-connect-sink)
+
+### Rust Development
+- [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
+- [Tokio Documentation](https://tokio.rs/)
+- [Axum Web Framework](https://docs.rs/axum/latest/axum/)
+
+### Frontend Development
+- [Next.js 15 Documentation](https://nextjs.org/docs)
+- [React 19 Documentation](https://react.dev/)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+
 ## Code of Conduct
 
 Please note that this project is released with a [Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
