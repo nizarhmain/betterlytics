@@ -1,158 +1,277 @@
-# Contributing to Better Analytics
+# Contributing to Betterlytics
 
-Thank you for your interest in contributing to Better Analytics! This guide will help you get started with development and contributing to the project.
+<div align="center">
 
-## Getting Started
+**Help us build the future of privacy-first analytics**
 
-### Prerequisites for Development
+[![Contributors](https://img.shields.io/github/contributors/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/pulls)
+[![License](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
-- [Node.js](https://nodejs.org/) (v18 or later)
-- [Rust](https://www.rust-lang.org/) (latest stable)
-- [pnpm](https://pnpm.io/) (package manager)
-- [Git](https://git-scm.com/)
+[🚀 Quick Start](#quick-start) • [💻 Development](#development-workflow) • [🧪 Testing](#testing) • [📝 Guidelines](#code-style) • [🔄 Pull Requests](#pull-request-process)
 
-### Development Setup
+</div>
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork**:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/better-analytics.git
-   cd better-analytics
-   ```
-3. **Follow the setup guide**: See [SETUP.md](SETUP.md) for detailed installation instructions
-4. **Create a new branch** for your feature:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+---
 
-## Development Workflow
+## 🌟 Why Contribute?
 
-### Development Commands
+Betterlytics is more than just an analytics platform - it's a movement towards privacy-respecting web analytics. By contributing, you're helping to:
 
+- 🔒 **Protect user privacy** across the web
+- 🚀 **Advance open source** analytics technology  
+- 🌍 **Build a better internet** for everyone
+- 💡 **Learn cutting-edge** technologies (Rust, ClickHouse, React 19, Next.js 15, and more)
+
+---
+
+## 🚀 Quick Start
+
+Get your development environment ready in minutes:
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🍴 Fork & Clone
+
+```bash
+# Fork on GitHub, then clone your fork
+git clone https://github.com/YOUR_USERNAME/better-analytics.git
+cd better-analytics
+
+# Add upstream remote
+git remote add upstream https://github.com/Lindharden/better-analytics.git
+```
+
+</td>
+<td width="50%" valign="top">
+
+### ⚡ Setup & Run
+
+```bash
+# Install dependencies & start services
+pnpm install
+pnpm run compose
+
+# Start development servers
+pnpm run backend    # Port 3001
+pnpm run dashboard  # Port 3000
+```
+
+</td>
+</tr>
+</table>
+
+**📖 Need detailed setup?** See our [Setup Guide](SETUP.md) for comprehensive instructions.
+
+---
+
+## 🛠️ Development Workflow
+
+### 📋 Prerequisites
+
+<table>
+<tr>
+<td width="20%" align="center">
+
+**🐳 Docker**
+Required for databases
+
+</td>
+<td width="20%" align="center">
+
+**🟢 Node.js**
+v18+ for dashboard
+
+</td>
+<td width="20%" align="center">
+
+**🦀 Rust**
+Latest stable
+
+</td>
+<td width="20%" align="center">
+
+**📦 pnpm**
+Package manager
+
+</td>
+<td width="20%" align="center">
+
+**🔧 Git**
+Version control
+
+</td>
+</tr>
+</table>
+
+### 🏗️ Project Architecture
+
+```
+betterlytics/
+├── 🦀 backend/                 # Rust server (Axum + ClickHouse)
+│   ├── src/                   # Source code
+│   ├── Cargo.toml             # Dependencies
+│   └── .env.example           # Environment template
+├── ⚛️ dashboard/               # Next.js 15 + React 19 + Tailwind css
+│   ├── src/                   # Source code  
+│   ├── package.json           # Dependencies
+│   └── .env.example           # Environment template
+├── 🗃️ migrations/              # Database migrations
+├── 🛠️ scripts/                # Build utilities
+├── 📄 static/                 # Tracking script
+└── 🐳 docker-compose.yml      # Services
+```
+
+### ⚡ Development Commands
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+#### 🚀 Quick Commands
 ```bash
 # Install dependencies
 pnpm install
 
-# Start all services (databases + backend + frontend)
+# Start everything
 pnpm run compose
 
-# Start backend only
+# Development servers
 pnpm run backend
-
-# Start dashboard only
 pnpm run dashboard
+```
+
+</td>
+<td width="50%" valign="top">
+
+#### 🔧 Build & Test
+```bash
+# Build for production
+pnpm build
 
 # Run tests
 pnpm test
 
-# Build for production
-pnpm build
-
-# Run Migrations
-pnpm run migrate
+# Performance testing
+pnpm run perf-test
 ```
 
-### Project Structure
+</td>
+</tr>
+</table>
 
-```
-better-analytics/
-├── backend/                # Rust backend server
-│   ├── src/                # Source code
-│   ├── Cargo.toml          # Rust dependencies
-│   └── .env.example        # Environment template
-├── dashboard/              # Next.js dashboard
-│   ├── src/                # Source code
-│   ├── package.json        # Node dependencies
-│   └── .env.example        # Environment template
-├── migrations/             # Database migrations
-├── scripts/                # Build and utility scripts
-├── static/                 # Static files (tracking script)
-└── docker-compose.yml      # Docker services
-```
+---
 
-## Database Development
+## 🗃️ Database Development
 
-### Creating New Migrations
+### 📝 Creating Migrations
 
-To create a new database migration:
 
-1. Create a new file in the `migrations` directory
-2. Name it following the pattern: `{number}_migration_name.sql`
-3. Ensure the number is the next in sequence
 
-Example:
+#### Naming Convention
 ```bash
-touch migrations/5_add_user_sessions.sql
+# Pattern: {number}_description.sql
+migrations/
+├── 1_initial_schema.sql
+├── 2_add_user_sessions.sql
+└── 3_add_custom_events.sql
 ```
 
-### Migration Guidelines
+See existing migrations for examples on how to create migrations.
 
-- **Always test migrations** on a copy of production data
-- **Make migrations reversible** when possible
-- **Document breaking changes** in the migration file
-- **Use descriptive names** that explain what the migration does
+---
 
-Example migration file:
-```sql
--- migrations/5_add_user_sessions.sql
--- Add user session tracking
+## 🧪 Testing
 
-CREATE TABLE user_sessions (
-    id UUID PRIMARY KEY,
-    user_id String,
-    session_start DateTime,
-    session_end Nullable(DateTime),
-    page_views UInt32 DEFAULT 0
-) ENGINE = MergeTree()
-ORDER BY (user_id, session_start);
+### 🎯 Testing Strategy
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+#### 🦀 Backend Tests
+```bash
+# Run Rust tests
+cargo test
+
+# With coverage
+cargo tarpaulin
 ```
 
-## Testing
+**Focus**: API endpoints, data processing, performance
 
-### Running Tests
+</td>
+<td width="33%" valign="top">
 
-TODO
+#### ⚛️ Frontend Tests
+```bash
+# Run React tests
+pnpm test:frontend
 
-### Performance Testing
+# Watch mode
+pnpm test:watch
+```
 
-Test the performance of the analytics backend:
+**Focus**: Components, user interactions, data flow
+
+</td>
+<td width="33%" valign="top">
+
+#### 🚀 Performance Tests
+```bash
+# Load testing
+pnpm run performance
+```
+
+**Focus**: Throughput, response times, scalability
+
+</td>
+</tr>
+</table>
+
+### 📊 Performance Testing
+
+Test the analytics ingestion performance:
 
 ```bash
 k6 run -e TARGET_URL=http://localhost:3001/track -e VUS=100 -e DURATION=1m k6-perf-test.js
+
+# or run the following command to test with standard configurations:
+pnpm run performance
 ```
 
-Parameters:
-- `TARGET_URL`: The URL of your backend server
-- `VUS`: Number of virtual users
-- `DURATION`: Duration of the test
+**Parameters**:
+- `TARGET_URL`: Backend server URL
+- `VUS`: Virtual users (concurrent connections)
+- `DURATION`: Test duration
 
-### Writing Tests
 
-- **Backend**: Use Rust's built-in testing framework
-- **Frontend**: Not yet included
-- **Integration**: Use the k6 performance testing setup
-- **Coverage**: Aim for >80% test coverage on new code
+---
 
-## Code Style
+## 📝 Code Style
 
-### Rust (Backend)
+### 🦀 Rust Guidelines
 
 - Follow [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
 - Use `cargo fmt` for formatting
 - Use `cargo clippy` for linting
-- Document public APIs with doc comments
 
-### TypeScript/React (Frontend)
 
-- Follow the existing ESLint configuration
+### ⚛️ TypeScript/React Guidelines
+
+- Follow existing ESLint configuration
 - Use Prettier for formatting
 - Prefer functional components with hooks
 - Use TypeScript strictly (no `any` types)
 
-### Commit Messages
 
-Use conventional commits format:
+### 📝 Commit Message Format
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+
 ```
 type(scope): description
 
@@ -161,141 +280,237 @@ type(scope): description
 [optional footer]
 ```
 
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
+<table>
+<tr>
+<td width="50%" valign="top">
 
-Examples:
+#### 🏷️ Types
+- `feat`: New feature
+- `fix`: Bug fix  
+- `docs`: Documentation
+- `style`: Code style
+- `refactor`: Code refactoring
+- `test`: Tests
+- `chore`: Maintenance
+
+</td>
+<td width="50%" valign="top">
+
+#### ✨ Examples
 ```
 feat(backend): add user session tracking
 fix(dashboard): resolve memory leak in real-time updates
 docs(readme): update installation instructions
+test(api): add integration tests for analytics endpoint
 ```
 
-## Pull Request Process
+</td>
+</tr>
+</table>
 
-1. **Ensure your code follows** the style guidelines
-2. **Add tests** for new functionality
-3. **Update documentation** if needed
-4. **Run the full test suite** and ensure it passes
-5. **Create a pull request** with:
-   - Clear title and description
-   - Reference to any related issues
-   - Screenshots for UI changes
-   - Performance impact notes if applicable
+---
 
-### Pull Request Template
+## 🔄 Pull Request Process
+
+### 📋 Before Submitting
+
+<table>
+<tr>
+<td width="25%" align="center">
+
+**✅ Code Quality**
+- [ ] Follows style guidelines
+- [ ] Passes all tests
+- [ ] No linting errors
+
+</td>
+<td width="25%" align="center">
+
+**📚 Documentation**
+- [ ] Updates relevant docs
+- [ ] Adds code comments
+- [ ] Updates CHANGELOG
+
+</td>
+<td width="25%" align="center">
+
+**🧪 Testing**
+- [ ] Adds new tests
+- [ ] Maintains coverage
+- [ ] Manual testing done
+
+</td>
+<td width="25%" align="center">
+
+**🔍 Review Ready**
+- [ ] Clear description
+- [ ] Links related issues
+- [ ] Screenshots if UI
+
+</td>
+</tr>
+</table>
+
+### 📝 PR Template (Not strictly required to adhere to yet)
 
 ```markdown
-## Description
-Brief description of changes
+## 📋 Description
+Brief description of changes and motivation
 
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
+## 🔄 Type of Change
+- [ ] 🐛 Bug fix
+- [ ] ✨ New feature  
+- [ ] 💥 Breaking change
+- [ ] 📚 Documentation update
+- [ ] 🎨 Style/UI changes
 
-## Testing
+## 🧪 Testing
 - [ ] Tests pass locally
-- [ ] Added new tests for new functionality
+- [ ] Added new tests
 - [ ] Manual testing completed
+- [ ] Performance impact assessed
 
-## Screenshots (if applicable)
+## 📸 Screenshots (if applicable)
 Add screenshots for UI changes
 
-## Performance Impact
-Describe any performance implications
+## 📝 Additional Notes
+Any additional context or considerations
 ```
 
-## Issue Guidelines
+### 🔍 Review Process
 
-### Reporting Bugs
+1. **Automated checks** must pass (CI/CD, linting, tests)
+2. **Code review** by at least one maintainer
+3. **Manual testing** is a must for all changes
+4. **Documentation review** if docs are updated
+5. **Merge** after approval and passing checks
 
-Include:
+---
+
+## 🐛 Issue Guidelines (Not strictly required to adhere to yet)
+
+### Bug Reports
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+#### 📋 Include This Information when applicable
 - **Operating system** and version
+- **Browser** (for dashboard issues)
 - **Node.js version** (`node --version`)
 - **Rust version** (`rustc --version`)
-- **Steps to reproduce** the issue
+- **Steps to reproduce**
 - **Expected vs actual behavior**
 - **Error messages** and logs
 - **Screenshots** if applicable
 
+</td>
+<td width="50%" valign="top">
+
+#### 🔍 Before Reporting
+- [ ] Search existing issues
+- [ ] Try latest version
+- [ ] Check documentation
+- [ ] Minimal reproduction case
+- [ ] Clear, descriptive title
+
+</td>
+</tr>
+</table>
+
 ### Feature Requests
 
-Include:
+If possible, include:
 - **Clear description** of the feature
-- **Use case** and motivation
+- **Use case** and motivation  
 - **Proposed implementation** (if you have ideas)
 - **Alternatives considered**
+- **Mockups/wireframes** (for UI features)
 
-## Development Tips
+Although any feature requests are welcome, and we'll gladly help refine the issues you create!
 
-### Hot Reloading
+---
 
-- **Frontend**: Next.js provides hot reloading out of the box
-- **Backend**: Use `cargo watch` for auto-recompilation:
-  ```bash
-  cargo install cargo-watch
-  cargo watch -x run
-  ```
+## 🆘 Getting Help
 
-### Debugging
+<table>
+<tr>
+<td width="25%" align="center">
 
-- **Backend**: Use `RUST_LOG=debug` for verbose logging
-- **Frontend**: Use browser dev tools and React DevTools
-- **Database**: Use ClickHouse's web interface at `http://localhost:8123/play`
+### 💬 Discord
+[![Discord](https://img.shields.io/badge/Discord-Join-7289da.svg)](https://discord.gg/vwqSvPn6sP)
 
-### Common Development Tasks
+Real-time help and discussion
 
-```bash
-# Reset database
-docker-compose down -v
-pnpm run compose
+</td>
+<td width="25%" align="center">
 
-# View logs
-docker-compose logs -f clickhouse
-docker-compose logs -f postgres
-```
+### 🐛 GitHub Issues
+[![Issues](https://img.shields.io/badge/Issues-Report-red.svg)](https://github.com/Lindharden/better-analytics/issues)
 
-## Getting Help
+Bug reports and feature requests
 
-- **Discord**: Join our development Discord (link in README)
-- **Issues**: Use GitHub issues for bugs and feature requests
-- **Discussions**: Use GitHub discussions for questions
-- **Email**: Contact maintainers directly for security issues
+</td>
+<td width="25%" align="center">
 
-## Technical Resources
+### 💡 Discussions
+[![Discussions](https://img.shields.io/badge/Discussions-Ask-blue.svg)](https://github.com/Lindharden/better-analytics/discussions)
 
-### Performance Optimization
+Questions and ideas
+
+</td>
+<td width="25%" align="center">
+
+### 📧 Email
+[![Email](https://img.shields.io/badge/Email-Security-orange.svg)](mailto:security@betterlytics.com)
+
+Security issues only
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📚 Technical Resources
+
+### ⚡ Performance Optimization
 - [ClickHouse Performance Optimization](https://www.highlight.io/blog/lw5-clickhouse-performance-optimization)
 - [ClickHouse Operations Overview](https://clickhouse.com/docs/operations/overview)
 - [ClickHouse Data Insertion Guide](https://clickhouse.com/docs/guides/inserting-data)
 - [Asynchronous Data Inserts in ClickHouse](https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse)
 - [Data Batching for Optimal Performance](https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse#data-needs-to-be-batched-for-optimal-performance)
 
-### Integrations
+### 🔗 Integrations
 - [ClickHouse Kafka Connect Sink](https://clickhouse.com/docs/integrations/kafka/clickhouse-kafka-connect-sink)
 
-### Rust Development
+### 🦀 Rust Development
 - [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
 - [Tokio Documentation](https://tokio.rs/)
 - [Axum Web Framework](https://docs.rs/axum/latest/axum/)
 
-### Frontend Development
+### ⚛️ Frontend Development
 - [Next.js 15 Documentation](https://nextjs.org/docs)
 - [React 19 Documentation](https://react.dev/)
 - [Tailwind CSS](https://tailwindcss.com/docs)
 
-## Code of Conduct
+---
+
+## 📜 Code of Conduct
 
 Please note that this project is released with a [Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-## License
+## 📄 License
 
 By contributing to Betterlytics, you agree that your contributions will be licensed under the AGPL-3.0 license.
+
+---
+
+<div align="center">
+
+**Ready to contribute?** 🚀 [Fork the repository](https://github.com/Lindharden/better-analytics/fork) and start building!
+
+Made with ❤️ by the Betterlytics team
+
+</div>
