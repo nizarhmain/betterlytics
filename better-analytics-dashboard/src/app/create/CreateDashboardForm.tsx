@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export default function CreateDashboardForm() {
-  const [ domain, setDomain ] = useState<string>("");
+  const [domain, setDomain] = useState<string>("");
 
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -17,14 +17,14 @@ export default function CreateDashboardForm() {
   const submitDashboard = () => {
     startTransition(async () => {
       try {
-        const dashboard = await createDashboardAction(domain)
+        const dashboard = await createDashboardAction(domain);
         router.push(`/dashboard/${dashboard.id}`);
-      } catch(err) {
+      } catch (err) {
         console.error(err);
-        toast.error('Failed to create dashboard.');
+        toast.error("Failed to create dashboard.");
       }
-    })
-  }
+    });
+  };
 
   return (
     <form
@@ -34,12 +34,13 @@ export default function CreateDashboardForm() {
       }}
       className="mt-8 space-y-6"
     >
-      <div className="space-y-2 text-muted-foreground">
-        <Label className="font-medium">Domain</Label>
+      <div className="space-y-2">
+        <Label className="font-medium text-muted-foreground">Domain</Label>
         <Input
           type="text"
-          onChange={(evt) => setDomain(evt.target.value)} value={domain}
-          className="text-gray-900 !bg-white"
+          onChange={(evt) => setDomain(evt.target.value)}
+          value={domain}
+          className="!bg-white text-black"
           placeholder="betterlytics.io"
         />
       </div>

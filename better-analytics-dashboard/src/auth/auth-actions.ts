@@ -1,4 +1,4 @@
-"use server";
+"server only";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -52,14 +52,3 @@ export function withDashboardAuthContext<
     }
   };
 }
-
-export type GetAuthRestProps<T> = T extends (
-  context: AuthContext,
-  ...args: infer Args
-) => unknown
-  ? Args
-  : never;
-export type PublicAuthAction<Action extends (...props: any[]) => any> = (
-  dashboardId: string,
-  ...props: GetAuthRestProps<Action>
-) => ReturnType<Action>;
