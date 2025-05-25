@@ -42,7 +42,7 @@ export function BASidebarHeader() {
         !isMobile && (
           <Button
             variant='ghost'
-            className="absolute -right-2 top-9 rounded-sm size-6 bg-white border-1 border-l-0 hover:bg-white hover:cursor-pointer"
+            className="absolute -right-2 top-9 rounded-sm size-6 bg-background border-1 border-l-0 hover:bg-background/80 hover:cursor-pointer"
             onClick={toggleSidebar}
           >
             { open ? <ChevronLeftIcon /> : <ChevronRightIcon /> }
