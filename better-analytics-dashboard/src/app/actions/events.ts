@@ -1,10 +1,11 @@
-'use server';
+"use server";
 
-import { checkAuth } from "@/lib/auth-actions";
-import { EventTypeRow } from "@/entities/events";
+import { withDashboardAuthContext } from "@/auth/auth-actions";
 import { getCustomEventsOverviewForSite } from "@/services/events";
+import { type AuthContext } from "@/entities/authContext";
 
-export async function fetchCustomEventsOverviewAction(siteId: string, startDate: Date, endDate: Date): Promise<EventTypeRow[]> {
-  await checkAuth();
-  return getCustomEventsOverviewForSite(siteId, startDate, endDate);
-}
+export const fetchCustomEventsOverviewAction = withDashboardAuthContext(
+  async (ctx: AuthContext, startDate: Date, endDate: Date) => {
+    return getCustomEventsOverviewForSite(ctx.siteId, startDate, endDate);
+  }
+);

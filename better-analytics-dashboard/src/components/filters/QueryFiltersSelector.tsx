@@ -49,7 +49,7 @@ export default function QueryFiltersSelector() {
                       key={filter.id}
                       onFilterUpdate={updateQueryFilter}
                       filter={filter}
-                      requestRemoval={(_filter) => (console.log(_filter), removeQueryFilter(_filter.id))}
+                      requestRemoval={(_filter) => removeQueryFilter(_filter.id)}
                       />
                     ))
                 }

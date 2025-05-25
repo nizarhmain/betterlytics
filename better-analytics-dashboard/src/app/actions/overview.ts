@@ -1,42 +1,91 @@
-'use server';
+"use server";
 
 import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { DailyPageViewRow, TotalPageViewsRow } from "@/entities/pageviews";
-import { getDeviceTypeBreakdownForSite } from "@/services/devices";
-import { getPageViewsForSite, getTopPagesForSite, getTotalPageViewsForSite } from "@/services/pages";
+import {
+  getPageViewsForSite,
+  getTopPagesForSite,
+  getTotalPageViewsForSite,
+} from "@/services/pages";
 import { getSummaryStatsForSite } from "@/services/visitors";
 import { getUniqueVisitorsForSite } from "@/services/visitors";
-import { checkAuth } from "@/lib/auth-actions";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { QueryFilter } from "@/entities/filter";
+import { withDashboardAuthContext } from "@/auth/auth-actions";
+import { AuthContext } from "@/entities/authContext";
 
-export async function fetchTotalPageViewsAction(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<TotalPageViewsRow[]> {
-  await checkAuth();
-  return getTotalPageViewsForSite(siteId, startDate, endDate, granularity, queryFilters);
-}
+export const fetchTotalPageViewsAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    granularity: GranularityRangeValues,
+    queryFilters: QueryFilter[]
+  ): Promise<TotalPageViewsRow[]> => {
+    return getTotalPageViewsForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      granularity,
+      queryFilters
+    );
+  }
+);
 
-export async function fetchPageViewsAction(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues): Promise<DailyPageViewRow[]> {
-  await checkAuth();
-  return getPageViewsForSite(siteId, startDate, endDate, granularity);
-}
+export const fetchPageViewsAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    granularity: GranularityRangeValues
+  ): Promise<DailyPageViewRow[]> => {
+    return getPageViewsForSite(ctx.siteId, startDate, endDate, granularity);
+  }
+);
 
-export async function fetchUniqueVisitorsAction(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<DailyUniqueVisitorsRow[]> {
-  await checkAuth();
-  return getUniqueVisitorsForSite(siteId, startDate, endDate, granularity, queryFilters);
-}
+export const fetchUniqueVisitorsAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    granularity: GranularityRangeValues,
+    queryFilters: QueryFilter[]
+  ): Promise<DailyUniqueVisitorsRow[]> => {
+    return getUniqueVisitorsForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      granularity,
+      queryFilters
+    );
+  }
+);
 
-export async function fetchSummaryStatsAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
-  await checkAuth();
-  return getSummaryStatsForSite(siteId, startDate, endDate, queryFilters);
-}
+export const fetchSummaryStatsAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    queryFilters: QueryFilter[]
+  ) => {
+    return getSummaryStatsForSite(ctx.siteId, startDate, endDate, queryFilters);
+  }
+);
 
-export async function fetchTopPagesAction(siteId: string, startDate: Date, endDate: Date, limit: number, queryFilters: QueryFilter[]) {
-  await checkAuth();
-  return getTopPagesForSite(siteId, startDate, endDate, limit, queryFilters);
-}
-
-export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
-  await checkAuth();
-  return getDeviceTypeBreakdownForSite(siteId, startDate, endDate, queryFilters);
-}
-  
+export const fetchTopPagesAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    limit: number,
+    queryFilters: QueryFilter[]
+  ) => {
+    return getTopPagesForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      limit,
+      queryFilters
+    );
+  }
+);

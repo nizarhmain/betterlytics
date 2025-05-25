@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 
 export default function LoginForm() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -16,14 +16,14 @@ export default function LoginForm() {
 
     try {
       const result = await signIn("credentials", {
-        username,
+        email,
         password,
         redirect: true,
         callbackUrl: "/dashboard"
       });
       
       if (result?.error) {
-        setError("Invalid username or password");
+        setError("Invalid email or password");
         setIsLoading(false);
       }
     } catch {
@@ -41,18 +41,18 @@ export default function LoginForm() {
       )}
       <div className="rounded-md shadow-sm -space-y-px">
         <div>
-          <label htmlFor="username" className="sr-only">
-            Username
+          <label htmlFor="email" className="sr-only">
+            Email
           </label>
           <input
-            id="username"
-            name="username"
-            type="text"
+            id="email"
+            name="email"
+            type="email"
             required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="Username"
+            placeholder="Email"
           />
         </div>
         <div>

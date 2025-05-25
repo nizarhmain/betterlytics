@@ -7,8 +7,8 @@ import { type QueryFilter } from '@/entities/filter';
 import { subHours, endOfHour } from 'date-fns';
 import { toDateTimeString } from '@/utils/dateFormatters';
 
-export async function getFunnelsBySiteId(siteId: string): Promise<FunnelDetails[]> {
-  const funnels = await PostgresFunnelRepository.getFunnelsBySiteId(siteId);
+export async function getFunnelsByDashboardId(dashboardId: string, siteId: string,): Promise<FunnelDetails[]> {
+  const funnels = await PostgresFunnelRepository.getFunnelsByDashboardId(dashboardId);
   
   const funnelsDetails = await Promise.all(
       funnels.map(async (funnel: Funnel) => (
@@ -48,7 +48,7 @@ export async function getFunnelDetailsById(
   });
 }
 
-export async function createFunnelForSite(funnel: CreateFunnel): Promise<Funnel> {
+export async function createFunnelForDashboard(funnel: CreateFunnel): Promise<Funnel> {
   return PostgresFunnelRepository.createFunnel(funnel);
 }
 

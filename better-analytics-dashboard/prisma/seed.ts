@@ -1,49 +1,74 @@
+import { PrismaClient } from '@prisma/client'
+import * as bcrypt from 'bcrypt'
+import * as dotenv from 'dotenv'
 
-import { Prisma, PrismaClient } from '@prisma/client'
+dotenv.config()
 
 const prisma = new PrismaClient()
 
-const SITE_ID = 'default-site';
+const DEFAULT_DASHBOARD_TRACKING_ID = process.env.SITE_ID || 'default-site'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com'
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin'
+const SALT_ROUNDS = 10
 
-const siteData: Prisma.SiteCreateInput = {
-  siteId: SITE_ID,
-}
-
-const funnelData = {
-  name: 'Basic funnel',
-  siteId: SITE_ID,
-  pages: [
-    '/dashboard',
-    '/dashboard/pages',
-    '/dashboard/geography',
-  ]
-}
-
-
-export async function main() {
-  // Create site
-  const siteExists = await prisma.site.findFirst({
-    where: {
-      siteId: siteData.siteId
-    }
-  });
-
-  if (!siteExists) { 
-    await prisma.site.create({ data: siteData });
+async function main() {
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: ADMIN_EMAIL }
+  })
+  
+  let adminUser
+  
+  if (!existingAdmin) {
+    console.log(`Creating admin user with email: ${ADMIN_EMAIL}...`)
+    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, SALT_ROUNDS)
+    
+    adminUser = await prisma.user.create({
+      data: {
+        email: ADMIN_EMAIL,
+        name: 'Admin',
+        passwordHash: hashedPassword,
+        role: 'admin',
+      }
+    })
+    console.log('Admin user created successfully')
+  } else {
+    console.log('Admin user already exists, skipping creation')
+    adminUser = existingAdmin
   }
 
-  // Create funnel
-  const funnelExists = await prisma.funnel.findFirst({
-    where: {
-      name: funnelData.name
-    }
-  });
+  // const dashboard = await prisma.dashboard.upsert({
+  //   where: { siteId: DEFAULT_DASHBOARD_TRACKING_ID },
+  //   update: {
+  //     name: 'Default Admin Dashboard',
+  //     userId: adminUser.id
+  //   },
+  //   create: {
+  //     siteId: DEFAULT_DASHBOARD_TRACKING_ID,
+  //     name: 'Default Admin Dashboard',
+  //     userId: adminUser.id
+  //   },
+  // })
 
-  if (!funnelExists) {  
-    await prisma.funnel.create({
-      data: funnelData
-    });
-  }
+  // const funnelName = 'Basic funnel'
+  
+  // let existingFunnel = await prisma.funnel.findFirst({
+  //   where: {
+  //     name: funnelName,
+  //     dashboardId: dashboard.id
+  //   }
+  // })
+
+  // if (!existingFunnel) {
+  //   await prisma.funnel.create({
+  //     data: {
+  //       name: funnelName,
+  //       pages: ['/dashboard', '/dashboard/pages', '/dashboard/geography'],
+  //       dashboard: {
+  //         connect: { id: dashboard.id }, 
+  //       },
+  //     }
+  //   })
+  // }
 }
 
 main()

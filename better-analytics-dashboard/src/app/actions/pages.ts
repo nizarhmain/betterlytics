@@ -1,29 +1,53 @@
-'use server';
+"use server";
 
-import { getPageAnalytics, getPageDetail, getPageTrafficForTimePeriod } from "@/services/pages";
+import {
+  getPageAnalytics,
+  getPageDetail,
+  getPageTrafficForTimePeriod,
+} from "@/services/pages";
 import { PageAnalytics } from "@/entities/pages";
-import { checkAuth } from "@/lib/auth-actions";
 import { TotalPageViewsRow } from "@/entities/pageviews";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { QueryFilter } from "@/entities/filter";
+import { withDashboardAuthContext } from "@/auth/auth-actions";
+import { AuthContext } from "@/entities/authContext";
 
-export async function fetchPageAnalyticsAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<PageAnalytics[]> {
-  await checkAuth();
-  return getPageAnalytics(siteId, startDate, endDate, queryFilters);
-}
+export const fetchPageAnalyticsAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    queryFilters: QueryFilter[]
+  ): Promise<PageAnalytics[]> => {
+    return getPageAnalytics(ctx.siteId, startDate, endDate, queryFilters);
+  }
+);
 
-export async function fetchPageDetailAction(siteId: string, path: string, startDate: Date, endDate: Date): Promise<PageAnalytics | null> {
-  await checkAuth();
-  return getPageDetail(siteId, path, startDate, endDate);
-}
+export const fetchPageDetailAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    path: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<PageAnalytics | null> => {
+    return getPageDetail(ctx.siteId, path, startDate, endDate);
+  }
+);
 
-export async function fetchPageTrafficTimeSeriesAction(
-  siteId: string,
-  path: string,
-  startDate: Date,
-  endDate: Date,
-  granularity: GranularityRangeValues
-): Promise<TotalPageViewsRow[]> {
-  await checkAuth();
-  return getPageTrafficForTimePeriod(siteId, path, startDate, endDate, granularity);
-} 
+export const fetchPageTrafficTimeSeriesAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    path: string,
+    startDate: Date,
+    endDate: Date,
+    granularity: GranularityRangeValues
+  ): Promise<TotalPageViewsRow[]> => {
+    return getPageTrafficForTimePeriod(
+      ctx.siteId,
+      path,
+      startDate,
+      endDate,
+      granularity
+    );
+  }
+);

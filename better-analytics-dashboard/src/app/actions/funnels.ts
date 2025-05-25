@@ -1,54 +1,60 @@
-'use server';
+"use server";
 
-import { checkAuth } from "@/lib/auth-actions";
-import { type Funnel, CreateFunnelSchema, FunnelDetails } from "@/entities/funnels";
-import { createFunnelForSite, getFunnelDetailsById, getFunnelsBySiteId, getFunnelPreviewData } from "@/services/funnels";
+import {
+  type Funnel,
+  CreateFunnelSchema,
+  FunnelDetails,
+} from "@/entities/funnels";
+import {
+  createFunnelForDashboard,
+  getFunnelDetailsById,
+  getFunnelPreviewData,
+  getFunnelsByDashboardId,
+} from "@/services/funnels";
+import { withDashboardAuthContext } from "@/auth/auth-actions";
+import { AuthContext } from "@/entities/authContext";
 
-export async function postFunnelAction(
-  siteId: string, 
-  name: string, 
-  pages: string[], 
-  isStrict: boolean
-): Promise<Funnel> {
-  await checkAuth();
-  const funnel = CreateFunnelSchema.parse({
-    siteId,
-    name,
-    pages,
-    isStrict
-  });
-  return createFunnelForSite(funnel);
-}
+export const postFunnelAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    name: string,
+    pages: string[],
+    isStrict: boolean
+  ): Promise<Funnel> => {
+    const funnel = CreateFunnelSchema.parse({
+      siteId: ctx.siteId,
+      name,
+      pages,
+      isStrict,
+    });
+    return createFunnelForDashboard(funnel);
+  }
+);
 
-export async function fetchFunnelDetailsAction(
-  siteId: string, 
-  funnelId: string, 
-): Promise<FunnelDetails> {
-  await checkAuth();
-  const funnel = await getFunnelDetailsById(siteId, funnelId);
-  if (funnel === null) {
-    throw 'Funnel not found'
-  };
+export const fetchFunnelDetailsAction = withDashboardAuthContext(
+  async (ctx: AuthContext, funnelId: string): Promise<FunnelDetails> => {
+    const funnel = await getFunnelDetailsById(ctx.siteId, funnelId);
+    if (funnel === null) {
+      throw new Error("Funnel not found");
+    }
 
-  return funnel;
-}
+    return funnel;
+  }
+);
 
-export async function fetchFunnelsAction(siteId: string): Promise<FunnelDetails[]> {
-  await checkAuth();
-  return getFunnelsBySiteId(siteId);
-}
+export const fetchFunnelsAction = withDashboardAuthContext(
+  async (ctx: AuthContext): Promise<FunnelDetails[]> => {
+    return getFunnelsByDashboardId(ctx.dashboardId, ctx.siteId);
+  }
+);
 
-export async function fetchFunnelPreviewAction(
-  siteId: string, 
-  funnelName: string, 
-  pages: string[],
-  isStrict: boolean
-): Promise<FunnelDetails> {
-  await checkAuth();
-  return getFunnelPreviewData(
-    siteId,
-    funnelName,
-    pages,
-    isStrict
-  );
-}
+export const fetchFunnelPreviewAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    funnelName: string,
+    pages: string[],
+    isStrict: boolean
+  ): Promise<FunnelDetails> => {
+    return getFunnelPreviewData(ctx.siteId, funnelName, pages, isStrict);
+  }
+);

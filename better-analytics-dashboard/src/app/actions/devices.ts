@@ -1,38 +1,102 @@
-'use server';
+"use server";
 
-import { getDeviceTypeBreakdownForSite, getBrowserBreakdownForSite, getDeviceSummaryForSite, getOperatingSystemBreakdownForSite, getDeviceUsageTrendForSite } from "@/services/devices";
-import { DeviceType, BrowserStats, DeviceSummary, OperatingSystemStats, DeviceUsageTrendRow } from "@/entities/devices";
-import { checkAuth } from "@/lib/auth-actions";
+import {
+  getDeviceTypeBreakdownForSite,
+  getBrowserBreakdownForSite,
+  getDeviceSummaryForSite,
+  getOperatingSystemBreakdownForSite,
+  getDeviceUsageTrendForSite,
+} from "@/services/devices";
+import {
+  DeviceType,
+  BrowserStats,
+  DeviceSummary,
+  OperatingSystemStats,
+  DeviceUsageTrendRow,
+} from "@/entities/devices";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { QueryFilter } from "@/entities/filter";
+import { withDashboardAuthContext } from "@/auth/auth-actions";
+import { AuthContext } from "@/entities/authContext";
 
-export async function fetchDeviceTypeBreakdownAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<DeviceType[]> {
-  await checkAuth();
-  return getDeviceTypeBreakdownForSite(siteId, startDate, endDate, queryFilters);
-}
+export const fetchDeviceTypeBreakdownAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    queryFilters: QueryFilter[]
+  ): Promise<DeviceType[]> => {
+    return getDeviceTypeBreakdownForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      queryFilters
+    );
+  }
+);
 
-export async function fetchDeviceSummaryAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<DeviceSummary> {
-  await checkAuth();
-  return getDeviceSummaryForSite(siteId, startDate, endDate, queryFilters);
-}
+export const fetchDeviceSummaryAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    queryFilters: QueryFilter[]
+  ): Promise<DeviceSummary> => {
+    return getDeviceSummaryForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      queryFilters
+    );
+  }
+);
 
-export async function fetchBrowserBreakdownAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<BrowserStats[]> {
-  await checkAuth();
-  return getBrowserBreakdownForSite(siteId, startDate, endDate, queryFilters);
-}
+export const fetchBrowserBreakdownAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    queryFilters: QueryFilter[]
+  ): Promise<BrowserStats[]> => {
+    return getBrowserBreakdownForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      queryFilters
+    );
+  }
+);
 
-export async function fetchOperatingSystemBreakdownAction(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<OperatingSystemStats[]> {
-  await checkAuth();
-  return getOperatingSystemBreakdownForSite(siteId, startDate, endDate, queryFilters);
-}
+export const fetchOperatingSystemBreakdownAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    queryFilters: QueryFilter[]
+  ): Promise<OperatingSystemStats[]> => {
+    return getOperatingSystemBreakdownForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      queryFilters
+    );
+  }
+);
 
-export async function fetchDeviceUsageTrendAction(
-  siteId: string, 
-  startDate: Date, 
-  endDate: Date,
-  granularity: GranularityRangeValues,
-  queryFilters: QueryFilter[]
-): Promise<DeviceUsageTrendRow[]> {
-  await checkAuth();
-  return getDeviceUsageTrendForSite(siteId, startDate, endDate, granularity, queryFilters);
-} 
+export const fetchDeviceUsageTrendAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    granularity: GranularityRangeValues,
+    queryFilters: QueryFilter[]
+  ): Promise<DeviceUsageTrendRow[]> => {
+    return getDeviceUsageTrendForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      granularity,
+      queryFilters
+    );
+  }
+);
