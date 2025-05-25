@@ -1,5 +1,15 @@
 import Link from "next/link";
-import { LayoutDashboard, FileText, Smartphone, CircleDot, Globe, Link2, Funnel, DollarSign } from "lucide-react";
+import {
+  LayoutDashboard,
+  FileText,
+  Smartphone,
+  CircleDot,
+  Globe,
+  Link2,
+  Funnel,
+  DollarSign,
+  Route,
+} from "lucide-react";
 import { BASidebarHeader } from "./BASidebarHeader";
 import {
   Sidebar,
@@ -11,7 +21,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import BASidebarCollapsibleSignOutButton from "./BASidebarCollapsibleSignOutButton";
 import SettingsButton from "../SettingsButton";
@@ -23,7 +33,7 @@ const navItems = [
   { name: "Pages", href: "pages", icon: <FileText size={18} /> },
   { name: "Referrers", href: "referrers", icon: <Link2 size={18} /> },
   { name: "Geography", href: "geography", icon: <Globe size={18} /> },
-  { name: "User Journey", href: "user-journey", icon: <CircleDot size={18} /> },
+  { name: "User Journey", href: "user-journey", icon: <Route size={18} /> },
   { name: "Funnels", href: "funnels", icon: <Funnel size={18} /> },
   { name: "Devices", href: "devices", icon: <Smartphone size={18} /> },
   { name: "Campaigns", href: "campaign", icon: <DollarSign size={18} /> },
@@ -43,20 +53,20 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
       <SidebarContent className="pl-1">
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {navItems.map((item) => (
-                  <SidebarMenuItem key={item.name}>
-                    <SidebarMenuButton asChild>
-                      <Link href={`/dashboard/${dashboardId}/${item.href}`}>
-                        <span>{item.icon}</span>
-                        <span>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton asChild>
+                    <Link href={`/dashboard/${dashboardId}/${item.href}`}>
+                      <span>{item.icon}</span>
+                      <span>{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
@@ -69,4 +79,4 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
       </SidebarFooter>
     </Sidebar>
   );
-} 
+}

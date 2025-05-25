@@ -1,11 +1,14 @@
-import * as bcrypt from 'bcrypt';
-import { findUserByEmail, createUser } from '@/repositories/postgres/user';
-import { findDashboardById, findUserDashboard } from '@/repositories/postgres/dashboard';
-import { env } from '@/lib/env';
-import type { User } from 'next-auth';
-import { CreateUserData, LoginUserData, UserSchema } from '@/entities/user';
-import { v4 as uuidv4 } from 'uuid';
-import { AuthContext, AuthContextSchema } from '@/entities/authContext';
+import * as bcrypt from "bcrypt";
+import { findUserByEmail, createUser } from "@/repositories/postgres/user";
+import {
+  findDashboardById,
+  findUserDashboard,
+} from "@/repositories/postgres/dashboard";
+import { env } from "@/lib/env";
+import type { User } from "next-auth";
+import { CreateUserData, LoginUserData, UserSchema } from "@/entities/user";
+import { v4 as uuidv4 } from "uuid";
+import { AuthContext, AuthContextSchema } from "@/entities/authContext";
 
 const SALT_ROUNDS = 10;
 
@@ -13,7 +16,9 @@ const SALT_ROUNDS = 10;
  * Verifies user credentials against stored password hash
  * @returns User object or null if verification fails
  */
-export async function verifyCredentials(loginData: LoginUserData): Promise<User | null> {
+export async function verifyCredentials(
+  loginData: LoginUserData
+): Promise<User | null> {
   const { email, password } = loginData;
   const dbUser = await findUserByEmail(email);
 
@@ -29,8 +34,6 @@ export async function verifyCredentials(loginData: LoginUserData): Promise<User 
   try {
     return UserSchema.parse({
       ...dbUser,
-      // dashboardId: dashboard.id,
-      // siteId: dashboard.siteId,
     });
   } catch (error) {
     console.error("Error validating authenticated user data:", error);
@@ -43,7 +46,7 @@ export async function verifyCredentials(loginData: LoginUserData): Promise<User 
  * Only proceeds when credentials match environment variables
  */
 export async function attemptAdminInitialization(
-  email: string, 
+  email: string,
   password: string
 ): Promise<User | null> {
   if (email !== env.ADMIN_EMAIL || password !== env.ADMIN_PASSWORD) {
@@ -63,21 +66,20 @@ export async function attemptAdminInitialization(
       passwordHash: hashedPassword,
       role: "admin",
     };
-    
+
     const newAdminUser = await createUser(adminUserData);
-    
+
     const siteId = uuidv4();
-    
+
     return UserSchema.parse({
       ...newAdminUser,
-      // dashboardId: dashboard.id,
       siteId,
     });
   } catch (error) {
     console.error("Error during initial admin setup:", error);
     return null;
   }
-} 
+}
 
 export async function authorizeUserDashboard(
   userId: string,
@@ -90,7 +92,7 @@ export async function authorizeUserDashboard(
     role: userDashboard.role,
     userId: userDashboard.userId,
     dashboardId: dashboard.id,
-    siteId: dashboard.siteId
+    siteId: dashboard.siteId,
   };
 
   return AuthContextSchema.parse(context);
