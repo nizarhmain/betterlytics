@@ -45,6 +45,37 @@ export async function findUserDashboard(
   }
 }
 
+export async function findFirstUserDashboard(
+  userId: string
+): Promise<Dashboard | null> {
+  try {
+    const prismaUserDashboard = await prisma.userDashboard.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (prismaUserDashboard === null) {
+      return null;
+    }
+
+    const prismaDashboard = await prisma.dashboard.findFirst({
+      where: {
+        id: prismaUserDashboard?.dashboardId,
+      },
+    });
+
+    if (prismaDashboard === null) {
+      return null;
+    }
+
+    return DashboardSchema.parse(prismaDashboard);
+  } catch {
+    console.error("Error while finding user's first dashboard");
+    throw new Error("Faild to find dashboard");
+  }
+}
+
 export async function createDashboard(
   data: DashboardWriteData
 ): Promise<Dashboard> {

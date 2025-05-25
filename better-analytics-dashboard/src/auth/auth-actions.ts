@@ -7,7 +7,7 @@ import { Session } from "next-auth";
 import { type AuthContext } from "@/entities/authContext";
 import { authorizeUserDashboard } from "@/services/auth.service";
 
-async function getAuthSession(): Promise<Session | null> {
+export async function getAuthSession(): Promise<Session | null> {
   const session = await getServerSession(authOptions);
   return session;
 }
