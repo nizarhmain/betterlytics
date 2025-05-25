@@ -1,83 +1,107 @@
 # Better Analytics
 
-A modern, privacy-focused analytics platform built with Rust and ClickHouse.
+<div align="center">
 
-## Prerequisites
+<img src=".github/assets/logo-dark-raw.png" alt="Better Analytics Logo" width="120">
 
-- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
-- [Node.js](https://nodejs.org/) (v18 or later)
-- [Rust](https://www.rust-lang.org/) (latest stable)
-- [pnpm](https://pnpm.io/) (package manager)
+**A modern, Cookieless & privacy-focused analytics platform built for the future**
 
-## Getting Started
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-### 1. Clone the Repository
+[![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/) [![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/) [![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)](https://reactjs.org/) [![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
+[![ClickHouse](https://img.shields.io/badge/ClickHouse-FFCC01?style=flat&logo=clickhouse&logoColor=black)](https://clickhouse.com/) [![PostgreSQL](https://img.shields.io/badge/postgresql-%23316192.svg?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/) [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+
+
+[🚀 Quick Start](#getting-started) • [📖 Documentation](#project-structure) • [🤝 Contributing](#contributing) • [📄 License](#license)
+
+</div>
+
+---
+
+## 🌟 Why Better Analytics?
+
+Better Analytics is a **high-performance, privacy-first** analytics platform that puts you in control of your data. Built with modern technologies like Rust and ClickHouse, it delivers lightning-fast insights while respecting user privacy.
+
+**Our core principles:**
+
+- 🔒 **Privacy-First**: GDPR compliant, no third-party tracking
+- 🍪 **Cookieless**: No cookies required, respects user privacy
+- ⚡ **Lightning Fast**: Built on Rust and ClickHouse for maximum performance
+- 📊 **Real-time Insights**: Live dashboard with instant data updates
+- 🎯 **Lightweight Tracking**: Minimal impact on your website's performance
+- 🔧 **Self-Hosted**: Complete control over your data and infrastructure
+- 📱 **Modern UI**: Beautiful, responsive dashboard built with Next.js 15 and React 19
+- 🚀 **Scalable**: Handles millions of events with ease
+- 🛠️ **Developer Friendly**: Easy to deploy, customize, and extend
+
+### 🚀 Complete Feature Set
+
+#### 📊 Core Analytics
+| Feature | Description |
+|---------|-------------|
+| **Real-time Dashboard** | Live visitor tracking with instant updates powered by Clickhouse |
+| **Page Analytics** | Detailed page views, bounce rates, and engagement metrics |
+| **Referrer Tracking** | Complete referral source analysis and traffic attribution |
+| **Geographic Insights** | Global visitor mapping with MaxMind GeoIP integration |
+| **Device & Browser Detection** | Comprehensive device, OS, and browser analytics |
+| **Campaign Tracking** | UTM parameter tracking and marketing campaign analysis |
+| **User Journey Mapping** | Visualize complete user paths through your site |
+| **Conversion Funnels** | Track multi-step conversion processes and drop-off points |
+| **Custom Events** | Track any custom interactions and business metrics |
+| **Real-time Visitor Feed** | See live visitor activity as it happens |
+
+#### 🛠️ Platform & Integration
+| Feature | Description |
+|---------|-------------|
+| **Modern UI** | Beautiful dashboard built with Next.js 15, React 19, and Tailwind CSS |
+| **Lightweight Script** | Minimal tracking script with zero performance impact |
+| **Easy Integration** | Simple one-line script installation |
+| **Docker Deployment** | One-command deployment with Docker Compose |
+| **Performance Optimized** | Built on ClickHouse for sub-second query responses |
+
+
+
+## 📸 Dashboard Preview
+
+<div align="center">
+
+### Overview
+![Dashboard Overview](.github/assets/betterlytics-showcase-overview.png)
+
+### Geography Insights
+![Real-time Analytics](.github/assets/betterlytics-showcase-geography.png)
+
+### User Journey Diagram
+![Detailed Reports](.github/assets/betterlytics-showcase-journey.png)
+
+### Devices Breakdown
+![Detailed Reports](.github/assets/betterlytics-showcase-devices.png)
+
+### Pages Breakdown
+![Detailed Reports](.github/assets/betterlytics-showcase-pages.png)
+
+... and much more
+
+</div>
+
+
+## 🚀 Quick Start
+
+Get Better Analytics running in minutes:
 
 ```bash
 git clone https://github.com/Lindharden/better-analytics.git
 cd better-analytics
-```
-
-### 2. Environment Setup
-
-Create a copy of the `.env.example` file in root and rename it to `.env` and adjust environment variables accordingly - most can be left as is.
-
-Then create a copy of the `.env.example` file in `backend` and rename it to `.env` and adjust environment variables accordingly - most can be left as is.
-
-Lastly, create a copy of the `.env.example` file in `better-analytics-dashboard` folder and rename it to `.env` and adjust environment variables accordingly - most can be left as is.
-
-### 3. Start Docker containers
-
-```bash
+pnpm install
 pnpm run compose
 ```
 
-This will:
-- start a ClickHouse instance with:
-  - HTTP interface on port 8123
-  - Native interface on port 9000
-  - Data persisted in `./data/clickhouse`
-- start a Postgres instance with:
-  - HTTP interface on port 5432
-  - Data persisted in `./data/postgres`
-- start a PGAdmin instance with:
-  - HTTP interface on port 5433
-  - Data persisted in `./data/pgadmin`
-- run migrations for ClickHouse & Postgres
-- generate the Prisma client for dashboard
-- seed Postgres to quickly get up an running with basics
+That's it! Your analytics dashboard will be available at `http://localhost:3000`
 
-### 4. Install dependencies
+📖 **[Full Setup Guide →](SETUP.md)** | 🐳 **[Docker Setup →](SETUP.md#docker-setup)** | 🛠️ **[Development →](SETUP.md#development)**
 
-```bash
-pnpm install
-```
-
-This will:
-- Install all dependencies
-
-### 5. Start the Backend Server
-
-```bash
-pnpm run backend
-```
-
-The Rust server will:
-- Start on port 3001
-- Connect to ClickHouse
-- Handle analytics events
-- Provide API endpoints for the dashboard
-
-### 6. Start the Dashboard
-
-```bash
-pnpm run dashboard
-```
-
-The dashboard will:
-- Start on port 3000
-- Connect to the backend API
-- Show real-time analytics
+---
 
 ## Project Structure
 
@@ -91,6 +115,30 @@ better-analytics/
 ├── docker-compose.yml # Docker Compose file for Clickhouse
 └── package.json       # Root package.json
 ```
+
+## 🗺️ Roadmap
+
+We're constantly working to improve Betterlytics. Here's what's coming next:
+
+### 🚧 In Development
+- 🔌 **REST API** - Full API access for custom integrations and data export
+- ☁️ **Cloud Hosting** - Managed hosting option for easy deployment
+
+### 🎯 Planned Features
+- 🔔 **Alerts & Notifications** - Custom alerts for traffic spikes and anomalies
+- 📊 **Advanced Reporting** - Scheduled reports and custom dashboards
+- 🔗 **Integrations** - Connect with popular tools (Slack, Discord, Webhooks)
+- 📈 **A/B Testing** - Built-in experimentation platform
+- 🤖 **AI Insights** - Automated insights and recommendations
+- 📱 **Mobile App** - Native mobile dashboard for iOS and Android
+
+### 💡 Ideas & Suggestions
+Have an idea for Betterlytics? We'd love to hear it! 
+- Open an [issue](https://github.com/Lindharden/better-analytics/issues) to suggest new features
+- Join our discussions to share your thoughts
+- Contribute code to help us build these features faster
+
+---
 
 ## Development
 
