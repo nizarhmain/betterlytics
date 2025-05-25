@@ -12,12 +12,14 @@ import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
+import { useDictionary } from "@/contexts/DictionaryProvider";
 
 export default function DashboardPageClient() {
   const dashboardId = useDashboardId();
   const { granularity, startDate, endDate } = useTimeRangeContext();
   const { queryFilters } = useQueryFiltersContext();
-
+  const dict = useDictionary();  
+  
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['summaryStats', dashboardId, startDate, endDate, queryFilters],
     queryFn: () => fetchSummaryStatsAction(dashboardId, startDate, endDate, queryFilters),
@@ -42,24 +44,24 @@ export default function DashboardPageClient() {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <SummaryCard
-          title="Unique Visitors"
+          title={dict.dashboard.client["Unique visitors"]}
           value={summaryLoading ? '...' : summary?.uniqueVisitors?.toLocaleString() ?? '0'}
           changeText=""
           changeColor="text-green-600"
         />
         <SummaryCard
-          title="Total Pageviews"
+          title={dict.dashboard.client["Total pageviews"]}
           value={summaryLoading ? '...' : summary?.pageviews?.toLocaleString() ?? '0'}
           changeText=""
           changeColor="text-red-600"
         />
         <SummaryCard
-          title="Bounce Rate"
+          title={dict.dashboard.client.bounceRate}
           value={summaryLoading ? '...' : summary?.bounceRate !== undefined ? `${summary.bounceRate}%` : '0%'}
           changeText=""
         />
         <SummaryCard
-          title="Avg. Visit Duration"
+          title={dict.dashboard.client.avgVisitDuration}
           value={summaryLoading ? '...' : formatDuration(summary?.avgVisitDuration ?? 0)}
           changeText=""
           changeColor="text-green-600"
@@ -78,14 +80,14 @@ export default function DashboardPageClient() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="bg-card rounded-lg p-6 border border-border shadow">
           {topPagesLoading ? (
-            <div className="text-center p-8 text-muted-foreground">Loading...</div>
+            <div className="text-center p-8 text-muted-foreground">{dict.misc.loading}</div>
           ) : (
             <TopPagesTable pages={topPages ?? []} />
           )}
         </div>
         <div className="bg-card rounded-lg p-6 border border-border shadow">
           {deviceBreakdownLoading ? (
-            <div className="text-center p-8 text-muted-foreground">Loading...</div>
+            <div className="text-center p-8 text-muted-foreground">{dict.misc.loading}</div>
           ) : (
             <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />
           )}

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Providers from "@/app/Providers";
+import Providers from "@/app/[lang]/Providers";
+import { getDictionary, SupportedLanguages } from "@/app/dictionaries";
 import Script from "next/script";
 import { Toaster } from "@/components/ui/sonner"
+import { ReactNode } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,17 +28,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+type RootLayoutParams = {
+  children: ReactNode,
+  params: Promise<{lang: SupportedLanguages}>
+}
+
+export default async function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+  params
+}: RootLayoutParams) {
+  const { lang } = await params;
+  const dict = getDictionary(lang);
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers dictionary={dict}>{children}</Providers>
         <Toaster />
       </body>
     </html>

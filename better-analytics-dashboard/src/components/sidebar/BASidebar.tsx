@@ -27,6 +27,8 @@ import BASidebarCollapsibleSignOutButton from "./BASidebarCollapsibleSignOutButt
 import SettingsButton from "../SettingsButton";
 import { IntegrationButton } from "@/components/integration/IntegrationButton";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { SupportedLanguages } from "@/app/dictionaries";
+import { LanguageSelect } from "./LanguageSelect";
 
 const navItems = [
   { name: "Overview", href: "", icon: <LayoutDashboard size={18} /> },
@@ -42,9 +44,12 @@ const navItems = [
 
 type BASidebarProps = {
   dashboardId: string;
+  params: Promise<{lang: SupportedLanguages}>;
 };
 
-export default async function BASidebar({ dashboardId }: BASidebarProps) {
+export default async function BASidebar({ dashboardId, params }: BASidebarProps) { 
+  const { lang } = await params;
+  
   return (
     <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader>
@@ -58,7 +63,7 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
-                    <Link href={`/dashboard/${dashboardId}/${item.href}`}>
+                    <Link href={`/${lang}/dashboard/${dashboardId}/${item.href}`}>
                       <span>{item.icon}</span>
                       <span>{item.name}</span>
                     </Link>
@@ -72,6 +77,7 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
       <SidebarFooter>
         <SidebarMenu>
           <SettingsButton />
+          <LanguageSelect />
           <ThemeSwitcher />
           <IntegrationButton />
           <BASidebarCollapsibleSignOutButton />
