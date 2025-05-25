@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "dashboard-unit-tests": "vitest run",
+    "unit-tests": "vitest run",
     "migrate": "pnpx prisma migrate dev",
     "generate": "pnpx prisma generate",
     "seed": "pnpx prisma db seed"

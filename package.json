@@ -12,7 +12,8 @@
     "generate": "pnpm --filter better-analytics-dashboard generate",
     "seed": "pnpm --filter better-analytics-dashboard seed",
     "simulate": "node simulate-events.js",
-    "performance": "k6 run -e TARGET_URL=http://localhost:3001/track -e VUS=100 -e DURATION=30s k6-perf-test.js"
+    "performance": "k6 run -e TARGET_URL=http://localhost:3001/track -e VUS=100 -e DURATION=30s k6-perf-test.js",
+    "unit-tests": "pnpm --filter better-analytics-dashboard unit-tests"
   },
   "packageManager": "pnpm@10.9.0",
   "dependencies": {
