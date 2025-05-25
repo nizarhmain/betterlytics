@@ -6,9 +6,19 @@ services:
     ports:
       - "8123:8123" # HTTP interface - access /play for testing
       - "9000:9000" # Native interface
-    command: ["clickhouse-server", "--", "--listen_host=0.0.0.0"]
+    command:
+      [
+        "clickhouse-server",
+        "--",
+        "--listen_host=0.0.0.0",
+        "--config-file=/etc/clickhouse-server/config.xml",
+      ]
+    env_file:
+      - .env
     volumes:
       - ./data/clickhouse/:/var/lib/clickhouse/
+      - ./clickhouse-config/users.d/:/etc/clickhouse-server/users.d/
+      - ./clickhouse-logs/:/var/log/clickhouse-server/
     ulimits:
       nofile:
         soft: 262144
