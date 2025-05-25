@@ -1,4 +1,4 @@
-# Better Analytics
+# Betterlytics
 
 <div align="center">
 
@@ -19,13 +19,13 @@
 
 ---
 
-## 🌟 Why Better Analytics?
+## 🌟 Why Betterlytics?
 
-Better Analytics is a **high-performance, privacy-first** analytics platform that puts you in control of your data. Built with modern technologies like Rust and ClickHouse, it delivers lightning-fast insights while respecting user privacy.
+Betterlytics is a **high-performance, privacy-first** analytics platform that puts you in control of your data. Built with modern technologies like Rust and ClickHouse, it delivers lightning-fast insights while respecting user privacy.
 
 **Our core principles:**
 
-- 🔒 **Privacy-First**: GDPR compliant, no third-party tracking
+- 🔒 **Privacy-First**: GDPR, CCPA, and PECR compliant with no third-party tracking
 - 🍪 **Cookieless**: No cookies required, respects user privacy
 - ⚡ **Lightning Fast**: Built on Rust and ClickHouse for maximum performance
 - 📊 **Real-time Insights**: Live dashboard with instant data updates
@@ -46,6 +46,7 @@ Better Analytics is a **high-performance, privacy-first** analytics platform tha
 | **Geographic Insights** | Global visitor mapping with MaxMind GeoIP integration |
 | **Device & Browser Detection** | Comprehensive device, OS, and browser analytics |
 | **Campaign Tracking** | UTM parameter tracking and marketing campaign analysis |
+| **Advanced Filtering** | Filter data across numerous dimensions and time ranges |
 | **User Journey Mapping** | Visualize complete user paths through your site |
 | **Conversion Funnels** | Track multi-step conversion processes and drop-off points |
 | **Custom Events** | Track any custom interactions and business metrics |
@@ -56,11 +57,58 @@ Better Analytics is a **high-performance, privacy-first** analytics platform tha
 |---------|-------------|
 | **Modern UI** | Beautiful dashboard built with Next.js 15, React 19, and Tailwind CSS |
 | **Lightweight Script** | Minimal tracking script with zero performance impact |
+| **SPA Support** | Full support for Single Page Applications and client-side routing |
 | **Easy Integration** | Simple one-line script installation |
 | **Docker Deployment** | One-command deployment with Docker Compose |
 | **Performance Optimized** | Built on ClickHouse for sub-second query responses |
 
+## 🚀 Getting Started
 
+Choose the option that works best for you:
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### ☁️ Cloud Hosting (Recommended)
+
+Get started instantly with our free managed cloud service:
+
+**[Start Free →](https://betterlytics.com/signup)**
+
+- ✅ **Free forever plan** - No trial, genuinely free for small sites
+- ✅ **No setup required** - Ready in 30 seconds
+- ✅ **EU infrastructure** - All data processed on EU-owned cloud infrastructure
+- ✅ **Automatic updates** - Always latest features
+- ✅ **Managed infrastructure** - We handle scaling and maintenance
+- ✅ **99.9% uptime** - Enterprise-grade reliability
+- ✅ **Premium support** - Get help from our expert team
+- ✅ **Automatic backups** - Your data is safe and recoverable
+- ✅ **Paid plans available** - Scale up when you need more
+
+</td>
+<td width="50%" valign="top">
+
+### 🏠 Self-Hosting
+
+Run Betterlytics on your own infrastructure for complete control and privacy.
+
+**[Quick Setup Guide →](SETUP.md#quick-setup)**
+
+- ✅ **Complete privacy** - Your data never leaves your servers
+- ✅ **Full control** - Customize everything to your needs
+- ✅ **No fees to us** - Your money goes to infrastructure providers
+- ⚠️ **You manage everything** - Installation, maintenance, upgrades, security
+- ⚠️ **Your responsibility** - Server capacity, uptime, backups, loading times
+- ⚠️ **Infrastructure costs** - Server, CDN, backups, and associated costs
+
+📖 **[Setup Guide](SETUP.md#quick-setup)** | 🐳 **[Docker Setup](SETUP.md#docker-setup)** | 🛠️ **[Development](CONTRIBUTING.md)**
+
+</td>
+</tr>
+</table>
+
+---
 
 ## 📸 Dashboard Preview
 
@@ -106,7 +154,7 @@ Betterlytics is built for speed. Here's how it performs:
 | **Geographic Data** | x | Global dataset |
 
 ### Scalability
-- **Events/Day**: Tested up to 100M+ events
+- **Events/Day**: Tested up to xM+ events
 - **Concurrent Users**: 1,000+ dashboard users
 - **Data Retention**: Unlimited (depends on storage)
 - **Geographic Distribution**: Multi-region support
@@ -114,98 +162,43 @@ Betterlytics is built for speed. Here's how it performs:
 > 📊 **Benchmarks performed on**: 4-core CPU, 8GB RAM, SSD storage  
 > 🔄 **Last updated**: [Date to be added]  
 
-## 🚀 Quick Start
-
-Get Better Analytics running in minutes:
-
-```bash
-git clone https://github.com/Lindharden/better-analytics.git
-cd better-analytics
-pnpm install
-pnpm run compose
-```
-
-That's it! Your analytics dashboard will be available at `http://localhost:3000`
-
-📖 **[Full Setup Guide →](SETUP.md)** | 🐳 **[Docker Setup →](SETUP.md#docker-setup)** | 🛠️ **[Development →](SETUP.md#development)**
-
----
-
-## Project Structure
-
-```
-better-analytics/
-├── backend/           # Rust server
-├── dashboard/         # Next.js dashboard
-├── migrations/        # Database migrations
-├── scripts/           # Migration runner
-├── static/            # Static files where the tracking script is located
-├── docker-compose.yml # Docker Compose file for Clickhouse
-└── package.json       # Root package.json
-```
-
 ## 🗺️ Roadmap
 
 We're constantly working to improve Betterlytics. Here's what's coming next:
 
+<table>
+<tr>
+<td width="50%" valign="top">
+
 ### 🚧 In Development
-- 🔌 **REST API** - Full API access for custom integrations and data export
-- ☁️ **Cloud Hosting** - Managed hosting option for easy deployment
+
+| Feature | Description |
+|---------|-------------|
+| 🔌 **REST API** | Full API access for custom integrations and data export |
+| ☁️ **Cloud Hosting** | Managed hosting option for easy deployment |
+
+</td>
+<td width="50%" valign="top">
 
 ### 🎯 Planned Features
-- 🔔 **Alerts & Notifications** - Custom alerts for traffic spikes and anomalies
-- 📊 **Advanced Reporting** - Scheduled reports and custom dashboards
-- 🔗 **Integrations** - Connect with popular tools (Slack, Discord, Webhooks)
-- 📈 **A/B Testing** - Built-in experimentation platform
-- 🤖 **AI Insights** - Automated insights and recommendations
-- 📱 **Mobile App** - Native mobile dashboard for iOS and Android
 
-### 💡 Ideas & Suggestions
+| Feature | Description |
+|---------|-------------|
+| 🔔 **Alerts & Notifications** | Custom alerts for traffic spikes and anomalies |
+| 📊 **Advanced Reporting** | Scheduled reports and custom dashboards |
+| 🔗 **Integrations** | Connect with popular tools (Slack, Discord, Webhooks) |
+| 📈 **A/B Testing** | Built-in experimentation platform |
+| 🤖 **AI Insights** | Automated insights and recommendations |
+
+</td>
+</tr>
+</table>
+
+## 💡 Ideas & Suggestions
 Have an idea for Betterlytics? We'd love to hear it! 
 - Open an [issue](https://github.com/Lindharden/better-analytics/issues) to suggest new features
 - Join our discussions to share your thoughts
 - Contribute code to help us build these features faster
-
----
-
-## Development
-
-### Creating New Migrations
-
-To create a new database migration, create a new file in the `migrations` directory and ensure the file is named like `1_migration_name.sql` where the number is the next available number in the sequence of existing migrations.
-
-### Running Performance Tests
-
-Run the following command to run a performance test, where TARGET_URL is the URL of the backend server, VUS is the number of virtual users, and DURATION is the duration of the test:
-
-```bash
-k6 run -e TARGET_URL=http://localhost:3001/track -e VUS=100 -e DURATION=1m k6-perf-test.js
-```
-
-## Deployment
-
-A docker-compose file will be added in the future to deploy the backend and dashboard as a single service.
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
-
-The AGPL-3.0 license means:
-- You are free to use, modify, and distribute this software
-- Any modifications or derivative works must also be licensed under AGPL-3.0
-- You must make the source code available when distributing the software
-- If you run a modified version of the software on a server and make it available to others, you must make the source code available to them
-- The software comes with no warranty
-
-This license ensures that the software remains free and open source, and that any improvements or modifications to it are also shared with the community.
 
 ---
 
