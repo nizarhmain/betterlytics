@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src=".github/assets/logo-dark-raw.png" alt="Better Analytics Logo" width="120">
+<img src=".github/assets/logo-dark-raw.png" alt="Betterlytics Logo" width="120">
 
 **A modern, Cookieless & privacy-focused analytics platform built for the future**
 
@@ -140,10 +140,10 @@ Betterlytics is built for speed. Here's how it performs:
 ### Request Handling
 | Metric | Value | Notes |
 |--------|-------|-------|
-| **Requests/Second** | 25,000+ | Single instance, standard hardware |
+| **Requests/Second** | 25,000+ | Single instance |
 | **Response Time** | <5ms | P95 for tracking requests |
-| **Memory Usage** | x | Rust backend at steady state |
-| **CPU Usage** | x | During normal operation |
+| **Memory Usage** | x | Rust backend during stress testing |
+| **CPU Usage** | x | During stress testing |
 
 ### Query Performance
 | Query Type | Response Time | Dataset Size |
@@ -206,7 +206,7 @@ Have an idea for Betterlytics? We'd love to hear it!
 
 Join our small community of developers and privacy advocates:
 
-- 💬 **[Discord](https://discord.gg/betterlytics)** - Get help, share ideas, and connect with other users and developers
+- 💬 **[Discord](https://discord.gg/vwqSvPn6sP)** - Get help, share ideas, and connect with other users and developers
 - 🦋 **[Bluesky](https://bsky.app/profile/betterlytics.bsky.social)** - Follow us for updates and announcements
 - 🐛 **[GitHub Issues](https://github.com/Lindharden/better-analytics/issues)** - Report bugs and request features
 - 💡 **[GitHub Discussions](https://github.com/Lindharden/better-analytics/discussions)** - Ask questions and share feedback

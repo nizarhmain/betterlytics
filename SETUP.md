@@ -1,159 +1,238 @@
-# Better Analytics Setup Guide
+# Betterlytics Setup Guide
 
-This guide will walk you through setting up Betterlytics on your local machine or server.
+<div align="center">
 
-## Prerequisites
+**Get Betterlytics running on your infrastructure in minutes**
 
-Before you begin, make sure you have the following installed:
+[![Setup Guide](https://img.shields.io/badge/Setup-Guide-blue.svg)](SETUP.md)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
 
-- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
-- [Node.js](https://nodejs.org/) (v18 or later)
-- [Rust](https://www.rust-lang.org/) (latest stable)
-- [pnpm](https://pnpm.io/) (package manager)
+[🚀 Quick Setup](#quick-setup) • [📋 Prerequisites](#prerequisites) • [🔧 Detailed Setup](#detailed-setup) • [🐳 Docker](#docker-setup)
 
-## Quick Setup
+</div>
 
-For the fastest setup experience:
+---
+
+## 🚀 Quick Setup
+
+Get up and running in under 5 minutes:
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### ⚡ Express Setup
 
 ```bash
 git clone https://github.com/Lindharden/better-analytics.git
 cd better-analytics
 pnpm install
 pnpm run compose
+pnpm run backend
 pnpm run dashboard
 ```
 
-Your dashboard will be available at `http://localhost:3000`
+**That's it!** Your dashboard will be available at:
+- 📊 **Dashboard**: `http://localhost:3000`
+- 🔍 **ClickHouse**: `http://localhost:8123/play`
 
-## Detailed Setup
+</td>
+<td width="50%" valign="top">
 
-### 1. Clone the Repository
+### ✅ What This Does
+
+- 🐳 **Starts Docker services** (ClickHouse, PostgreSQL)
+- 📦 **Installs dependencies** for all components
+- 🗃️ **Runs database migrations** automatically
+- 🌱 **Seeds sample data** for testing
+- 🚀 **Generates Prisma client** for the dashboard
+
+**Next step**: Login to your dashboard using the login credentials defined in your dashboard/.env configuration file.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📋 Prerequisites
+
+Before you begin, ensure you have these tools installed:
+
+<table>
+<tr>
+<td width="25%" align="center">
+
+### 🐳 Docker
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+
+**Required for databases**
+- Docker Desktop (recommended)
+- Docker Compose included
+
+</td>
+<td width="25%" align="center">
+
+### 🟢 Node.js
+[![Node.js](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+
+**v18 or later**
+- Dashboard frontend
+- Build tools
+
+</td>
+<td width="25%" align="center">
+
+### 🦀 Rust
+[![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+
+**Latest stable**
+- Backend server
+- High-performance analytics
+
+</td>
+<td width="25%" align="center">
+
+### 📦 pnpm
+[![pnpm](https://img.shields.io/badge/pnpm-%234a4a4a.svg?style=for-the-badge&logo=pnpm&logoColor=f69220)](https://pnpm.io/)
+
+**Package manager**
+- Fast installs
+- Workspace support
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🔧 Detailed Setup
+
+### 1️⃣ Clone & Navigate
 
 ```bash
 git clone https://github.com/Lindharden/better-analytics.git
 cd better-analytics
 ```
 
-### 2. Environment Setup
+### 2️⃣ Environment Configuration
 
-Create environment files for each component:
+<table>
+<tr>
+<td width="33%" valign="top">
 
-#### Root Environment
+#### 🌍 Root Environment
 ```bash
 cp .env.example .env
 ```
+**Contains**: Database URLs, general config
 
-#### Backend Environment
+</td>
+<td width="33%" valign="top">
+
+#### ⚙️ Backend Environment
 ```bash
 cp backend/.env.example backend/.env
 ```
+**Contains**: Rust server config, API keys
 
-#### Dashboard Environment
+</td>
+<td width="33%" valign="top">
+
+#### 🎨 Dashboard Environment
 ```bash
-cp better-analytics-dashboard/.env.example better-analytics-dashboard/.env
+cp dashboard/.env.example dashboard/.env
 ```
+**Contains**: Next.js config, API endpoints
 
-> **Note:** Most environment variables can be left as their default values for local development.
+</td>
+</tr>
+</table>
 
-### 3. Install Dependencies
+> 💡 **Tip**: Default values work for local development. Only modify if you have specific requirements or are deploying locally for production use.
+
+### 3️⃣ Install Dependencies
 
 ```bash
 pnpm install
 ```
 
-This will install all dependencies for the entire monorepo.
-
-### 4. Start Docker Services
+### 4️⃣ Start Infrastructure
 
 ```bash
 pnpm run compose
 ```
 
-This command will:
-- Start a ClickHouse instance with:
-  - HTTP interface on port 8123
-  - Native interface on port 9000
-  - Data persisted in `./data/clickhouse`
-- Start a PostgreSQL instance with:
-  - HTTP interface on port 5432
-  - Data persisted in `./data/postgres`
-- Run migrations for ClickHouse & PostgreSQL
-- Generate the Prisma client for the dashboard
-- Seed PostgreSQL with basic data
+<details>
+<summary><strong>🔍 What services start?</strong></summary>
 
-### 5. Start the Backend Server
+| Service | Port | Purpose | Access |
+|---------|------|---------|--------|
+| **ClickHouse** | 8123, 9000 | Analytics database | `http://localhost:8123/play` |
+| **PostgreSQL** | 5432 | App database | Connection string in `.env` |
+
+**Data persistence**: All data is stored in `./data/` directory
+
+</details>
+
+### 5️⃣ Start Backend Server
 
 ```bash
 pnpm run backend
 ```
 
-The Rust server will:
-- Start on port 3001
-- Connect to ClickHouse
-- Handle analytics events
-
-### 6. Start the Dashboard
+### 6️⃣ Start Dashboard
 
 ```bash
 pnpm run dashboard
 ```
+---
 
-The dashboard will:
-- Start on port 3000
-- Connect to the backend API
-- Show real-time analytics
+## 🐳 Docker Setup
 
-## Docker Setup
+### 🎯 Production-Ready Deployment
 
-### Using Docker Compose (Recommended)
+<table>
+<tr>
+<td width="50%" valign="top">
 
-The easiest way to run Better Analytics is using Docker Compose:
-
-```bash
-docker-compose up -d
-```
-
-This will start all services in the background.
-
-## Production Deployment
-
-### Environment Variables
-
-For production, ensure you set:
+#### 🚀 Express Docker Start
 
 ```bash
-# Security
-DATABASE_URL=your_production_db_url
-CLICKHOUSE_URL=your_production_clickhouse_url
-JWT_SECRET=your_secure_jwt_secret
-
-# Performance
-RUST_LOG=info
-NODE_ENV=production
+# Start all services
+pnpm super command TODO
 ```
 
-### Docker Production Setup
+**Perfect for**: Production deployments, CI/CD
+
+</td>
+<td width="50%" valign="top">
+
+#### 🔧 Development Mode
 
 ```bash
-# Build production images
-docker-compose -f docker-compose.prod.yml build
+# Start with rebuild
+pnpm run compose
 
-# Start production services
-docker-compose -f docker-compose.prod.yml up -d
+# Reset everything
+docker-compose down -v
 ```
 
-### Scaling
+**Perfect for**: Development, testing, debugging
 
-For high-traffic deployments:
+</td>
+</tr>
+</table>
 
-1. Use multiple backend instances behind a load balancer
-2. Configure ClickHouse clustering
-3. Use Redis for session storage
-4. Enable database connection pooling
+---
 
-## Next Steps
 
-- [Contributing Guide](CONTRIBUTING.md)
-- [API Documentation](API.md)
-- [Deployment Guide](DEPLOYMENT.md)
-- [Architecture Overview](README.md#architecture) 
+<div align="center">
+
+**Need help?** Join our [Discord](https://discord.gg/vwqSvPn6sP) or [open an issue](https://github.com/Lindharden/better-analytics/issues)
+
+Made with ❤️ by the Betterlytics team
+
+</div> 
