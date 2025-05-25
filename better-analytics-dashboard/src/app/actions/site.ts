@@ -1,7 +1,9 @@
-'use server';
+"use server";
 import { AuthContext } from "@/entities/authContext";
-import { withDashboardAuthContext } from "./using-context-auth";
+import { withDashboardAuthContext } from "@/auth/auth-actions";
 
-export const fetchSiteId = withDashboardAuthContext(async (ctx: AuthContext): Promise<string> => {
-  return ctx.siteId;
-});
+export const fetchSiteId = withDashboardAuthContext(
+  async (ctx: AuthContext): Promise<string> => {
+    return ctx.siteId;
+  }
+);
