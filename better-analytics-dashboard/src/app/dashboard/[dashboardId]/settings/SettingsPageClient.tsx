@@ -3,7 +3,18 @@
 import { useState, useEffect, useTransition, startTransition } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Loader2, Save, RotateCcw } from "lucide-react";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
+import { Loader2, Save, RotateCcw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardSettings, DashboardSettingsUpdate } from "@/entities/settings";
 import { getDashboardSettingsAction, updateDashboardSettingsAction, resetDashboardSettingsAction } from "@/app/actions/settings";
@@ -143,18 +154,59 @@ export default function SettingsPageClient({ dashboardId }: SettingsPageClientPr
         </TabsContent>
 
         <div className="flex justify-between pt-6 border-t">
-          <Button 
-            variant="outline" 
-            onClick={handleReset}
-            disabled={isPendingReset || isPendingSave}
-          >
-            {isPendingReset ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <RotateCcw className="h-4 w-4 mr-2" />
-            )}
-            Reset to Defaults
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                disabled={isPendingReset || isPendingSave}
+              >
+                {isPendingReset ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                )}
+                Reset to Defaults
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  Reset Settings to Defaults
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to reset all settings to their default values? This action cannot be undone and will:
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Reset all display preferences</li>
+                  <li>Clear all report recipients</li>
+                  <li>Reset data retention and alert settings</li>
+                  <li>Lose any custom configurations</li>
+                </ul>
+              </div>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isPendingReset}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleReset}
+                  disabled={isPendingReset}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {isPendingReset ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                  )}
+                  Reset Settings
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           
           <Button 
             onClick={handleSave}
