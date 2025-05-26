@@ -16,8 +16,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Loader2, Save, RotateCcw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { DashboardSettings, DashboardSettingsUpdate } from "@/entities/settings";
-import { getDashboardSettingsAction, updateDashboardSettingsAction, resetDashboardSettingsAction } from "@/app/actions/settings";
+import { DashboardSettingsUpdate } from "@/entities/settings";
+import { updateDashboardSettingsAction, resetDashboardSettingsAction } from "@/app/actions/settings";
+import { useSettings } from "@/contexts/SettingsProvider";
 import DisplaySettings from "@/components/settings/DisplaySettings";
 import DataSettings from "@/components/settings/DataSettings";
 import ReportSettings from "@/components/settings/ReportSettings";
@@ -28,37 +29,26 @@ type SettingsPageClientProps = {
 };
 
 export default function SettingsPageClient({ dashboardId }: SettingsPageClientProps) {
-  const [settings, setSettings] = useState<DashboardSettings | null>(null);
+  const { settings, refreshSettings } = useSettings();
   const [formData, setFormData] = useState<DashboardSettingsUpdate>({});
   const [activeTab, setActiveTab] = useState("display");
   const [isPendingSave, startTransitionSave] = useTransition();
   const [isPendingReset, startTransitionReset] = useTransition();
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function loadSettings() {
-      try {
-        const data = await getDashboardSettingsAction(dashboardId);
-        setSettings(data);
-        setFormData({
-          showGridLines: data.showGridLines,
-          defaultDateRange: data.defaultDateRange,
-          dataRetentionDays: data.dataRetentionDays,
-          weeklyReports: data.weeklyReports,
-          monthlyReports: data.monthlyReports,
-          reportRecipients: data.reportRecipients,
-          alertsEnabled: data.alertsEnabled,
-          alertsThreshold: data.alertsThreshold,
-        });
-      } catch (error) {
-        toast.error("Failed to load settings");
-      } finally {
-        setIsLoading(false);
-      }
+    if (settings) {
+      setFormData({
+        showGridLines: settings.showGridLines,
+        defaultDateRange: settings.defaultDateRange,
+        dataRetentionDays: settings.dataRetentionDays,
+        weeklyReports: settings.weeklyReports,
+        monthlyReports: settings.monthlyReports,
+        reportRecipients: settings.reportRecipients,
+        alertsEnabled: settings.alertsEnabled,
+        alertsThreshold: settings.alertsThreshold,
+      });
     }
-
-    loadSettings();
-  }, [dashboardId]);
+  }, [settings]);
 
   const handleUpdate = (updates: Partial<DashboardSettingsUpdate>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -67,8 +57,8 @@ export default function SettingsPageClient({ dashboardId }: SettingsPageClientPr
   const handleSave = () => {
     startTransitionSave(async () => {
       try {
-        const updatedSettings = await updateDashboardSettingsAction(dashboardId, formData);
-        setSettings(updatedSettings);
+        await updateDashboardSettingsAction(dashboardId, formData);
+        await refreshSettings();
         toast.success("Settings saved successfully");
       } catch (error) {
         toast.error("Failed to save settings");
@@ -79,18 +69,8 @@ export default function SettingsPageClient({ dashboardId }: SettingsPageClientPr
   const handleReset = () => {
     startTransitionReset(async () => {
       try {
-        const resetSettings = await resetDashboardSettingsAction(dashboardId);
-        setSettings(resetSettings);
-        setFormData({
-          showGridLines: resetSettings.showGridLines,
-          defaultDateRange: resetSettings.defaultDateRange,
-          dataRetentionDays: resetSettings.dataRetentionDays,
-          weeklyReports: resetSettings.weeklyReports,
-          monthlyReports: resetSettings.monthlyReports,
-          reportRecipients: resetSettings.reportRecipients,
-          alertsEnabled: resetSettings.alertsEnabled,
-          alertsThreshold: resetSettings.alertsThreshold,
-        });
+        await resetDashboardSettingsAction(dashboardId);
+        await refreshSettings();
         toast.success("Settings reset to defaults");
       } catch (error) {
         toast.error("Failed to reset settings");
@@ -98,23 +78,12 @@ export default function SettingsPageClient({ dashboardId }: SettingsPageClientPr
     });
   };
 
-  if (isLoading) {
+  if (!settings) {
     return (
       <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-[1000]">
         <div className="flex flex-col items-center">
         <div className="w-10 h-10 border-4 border-accent border-t-primary rounded-full animate-spin mb-2"></div>
           <p className="text-foreground">Loading settings...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!settings) {
-    return (
-      <div className="container mx-auto p-6 max-w-4xl h-full w-full flex flex-col relative items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground">Failed to load settings.</p>
-          <p className="text-muted-foreground">Please contact support if the problem persists!</p>
         </div>
       </div>
     );
