@@ -12,7 +12,6 @@
 
 [![ClickHouse](https://img.shields.io/badge/ClickHouse-FFCC01?style=flat&logo=clickhouse&logoColor=black)](https://clickhouse.com/) [![PostgreSQL](https://img.shields.io/badge/postgresql-%23316192.svg?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/) [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 
-
 [🚀 Getting Started](#-getting-started) • [📸 Dashboard](#-dashboard-preview) • [⚡ Benchmarks](#-performance-benchmarks) • [🗺️ Roadmap](#️-roadmap) • [👥 Community](#-community)
 
 </div>
@@ -28,7 +27,6 @@ Betterlytics is a **high-performance, privacy-first** analytics platform that pu
 - 🔒 **Privacy-First**: GDPR, CCPA, and PECR compliant with no third-party tracking
 - 🍪 **Cookieless**: No cookies required, respects user privacy
 - ⚡ **Lightning Fast**: Built on Rust and ClickHouse for maximum performance
-- 📊 **Real-time Insights**: Live dashboard with instant data updates
 - 🎯 **Lightweight Tracking**: Minimal impact on your website's performance
 - 🔧 **Self-Hosted**: Complete control over your data and infrastructure
 - 📱 **Modern UI**: Beautiful, responsive dashboard built with Next.js 15 and React 19
@@ -38,29 +36,28 @@ Betterlytics is a **high-performance, privacy-first** analytics platform that pu
 ### 🚀 Complete Feature Set
 
 #### 📊 Core Analytics
-| Feature | Description |
-|---------|-------------|
-| **Real-time Dashboard** | Live visitor tracking with instant updates powered by Clickhouse |
-| **Page Analytics** | Detailed page views, bounce rates, and engagement metrics |
-| **Referrer Tracking** | Complete referral source analysis and traffic attribution |
-| **Geographic Insights** | Global visitor mapping with MaxMind GeoIP integration |
-| **Device & Browser Detection** | Comprehensive device, OS, and browser analytics |
-| **Campaign Tracking** | UTM parameter tracking and marketing campaign analysis |
-| **Advanced Filtering** | Filter data across numerous dimensions and time ranges |
-| **User Journey Mapping** | Visualize complete user paths through your site |
-| **Conversion Funnels** | Track multi-step conversion processes and drop-off points |
-| **Custom Events** | Track any custom interactions and business metrics |
-| **Real-time Visitor Feed** | See live visitor activity as it happens |
+
+| Feature                        | Description                                               |
+| ------------------------------ | --------------------------------------------------------- |
+| **Page Analytics**             | Detailed page views, bounce rates, and engagement metrics |
+| **Referrer Tracking**          | Complete referral source analysis and traffic attribution |
+| **Geographic Insights**        | Global visitor mapping with MaxMind GeoIP integration     |
+| **Device & Browser Detection** | Comprehensive device, OS, and browser analytics           |
+| **Campaign Tracking**          | UTM parameter tracking and marketing campaign analysis    |
+| **Advanced Filtering**         | Filter data across numerous dimensions and time ranges    |
+| **User Journey Mapping**       | Visualize complete user paths through your site           |
+| **Conversion Funnels**         | Track multi-step conversion processes and drop-off points |
+| **Custom Events**              | Track any custom interactions and business metrics        |
 
 #### 🛠️ Platform & Integration
-| Feature | Description |
-|---------|-------------|
-| **Modern UI** | Beautiful dashboard built with Next.js 15, React 19, and Tailwind CSS |
-| **Lightweight Script** | Minimal tracking script with zero performance impact |
-| **SPA Support** | Full support for Single Page Applications and client-side routing |
-| **Easy Integration** | Simple one-line script installation |
-| **Docker Deployment** | One-command deployment with Docker Compose |
-| **Performance Optimized** | Built on ClickHouse for sub-second query responses |
+
+| Feature                   | Description                                                           |
+| ------------------------- | --------------------------------------------------------------------- |
+| **Modern UI**             | Beautiful dashboard built with Next.js 15, React 19, and Tailwind CSS |
+| **Lightweight Script**    | Minimal tracking script with zero performance impact                  |
+| **SPA Support**           | Full support for Single Page Applications and client-side routing     |
+| **Easy Integration**      | Simple one-line script installation                                   |
+| **Performance Optimized** | Built on ClickHouse for sub-second query responses                    |
 
 ## 🚀 Getting Started
 
@@ -115,18 +112,23 @@ Run Betterlytics on your own infrastructure for complete control and privacy.
 <div align="center">
 
 ### Overview
+
 ![Dashboard Overview](.github/assets/betterlytics-showcase-overview.png)
 
 ### Geography Insights
+
 ![Real-time Analytics](.github/assets/betterlytics-showcase-geography.png)
 
 ### User Journey Diagram
+
 ![Detailed Reports](.github/assets/betterlytics-showcase-journey.png)
 
 ### Devices Breakdown
+
 ![Detailed Reports](.github/assets/betterlytics-showcase-devices.png)
 
 ### Pages Breakdown
+
 ![Detailed Reports](.github/assets/betterlytics-showcase-pages.png)
 
 ... and much more
@@ -138,29 +140,32 @@ Run Betterlytics on your own infrastructure for complete control and privacy.
 Betterlytics is built for speed. Here's how it performs:
 
 ### Request Handling
-| Metric | Value | Notes |
-|--------|-------|-------|
-| **Requests/Second** | 25,000+ | Single instance |
-| **Response Time** | <5ms | P95 for tracking requests |
-| **Memory Usage** | x | Rust backend during stress testing |
-| **CPU Usage** | x | During stress testing |
+
+| Metric              | Value   | Notes                              |
+| ------------------- | ------- | ---------------------------------- |
+| **Requests/Second** | 25,000+ | Single instance                    |
+| **Response Time**   | <5ms    | P95 for tracking requests          |
+| **Memory Usage**    | x       | Rust backend during stress testing |
+| **CPU Usage**       | x       | During stress testing              |
 
 ### Query Performance
-| Query Type | Response Time | Dataset Size |
-|------------|---------------|--------------|
-| **Overview Page** | x | 1M+ events |
-| **Page Analytics** | x | 10M+ events |
-| **User-Journey** | x | 100M+ events |
-| **Geographic Data** | x | Global dataset |
+
+| Query Type          | Response Time | Dataset Size   |
+| ------------------- | ------------- | -------------- |
+| **Overview Page**   | x             | 1M+ events     |
+| **Page Analytics**  | x             | 10M+ events    |
+| **User-Journey**    | x             | 100M+ events   |
+| **Geographic Data** | x             | Global dataset |
 
 ### Scalability
+
 - **Events/Day**: Tested up to xM+ events
 - **Concurrent Users**: 1,000+ dashboard users
 - **Data Retention**: Unlimited (depends on storage)
 - **Geographic Distribution**: Multi-region support
 
 > 📊 **Benchmarks performed on**: 4-core CPU, 8GB RAM, SSD storage  
-> 🔄 **Last updated**: [Date to be added]  
+> 🔄 **Last updated**: [Date to be added]
 
 ## 🗺️ Roadmap
 
@@ -172,30 +177,33 @@ We're constantly working to improve Betterlytics. Here's what's coming next:
 
 ### 🚧 In Development
 
-| Feature | Description |
-|---------|-------------|
-| 🔌 **REST API** | Full API access for custom integrations and data export |
-| ☁️ **Cloud Hosting** | Managed hosting option for easy deployment |
+| Feature                  | Description                                             |
+| ------------------------ | ------------------------------------------------------- |
+| 🐳 **Docker Deployment** | One-command deployment with Docker Compose              |
+| 🔌 **REST API**          | Full API access for custom integrations and data export |
+| ☁️ **Cloud Hosting**     | Managed hosting option for easy deployment              |
 
 </td>
 <td width="50%" valign="top">
 
 ### 🎯 Planned Features
 
-| Feature | Description |
-|---------|-------------|
-| 🔔 **Alerts & Notifications** | Custom alerts for traffic spikes and anomalies |
-| 📊 **Advanced Reporting** | Scheduled reports and custom dashboards |
-| 🔗 **Integrations** | Connect with popular tools (Slack, Discord, Webhooks) |
-| 📈 **A/B Testing** | Built-in experimentation platform |
-| 🤖 **AI Insights** | Automated insights and recommendations |
+| Feature                       | Description                                           |
+| ----------------------------- | ----------------------------------------------------- |
+| 🔔 **Alerts & Notifications** | Custom alerts for traffic spikes and anomalies        |
+| 📊 **Advanced Reporting**     | Scheduled reports and custom dashboards               |
+| 🔗 **Integrations**           | Connect with popular tools (Slack, Discord, Webhooks) |
+| 📈 **A/B Testing**            | Built-in experimentation platform                     |
+| 🤖 **AI Insights**            | Automated insights and recommendations                |
 
 </td>
 </tr>
 </table>
 
 ## 💡 Ideas & Suggestions
-Have an idea for Betterlytics? We'd love to hear it! 
+
+Have an idea for Betterlytics? We'd love to hear it!
+
 - Open an [issue](https://github.com/Lindharden/better-analytics/issues) to suggest new features
 - Join our discussions to share your thoughts
 - Contribute code to help us build these features faster
