@@ -6,8 +6,9 @@ import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { EventTypeRow } from "@/entities/events";
 import { fetchCustomEventsOverviewAction } from "@/app/actions";
-import EventsTable from "@/components/analytics/EventsTypeTable";
 import { useDashboardId } from '@/hooks/use-dashboard-id';
+import { EventsTable } from '@/components/events/EventsTable';
+
 
 export default function EventsClient() {
   const { startDate, endDate } = useTimeRangeContext();
@@ -18,12 +19,17 @@ export default function EventsClient() {
     queryFn: () => fetchCustomEventsOverviewAction(dashboardId, startDate, endDate)
   });
 
+  const totalEvents = events.reduce((sum, e) => sum + e.count, 0);
+  const avgEventsPerType = events.length > 0 ? Math.round(totalEvents / events.length) : 0;
+  const mostPopularEvent = events.length > 0 ? events[0] : null;
+  const eventDiversity = events.length;
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-foreground mb-1">Events</h1>
-          <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
+          <p className="text-sm text-muted-foreground">Analytics and insights for your custom events</p>
         </div>
         <div className="flex justify-end gap-4">
           <TimeRangeSelector />
@@ -33,17 +39,23 @@ export default function EventsClient() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard
           title="Total Events"
-          value={eventsLoading ? '...' : String(events.length)}
+          value={eventsLoading ? '...' : totalEvents.toLocaleString()}
           changeText=""
         />
         <SummaryCard
-          title="Avg. Event invokes"
-          value={eventsLoading ? '...' : 
-            events.length > 0 
-              ? Math.round(events.reduce((sum, e) => sum + e.count, 0) / events.length).toLocaleString()
-              : '0'
-          }
+          title="Event Types"
+          value={eventsLoading ? '...' : String(eventDiversity)}
           changeText=""
+        />
+        <SummaryCard
+          title="Avg. per Type"
+          value={eventsLoading ? '...' : avgEventsPerType.toLocaleString()}
+          changeText=""
+        />
+        <SummaryCard
+          title="Most Popular"
+          value={eventsLoading ? '...' : (mostPopularEvent?.event_name || 'None')}
+          changeText={mostPopularEvent ? `${mostPopularEvent.count.toLocaleString()} events` : ''}
         />
       </div>
 
