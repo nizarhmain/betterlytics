@@ -483,7 +483,7 @@ Questions and ideas
 
 ### 📧 Email
 
-[![Email](https://img.shields.io/badge/Email-Security-orange.svg)](mailto:security@betterlytics.com)
+[![Email](https://img.shields.io/badge/Email-Security-orange.svg)](mailto:security@betterlytics.io)
 
 Security issues only
 
