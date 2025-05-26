@@ -20,7 +20,7 @@
 Betterlytics is more than just an analytics platform - it's a movement towards privacy-respecting web analytics. By contributing, you're helping to:
 
 - 🔒 **Protect user privacy** across the web
-- 🚀 **Advance open source** analytics technology  
+- 🚀 **Advance open source** analytics technology
 - 🌍 **Build a better internet** for everyone
 - 💡 **Learn cutting-edge** technologies (Rust, ClickHouse, React 19, Next.js 15, and more)
 
@@ -116,7 +116,7 @@ betterlytics/
 │   ├── Cargo.toml             # Dependencies
 │   └── .env.example           # Environment template
 ├── ⚛️ dashboard/               # Next.js 15 + React 19 + Tailwind css
-│   ├── src/                   # Source code  
+│   ├── src/                   # Source code
 │   ├── package.json           # Dependencies
 │   └── .env.example           # Environment template
 ├── 🗃️ migrations/              # Database migrations
@@ -132,6 +132,7 @@ betterlytics/
 <td width="50%" valign="top">
 
 #### 🚀 Quick Commands
+
 ```bash
 # Install dependencies
 pnpm install
@@ -148,6 +149,7 @@ pnpm run dashboard
 <td width="50%" valign="top">
 
 #### 🔧 Build & Test
+
 ```bash
 # Build for production
 pnpm build
@@ -169,9 +171,8 @@ pnpm run perf-test
 
 ### 📝 Creating Migrations
 
-
-
 #### Naming Convention
+
 ```bash
 # Pattern: {number}_description.sql
 migrations/
@@ -184,7 +185,7 @@ See existing migrations for examples on how to create migrations.
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing - WIP
 
 ### 🎯 Testing Strategy
 
@@ -193,6 +194,7 @@ See existing migrations for examples on how to create migrations.
 <td width="33%" valign="top">
 
 #### 🦀 Backend Tests
+
 ```bash
 # Run Rust tests
 cargo test
@@ -207,6 +209,7 @@ cargo tarpaulin
 <td width="33%" valign="top">
 
 #### ⚛️ Frontend Tests
+
 ```bash
 # Run React tests
 pnpm test:frontend
@@ -221,6 +224,7 @@ pnpm test:watch
 <td width="33%" valign="top">
 
 #### 🚀 Performance Tests
+
 ```bash
 # Load testing
 pnpm run performance
@@ -244,10 +248,10 @@ pnpm run performance
 ```
 
 **Parameters**:
+
 - `TARGET_URL`: Backend server URL
 - `VUS`: Virtual users (concurrent connections)
 - `DURATION`: Test duration
-
 
 ---
 
@@ -259,14 +263,12 @@ pnpm run performance
 - Use `cargo fmt` for formatting
 - Use `cargo clippy` for linting
 
-
 ### ⚛️ TypeScript/React Guidelines
 
 - Follow existing ESLint configuration
 - Use Prettier for formatting
 - Prefer functional components with hooks
 - Use TypeScript strictly (no `any` types)
-
 
 ### 📝 Commit Message Format
 
@@ -285,8 +287,9 @@ type(scope): description
 <td width="50%" valign="top">
 
 #### 🏷️ Types
+
 - `feat`: New feature
-- `fix`: Bug fix  
+- `fix`: Bug fix
 - `docs`: Documentation
 - `style`: Code style
 - `refactor`: Code refactoring
@@ -297,6 +300,7 @@ type(scope): description
 <td width="50%" valign="top">
 
 #### ✨ Examples
+
 ```
 feat(backend): add user session tracking
 fix(dashboard): resolve memory leak in real-time updates
@@ -319,6 +323,7 @@ test(api): add integration tests for analytics endpoint
 <td width="25%" align="center">
 
 **✅ Code Quality**
+
 - [ ] Follows style guidelines
 - [ ] Passes all tests
 - [ ] No linting errors
@@ -327,6 +332,7 @@ test(api): add integration tests for analytics endpoint
 <td width="25%" align="center">
 
 **📚 Documentation**
+
 - [ ] Updates relevant docs
 - [ ] Adds code comments
 - [ ] Updates CHANGELOG
@@ -335,6 +341,7 @@ test(api): add integration tests for analytics endpoint
 <td width="25%" align="center">
 
 **🧪 Testing**
+
 - [ ] Adds new tests
 - [ ] Maintains coverage
 - [ ] Manual testing done
@@ -343,6 +350,7 @@ test(api): add integration tests for analytics endpoint
 <td width="25%" align="center">
 
 **🔍 Review Ready**
+
 - [ ] Clear description
 - [ ] Links related issues
 - [ ] Screenshots if UI
@@ -355,25 +363,30 @@ test(api): add integration tests for analytics endpoint
 
 ```markdown
 ## 📋 Description
+
 Brief description of changes and motivation
 
 ## 🔄 Type of Change
+
 - [ ] 🐛 Bug fix
-- [ ] ✨ New feature  
+- [ ] ✨ New feature
 - [ ] 💥 Breaking change
 - [ ] 📚 Documentation update
 - [ ] 🎨 Style/UI changes
 
 ## 🧪 Testing
+
 - [ ] Tests pass locally
 - [ ] Added new tests
 - [ ] Manual testing completed
 - [ ] Performance impact assessed
 
 ## 📸 Screenshots (if applicable)
+
 Add screenshots for UI changes
 
 ## 📝 Additional Notes
+
 Any additional context or considerations
 ```
 
@@ -396,6 +409,7 @@ Any additional context or considerations
 <td width="50%" valign="top">
 
 #### 📋 Include This Information when applicable
+
 - **Operating system** and version
 - **Browser** (for dashboard issues)
 - **Node.js version** (`node --version`)
@@ -409,6 +423,7 @@ Any additional context or considerations
 <td width="50%" valign="top">
 
 #### 🔍 Before Reporting
+
 - [ ] Search existing issues
 - [ ] Try latest version
 - [ ] Check documentation
@@ -422,8 +437,9 @@ Any additional context or considerations
 ### Feature Requests
 
 If possible, include:
+
 - **Clear description** of the feature
-- **Use case** and motivation  
+- **Use case** and motivation
 - **Proposed implementation** (if you have ideas)
 - **Alternatives considered**
 - **Mockups/wireframes** (for UI features)
@@ -439,6 +455,7 @@ Although any feature requests are welcome, and we'll gladly help refine the issu
 <td width="25%" align="center">
 
 ### 💬 Discord
+
 [![Discord](https://img.shields.io/badge/Discord-Join-7289da.svg)](https://discord.gg/vwqSvPn6sP)
 
 Real-time help and discussion
@@ -447,6 +464,7 @@ Real-time help and discussion
 <td width="25%" align="center">
 
 ### 🐛 GitHub Issues
+
 [![Issues](https://img.shields.io/badge/Issues-Report-red.svg)](https://github.com/Lindharden/better-analytics/issues)
 
 Bug reports and feature requests
@@ -455,6 +473,7 @@ Bug reports and feature requests
 <td width="25%" align="center">
 
 ### 💡 Discussions
+
 [![Discussions](https://img.shields.io/badge/Discussions-Ask-blue.svg)](https://github.com/Lindharden/better-analytics/discussions)
 
 Questions and ideas
@@ -463,6 +482,7 @@ Questions and ideas
 <td width="25%" align="center">
 
 ### 📧 Email
+
 [![Email](https://img.shields.io/badge/Email-Security-orange.svg)](mailto:security@betterlytics.com)
 
 Security issues only
@@ -476,6 +496,7 @@ Security issues only
 ## 📚 Technical Resources
 
 ### ⚡ Performance Optimization
+
 - [ClickHouse Performance Optimization](https://www.highlight.io/blog/lw5-clickhouse-performance-optimization)
 - [ClickHouse Operations Overview](https://clickhouse.com/docs/operations/overview)
 - [ClickHouse Data Insertion Guide](https://clickhouse.com/docs/guides/inserting-data)
@@ -483,14 +504,17 @@ Security issues only
 - [Data Batching for Optimal Performance](https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse#data-needs-to-be-batched-for-optimal-performance)
 
 ### 🔗 Integrations
+
 - [ClickHouse Kafka Connect Sink](https://clickhouse.com/docs/integrations/kafka/clickhouse-kafka-connect-sink)
 
 ### 🦀 Rust Development
+
 - [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
 - [Tokio Documentation](https://tokio.rs/)
 - [Axum Web Framework](https://docs.rs/axum/latest/axum/)
 
 ### ⚛️ Frontend Development
+
 - [Next.js 15 Documentation](https://nextjs.org/docs)
 - [React 19 Documentation](https://react.dev/)
 - [Tailwind CSS](https://tailwindcss.com/docs)
