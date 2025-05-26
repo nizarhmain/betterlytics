@@ -6,7 +6,7 @@
     "dashboard": "pnpm --filter better-analytics-dashboard dev",
     "build": "pnpm --filter better-analytics-dashboard build",
     "start": "pnpm --filter better-analytics-dashboard start",
-    "compose": "docker compose up -d && pnpm run migrate && pnpm run generate && pnpm run seed",
+    "compose": "docker compose up -d && timeout /t 5 /nobreak && pnpm run migrate && pnpm run generate && pnpm run seed",
     "compose-down": "docker compose down",
     "db-setup": "node scripts/run-clickhouse-setup.js",
     "migrate": "node scripts/run-migration.js && pnpm --filter better-analytics-dashboard migrate",
