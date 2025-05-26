@@ -1,115 +1,540 @@
-# Contributing to Better Analytics
+# Contributing to Betterlytics
 
-Thank you for your interest in contributing to Better Analytics! This document outlines the process for contributing to our project and maintaining high code quality.
+<div align="center">
 
-## Table of Contents
-- [Development Workflow](#development-workflow)
-- [Branch Protection](#branch-protection)
-- [Issue Management](#issue-management)
-- [Pull Request Process](#pull-request-process)
-- [Code Review Guidelines](#code-review-guidelines)
-- [Commit Message Guidelines](#commit-message-guidelines)
-- [License](#license)
+**Help us build the future of privacy-first analytics**
 
-## Development Workflow
+[![Contributors](https://img.shields.io/github/contributors/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/pulls)
+[![License](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-### Branch Strategy
-- `main` - Production-ready code
-- `develop` - Integration branch for features
-- `feature/*` - New features
-- `bug/*` - Bug fixes
-- `hotfix/*` - Urgent fixes that need to be applied to `main`
-- `release/*` - Release preparation
+[🚀 Quick Start](#-quick-start) • [🛠️ Development](#️-development-workflow) • [🧪 Testing](#-testing) • [📝 Code Style](#-code-style) • [🔄 Pull Requests](#-pull-request-process) • [🐛 Issues](#-issue-guidelines-not-strictly-required-to-adhere-to-yet) • [🆘 Help](#-getting-help)
 
-### Issue-First Development
-1. **Create an Issue First**
-   - Every change should start with an issue
-   - Use issue templates for bugs, features, and documentation
-   - Clearly describe the problem or feature request to the best of your ability - the more information you provide, the better. This includes screenshots, code snippets, and any other relevant information.
-   - Include acceptance criteria when applicable
+</div>
 
-2. **Branch Naming**
-   - Format: `type/issue-number-description`
-   - Example: `feature/42-add-user-authentication`
+---
 
-3. **Pull Request Process**
-   - Create PRs against the `develop` branch
-   - Link PR to the relevant issue
-   - Use PR templates for consistent documentation (TODO)
-   - Ensure all CI checks pass (TODO)
-   - Get at least one review before merging
+## 🌟 Why Contribute?
 
-## Branch Protection
+Betterlytics is more than just an analytics platform - it's a movement towards privacy-respecting web analytics. By contributing, you're helping to:
 
-The following rules are enforced on protected branches (TODO):
+- 🔒 **Protect user privacy** across the web
+- 🚀 **Advance open source** analytics technology
+- 🌍 **Build a better internet** for everyone
+- 💡 **Learn cutting-edge** technologies (Rust, ClickHouse, React 19, Next.js 15, and more)
 
-### Main Branch
-- No direct pushes
-- Require pull request reviews
-- Require status checks to pass
-- Require branches to be up to date before merging
-- Require linear history
-- Require signed commits
+---
 
-### Develop Branch
-- No direct pushes
-- Require pull request reviews
-- Require status checks to pass
-- Require branches to be up to date before merging
+## 🚀 Quick Start
 
-## Issue Management
+Get your development environment ready in minutes:
 
-### Issue Labels
-- `bug` - Something isn't working
-- `feature` - A new feature
-- `task` - A task that needs to be done
-- `enhancement` - Minor addition or feature enhancement
-- `documentation` - Documentation only changes
-- `security` - Security related changes
-- `refactor` - Code change that neither fixes a bug nor adds a feature
-- `good first issue` - Good for newcomers
-- `help wanted` - Extra attention is needed
-- `priority: high/medium/low` - Issue priority
-- `status: in progress` - Currently being worked on
-- `status: blocked` - Blocked by other issues
+<table>
+<tr>
+<td width="50%" valign="top">
 
-## Pull Request Process
+### 🍴 Fork & Clone
 
-1. **Before Creating a PR**
-   - Ensure your branch is up to date with `develop`
-   - Run all tests locally
-   - Follow the code style guide
-   - Update documentation if needed
+```bash
+# Fork on GitHub, then clone your fork
+git clone https://github.com/YOUR_USERNAME/better-analytics.git
+cd better-analytics
 
-2. **PR Description**
-   - Link to the related issue
-   - Describe the changes made
-   - List any breaking changes
-   - Include screenshots for UI changes
-   - Document testing steps
+# Add upstream remote
+git remote add upstream https://github.com/Lindharden/better-analytics.git
+```
 
-3. **Review Process**
-   - Address all review comments
-   - Keep PRs focused and small
-   - Update PR if base branch changes
-   - Squash commits before merging
+</td>
+<td width="50%" valign="top">
 
-## Code Review Guidelines
+### ⚡ Setup & Run
 
-### For Reviewers
-- Be constructive and specific
-- Check for security implications
-- Verify test coverage
-- Ensure documentation is updated
-- Consider performance impact
-- Keep a good tone
+```bash
+# Install dependencies & start services
+pnpm install
+pnpm run compose
 
-### For Authors
-- Respond to all review comments
-- Keep PRs up to date
-- Be open to feedback
-- Document complex decisions
+# Start development servers
+pnpm run backend    # Port 3001
+pnpm run dashboard  # Port 3000
+```
 
-## License
+</td>
+</tr>
+</table>
 
-By contributing to Better Analytics, you agree that your contributions will be licensed under the AGPL-3.0 license. 
+**📖 Need detailed setup?** See our [Setup Guide](SETUP.md) for comprehensive instructions.
+
+---
+
+## 🛠️ Development Workflow
+
+### 📋 Prerequisites
+
+<table>
+<tr>
+<td width="20%" align="center">
+
+**🐳 Docker**
+Required for databases
+
+</td>
+<td width="20%" align="center">
+
+**🟢 Node.js**
+v18+ for dashboard
+
+</td>
+<td width="20%" align="center">
+
+**🦀 Rust**
+Latest stable
+
+</td>
+<td width="20%" align="center">
+
+**📦 pnpm**
+Package manager
+
+</td>
+<td width="20%" align="center">
+
+**🔧 Git**
+Version control
+
+</td>
+</tr>
+</table>
+
+### 🏗️ Project Architecture
+
+```
+betterlytics/
+├── 🦀 backend/                 # Rust server (Axum + ClickHouse)
+│   ├── src/                   # Source code
+│   ├── Cargo.toml             # Dependencies
+│   └── .env.example           # Environment template
+├── ⚛️ dashboard/               # Next.js 15 + React 19 + Tailwind css
+│   ├── src/                   # Source code
+│   ├── package.json           # Dependencies
+│   └── .env.example           # Environment template
+├── 🗃️ migrations/              # Database migrations
+├── 🛠️ scripts/                # Build utilities
+├── 📄 static/                 # Tracking script
+└── 🐳 docker-compose.yml      # Services
+```
+
+### ⚡ Development Commands
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+#### 🚀 Quick Commands
+
+```bash
+# Install dependencies
+pnpm install
+
+# Start everything
+pnpm run compose
+
+# Development servers
+pnpm run backend
+pnpm run dashboard
+```
+
+</td>
+<td width="50%" valign="top">
+
+#### 🔧 Build & Test
+
+```bash
+# Build for production
+pnpm build
+
+# Run tests
+pnpm test
+
+# Performance testing
+pnpm run perf-test
+```
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🗃️ Database Development
+
+### 📝 Creating Migrations
+
+#### Naming Convention
+
+```bash
+# Pattern: {number}_description.sql
+migrations/
+├── 1_initial_schema.sql
+├── 2_add_user_sessions.sql
+└── 3_add_custom_events.sql
+```
+
+See existing migrations for examples on how to create migrations.
+
+---
+
+## 🧪 Testing - WIP
+
+### 🎯 Testing Strategy
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+#### 🦀 Backend Tests
+
+```bash
+# Run Rust tests
+cargo test
+
+# With coverage
+cargo tarpaulin
+```
+
+**Focus**: API endpoints, data processing, performance
+
+</td>
+<td width="33%" valign="top">
+
+#### ⚛️ Frontend Tests
+
+```bash
+# Run React tests
+pnpm test:frontend
+
+# Watch mode
+pnpm test:watch
+```
+
+**Focus**: Components, user interactions, data flow
+
+</td>
+<td width="33%" valign="top">
+
+#### 🚀 Performance Tests
+
+```bash
+# Load testing
+pnpm run performance
+```
+
+**Focus**: Throughput, response times, scalability
+
+</td>
+</tr>
+</table>
+
+### 📊 Performance Testing
+
+Test the analytics ingestion performance:
+
+```bash
+k6 run -e TARGET_URL=http://localhost:3001/track -e VUS=100 -e DURATION=1m k6-perf-test.js
+
+# or run the following command to test with standard configurations:
+pnpm run performance
+```
+
+**Parameters**:
+
+- `TARGET_URL`: Backend server URL
+- `VUS`: Virtual users (concurrent connections)
+- `DURATION`: Test duration
+
+---
+
+## 📝 Code Style
+
+### 🦀 Rust Guidelines
+
+- Follow [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
+- Use `cargo fmt` for formatting
+- Use `cargo clippy` for linting
+
+### ⚛️ TypeScript/React Guidelines
+
+- Follow existing ESLint configuration
+- Use Prettier for formatting
+- Prefer functional components with hooks
+- Use TypeScript strictly (no `any` types)
+
+### 📝 Commit Message Format
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+```
+type(scope): description
+
+[optional body]
+
+[optional footer]
+```
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+#### 🏷️ Types
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Code style
+- `refactor`: Code refactoring
+- `test`: Tests
+- `chore`: Maintenance
+
+</td>
+<td width="50%" valign="top">
+
+#### ✨ Examples
+
+```
+feat(backend): add user session tracking
+fix(dashboard): resolve memory leak in real-time updates
+docs(readme): update installation instructions
+test(api): add integration tests for analytics endpoint
+```
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🔄 Pull Request Process
+
+### 📋 Before Submitting
+
+<table>
+<tr>
+<td width="25%" align="center">
+
+**✅ Code Quality**
+
+- [ ] Follows style guidelines
+- [ ] Passes all tests
+- [ ] No linting errors
+
+</td>
+<td width="25%" align="center">
+
+**📚 Documentation**
+
+- [ ] Updates relevant docs
+- [ ] Adds code comments
+- [ ] Updates CHANGELOG
+
+</td>
+<td width="25%" align="center">
+
+**🧪 Testing**
+
+- [ ] Adds new tests
+- [ ] Maintains coverage
+- [ ] Manual testing done
+
+</td>
+<td width="25%" align="center">
+
+**🔍 Review Ready**
+
+- [ ] Clear description
+- [ ] Links related issues
+- [ ] Screenshots if UI
+
+</td>
+</tr>
+</table>
+
+### 📝 PR Template (Not strictly required to adhere to yet)
+
+```markdown
+## 📋 Description
+
+Brief description of changes and motivation
+
+## 🔄 Type of Change
+
+- [ ] 🐛 Bug fix
+- [ ] ✨ New feature
+- [ ] 💥 Breaking change
+- [ ] 📚 Documentation update
+- [ ] 🎨 Style/UI changes
+
+## 🧪 Testing
+
+- [ ] Tests pass locally
+- [ ] Added new tests
+- [ ] Manual testing completed
+- [ ] Performance impact assessed
+
+## 📸 Screenshots (if applicable)
+
+Add screenshots for UI changes
+
+## 📝 Additional Notes
+
+Any additional context or considerations
+```
+
+### 🔍 Review Process
+
+1. **Automated checks** must pass (CI/CD, linting, tests)
+2. **Code review** by at least one maintainer
+3. **Manual testing** is a must for all changes
+4. **Documentation review** if docs are updated
+5. **Merge** after approval and passing checks
+
+---
+
+## 🐛 Issue Guidelines (Not strictly required to adhere to yet)
+
+### Bug Reports
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+#### 📋 Include This Information when applicable
+
+- **Operating system** and version
+- **Browser** (for dashboard issues)
+- **Node.js version** (`node --version`)
+- **Rust version** (`rustc --version`)
+- **Steps to reproduce**
+- **Expected vs actual behavior**
+- **Error messages** and logs
+- **Screenshots** if applicable
+
+</td>
+<td width="50%" valign="top">
+
+#### 🔍 Before Reporting
+
+- [ ] Search existing issues
+- [ ] Try latest version
+- [ ] Check documentation
+- [ ] Minimal reproduction case
+- [ ] Clear, descriptive title
+
+</td>
+</tr>
+</table>
+
+### Feature Requests
+
+If possible, include:
+
+- **Clear description** of the feature
+- **Use case** and motivation
+- **Proposed implementation** (if you have ideas)
+- **Alternatives considered**
+- **Mockups/wireframes** (for UI features)
+
+Although any feature requests are welcome, and we'll gladly help refine the issues you create!
+
+---
+
+## 🆘 Getting Help
+
+<table>
+<tr>
+<td width="25%" align="center">
+
+### 💬 Discord
+
+[![Discord](https://img.shields.io/badge/Discord-Join-7289da.svg)](https://discord.gg/vwqSvPn6sP)
+
+Real-time help and discussion
+
+</td>
+<td width="25%" align="center">
+
+### 🐛 GitHub Issues
+
+[![Issues](https://img.shields.io/badge/Issues-Report-red.svg)](https://github.com/Lindharden/better-analytics/issues)
+
+Bug reports and feature requests
+
+</td>
+<td width="25%" align="center">
+
+### 💡 Discussions
+
+[![Discussions](https://img.shields.io/badge/Discussions-Ask-blue.svg)](https://github.com/Lindharden/better-analytics/discussions)
+
+Questions and ideas
+
+</td>
+<td width="25%" align="center">
+
+### 📧 Email
+
+[![Email](https://img.shields.io/badge/Email-Security-orange.svg)](mailto:security@betterlytics.io)
+
+Security issues only
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📚 Technical Resources
+
+### ⚡ Performance Optimization
+
+- [ClickHouse Performance Optimization](https://www.highlight.io/blog/lw5-clickhouse-performance-optimization)
+- [ClickHouse Operations Overview](https://clickhouse.com/docs/operations/overview)
+- [ClickHouse Data Insertion Guide](https://clickhouse.com/docs/guides/inserting-data)
+- [Asynchronous Data Inserts in ClickHouse](https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse)
+- [Data Batching for Optimal Performance](https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse#data-needs-to-be-batched-for-optimal-performance)
+
+### 🔗 Integrations
+
+- [ClickHouse Kafka Connect Sink](https://clickhouse.com/docs/integrations/kafka/clickhouse-kafka-connect-sink)
+
+### 🦀 Rust Development
+
+- [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
+- [Tokio Documentation](https://tokio.rs/)
+- [Axum Web Framework](https://docs.rs/axum/latest/axum/)
+
+### ⚛️ Frontend Development
+
+- [Next.js 15 Documentation](https://nextjs.org/docs)
+- [React 19 Documentation](https://react.dev/)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+
+---
+
+## 📜 Code of Conduct
+
+Please note that this project is released with a [Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+
+## 📄 License
+
+By contributing to Betterlytics, you agree that your contributions will be licensed under the AGPL-3.0 license.
+
+---
+
+<div align="center">
+
+**Ready to contribute?** 🚀 [Fork the repository](https://github.com/Lindharden/better-analytics/fork) and start building!
+
+Made with ❤️ by the Betterlytics team
+
+</div>
