@@ -20,10 +20,12 @@ export function middleware(request: NextRequest) {
     : DEFAULT_LANGUAGE;
 
   request.nextUrl.pathname = `/${locale}${pathname}`;
-  return NextResponse.redirect(request.nextUrl);
+  
+  const response = NextResponse.redirect(request.nextUrl);
+  response.headers.set('Vary', 'Accept-Language');
+  return response;
 }
- 
+
 export const config = {
   matcher: [ '/((?!_next|favicon.ico|.*\\..*|api).*)' ],
 }
- 
