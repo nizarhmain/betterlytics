@@ -143,10 +143,24 @@ impl Database {
     }
 
     async fn remove_data_retention_policy(client: &Client) -> Result<()> {
-        let alter_query = "ALTER TABLE analytics.events REMOVE TTL";
-        client.query(alter_query).execute().await.map_err(|e| 
-            anyhow::anyhow!("Failed to remove data retention policy from analytics.events table: {}.", e)
-        )?;
+        let create_table_query: String = client
+            .query("SELECT create_table_query FROM system.tables WHERE database = 'analytics' AND name = 'events'")
+            .fetch_one()
+            .await?;
+
+        if create_table_query.contains("TTL ") {
+            println!("[INFO] TTL policy exists, removing it.");
+            let alter_query = "ALTER TABLE analytics.events REMOVE TTL";
+            client
+                .query(alter_query)
+                .execute()
+                .await
+                .map_err(|e| anyhow::anyhow!("Failed to remove data retention policy: {}", e))?;
+            println!("[INFO] TTL policy removed successfully.");
+        } else {
+            println!("[INFO] No TTL policy found on events table, nothing to remove.");
+        }
+
         Ok(())
     }
 
