@@ -161,12 +161,7 @@ export function EventLog({ pageSize = DEFAULT_PAGE_SIZE }: EventLogProps) {
               <LiveIndicator />
             </div>
             <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold">Event Log</span>
-                <Badge variant="secondary" className="text-xs font-normal">
-                  {filteredEvents.length} events
-                </Badge>
-              </div>
+              <span className="text-lg font-semibold">Event Log</span>
               <span className="text-xs text-muted-foreground font-normal">
                 Real-time activity tracking
               </span>
