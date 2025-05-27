@@ -1,25 +1,42 @@
 'server-only';
 
-import { getCustomEventsOverview, getEventPropertyData } from '@/repositories/clickhouse';
+import { getCustomEventsOverview, getEventPropertyData, getRecentEvents, getTotalEventCount } from '@/repositories/clickhouse';
 import { toDateTimeString } from '@/utils/dateFormatters';
 import { EventPropertiesOverview, EventPropertyAnalytics, EventPropertyValue } from '@/entities/events';
+import { calculatePercentage } from '@/utils/mathUtils';
+import { QueryFilter } from '@/entities/filter';
 
-export async function getCustomEventsOverviewForSite(siteId: string, startDate: Date, endDate: Date) {
+const MAX_TOP_VALUES = 10;
+
+export async function getCustomEventsOverviewForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  return getCustomEventsOverview(siteId, formattedStart, formattedEnd);
+  return getCustomEventsOverview(siteId, formattedStart, formattedEnd, queryFilters);
+}
+
+export async function getRecentEventsForSite(siteId: string, startDate: Date, endDate: Date, limit?: number, offset?: number, queryFilters?: QueryFilter[]) {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  return getRecentEvents(siteId, formattedStart, formattedEnd, limit, offset, queryFilters);
+}
+
+export async function getTotalEventCountForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  return getTotalEventCount(siteId, formattedStart, formattedEnd, queryFilters);
 }
 
 export async function getEventPropertiesAnalyticsForSite(
   siteId: string, 
   eventName: string, 
   startDate: Date, 
-  endDate: Date
+  endDate: Date,
+  queryFilters: QueryFilter[]
 ): Promise<EventPropertiesOverview> {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
 
-  const rawPropertyData = await getEventPropertyData(siteId, eventName, formattedStart, formattedEnd);
+  const rawPropertyData = await getEventPropertyData(siteId, eventName, formattedStart, formattedEnd, queryFilters);
   
   const totalEvents = rawPropertyData.length;
   const properties = processPropertyData(rawPropertyData);
@@ -34,11 +51,11 @@ export async function getEventPropertiesAnalyticsForSite(
 function processPropertyData(rawPropertyData: Array<{ custom_event_json: string }>): EventPropertyAnalytics[] {
   const propertyMap = new Map<string, Map<string, number>>();
 
-  for (const row of rawPropertyData) {
+  rawPropertyData.forEach(row => {
     try {
       const properties = JSON.parse(row.custom_event_json);
       
-      for (const [key, value] of Object.entries(properties)) {
+      Object.entries(properties).forEach(([key, value]) => {
         if (!propertyMap.has(key)) {
           propertyMap.set(key, new Map());
         }
@@ -46,33 +63,30 @@ function processPropertyData(rawPropertyData: Array<{ custom_event_json: string 
         const valueStr = String(value);
         const valueMap = propertyMap.get(key)!;
         valueMap.set(valueStr, (valueMap.get(valueStr) || 0) + 1);
-      }
-    } catch (e) {
+      });
+    } catch {
       // Skip invalid JSON
-      continue;
     }
-  }
+  });
 
-  const properties: EventPropertyAnalytics[] = Array.from(propertyMap.entries()).map(([propertyName, valueMap]) => {
-    const totalOccurrences = Array.from(valueMap.values()).reduce((sum, count) => sum + count, 0);
-    const uniqueValueCount = valueMap.size;
-    
-    const topValues: EventPropertyValue[] = Array.from(valueMap.entries())
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 10)
-      .map(([value, count]) => ({
-        value,
-        count,
-        percentage: Math.round((count / totalOccurrences) * 100 * 100) / 100,
-      }));
+  return Array.from(propertyMap.entries())
+    .map(([propertyName, valueMap]) => {
+      const totalOccurrences = Array.from(valueMap.values()).reduce((sum, count) => sum + count, 0);
+      
+      const topValues: EventPropertyValue[] = Array.from(valueMap.entries())
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, MAX_TOP_VALUES)
+        .map(([value, count]) => ({
+          value,
+          count,
+          percentage: calculatePercentage(count, totalOccurrences),
+        }));
 
-    return {
-      propertyName,
-      uniqueValueCount,
-      totalOccurrences,
-      topValues,
-    };
-  }).sort((a, b) => b.totalOccurrences - a.totalOccurrences);
-
-  return properties;
+      return {
+        propertyName,
+        uniqueValueCount: valueMap.size,
+        totalOccurrences,
+        topValues,
+      };
+    });
 }

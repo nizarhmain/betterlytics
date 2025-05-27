@@ -1,28 +1,25 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import SummaryCard from "@/components/SummaryCard";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { EventTypeRow } from "@/entities/events";
-import { fetchCustomEventsOverviewAction } from "@/app/actions";
+import { fetchCustomEventsOverviewAction } from "@/app/actions/events";
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 import { EventsTable } from '@/components/events/EventsTable';
-
+import { EventLog } from '@/components/events/EventLog';
+import QueryFiltersSelector from '@/components/filters/QueryFiltersSelector';
 
 export default function EventsClient() {
   const { startDate, endDate } = useTimeRangeContext();
+  const { queryFilters } = useQueryFiltersContext();
   const dashboardId = useDashboardId();
 
-  const { data: events = [], isLoading: eventsLoading } = useQuery<EventTypeRow[]>({
-    queryKey: ['customEvents', dashboardId, startDate, endDate],
-    queryFn: () => fetchCustomEventsOverviewAction(dashboardId, startDate, endDate)
+  const { data: events = [], isLoading } = useQuery<EventTypeRow[]>({
+    queryKey: ['customEvents', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, queryFilters)
   });
-
-  const totalEvents = events.reduce((sum, e) => sum + e.count, 0);
-  const avgEventsPerType = events.length > 0 ? Math.round(totalEvents / events.length) : 0;
-  const mostPopularEvent = events.length > 0 ? events[0] : null;
-  const eventDiversity = events.length;
 
   return (
     <div className="p-6 space-y-6">
@@ -32,34 +29,14 @@ export default function EventsClient() {
           <p className="text-sm text-muted-foreground">Analytics and insights for your custom events</p>
         </div>
         <div className="flex justify-end gap-4">
+          <QueryFiltersSelector />
           <TimeRangeSelector />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <SummaryCard
-          title="Total Events"
-          value={eventsLoading ? '...' : totalEvents.toLocaleString()}
-          changeText=""
-        />
-        <SummaryCard
-          title="Event Types"
-          value={eventsLoading ? '...' : String(eventDiversity)}
-          changeText=""
-        />
-        <SummaryCard
-          title="Avg. per Type"
-          value={eventsLoading ? '...' : avgEventsPerType.toLocaleString()}
-          changeText=""
-        />
-        <SummaryCard
-          title="Most Popular"
-          value={eventsLoading ? '...' : (mostPopularEvent?.event_name || 'None')}
-          changeText={mostPopularEvent ? `${mostPopularEvent.count.toLocaleString()} events` : ''}
-        />
-      </div>
-
-      <EventsTable data={events} />
+      <EventsTable data={events} isLoading={isLoading} />
+      
+      <EventLog />
     </div>
   );
 } 
