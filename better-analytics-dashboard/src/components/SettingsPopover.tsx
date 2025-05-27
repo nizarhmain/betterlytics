@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { useState } from 'react';
 
 interface SettingsPopoverProps {
+  dashboardId: string;
   onClose: () => void;
 }
 
-export default function SettingsPopover({ onClose }: SettingsPopoverProps) {
+export default function SettingsPopover({ dashboardId, onClose }: SettingsPopoverProps) {
   const [isDarkTheme, setIsDarkTheme] = useState(true);
 
   return (
@@ -51,7 +52,7 @@ export default function SettingsPopover({ onClose }: SettingsPopoverProps) {
 
       <div className="p-3 border-t border-border">
         <Link 
-          href="/dashboard/settings" 
+          href={`/dashboard/${dashboardId}/settings`}
           onClick={onClose}
           className="flex items-center gap-2 w-full text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground p-2 rounded-md transition-colors"
         >

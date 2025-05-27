@@ -9,6 +9,7 @@ import {
   DashboardWriteData,
   DashboardWriteSchema,
 } from "@/entities/dashboard";
+import { DEFAULT_DASHBOARD_SETTINGS } from "@/entities/settings";
 
 export async function findDashboardById(
   dashboardId: string
@@ -81,7 +82,7 @@ export async function createDashboard(
 ): Promise<Dashboard> {
   try {
     const validatedData = DashboardWriteSchema.parse(data);
-    console.log(validatedData);
+    
     const prismaDashboard = await prisma.dashboard.create({
       data: {
         domain: validatedData.domain,
@@ -90,6 +91,11 @@ export async function createDashboard(
           create: {
             userId: validatedData.userId,
             role: "admin",
+          },
+        },
+        settings: {
+          create: {
+            ...DEFAULT_DASHBOARD_SETTINGS,
           },
         },
       },
