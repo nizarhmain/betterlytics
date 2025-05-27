@@ -19,16 +19,14 @@ import { toast } from "sonner";
 import { DashboardSettingsUpdate } from "@/entities/settings";
 import { updateDashboardSettingsAction, resetDashboardSettingsAction } from "@/app/actions/settings";
 import { useSettings } from "@/contexts/SettingsProvider";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
 import DisplaySettings from "@/components/settings/DisplaySettings";
 import DataSettings from "@/components/settings/DataSettings";
 import ReportSettings from "@/components/settings/ReportSettings";
 import AlertSettings from "@/components/settings/AlertSettings";
 
-type SettingsPageClientProps = {
-  dashboardId: string;
-};
-
-export default function SettingsPageClient({ dashboardId }: SettingsPageClientProps) {
+export default function SettingsPageClient() {
+  const dashboardId = useDashboardId();
   const { settings, refreshSettings } = useSettings();
   const [formData, setFormData] = useState<DashboardSettingsUpdate>({});
   const [activeTab, setActiveTab] = useState("display");
@@ -37,16 +35,7 @@ export default function SettingsPageClient({ dashboardId }: SettingsPageClientPr
 
   useEffect(() => {
     if (settings) {
-      setFormData({
-        showGridLines: settings.showGridLines,
-        defaultDateRange: settings.defaultDateRange,
-        dataRetentionDays: settings.dataRetentionDays,
-        weeklyReports: settings.weeklyReports,
-        monthlyReports: settings.monthlyReports,
-        reportRecipients: settings.reportRecipients,
-        alertsEnabled: settings.alertsEnabled,
-        alertsThreshold: settings.alertsThreshold,
-      });
+      setFormData({ ...settings });
     }
   }, [settings]);
 

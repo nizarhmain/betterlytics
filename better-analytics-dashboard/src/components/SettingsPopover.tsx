@@ -6,14 +6,15 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from 'react';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 interface SettingsPopoverProps {
-  dashboardId: string;
   onClose: () => void;
 }
 
-export default function SettingsPopover({ dashboardId, onClose }: SettingsPopoverProps) {
+export default function SettingsPopover({ onClose }: SettingsPopoverProps) {
   const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const dashboardId = useDashboardId();
 
   return (
     <div className="w-72 bg-popover shadow-lg rounded-md border border-border text-popover-foreground">
