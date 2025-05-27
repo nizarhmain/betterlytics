@@ -14,6 +14,7 @@ import { ExpandedEventContent } from './ExpandedEventContent';
 import { calculatePercentage } from '@/utils/mathUtils';
 import { formatTimeAgo } from '@/utils/dateFormatters';
 import { formatPercentage } from '@/utils/formatters';
+import { cn } from '@/lib/utils';
 
 interface EventsTableProps {
   data: EventTypeRow[];
@@ -92,9 +93,10 @@ export function EventsTable({ data, isLoading = false }: EventsTableProps) {
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               )}
             </div>
-            <span className={`font-medium transition-colors duration-100 ${
-              event.isExpanded ? 'text-primary' : 'text-foreground'
-            }`}>
+            <span className={cn(
+              "font-medium transition-colors duration-100",
+              event.isExpanded ? "text-primary" : "text-foreground"
+            )}>
               {event.event_name}
             </span>
           </div>
@@ -244,26 +246,26 @@ export function EventsTable({ data, isLoading = false }: EventsTableProps) {
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className={`px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400 ${
-                        header.column.getCanSort()
-                          ? 'cursor-pointer select-none hover:bg-gray-200 dark:hover:bg-slate-700'
-                          : ''
-                        } ${ header.id === 'event_name' ? 'text-left' : 'text-right' }`
-                      }
+                      className={cn(
+                        "px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400",
+                        header.column.getCanSort() && "cursor-pointer select-none hover:bg-gray-200 dark:hover:bg-slate-700",
+                        header.id === 'event_name' ? "text-left" : "text-right"
+                      )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      <div className={`flex items-center ${
-                        header.id === 'event_name' ? 'justify-start' : 'justify-end'
-                      }`}>
+                      <div className={cn(
+                        "flex items-center",
+                        header.id === 'event_name' ? "justify-start" : "justify-end"
+                      )}>
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {header.column.getCanSort() && (
                           <div className="w-4 h-4 flex items-center justify-center ml-2">
                             {header.column.getIsSorted() === 'desc' ? (
-                              <ArrowDown className="h-4 w-4" />
+                              <ArrowDown className="size-4" />
                             ) : header.column.getIsSorted() === 'asc' ? (
-                              <ArrowUp className="h-4 w-4" />
+                              <ArrowUp className="size-4" />
                             ) : (
-                              <div className="h-4 w-4" />
+                              <div className="size-4" />
                             )}
                           </div>
                         )}
@@ -281,9 +283,10 @@ export function EventsTable({ data, isLoading = false }: EventsTableProps) {
                 return (
                   <React.Fragment key={row.id}>
                     <TableRow 
-                      className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 ${
-                        isExpanded ? 'bg-primary/5' : ''
-                      }`}
+                      className={cn(
+                        "cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50",
+                        isExpanded && "bg-primary/5"
+                      )}
                       onClick={() => toggleRow(event.event_name)}
                     >
                       {row.getVisibleCells().map((cell) => (

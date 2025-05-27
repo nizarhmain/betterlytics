@@ -10,15 +10,12 @@ import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { formatNumber } from '@/utils/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { EventLogItem } from './EventLogItem';
 
 const DEFAULT_PAGE_SIZE = 25;
-const EVENTS_REFRESH_INTERVAL = 30 * 1000; // 30 seconds
-const COUNT_REFRESH_INTERVAL = 60 * 1000; // 1 minute
-const INTERSECTION_THRESHOLD = 3; // Trigger loading when within 3 items of end
+const EVENTS_REFRESH_INTERVAL_MS = 30 * 1000; // 30 seconds
+const COUNT_REFRESH_INTERVAL_MS = 60 * 1000; // 1 minute
 
 interface EventLogProps {
   pageSize?: number;
@@ -30,18 +27,16 @@ const LiveIndicator = () => (
   </div>
 );
 
-const EmptyState = ({ filter }: { filter: string }) => (
+const EmptyState = () => (
   <div className="flex flex-col items-center justify-center py-16 space-y-3">
     <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center relative">
       <Clock className="h-6 w-6 text-muted-foreground" />
       <div className="absolute inset-0 rounded-full bg-green-500/10 animate-pulse" />
     </div>
     <div className="text-center">
-      <p className="text-sm font-medium text-foreground">
-        {filter ? 'No events match your filter' : 'Waiting for events...'}
-      </p>
+      <p className="text-sm font-medium text-foreground">Waiting for events...</p>
       <p className="text-xs text-muted-foreground mt-1">
-        {filter ? 'Try adjusting your search terms' : 'Events will appear here in real-time as they occur'}
+        Events will appear here in real-time as they occur
       </p>
     </div>
   </div>
@@ -57,15 +52,9 @@ const LoadingMoreIndicator = () => (
 );
 
 const createShowingText = (
-  filter: string,
-  filteredEvents: EventLogEntry[],
   allEvents: EventLogEntry[],
   totalCount: number
 ): string => {
-  if (filter) {
-    return `Showing ${filteredEvents.length} of ${allEvents.length} loaded events (filtered)`;
-  }
-  
   if (totalCount === 0) {
     return 'No events found';
   }
@@ -84,7 +73,6 @@ export function EventLog({ pageSize = DEFAULT_PAGE_SIZE }: EventLogProps) {
   const { startDate, endDate } = useTimeRangeContext();
   const { queryFilters } = useQueryFiltersContext();
   const dashboardId = useDashboardId();
-  const [filter, setFilter] = useState('');
 
   const {
     data,
@@ -101,28 +89,19 @@ export function EventLog({ pageSize = DEFAULT_PAGE_SIZE }: EventLogProps) {
       if (lastPage.length < pageSize) return undefined;
       return allPages.length * pageSize;
     },
-    refetchInterval: EVENTS_REFRESH_INTERVAL,
+    refetchInterval: EVENTS_REFRESH_INTERVAL_MS,
   });
 
   const { data: totalCount = 0 } = useQuery({
     queryKey: ['totalEventCount', dashboardId, startDate, endDate, queryFilters],
     queryFn: () => fetchTotalEventCountAction(dashboardId, startDate, endDate, queryFilters),
-    refetchInterval: COUNT_REFRESH_INTERVAL,
+    refetchInterval: COUNT_REFRESH_INTERVAL_MS,
   });
 
-  const allEvents: EventLogEntry[] = data?.pages.flatMap((page: EventLogEntry[]) => page) ?? [];
+  const allEvents: EventLogEntry[] = useMemo(() => data?.pages.flatMap((page: EventLogEntry[]) => page) ?? [], [data]);
   
-  const filteredEvents = useMemo(() => {
-    if (!filter) return allEvents;
-    
-    const lowerFilter = filter.toLowerCase();
-    return allEvents.filter((event: EventLogEntry) => 
-      event.event_name.toLowerCase().includes(lowerFilter) ||
-      event.url.toLowerCase().includes(lowerFilter)
-    );
-  }, [allEvents, filter]);
-
-  // Intersection Observer ref for automatic loading
+  // Intersection Observer ref for automatic loading at halfway point
+  const intersectionThreshold = Math.floor(pageSize / 2);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   const observerCallback = useCallback((entries: IntersectionObserverEntry[]) => {
@@ -145,8 +124,8 @@ export function EventLog({ pageSize = DEFAULT_PAGE_SIZE }: EventLogProps) {
   }, [isLoading, observerCallback]);
 
   const currentCountText = useMemo(() => 
-    createShowingText(filter, filteredEvents, allEvents, totalCount),
-    [filter, filteredEvents, allEvents, totalCount]
+    createShowingText(allEvents, totalCount),
+    [allEvents, totalCount]
   );
 
   return (
@@ -169,14 +148,6 @@ export function EventLog({ pageSize = DEFAULT_PAGE_SIZE }: EventLogProps) {
             <div className="flex items-center gap-2 flex-shrink-0 ml-2">
             </div>
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Input
-              placeholder="Filter events..."
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="w-full sm:w-48 border bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/60"
-            />
-          </div>
         </CardTitle>
       </CardHeader>
 
@@ -187,13 +158,13 @@ export function EventLog({ pageSize = DEFAULT_PAGE_SIZE }: EventLogProps) {
               <Spinner />
               <p className="text-sm text-muted-foreground">Loading events...</p>
             </div>
-          ) : filteredEvents.length === 0 ? (
-            <EmptyState filter={filter} />
+          ) : allEvents.length === 0 ? (
+            <EmptyState />
           ) : (
             <>
               <div className="divide-y divide-border/60">
-                {filteredEvents.map((event: EventLogEntry, index: number) => {
-                  const isNearEnd = index >= filteredEvents.length - INTERSECTION_THRESHOLD;
+                {allEvents.map((event: EventLogEntry, index: number) => {
+                  const isNearEnd = index >= allEvents.length - intersectionThreshold;
                   
                   return (
                     <EventLogItem

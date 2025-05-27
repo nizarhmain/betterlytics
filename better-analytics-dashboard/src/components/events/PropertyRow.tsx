@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { EventPropertyAnalytics } from "@/entities/events";
 import { PropertyValueBar } from './PropertyValueBar';
+import { cn } from '@/lib/utils';
 
 interface PropertyRowProps {
   property: EventPropertyAnalytics;
@@ -14,11 +15,10 @@ export function PropertyRow({ property, isExpanded, onToggle }: PropertyRowProps
   return (
     <div className="space-y-3 relative">
       <div 
-        className={`flex items-center gap-3 py-2 px-3 rounded cursor-pointer transition-all duration-200 ${
-          isExpanded 
-            ? 'bg-background/30' 
-            : 'hover:bg-background/25'
-        }`}
+        className={cn(
+          "flex items-center gap-3 py-2 px-3 rounded cursor-pointer transition-all duration-200",
+          isExpanded ? "bg-background/30" : "hover:bg-background/25"
+        )}
         onClick={(e) => {
           e.stopPropagation();
           onToggle();
