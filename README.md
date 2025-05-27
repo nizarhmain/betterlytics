@@ -123,6 +123,10 @@ Run Betterlytics on your own infrastructure for complete control and privacy.
 
 ![Detailed Reports](.github/assets/betterlytics-showcase-journey.png)
 
+### Events and Live Event Insights
+
+![Events Analytics](.github/assets/betterlytics-showcase-events.png)
+
 ### Devices Breakdown
 
 ![Detailed Reports](.github/assets/betterlytics-showcase-devices.png)
