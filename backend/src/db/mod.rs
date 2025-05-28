@@ -40,7 +40,7 @@ impl Database {
 
     async fn create_client(config: Arc<Config>) -> Result<Client> {
         println!("Creating ClickHouse client with URL: {}", &config.clickhouse_url);
-        let client = Client::default().with_url(&config.clickhouse_url);
+        let client = Client::default().with_user(&config.clickhouse_user).with_password(&config.clickhouse_password).with_url(&config.clickhouse_url);
         println!("ClickHouse client created successfully");
         Ok(client)
     }
