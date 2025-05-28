@@ -25,11 +25,43 @@ import DataSettings from "@/components/settings/DataSettings";
 import ReportSettings from "@/components/settings/ReportSettings";
 import AlertSettings from "@/components/settings/AlertSettings";
 
+interface SettingsTabConfig {
+  id: string;
+  label: string;
+  component: React.ComponentType<{
+    formData: DashboardSettingsUpdate;
+    onUpdate: (updates: Partial<DashboardSettingsUpdate>) => void;
+  }>;
+}
+
+const SETTINGS_TABS: SettingsTabConfig[] = [
+  {
+    id: "display",
+    label: "Display",
+    component: DisplaySettings,
+  },
+  {
+    id: "data",
+    label: "Data",
+    component: DataSettings,
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    component: ReportSettings,
+  },
+  {
+    id: "alerts",
+    label: "Alerts",
+    component: AlertSettings,
+  },
+];
+
 export default function SettingsPageClient() {
   const dashboardId = useDashboardId();
   const { settings, refreshSettings } = useSettings();
   const [formData, setFormData] = useState<DashboardSettingsUpdate>({});
-  const [activeTab, setActiveTab] = useState("display");
+  const [activeTab, setActiveTab] = useState(SETTINGS_TABS[0].id);
   const [isPendingSave, startTransitionSave] = useTransition();
   const [isPendingReset, startTransitionReset] = useTransition();
 
@@ -88,28 +120,22 @@ export default function SettingsPageClient() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="display">Display</TabsTrigger>
-          <TabsTrigger value="data">Data</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
+        <TabsList className={`grid w-full grid-cols-${SETTINGS_TABS.length}`}>
+          {SETTINGS_TABS.map((tab) => (
+            <TabsTrigger key={tab.id} value={tab.id}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <TabsContent value="display">
-          <DisplaySettings formData={formData} onUpdate={handleUpdate} />
-        </TabsContent>
-
-        <TabsContent value="data">
-          <DataSettings formData={formData} onUpdate={handleUpdate} />
-        </TabsContent>
-
-        <TabsContent value="reports">
-          <ReportSettings formData={formData} onUpdate={handleUpdate} />
-        </TabsContent>
-
-        <TabsContent value="alerts">
-          <AlertSettings formData={formData} onUpdate={handleUpdate} />
-        </TabsContent>
+        {SETTINGS_TABS.map((tab) => {
+          const Component = tab.component;
+          return (
+            <TabsContent key={tab.id} value={tab.id}>
+              <Component formData={formData} onUpdate={handleUpdate} />
+            </TabsContent>
+          );
+        })}
 
         <div className="flex justify-between pt-6 border-t">
           <AlertDialog>
