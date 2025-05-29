@@ -3,7 +3,7 @@
     <level>debug</level>
     <log>/var/log/clickhouse-server/clickhouse-server.log</log>
     <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
-    <size>1000M</size>
+    <size>500M</size>
     <count>3</count>
   </logger>
   <display_name>ch-1S_1K</display_name>
