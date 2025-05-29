@@ -102,7 +102,7 @@ export default function UserSettingsDialog({ open, onOpenChange }: UserSettingsD
     }
   }
 
-  if (!isLoading) {
+  if (isLoading) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[700px]">
