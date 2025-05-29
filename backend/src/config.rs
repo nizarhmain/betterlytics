@@ -34,9 +34,9 @@ impl Config {
                 .unwrap_or_else(|_| "info".to_string()),
             clickhouse_url: env::var("CLICKHOUSE_URL")
                 .unwrap_or_else(|_| "http://localhost:8123".to_string()),
-            clickhouse_user: env::var("CLICKHOUSE_USER")
+            clickhouse_user: env::var("CLICKHOUSE_BACKEND_USER")
                 .unwrap_or_else(|_| "default".to_string()),
-            clickhouse_password: env::var("CLICKHOUSE_PASSWORD")
+            clickhouse_password: env::var("CLICKHOUSE_BACKEND_PASSWORD")
                 .unwrap_or_else(|_| "password".to_string()),
             // GeoIP configuration
             enable_geolocation: env::var("ENABLE_GEOLOCATION")

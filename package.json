@@ -8,7 +8,7 @@
     "start": "pnpm --filter better-analytics-dashboard start",
     "compose": "docker compose up -d && pnpm run migrate && pnpm run generate && pnpm run seed",
     "compose-down": "docker compose down",
-    "migrate": "node scripts/run-migration.js && pnpm --filter better-analytics-dashboard migrate",
+    "migrate": "pnpm --filter better-analytics-dashboard migrate && node scripts/run-migration.js",
     "generate": "pnpm --filter better-analytics-dashboard generate",
     "seed": "pnpm --filter better-analytics-dashboard seed",
     "simulate": "node simulate-events.js",
@@ -19,6 +19,7 @@
   "dependencies": {
     "clickhouse": "^2.6.0",
     "clickhouse-migrations": "^1.0.4",
+    "@clickhouse/client": "^1.11.1",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "lucide-react": "^0.503.0",
