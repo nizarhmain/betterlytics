@@ -1,15 +1,13 @@
-import prisma from "@/lib/postgres";
-import { 
-  DashboardSettings, 
-  DashboardSettingsSchema, 
-  DashboardSettingsUpdate, 
+import prisma from '@/lib/postgres';
+import {
+  DashboardSettings,
+  DashboardSettingsSchema,
+  DashboardSettingsUpdate,
   DashboardSettingsUpdateSchema,
-  DashboardSettingsCreateSchema 
-} from "@/entities/settings";
+  DashboardSettingsCreateSchema,
+} from '@/entities/settings';
 
-export async function findSettingsByDashboardId(
-  dashboardId: string
-): Promise<DashboardSettings | null> {
+export async function findSettingsByDashboardId(dashboardId: string): Promise<DashboardSettings | null> {
   try {
     const prismaSettings = await prisma.dashboardSettings.findUnique({
       where: { dashboardId },
@@ -21,21 +19,19 @@ export async function findSettingsByDashboardId(
 
     return DashboardSettingsSchema.parse(prismaSettings);
   } catch (error) {
-    console.error("Error finding settings by dashboard ID:", error);
-    throw new Error("Failed to find dashboard settings");
+    console.error('Error finding settings by dashboard ID:', error);
+    throw new Error('Failed to find dashboard settings');
   }
 }
 
 export async function updateSettings(
   dashboardId: string,
-  updates: DashboardSettingsUpdate
+  updates: DashboardSettingsUpdate,
 ): Promise<DashboardSettings> {
   try {
     const validatedUpdates = DashboardSettingsUpdateSchema.parse(updates);
 
-    const data = Object.fromEntries(
-      Object.entries(validatedUpdates).filter(([_, value]) => value !== undefined)
-    );
+    const data = Object.fromEntries(Object.entries(validatedUpdates).filter(([, value]) => value !== undefined));
 
     const updatedSettings = await prisma.dashboardSettings.update({
       where: { dashboardId },
@@ -44,14 +40,14 @@ export async function updateSettings(
 
     return DashboardSettingsSchema.parse(updatedSettings);
   } catch (error) {
-    console.error("Error updating settings:", error);
-    throw new Error("Failed to update dashboard settings");
+    console.error('Error updating settings:', error);
+    throw new Error('Failed to update dashboard settings');
   }
 }
 
 export async function createSettings(
   dashboardId: string,
-  settings: DashboardSettingsUpdate
+  settings: DashboardSettingsUpdate,
 ): Promise<DashboardSettings> {
   try {
     const validatedSettings = DashboardSettingsCreateSchema.parse({
@@ -65,7 +61,7 @@ export async function createSettings(
 
     return DashboardSettingsSchema.parse(createdSettings);
   } catch (error) {
-    console.error("Error creating settings:", error);
-    throw new Error("Failed to create dashboard settings");
+    console.error('Error creating settings:', error);
+    throw new Error('Failed to create dashboard settings');
   }
 }
