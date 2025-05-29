@@ -2,7 +2,7 @@
 
 import { CreditCard, BarChart3, Zap } from "lucide-react";
 import { UserSettingsUpdate } from "@/entities/userSettings";
-import SettingsCard from "../SettingsCard";
+import SettingsCard from "@/components/SettingsCard";
 
 interface UserSubscriptionSettingsProps {
   formData: UserSettingsUpdate;

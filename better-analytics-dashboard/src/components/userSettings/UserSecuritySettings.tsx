@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ZodError } from "zod";
-import SettingsCard from "../SettingsCard";
+import SettingsCard from "@/components/SettingsCard";
 
 const INITIAL_PASSWORD_STATE: ChangePasswordData = {
   currentPassword: "",

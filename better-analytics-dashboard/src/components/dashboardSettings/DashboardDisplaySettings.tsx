@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Monitor } from "lucide-react";
 import { DashboardSettingsUpdate } from "@/entities/dashboardSettings";
 import { TIME_RANGE_PRESETS } from "@/utils/timeRanges";
-import SettingsCard from "../SettingsCard";
+import SettingsCard from "@/components/SettingsCard";
 
 type DisplaySettingsProps = {
   formData: DashboardSettingsUpdate;

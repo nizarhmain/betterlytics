@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useTheme } from "next-themes";
 import { Monitor, Moon, Sun, Globe, Bell, Mail } from "lucide-react";
 import { UserSettingsUpdate } from "@/entities/userSettings";
-import SettingsCard from "../SettingsCard";
+import SettingsCard from "@/components/SettingsCard";
 
 interface UserPreferencesSettingsProps {
   formData: UserSettingsUpdate;

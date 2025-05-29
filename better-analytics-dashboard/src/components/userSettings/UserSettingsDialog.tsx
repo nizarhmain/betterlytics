@@ -22,11 +22,11 @@ import {
 import { useUserSettings } from "@/hooks/useUserSettings"
 import { UserSettingsUpdate } from "@/entities/userSettings"
 import { toast } from "sonner"
-import UserPreferencesSettings from "./UserPreferencesSettings"
-import UserSecuritySettings from "./UserSecuritySettings"
-import UserSubscriptionSettings from "./UserSubscriptionSettings"
-import UserInvoicesSettings from "./UserInvoicesSettings"
-import UserDangerZoneSettings from "./UserDangerZoneSettings"
+import UserPreferencesSettings from "@/components/userSettings/UserPreferencesSettings"
+import UserSecuritySettings from "@/components/userSettings/UserSecuritySettings"
+import UserSubscriptionSettings from "@/components/userSettings/UserSubscriptionSettings"
+import UserInvoicesSettings from "@/components/userSettings/UserInvoicesSettings"
+import UserDangerZoneSettings from "@/components/userSettings/UserDangerZoneSettings"
 
 interface UserSettingsDialogProps {
   open: boolean
