@@ -27,6 +27,7 @@ import UserSecuritySettings from "@/components/userSettings/UserSecuritySettings
 import UserSubscriptionSettings from "@/components/userSettings/UserSubscriptionSettings"
 import UserInvoicesSettings from "@/components/userSettings/UserInvoicesSettings"
 import UserDangerZoneSettings from "@/components/userSettings/UserDangerZoneSettings"
+import { Spinner } from "../ui/spinner"
 
 interface UserSettingsDialogProps {
   open: boolean
@@ -101,13 +102,13 @@ export default function UserSettingsDialog({ open, onOpenChange }: UserSettingsD
     }
   }
 
-  if (isLoading) {
+  if (!isLoading) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[700px]">
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">Loading settings...</span>
+          <div className="flex flex-col items-center justify-center py-16 space-y-3">
+            <Spinner />
+            <p className="text-sm text-muted-foreground">Loading settings...</p>
           </div>
         </DialogContent>
       </Dialog>
