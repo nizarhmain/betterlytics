@@ -18,3 +18,9 @@ export const updateUserSettingsAction = withUserAuth(
     return await UserSettingsService.updateUserSettings(userId, updates);
   }
 );
+
+export const deleteUserAccountAction = withUserAuth(
+  async (userId: string): Promise<void> => {
+    return await UserSettingsService.deleteUser(userId);
+  }
+);

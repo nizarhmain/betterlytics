@@ -2,6 +2,7 @@
 
 import { UserSettings, UserSettingsUpdate, DEFAULT_USER_SETTINGS } from "@/entities/userSettings";
 import * as UserSettingsRepository from "@/repositories/postgres/userSettings";
+import * as UserRepository from "@/repositories/postgres/user";
 
 export async function getUserSettings(
   userId: string,
@@ -29,5 +30,15 @@ export async function updateUserSettings(
   } catch (error) {
     console.error("Error updating user settings:", error);
     throw new Error("Failed to update user settings");
+  }
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+  try {
+    await UserRepository.deleteUser(userId);
+    console.log(`Successfully deleted user ${userId} and all associated data`);
+  } catch (error) {
+    console.error(`Error deleting user ${userId}:`, error);
+    throw new Error("Failed to delete user account and associated data");
   }
 }

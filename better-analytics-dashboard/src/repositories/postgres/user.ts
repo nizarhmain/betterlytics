@@ -63,4 +63,15 @@ export async function registerUser(data: RegisterUserData): Promise<User> {
     console.error("Error registering user:", error);
     throw error;
   }
-} 
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+  try {
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+  } catch (error) {
+    console.error(`Error deleting user ${userId}:`, error);
+    throw new Error(`Failed to delete user ${userId}.`);
+  }
+}
