@@ -1,53 +1,73 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Loader2, Save, RotateCcw, AlertTriangle } from 'lucide-react';
-import { toast } from 'sonner';
-import { DashboardSettingsUpdate } from '@/entities/settings';
-import { updateDashboardSettingsAction, resetDashboardSettingsAction } from '@/app/actions/settings';
-import { useSettings } from '@/contexts/SettingsProvider';
-import DisplaySettings from '@/components/settings/DisplaySettings';
-import DataSettings from '@/components/settings/DataSettings';
-import ReportSettings from '@/components/settings/ReportSettings';
-import AlertSettings from '@/components/settings/AlertSettings';
+import { useState, useEffect, useTransition, startTransition } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
+import { Loader2, Save, RotateCcw, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+import { DashboardSettingsUpdate } from "@/entities/settings";
+import { updateDashboardSettingsAction, resetDashboardSettingsAction } from "@/app/actions/settings";
+import { useSettings } from "@/contexts/SettingsProvider";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
+import DisplaySettings from "@/components/settings/DisplaySettings";
+import DataSettings from "@/components/settings/DataSettings";
+import ReportSettings from "@/components/settings/ReportSettings";
+import AlertSettings from "@/components/settings/AlertSettings";
 
-type SettingsPageClientProps = {
-  dashboardId: string;
-};
+interface SettingsTabConfig {
+  id: string;
+  label: string;
+  component: React.ComponentType<{
+    formData: DashboardSettingsUpdate;
+    onUpdate: (updates: Partial<DashboardSettingsUpdate>) => void;
+  }>;
+}
 
-export default function SettingsPageClient({ dashboardId }: SettingsPageClientProps) {
+const SETTINGS_TABS: SettingsTabConfig[] = [
+  {
+    id: "display",
+    label: "Display",
+    component: DisplaySettings,
+  },
+  {
+    id: "data",
+    label: "Data",
+    component: DataSettings,
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    component: ReportSettings,
+  },
+  {
+    id: "alerts",
+    label: "Alerts",
+    component: AlertSettings,
+  },
+];
+
+export default function SettingsPageClient() {
+  const dashboardId = useDashboardId();
   const { settings, refreshSettings } = useSettings();
   const [formData, setFormData] = useState<DashboardSettingsUpdate>({});
-  const [activeTab, setActiveTab] = useState('display');
+  const [activeTab, setActiveTab] = useState(SETTINGS_TABS[0].id);
   const [isPendingSave, startTransitionSave] = useTransition();
   const [isPendingReset, startTransitionReset] = useTransition();
 
   useEffect(() => {
     if (settings) {
-      setFormData({
-        showGridLines: settings.showGridLines,
-        defaultDateRange: settings.defaultDateRange,
-        dataRetentionDays: settings.dataRetentionDays,
-        weeklyReports: settings.weeklyReports,
-        monthlyReports: settings.monthlyReports,
-        reportRecipients: settings.reportRecipients,
-        alertsEnabled: settings.alertsEnabled,
-        alertsThreshold: settings.alertsThreshold,
-        language: settings.language,
-      });
+      setFormData({ ...settings });
     }
   }, [settings]);
 
@@ -97,29 +117,23 @@ export default function SettingsPageClient({ dashboardId }: SettingsPageClientPr
         <p className='text-muted-foreground'>Configure your dashboard preferences and data collection settings</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
-        <TabsList className='grid w-full grid-cols-4'>
-          <TabsTrigger value='display'>Display</TabsTrigger>
-          <TabsTrigger value='data'>Data</TabsTrigger>
-          <TabsTrigger value='reports'>Reports</TabsTrigger>
-          <TabsTrigger value='alerts'>Alerts</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className={`grid w-full grid-cols-${SETTINGS_TABS.length}`}>
+          {SETTINGS_TABS.map((tab) => (
+            <TabsTrigger key={tab.id} value={tab.id}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <TabsContent value='display'>
-          <DisplaySettings formData={formData} onUpdate={handleUpdate} />
-        </TabsContent>
-
-        <TabsContent value='data'>
-          <DataSettings formData={formData} onUpdate={handleUpdate} />
-        </TabsContent>
-
-        <TabsContent value='reports'>
-          <ReportSettings formData={formData} onUpdate={handleUpdate} />
-        </TabsContent>
-
-        <TabsContent value='alerts'>
-          <AlertSettings formData={formData} onUpdate={handleUpdate} />
-        </TabsContent>
+        {SETTINGS_TABS.map((tab) => {
+          const Component = tab.component;
+          return (
+            <TabsContent key={tab.id} value={tab.id}>
+              <Component formData={formData} onUpdate={handleUpdate} />
+            </TabsContent>
+          );
+        })}
 
         <div className='flex justify-between border-t pt-6'>
           <AlertDialog>

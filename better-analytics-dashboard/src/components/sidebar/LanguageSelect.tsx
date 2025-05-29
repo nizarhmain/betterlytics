@@ -10,15 +10,17 @@ const LANGUAGE_TO_COUNTRYCODE = {
   en: 'GB',
   da: 'DK',
 } satisfies Record<SupportedLanguages, FlagIconProps['countryCode']>;
+
 type LanguageSelectProps = {
   onUpdate: React.Dispatch<SupportedLanguages>;
   value?: string;
+  id?: string;
 };
 
-export function LanguageSelect({ onUpdate, value: language }: LanguageSelectProps) {
+export function LanguageSelect({ onUpdate, value: language, id }: LanguageSelectProps) {
   return (
     <Select value={language} onValueChange={onUpdate}>
-      <SelectTrigger>
+      <SelectTrigger id={id}>
         <SelectValue>
           {language && (
             <div className='m-0 flex items-center gap-2 p-0'>

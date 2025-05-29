@@ -29,14 +29,6 @@ export async function updateDashboardSettings(
   updates: DashboardSettingsUpdate,
 ): Promise<DashboardSettings> {
   try {
-    const validatedUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([_, value]) => value !== undefined)
-    );
-
-    if (Object.keys(validatedUpdates).length === 0) {
-      return await getDashboardSettings(dashboardId);
-    }
-
     return await SettingsRepository.updateSettings(dashboardId, updates);
   } catch (error) {
     console.error("Error updating dashboard settings:", error);

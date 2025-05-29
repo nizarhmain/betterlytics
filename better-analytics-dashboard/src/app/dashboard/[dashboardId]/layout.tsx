@@ -1,7 +1,10 @@
-import BASidebar from '@/components/sidebar/BASidebar';
-import { DashboardProvider } from './DashboardProvider';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import BAMobileSidebarTrigger from '@/components/sidebar/BAMobileSidebarTrigger';
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/auth";
+import BASidebar from "@/components/sidebar/BASidebar";
+import { DashboardProvider } from "./DashboardProvider";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import BAMobileSidebarTrigger from "@/components/sidebar/BAMobileSidebarTrigger";
 import DictionaryProvider from '@/contexts/DictionaryContextProvider';
 import { getDictionaryByDashboardId } from '@/app/actions/dictionary';
 
@@ -11,6 +14,12 @@ type DashboardLayoutProps = {
 };
 
 export default async function DashboardLayout({ children, params }: DashboardLayoutProps) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/");
+  }
+
   const { dashboardId } = await params;
   const dictionary = await getDictionaryByDashboardId(dashboardId);
 

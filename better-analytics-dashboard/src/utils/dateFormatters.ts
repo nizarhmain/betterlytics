@@ -26,3 +26,19 @@ export function formatDuration(seconds: number): string {
 
   return parts.join(' ');
 }
+
+// Helper function to format time ago in a user-friendly way
+export function formatTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffHours / 24);
+  
+  if (diffDays > 0) {
+    return `${diffDays}d ago`;
+  } else if (diffHours > 0) {
+    return `${diffHours}h ago`;
+  } else {
+    return 'Recently';
+  }
+}

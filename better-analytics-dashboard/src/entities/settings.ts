@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { TIME_RANGE_PRESETS } from '@/utils/timeRanges';
+import { z } from "zod";
+import { TIME_RANGE_PRESETS } from "@/utils/timeRanges";
 import { DEFAULT_LANGUAGE } from '@/dictionaries/dictionaries';
 
 export const TimeRangeValueSchema = z.enum(
@@ -31,7 +31,7 @@ export const DashboardSettingsSchema = z.object({
 
   createdAt: z.date(),
   updatedAt: z.date(),
-});
+}).strict();
 
 export const DashboardSettingsCreateSchema = z.object({
   dashboardId: z.string(),
@@ -44,7 +44,7 @@ export const DashboardSettingsCreateSchema = z.object({
   alertsEnabled: z.boolean(),
   alertsThreshold: z.number().int().positive(),
   language: z.string(),
-});
+}).strict();
 
 export const DashboardSettingsUpdateSchema = z.object({
   showGridLines: z.boolean().optional(),

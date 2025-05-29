@@ -75,7 +75,6 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
       <SidebarFooter>
         <SidebarMenu>
           <SettingsButton />
-          <ThemeSwitcher />
           <IntegrationButton />
           <BASidebarCollapsibleSignOutButton />
         </SidebarMenu>

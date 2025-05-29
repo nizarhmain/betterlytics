@@ -1,5 +1,11 @@
 import prisma from "@/lib/postgres";
-import { DashboardSettings, DashboardSettingsSchema, DashboardSettingsUpdate, DashboardSettingsUpdateSchema } from "@/entities/settings";
+import { 
+  DashboardSettings, 
+  DashboardSettingsSchema, 
+  DashboardSettingsUpdate, 
+  DashboardSettingsUpdateSchema,
+  DashboardSettingsCreateSchema 
+} from "@/entities/settings";
 
 export async function findSettingsByDashboardId(
   dashboardId: string
@@ -35,7 +41,8 @@ export async function updateSettings(
       where: { dashboardId },
       data,
     });
-
+    console.log("updated with: ", data);
+    console.log("updatedSettings are: ", updatedSettings);
     return DashboardSettingsSchema.parse(updatedSettings);
   } catch (error) {
     console.error("Error updating settings:", error);
@@ -47,7 +54,19 @@ export async function createSettings(
   dashboardId: string,
   settings: DashboardSettingsUpdate
 ): Promise<DashboardSettings> {
-  return await prisma.dashboardSettings.create({
-    data: { ...settings, dashboardId },
-  });
+  try {
+    const validatedSettings = DashboardSettingsCreateSchema.parse({
+      ...settings,
+      dashboardId,
+    });
+
+    const createdSettings = await prisma.dashboardSettings.create({
+      data: validatedSettings,
+    });
+
+    return DashboardSettingsSchema.parse(createdSettings);
+  } catch (error) {
+    console.error("Error creating settings:", error);
+    throw new Error("Failed to create dashboard settings");
+  }
 }
