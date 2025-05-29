@@ -15,13 +15,11 @@ async function main() {
     where: { email: ADMIN_EMAIL },
   });
 
-  let adminUser;
-
   if (!existingAdmin) {
     console.log(`Creating admin user with email: ${ADMIN_EMAIL}...`);
     const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, SALT_ROUNDS);
 
-    adminUser = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email: ADMIN_EMAIL,
         name: 'Admin',
@@ -30,9 +28,6 @@ async function main() {
       },
     });
     console.log('Admin user created successfully');
-  } else {
-    console.log('Admin user already exists, skipping creation');
-    adminUser = existingAdmin;
   }
 }
 

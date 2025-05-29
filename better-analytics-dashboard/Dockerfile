@@ -17,6 +17,8 @@ RUN npm run build
 
 FROM node:20-alpine as runner
 WORKDIR /app
+COPY ./prisma prisma
+RUN npm install dotenv@16.5.0
 
 ENV NODE_ENV=production
 ENV HOSTNAME="0.0.0.0"
@@ -31,4 +33,4 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-CMD ["node", "server.js"]
+CMD npx prisma@6.8.2 migrate deploy && npx prisma@6.8.2 db seed && node server.js

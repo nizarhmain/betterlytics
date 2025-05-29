@@ -14,21 +14,31 @@ services:
     build:
       context: ./backend
       dockerfile: ./Dockerfile
+    container_name: backend
+    hostname: backend
     ports:
       - 3001:3001
+    env_file:
+      - ./backend/.env.production
     depends_on:
-      ba_init:
-        condition: service_completed_successfully
+      clickhouse:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   dashboard:
     build:
       context: ./better-analytics-dashboard
       dockerfile: ./Dockerfile
+    env_file:
+      - ./better-analytics-dashboard/.env.production
     ports:
       - 3000:3000
     depends_on:
-      ba_init:
-        condition: service_completed_successfully
+      clickhouse:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
@@ -39,7 +49,7 @@ services:
     container_name: clickhouse
     hostname: clickhouse
     env_file:
-      - .env
+      - .env.production
     volumes:
       - clickhouse_data:/var/lib/clickhouse/
       - ./clickhouse-logs:/var/log/clickhouse-server/
@@ -63,7 +73,7 @@ services:
     ports:
       - 5432:5432
     env_file:
-      - .env
+      - .env.production
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     healthcheck:
@@ -71,27 +81,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
-  ba_init:
-    image: alpine:3.20
-    container_name: ba_init
-    env_file:
-      - .env
-    depends_on:
-      clickhouse:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./:/usr/src/app
-    command:
-      - /bin/sh
-      - -c
-      - |
-        cd /usr/src/app
-        wget -qO- https://get.pnpm.io/install.sh | sh -
-        pnpm run migrate
-        pnpm run seed
 
 volumes:
   clickhouse_data:
