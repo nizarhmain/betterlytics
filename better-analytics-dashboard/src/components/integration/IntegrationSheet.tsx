@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +13,8 @@ import Link from "next/link";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSiteId } from "@/app/actions";
+import { useTrackingVerification } from "@/hooks/use-tracking-verification";
+import React from "react";
 
 interface IntegrationSheetProps {
   open: boolean;
@@ -22,47 +24,36 @@ interface IntegrationSheetProps {
 interface IntegrationStatus {
   accountCreated: boolean;
   siteIdGenerated: boolean;
-  scriptInstalled: boolean;
   dataReceiving: boolean;
 }
 
 export function IntegrationSheet({ open, onOpenChange }: IntegrationSheetProps) {
   const [copiedIdentifier, setCopiedIdentifier] = useState<string | null>(null);
-  const [verifying, setVerifying] = useState(false);
   const [integrationStatus, setIntegrationStatus] = useState<IntegrationStatus>({
-    accountCreated: false,
-    siteIdGenerated: false,
-    scriptInstalled: false,
+    accountCreated: true,
+    siteIdGenerated: true,
     dataReceiving: false,
   });
 
   const dashboardId = useDashboardId();
+  const { isVerifying, isVerified, verify } = useTrackingVerification();
   
   const { data: siteId, isLoading } = useQuery({
     queryKey: ['siteId', dashboardId],
     queryFn: () => fetchSiteId(dashboardId),
   });
 
+  React.useEffect(() => {
+    setIntegrationStatus(prev => ({
+      ...prev,
+      dataReceiving: isVerified,
+    }));
+  }, [isVerified]);
+
   const trackingScript = siteId ? `<script async src="https://analytics.example.com/tracker.js" data-site-id="${siteId}"></script>` : '';
 
   const handleVerifyInstallation = async () => {
-    setVerifying(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setIntegrationStatus({
-        accountCreated: true,
-        siteIdGenerated: true,
-        scriptInstalled: true,
-        dataReceiving: true,
-      });
-
-      setVerifying(false);
-    } catch (err) {
-      toast.error("Failed to verify");
-    } finally {
-      setVerifying(false);
-    }
+    await verify();
   };
 
   const handleCopy = async (text: string, identifier: string) => {
@@ -139,7 +130,7 @@ export default App;
             <div className="flex items-center justify-between">
               <SheetTitle className="text-xl">Website Integration</SheetTitle>
               <div className="flex items-center">
-                {integrationStatus.accountCreated && integrationStatus.siteIdGenerated && integrationStatus.scriptInstalled && integrationStatus.dataReceiving ? (
+                {integrationStatus.accountCreated && integrationStatus.siteIdGenerated && integrationStatus.dataReceiving ? (
                   <Badge className="mr-3 px-2 py-1 text-xs font-medium bg-green-600/20 text-green-500 dark:bg-green-500/30 dark:text-green-400 rounded">Fully Integrated</Badge>
                 ) : (
                   <Badge className="mr-3 px-2 py-1 text-xs font-medium bg-red-600/20 text-red-500 dark:bg-red-500/30 dark:text-red-400 rounded">Not Fully Integrated</Badge>
@@ -268,7 +259,6 @@ export default App;
                     <CardContent className="space-y-3">
                       <StatusItem label="Account Created" description="Your account is ready" isComplete={integrationStatus.accountCreated} />
                       <StatusItem label="Site ID Generated" description="Your unique identifier" isComplete={integrationStatus.siteIdGenerated} />
-                      <StatusItem label="Script Installed" description="Tracking script detected" isComplete={integrationStatus.scriptInstalled} />
                       <StatusItem label="Data Receiving" description="Analytics data flowing" isComplete={integrationStatus.dataReceiving} />
                     </CardContent>
                   </Card>
@@ -296,8 +286,8 @@ export default App;
           </div>
 
           <div className="p-6 border-t border-border flex justify-end mt-auto sticky bg-background">
-            <Button variant="outline" onClick={handleVerifyInstallation} disabled={verifying || !siteId} size="sm">
-              {verifying ? (
+            <Button variant="outline" onClick={handleVerifyInstallation} disabled={isVerifying || !siteId} size="sm">
+              {isVerifying ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                   Verifying...
