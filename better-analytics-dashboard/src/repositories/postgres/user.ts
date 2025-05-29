@@ -75,3 +75,35 @@ export async function deleteUser(userId: string): Promise<void> {
     throw new Error(`Failed to delete user ${userId}.`);
   }
 }
+
+export async function updateUserPassword(userId: string, newPassword: string): Promise<void> {
+  try {
+    const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    
+    await prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+  } catch (error) {
+    console.error(`Error updating password for user ${userId}:`, error);
+    throw new Error(`Failed to update password for user ${userId}.`);
+  }
+}
+
+export async function verifyUserPassword(userId: string, password: string): Promise<boolean> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { passwordHash: true },
+    });
+
+    if (!user || !user.passwordHash) {
+      return false;
+    }
+
+    return await bcrypt.compare(password, user.passwordHash);
+  } catch (error) {
+    console.error(`Error verifying password for user ${userId}:`, error);
+    throw new Error(`Failed to verify password for user ${userId}.`);
+  }
+}

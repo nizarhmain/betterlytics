@@ -42,3 +42,26 @@ export async function deleteUser(userId: string): Promise<void> {
     throw new Error("Failed to delete user account and associated data");
   }
 }
+
+export async function changeUserPassword(
+  userId: string, 
+  oldPassword: string, 
+  newPassword: string
+): Promise<void> {
+  try {
+    const isOldPasswordValid = await UserRepository.verifyUserPassword(userId, oldPassword);
+    if (!isOldPasswordValid) {
+      throw new Error("Current password is incorrect");
+    }
+
+    await UserRepository.updateUserPassword(userId, newPassword);
+
+    console.log(`Successfully updated password for user ${userId}`);
+  } catch (error) {
+    console.error(`Error changing password for user ${userId}:`, error);
+    if (error instanceof Error && error.message === "Current password is incorrect") {
+      throw error;
+    }
+    throw new Error("Failed to change password");
+  }
+}
