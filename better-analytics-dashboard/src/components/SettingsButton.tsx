@@ -4,6 +4,7 @@ import SettingsPopover from './SettingsPopover';
 import { Settings } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState } from 'react';
+import { Button } from "@/components/ui/button";
 
 export default function SettingsButton() {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -11,12 +12,13 @@ export default function SettingsButton() {
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <PopoverTrigger asChild>
-        <button 
+        <Button 
+          variant="ghost"
           className="flex items-center gap-2 px-2 py-2 rounded hover:bg-accent hover:text-accent-foreground text-foreground text-sm font-medium w-full"
         >
           <Settings size={18} />
           Settings
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 border-none shadow-lg" side="top" align="start">
         <SettingsPopover onClose={() => setIsPopoverOpen(false)} />

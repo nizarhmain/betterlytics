@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from 'react';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 interface SettingsPopoverProps {
   onClose: () => void;
@@ -13,6 +14,7 @@ interface SettingsPopoverProps {
 
 export default function SettingsPopover({ onClose }: SettingsPopoverProps) {
   const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const dashboardId = useDashboardId();
 
   return (
     <div className="w-72 bg-popover shadow-lg rounded-md border border-border text-popover-foreground">
@@ -51,7 +53,7 @@ export default function SettingsPopover({ onClose }: SettingsPopoverProps) {
 
       <div className="p-3 border-t border-border">
         <Link 
-          href="/dashboard/settings" 
+          href={`/dashboard/${dashboardId}/settings`}
           onClick={onClose}
           className="flex items-center gap-2 w-full text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground p-2 rounded-md transition-colors"
         >

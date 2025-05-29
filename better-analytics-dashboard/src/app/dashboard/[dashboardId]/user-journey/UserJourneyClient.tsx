@@ -9,11 +9,13 @@ import TimeRangeSelector from "@/components/TimeRangeSelector";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import { Spinner } from "@/components/ui/spinner";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
 const JOURNEY_OPTIONS = [5, 10, 20, 50, 100];
 
-export default function UserJourneyClient({ siteId }: { siteId: string }) {
+export default function UserJourneyClient() {
+  const dashboardId = useDashboardId();
   const [numberOfSteps, setNumberOfSteps] = useState<number>(3);
   const [numberOfJourneys, setNumberOfJourneys] = useState<number>(10);
 
@@ -27,7 +29,6 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
   } = useQuery({
     queryKey: [
       "userJourney",
-      siteId,
       startDate,
       endDate,
       numberOfSteps,
@@ -36,7 +37,7 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
     ],
     queryFn: () => {
       return fetchUserJourneyAction(
-        siteId,
+        dashboardId,
         startDate,
         endDate,
         numberOfSteps,
