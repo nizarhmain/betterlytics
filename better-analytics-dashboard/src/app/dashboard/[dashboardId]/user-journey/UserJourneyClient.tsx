@@ -8,11 +8,14 @@ import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
+import { Spinner } from "@/components/ui/spinner";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
 const JOURNEY_OPTIONS = [5, 10, 20, 50, 100];
 
-export default function UserJourneyClient({ siteId }: { siteId: string }) {
+export default function UserJourneyClient() {
+  const dashboardId = useDashboardId();
   const [numberOfSteps, setNumberOfSteps] = useState<number>(3);
   const [numberOfJourneys, setNumberOfJourneys] = useState<number>(10);
 
@@ -26,7 +29,6 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
   } = useQuery({
     queryKey: [
       "userJourney",
-      siteId,
       startDate,
       endDate,
       numberOfSteps,
@@ -35,7 +37,7 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
     ],
     queryFn: () => {
       return fetchUserJourneyAction(
-        siteId,
+        dashboardId,
         startDate,
         endDate,
         numberOfSteps,
@@ -128,7 +130,7 @@ export default function UserJourneyClient({ siteId }: { siteId: string }) {
         {isLoading && (
           <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-lg">
             <div className="flex flex-col items-center">
-              <div className="w-10 h-10 border-4 border-t-primary border-r-transparent border-b-primary border-l-transparent rounded-full animate-spin mb-2"></div>
+              <Spinner size="lg" className="mb-2" />
               <p className="text-muted-foreground">Loading journey data...</p>
             </div>
           </div>

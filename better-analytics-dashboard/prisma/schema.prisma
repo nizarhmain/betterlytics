@@ -83,6 +83,7 @@ model Dashboard {
 
   userAccess UserDashboard[]
   funnels Funnel[]
+  settings DashboardSettings?
 }
 
 model UserDashboard {
@@ -113,4 +114,30 @@ model Funnel {
 
   dashboard    Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
   dashboardId  String
+}
+
+model DashboardSettings {
+  id String @id @default(cuid())
+  
+  dashboard Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  dashboardId String @unique
+  
+  // Display Settings
+  showGridLines Boolean @default(true)
+  defaultDateRange String @default("7d") // 24h, 7d, 28d, 3mo
+  
+  // Data Settings
+  dataRetentionDays Int @default(365) // Number of days to retain data
+  
+  // Report Settings
+  weeklyReports Boolean @default(true)
+  monthlyReports Boolean @default(false)
+  reportRecipients String[] @default([]) // Array of email addresses
+  
+  // Alert Settings
+  alertsEnabled Boolean @default(false)
+  alertsThreshold Int @default(1000) // Threshold for traffic alerts
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
