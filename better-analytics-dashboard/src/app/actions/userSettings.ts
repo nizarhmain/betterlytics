@@ -1,17 +1,20 @@
 "use server";
 
 import { UserSettings, UserSettingsUpdate } from "@/entities/userSettings";
-import { requireAuth } from "@/auth/auth-actions";
+import { withUserAuth } from "@/auth/auth-actions";
 import * as UserSettingsService from "@/services/userSettings";
 
-export async function getUserSettingsAction(): Promise<UserSettings> {
-  const session = await requireAuth();
-  return await UserSettingsService.getUserSettings(session.user.id);
-}
+export const getUserSettingsAction = withUserAuth(
+  async (userId: string): Promise<UserSettings> => {
+    return await UserSettingsService.getUserSettings(userId);
+  }
+);
 
-export async function updateUserSettingsAction(
-  updates: UserSettingsUpdate
-): Promise<UserSettings> {
-  const session = await requireAuth();
-  return await UserSettingsService.updateUserSettings(session.user.id, updates);
-}
+export const updateUserSettingsAction = withUserAuth(
+  async (
+    userId: string,
+    updates: UserSettingsUpdate
+  ): Promise<UserSettings> => {
+    return await UserSettingsService.updateUserSettings(userId, updates);
+  }
+);
