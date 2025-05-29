@@ -41,8 +41,7 @@ export async function updateSettings(
       where: { dashboardId },
       data,
     });
-    console.log("updated with: ", data);
-    console.log("updatedSettings are: ", updatedSettings);
+
     return DashboardSettingsSchema.parse(updatedSettings);
   } catch (error) {
     console.error("Error updating settings:", error);
