@@ -21,10 +21,8 @@ services:
     env_file:
       - ./backend/.env.production
     depends_on:
-      clickhouse:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
+      init:
+        condition: service_completed_successfully
 
   dashboard:
     build:
@@ -35,10 +33,8 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      clickhouse:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
+      init:
+        condition: service_completed_successfully
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
@@ -81,6 +77,36 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
+  init:
+    image: node:20-alpine
+    container_name: init
+    hostname: init
+    env_file:
+      - .env.production
+      - ./better-analytics-dashboard/.env.production
+    volumes:
+      - ./package.json:/app/package.json:ro
+      - ./migrations:/app/migrations:ro
+      - ./scripts:/app/scripts:ro
+      - ./better-analytics-dashboard/package.json:/app/better-analytics-dashboard/package.json:ro
+      - ./better-analytics-dashboard/prisma:/app/better-analytics-dashboard/prisma:ro
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /app
+        npm install
+        npm run prod-migrate
+        cd ./better-analytics-dashboard
+        npm install
+        npx prisma@6.8.2 migrate deploy
+        npx prisma@6.8.2 db seed
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
 volumes:
   clickhouse_data:
