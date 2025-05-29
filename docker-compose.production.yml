@@ -23,6 +23,8 @@ services:
     depends_on:
       init:
         condition: service_completed_successfully
+    networks:
+      - clickhouse_network
 
   dashboard:
     build:
@@ -35,13 +37,13 @@ services:
     depends_on:
       init:
         condition: service_completed_successfully
+    networks:
+      - postgres_network
+      - clickhouse_network
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     user: 101:101
-    ports:
-      - "0.0.0.0:8123:8123" # HTTP interface - access /play for testing
-      - "0.0.0.0:9000:9000" # Native interface
     container_name: clickhouse
     hostname: clickhouse
     env_file:
@@ -61,13 +63,13 @@ services:
       timeout: 2s
       retries: 10
       start_period: 10s
+    networks:
+      - clickhouse_network
 
   postgres:
     image: postgres:latest
     container_name: postgres
     hostname: postgres
-    ports:
-      - 5432:5432
     env_file:
       - .env.production
     volumes:
@@ -77,6 +79,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    networks:
+      - postgres_network
 
   init:
     image: node:20-alpine
@@ -107,7 +111,14 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+    networks:
+      - postgres_network
+      - clickhouse_network
 
 volumes:
   clickhouse_data:
   postgres_data:
+
+networks:
+  postgres_network:
+  clickhouse_network:
