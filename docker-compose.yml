@@ -1,6 +1,13 @@
 version: "3.8"
 
 services:
+  static:
+    image: nginx:alpine
+    volumes:
+      - ./static:/usr/share/nginx/html:ro
+    ports:
+      - 3006:80
+
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     user: 101:101

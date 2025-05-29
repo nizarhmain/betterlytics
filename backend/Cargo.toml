@@ -55,3 +55,8 @@ moka = { version = "0.12.10", features = ["sync"] }
 serde_repr = "0.1.20"
 strum_macros = "0.27.1"
 strum = "0.27.1"
+
+# OpenSSL
+[dependencies.openssl]
+version = "0.10"
+features = ["vendored"]

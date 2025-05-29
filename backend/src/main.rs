@@ -72,14 +72,6 @@ async fn main() {
         .route("/health", get(health_check))
         .route("/track", post(track_event))
         .route("/site-id", get(generate_site_id_handler))
-        .route("/test", get(|| async { 
-            let html = include_str!("../../static/test.html");
-            Html(html)
-        }))
-        .route("/analytics.js", get(|| async {
-            let js = include_str!("../../static/analytics.js");
-            (StatusCode::OK, js)
-        }))
         .with_state((db, processor))
         .layer(CorsLayer::permissive());
 
