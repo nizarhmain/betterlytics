@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition, startTransition } from "react";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { 
@@ -17,13 +17,12 @@ import {
 import { Loader2, Save, RotateCcw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardSettingsUpdate } from "@/entities/settings";
-import { updateDashboardSettingsAction, resetDashboardSettingsAction } from "@/app/actions/settings";
-import { useSettings } from "@/contexts/SettingsProvider";
+import { useDashboardSettings } from "@/hooks/useDashboardSettings";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
-import DisplaySettings from "@/components/settings/DisplaySettings";
-import DataSettings from "@/components/settings/DataSettings";
-import ReportSettings from "@/components/settings/ReportSettings";
-import AlertSettings from "@/components/settings/AlertSettings";
+import DisplaySettings from "@/components/dashboardSettings/DashboardDisplaySettings";
+import DataSettings from "@/components/dashboardSettings/DashboardDataSettings";
+import ReportSettings from "@/components/dashboardSettings/DashboardReportSettings";
+import AlertSettings from "@/components/dashboardSettings/DashboardAlertSettings";
 
 interface SettingsTabConfig {
   id: string;
@@ -59,47 +58,43 @@ const SETTINGS_TABS: SettingsTabConfig[] = [
 
 export default function SettingsPageClient() {
   const dashboardId = useDashboardId();
-  const { settings, refreshSettings } = useSettings();
-  const [formData, setFormData] = useState<DashboardSettingsUpdate>({});
+  const { 
+    settings, 
+    isLoading, 
+    isSaving, 
+    updateSetting, 
+    saveSettings, 
+    resetSettings 
+  } = useDashboardSettings(dashboardId);
   const [activeTab, setActiveTab] = useState(SETTINGS_TABS[0].id);
-  const [isPendingSave, startTransitionSave] = useTransition();
-  const [isPendingReset, startTransitionReset] = useTransition();
-
-  useEffect(() => {
-    if (settings) {
-      setFormData({ ...settings });
-    }
-  }, [settings]);
 
   const handleUpdate = (updates: Partial<DashboardSettingsUpdate>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
-  };
-
-  const handleSave = () => {
-    startTransitionSave(async () => {
-      try {
-        await updateDashboardSettingsAction(dashboardId, formData);
-        await refreshSettings();
-        toast.success("Settings saved successfully");
-      } catch (error) {
-        toast.error("Failed to save settings");
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value !== undefined) {
+        updateSetting(key as keyof DashboardSettingsUpdate, value);
       }
     });
   };
 
-  const handleReset = () => {
-    startTransitionReset(async () => {
-      try {
-        await resetDashboardSettingsAction(dashboardId);
-        await refreshSettings();
-        toast.success("Settings reset to defaults");
-      } catch (error) {
-        toast.error("Failed to reset settings");
-      }
-    });
+  const handleSave = async () => {
+    const result = await saveSettings();
+    if (result.success) {
+      toast.success("Settings saved successfully");
+    } else {
+      toast.error("Failed to save settings");
+    }
   };
 
-  if (!settings) {
+  const handleReset = async () => {
+    const result = await resetSettings();
+    if (result.success) {
+      toast.success("Settings reset to defaults");
+    } else {
+      toast.error("Failed to reset settings");
+    }
+  };
+
+  if (isLoading || !settings) {
     return (
       <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-[1000]">
         <div className="flex flex-col items-center">
@@ -132,7 +127,7 @@ export default function SettingsPageClient() {
           const Component = tab.component;
           return (
             <TabsContent key={tab.id} value={tab.id}>
-              <Component formData={formData} onUpdate={handleUpdate} />
+              <Component formData={settings} onUpdate={handleUpdate} />
             </TabsContent>
           );
         })}
@@ -142,9 +137,9 @@ export default function SettingsPageClient() {
             <AlertDialogTrigger asChild>
               <Button 
                 variant="outline" 
-                disabled={isPendingReset || isPendingSave}
+                disabled={isSaving}
               >
-                {isPendingReset ? (
+                {isSaving ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
                   <RotateCcw className="h-4 w-4 mr-2" />
@@ -173,15 +168,15 @@ export default function SettingsPageClient() {
               </div>
 
               <AlertDialogFooter>
-                <AlertDialogCancel disabled={isPendingReset}>
+                <AlertDialogCancel disabled={isSaving}>
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction 
                   onClick={handleReset}
-                  disabled={isPendingReset}
+                  disabled={isSaving}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  {isPendingReset ? (
+                  {isSaving ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : (
                     <RotateCcw className="h-4 w-4 mr-2" />
@@ -194,9 +189,9 @@ export default function SettingsPageClient() {
           
           <Button 
             onClick={handleSave}
-            disabled={isPendingSave || isPendingReset}
+            disabled={isSaving}
           >
-            {isPendingSave ? (
+            {isSaving ? (
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
             ) : (
               <Save className="h-4 w-4 mr-2" />

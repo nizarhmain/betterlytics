@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Bell } from "lucide-react";
 import { DashboardSettingsUpdate } from "@/entities/settings";
 import { ALERT_THRESHOLD_PRESETS } from "@/utils/settingsUtils";
-import SettingsCard from "./SettingsCard";
+import SettingsCard from "../SettingsCard";
 
 type AlertSettingsProps = {
   formData: DashboardSettingsUpdate;

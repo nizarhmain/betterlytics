@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Database } from "lucide-react";
 import { DashboardSettingsUpdate } from "@/entities/settings";
 import { DATA_RETENTION_PRESETS } from "@/utils/settingsUtils";
-import SettingsCard from "./SettingsCard";
+import SettingsCard from "../SettingsCard";
 
 type DataSettingsProps = {
   formData: DashboardSettingsUpdate;

@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { FileText, Plus, X } from "lucide-react";
 import { DashboardSettingsUpdate } from "@/entities/settings";
 import { z } from "zod";
-import SettingsCard from "./SettingsCard";
+import SettingsCard from "../SettingsCard";
 
 type ReportSettingsProps = {
   formData: DashboardSettingsUpdate;
