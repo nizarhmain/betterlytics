@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Loader2, Save, RotateCcw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { DashboardSettingsUpdate } from "@/entities/settings";
+import { DashboardSettingsUpdate } from "@/entities/dashboardSettings";
 import { useDashboardSettings } from "@/hooks/useDashboardSettings";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
 import DisplaySettings from "@/components/dashboardSettings/DashboardDisplaySettings";

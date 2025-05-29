@@ -3,7 +3,7 @@
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Database } from "lucide-react";
-import { DashboardSettingsUpdate } from "@/entities/settings";
+import { DashboardSettingsUpdate } from "@/entities/dashboardSettings";
 import { DATA_RETENTION_PRESETS } from "@/utils/settingsUtils";
 import SettingsCard from "../SettingsCard";
 

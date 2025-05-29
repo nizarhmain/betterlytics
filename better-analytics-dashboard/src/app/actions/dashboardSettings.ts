@@ -1,12 +1,9 @@
 "use server";
 
-import {
-  DashboardSettings,
-  DashboardSettingsUpdate,
-} from "@/entities/settings";
+import { DashboardSettings, DashboardSettingsUpdate } from "@/entities/dashboardSettings";
 import { withDashboardAuthContext } from "@/auth/auth-actions";
 import { AuthContext } from "@/entities/authContext";
-import * as SettingsService from "@/services/settings";
+import * as SettingsService from "@/services/dashboardSettings";
 
 export const getDashboardSettingsAction = withDashboardAuthContext(
   async (ctx: AuthContext): Promise<DashboardSettings> => {

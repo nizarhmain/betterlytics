@@ -9,7 +9,7 @@ import {
   DashboardWriteData,
   DashboardWriteSchema,
 } from "@/entities/dashboard";
-import { DEFAULT_DASHBOARD_SETTINGS } from "@/entities/settings";
+import { DEFAULT_DASHBOARD_SETTINGS } from "@/entities/dashboardSettings";
 
 export async function findDashboardById(
   dashboardId: string
