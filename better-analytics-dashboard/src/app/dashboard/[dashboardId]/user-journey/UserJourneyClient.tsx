@@ -8,6 +8,7 @@ import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
 import TimeRangeSelector from '@/components/TimeRangeSelector';
 import QueryFiltersSelector from '@/components/filters/QueryFiltersSelector';
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
+import { Spinner } from '@/components/ui/spinner';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
@@ -26,7 +27,7 @@ export default function UserJourneyClient() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['userJourney', dashboardId, startDate, endDate, numberOfSteps, numberOfJourneys, queryFilters],
+    queryKey: ['userJourney', startDate, endDate, numberOfSteps, numberOfJourneys, queryFilters],
     queryFn: () => {
       return fetchUserJourneyAction(
         dashboardId,
@@ -112,7 +113,7 @@ export default function UserJourneyClient() {
         {isLoading && (
           <div className='bg-background/70 absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm'>
             <div className='flex flex-col items-center'>
-              <div className='border-t-primary border-b-primary mb-2 h-10 w-10 animate-spin rounded-full border-4 border-r-transparent border-l-transparent'></div>
+              <Spinner size='lg' className='mb-2' />
               <p className='text-muted-foreground'>Loading journey data...</p>
             </div>
           </div>

@@ -1,144 +1,224 @@
-# Better Analytics
+# Betterlytics
 
-A modern, privacy-focused analytics platform built with Rust and ClickHouse.
+<div align="center">
 
-## Prerequisites
+<img src=".github/assets/logo-dark-raw.png" alt="Betterlytics Logo" width="120">
 
-- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
-- [Node.js](https://nodejs.org/) (v18 or later)
-- [Rust](https://www.rust-lang.org/) (latest stable)
-- [pnpm](https://pnpm.io/) (package manager)
+**A modern, Cookieless & privacy-focused analytics platform built for the future**
 
-## Getting Started
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-### 1. Clone the Repository
+[![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/) [![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/) [![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)](https://reactjs.org/) [![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-```bash
-git clone https://github.com/Lindharden/better-analytics.git
-cd better-analytics
-```
+[![ClickHouse](https://img.shields.io/badge/ClickHouse-FFCC01?style=flat&logo=clickhouse&logoColor=black)](https://clickhouse.com/) [![PostgreSQL](https://img.shields.io/badge/postgresql-%23316192.svg?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/) [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 
-### 2. Environment Setup
+[🚀 Getting Started](#-getting-started) • [📸 Dashboard](#-dashboard-preview) • [⚡ Benchmarks](#-performance-benchmarks) • [🗺️ Roadmap](#️-roadmap) • [👥 Community](#-community)
 
-Create a copy of the `.env.example` file in root and rename it to `.env` and adjust environment variables accordingly - most can be left as is.
+</div>
 
-Then create a copy of the `.env.example` file in `backend` and rename it to `.env` and adjust environment variables accordingly - most can be left as is.
+---
 
-Lastly, create a copy of the `.env.example` file in `better-analytics-dashboard` folder and rename it to `.env` and adjust environment variables accordingly - most can be left as is.
+## 🌟 Why Betterlytics?
 
-### 3. Start Docker containers
+Betterlytics is a **high-performance, privacy-first** analytics platform that puts you in control of your data. Built with modern technologies like Rust and ClickHouse, it delivers lightning-fast insights while respecting user privacy.
 
-```bash
-pnpm run compose
-```
+**Our core principles:**
 
-This will:
-- start a ClickHouse instance with:
-  - HTTP interface on port 8123
-  - Native interface on port 9000
-  - Data persisted in `./data/clickhouse`
-- start a Postgres instance with:
-  - HTTP interface on port 5432
-  - Data persisted in `./data/postgres`
-- start a PGAdmin instance with:
-  - HTTP interface on port 5433
-  - Data persisted in `./data/pgadmin`
-- run migrations for ClickHouse & Postgres
-- generate the Prisma client for dashboard
-- seed Postgres to quickly get up an running with basics
+- 🔒 **Privacy-First**: GDPR, CCPA, and PECR compliant with no third-party tracking
+- 🍪 **Cookieless**: No cookies required, respects user privacy
+- ⚡ **Lightning Fast**: Built on Rust and ClickHouse for maximum performance
+- 🎯 **Lightweight Tracking**: Minimal impact on your website's performance
+- 🔧 **Self-Hosted**: Complete control over your data and infrastructure
+- 📱 **Modern UI**: Beautiful, responsive dashboard built with Next.js 15 and React 19
+- 🚀 **Scalable**: Handles millions of events with ease
+- 🛠️ **Developer Friendly**: Easy to deploy, customize, and extend
 
-### 4. Install dependencies
+### 🚀 Complete Feature Set
 
-```bash
-pnpm install
-```
+#### 📊 Core Analytics
 
-This will:
-- Install all dependencies
+| Feature                        | Description                                               |
+| ------------------------------ | --------------------------------------------------------- |
+| **Page Analytics**             | Detailed page views, bounce rates, and engagement metrics |
+| **Referrer Tracking**          | Complete referral source analysis and traffic attribution |
+| **Geographic Insights**        | Global visitor mapping with MaxMind GeoIP integration     |
+| **Device & Browser Detection** | Comprehensive device, OS, and browser analytics           |
+| **Campaign Tracking**          | UTM parameter tracking and marketing campaign analysis    |
+| **Advanced Filtering**         | Filter data across numerous dimensions and time ranges    |
+| **User Journey Mapping**       | Visualize complete user paths through your site           |
+| **Conversion Funnels**         | Track multi-step conversion processes and drop-off points |
+| **Custom Events**              | Track any custom interactions and business metrics        |
 
-### 5. Start the Backend Server
+#### 🛠️ Platform & Integration
 
-```bash
-pnpm run backend
-```
+| Feature                   | Description                                                           |
+| ------------------------- | --------------------------------------------------------------------- |
+| **Modern UI**             | Beautiful dashboard built with Next.js 15, React 19, and Tailwind CSS |
+| **Lightweight Script**    | Minimal tracking script with zero performance impact                  |
+| **SPA Support**           | Full support for Single Page Applications and client-side routing     |
+| **Easy Integration**      | Simple one-line script installation                                   |
+| **Performance Optimized** | Built on ClickHouse for sub-second query responses                    |
 
-The Rust server will:
-- Start on port 3001
-- Connect to ClickHouse
-- Handle analytics events
-- Provide API endpoints for the dashboard
+## 🚀 Getting Started
 
-### 6. Start the Dashboard
+Choose the option that works best for you:
 
-```bash
-pnpm run dashboard
-```
+<table>
+<tr>
+<td width="50%" valign="top">
 
-The dashboard will:
-- Start on port 3000
-- Connect to the backend API
-- Show real-time analytics
+### ☁️ Cloud Hosting (Recommended)
 
-## Project Structure
+Get started instantly with our free managed cloud service:
 
-```
-better-analytics/
-├── backend/           # Rust server
-├── dashboard/         # Next.js dashboard
-├── migrations/        # Database migrations
-├── scripts/           # Migration runner
-├── static/            # Static files where the tracking script is located
-├── docker-compose.yml # Docker Compose file for Clickhouse
-└── package.json       # Root package.json
-```
+**[Start Free →](https://betterlytics.io/signup)**
 
-## Development
+- ✅ **Free forever plan** - No trial, genuinely free for small sites
+- ✅ **No setup required** - Ready in 30 seconds
+- ✅ **EU infrastructure** - All data processed on EU-owned cloud infrastructure
+- ✅ **Automatic updates** - Always latest features
+- ✅ **Managed infrastructure** - We handle scaling and maintenance
+- ✅ **99.9% uptime** - Enterprise-grade reliability
+- ✅ **Premium support** - Get help from our expert team
+- ✅ **Automatic backups** - Your data is safe and recoverable
+- ✅ **Paid plans available** - Scale up when you need more
 
-### Creating New Migrations
+</td>
+<td width="50%" valign="top">
 
-To create a new database migration, create a new file in the `migrations` directory and ensure the file is named like `1_migration_name.sql` where the number is the next available number in the sequence of existing migrations.
+### 🏠 Self-Hosting
 
-### Running Performance Tests
+Run Betterlytics on your own infrastructure for complete control and privacy.
 
-Run the following command to run a performance test, where TARGET_URL is the URL of the backend server, VUS is the number of virtual users, and DURATION is the duration of the test:
+**[Quick Setup Guide →](SETUP.md#quick-setup)**
 
-```bash
-k6 run -e TARGET_URL=http://localhost:3001/track -e VUS=100 -e DURATION=1m k6-perf-test.js
-```
+- ✅ **Complete privacy** - Your data never leaves your servers
+- ✅ **Full control** - Customize everything to your needs
+- ✅ **No fees to us** - Your money goes to infrastructure providers
+- ⚠️ **You manage everything** - Installation, maintenance, upgrades, security
+- ⚠️ **Your responsibility** - Server capacity, uptime, backups, loading times
+- ⚠️ **Infrastructure costs** - Server, CDN, backups, and associated costs
 
-## Deployment
+📖 **[Setup Guide](SETUP.md#quick-setup)** | 🐳 **[Docker Setup](SETUP.md#docker-setup)** | 🛠️ **[Development](CONTRIBUTING.md)**
 
-A docker-compose file will be added in the future to deploy the backend and dashboard as a single service.
+</td>
+</tr>
+</table>
 
-## Contributing
+---
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## 📸 Dashboard Preview
 
-## License
+<div align="center">
 
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
+### Overview
 
-The AGPL-3.0 license means:
-- You are free to use, modify, and distribute this software
-- Any modifications or derivative works must also be licensed under AGPL-3.0
-- You must make the source code available when distributing the software
-- If you run a modified version of the software on a server and make it available to others, you must make the source code available to them
-- The software comes with no warranty
+![Dashboard Overview](.github/assets/betterlytics-showcase-overview.png)
 
-This license ensures that the software remains free and open source, and that any improvements or modifications to it are also shared with the community.
+### Geography Insights
 
-## References
+![Real-time Analytics](.github/assets/betterlytics-showcase-geography.png)
 
-### Articles relevant to performance:
-https://www.highlight.io/blog/lw5-clickhouse-performance-optimization
-https://clickhouse.com/docs/operations/overview
-https://clickhouse.com/docs/guides/inserting-data
-https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse
-https://clickhouse.com/blog/asynchronous-data-inserts-in-clickhouse#data-needs-to-be-batched-for-optimal-performance
+### User Journey Diagram
 
-### Kafka:
-https://clickhouse.com/docs/integrations/kafka/clickhouse-kafka-connect-sink
+![Detailed Reports](.github/assets/betterlytics-showcase-journey.png)
+
+### Events and Live Event Insights
+
+![Events Analytics](.github/assets/betterlytics-showcase-events.png)
+
+### Devices Breakdown
+
+![Detailed Reports](.github/assets/betterlytics-showcase-devices.png)
+
+### Pages Breakdown
+
+![Detailed Reports](.github/assets/betterlytics-showcase-pages.png)
+
+... and much more
+
+</div>
+
+## ⚡ Performance Benchmarks
+
+Betterlytics is built for speed. Here's how it performs:
+
+### Request Handling
+
+| Metric              | Value   | Notes                              |
+| ------------------- | ------- | ---------------------------------- |
+| **Requests/Second** | 25,000+ | Single instance                    |
+| **Response Time**   | <5ms    | P95 for tracking requests          |
+| **Memory Usage**    | x       | Rust backend during stress testing |
+| **CPU Usage**       | x       | During stress testing              |
+
+### Query Performance
+
+| Query Type          | Response Time | Dataset Size   |
+| ------------------- | ------------- | -------------- |
+| **Overview Page**   | x             | 1M+ events     |
+| **Page Analytics**  | x             | 10M+ events    |
+| **User-Journey**    | x             | 100M+ events   |
+| **Geographic Data** | x             | Global dataset |
+
+### Scalability
+
+- **Events/Day**: Tested up to xM+ events
+- **Concurrent Users**: 1,000+ dashboard users
+- **Data Retention**: Unlimited (depends on storage)
+- **Geographic Distribution**: Multi-region support
+
+> 📊 **Benchmarks performed on**: 4-core CPU, 8GB RAM, SSD storage  
+> 🔄 **Last updated**: [Date to be added]
+
+## 🗺️ Roadmap
+
+We're constantly working to improve Betterlytics. Here's what's coming next:
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🚧 In Development
+
+| Feature                  | Description                                             |
+| ------------------------ | ------------------------------------------------------- |
+| 🐳 **Docker Deployment** | One-command deployment with Docker Compose              |
+| 🔌 **REST API**          | Full API access for custom integrations and data export |
+| ☁️ **Cloud Hosting**     | Managed hosting option for easy deployment              |
+
+</td>
+<td width="50%" valign="top">
+
+### 🎯 Planned Features
+
+| Feature                       | Description                                           |
+| ----------------------------- | ----------------------------------------------------- |
+| 🔔 **Alerts & Notifications** | Custom alerts for traffic spikes and anomalies        |
+| 📊 **Advanced Reporting**     | Scheduled reports and custom dashboards               |
+| 🔗 **Integrations**           | Connect with popular tools (Slack, Discord, Webhooks) |
+| 📈 **A/B Testing**            | Built-in experimentation platform                     |
+| 🤖 **AI Insights**            | Automated insights and recommendations                |
+
+</td>
+</tr>
+</table>
+
+## 💡 Ideas & Suggestions
+
+Have an idea for Betterlytics? We'd love to hear it!
+
+- Open an [issue](https://github.com/Lindharden/better-analytics/issues) to suggest new features
+- Join our discussions to share your thoughts
+- Contribute code to help us build these features faster
+
+---
+
+## 👥 Community
+
+Join our small community of developers and privacy advocates:
+
+- 💬 **[Discord](https://discord.gg/vwqSvPn6sP)** - Get help, share ideas, and connect with other users and developers
+- 🦋 **[Bluesky](https://bsky.app/profile/betterlytics.bsky.social)** - Follow us for updates and announcements
+- 🐛 **[GitHub Issues](https://github.com/Lindharden/better-analytics/issues)** - Report bugs and request features
+- 💡 **[GitHub Discussions](https://github.com/Lindharden/better-analytics/discussions)** - Ask questions and share feedback

@@ -6,6 +6,8 @@ import { QueryFiltersContextProvider } from '@/contexts/QueryFiltersContextProvi
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSiteId } from '@/app/actions';
+import { getDashboardSettingsAction } from '@/app/actions/settings';
+import { SettingsProvider } from '@/contexts/SettingsProvider';
 
 type DashboardProviderProps = {
   children: React.ReactNode;
@@ -13,9 +15,15 @@ type DashboardProviderProps = {
 
 export function DashboardProvider({ children }: DashboardProviderProps) {
   const dashboardId = useDashboardId();
+
   const { data: siteId } = useQuery({
     queryKey: ['siteId', dashboardId],
     queryFn: () => fetchSiteId(dashboardId),
+  });
+
+  const { data: initialSettings } = useQuery({
+    queryKey: ['dashboard-settings', dashboardId],
+    queryFn: () => getDashboardSettingsAction(dashboardId),
   });
 
   useEffect(() => {
@@ -32,9 +40,15 @@ export function DashboardProvider({ children }: DashboardProviderProps) {
     };
   }, [siteId]);
 
+  if (!initialSettings) {
+    return <div>Loading dashboard...</div>;
+  }
+
   return (
-    <TimeRangeContextProvider>
-      <QueryFiltersContextProvider>{children}</QueryFiltersContextProvider>
-    </TimeRangeContextProvider>
+    <SettingsProvider initialSettings={initialSettings} dashboardId={dashboardId}>
+      <TimeRangeContextProvider>
+        <QueryFiltersContextProvider>{children}</QueryFiltersContextProvider>
+      </TimeRangeContextProvider>
+    </SettingsProvider>
   );
 }
