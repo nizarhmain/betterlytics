@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { fetchUserJourneyAction } from "@/app/actions";
-import UserJourneyChart from "@/components/analytics/UserJourneyChart";
-import { useQuery } from "@tanstack/react-query";
-import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import TimeRangeSelector from "@/components/TimeRangeSelector";
-import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
-import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
-import { Spinner } from "@/components/ui/spinner";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
+import { useState } from 'react';
+import { fetchUserJourneyAction } from '@/app/actions';
+import UserJourneyChart from '@/components/analytics/UserJourneyChart';
+import { useQuery } from '@tanstack/react-query';
+import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
+import TimeRangeSelector from '@/components/TimeRangeSelector';
+import QueryFiltersSelector from '@/components/filters/QueryFiltersSelector';
+import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
+import { Spinner } from '@/components/ui/spinner';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
 const JOURNEY_OPTIONS = [5, 10, 20, 50, 100];
@@ -27,14 +27,7 @@ export default function UserJourneyClient() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: [
-      "userJourney",
-      startDate,
-      endDate,
-      numberOfSteps,
-      numberOfJourneys,
-      queryFilters,
-    ],
+    queryKey: ['userJourney', startDate, endDate, numberOfSteps, numberOfJourneys, queryFilters],
     queryFn: () => {
       return fetchUserJourneyAction(
         dashboardId,
@@ -42,33 +35,25 @@ export default function UserJourneyClient() {
         endDate,
         numberOfSteps,
         numberOfJourneys,
-        queryFilters
+        queryFilters,
       );
     },
   });
 
-  const errorMessage =
-    error instanceof Error ? error.message : "Failed to fetch journey data";
+  const errorMessage = error instanceof Error ? error.message : 'Failed to fetch journey data';
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className='space-y-6 p-6'>
+      <div className='flex flex-col justify-between gap-y-4 xl:flex-row xl:items-center'>
         <div>
-          <h1 className="text-2xl font-bold text-foreground mb-1">
-            User Journey
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Analytics and insights for your website
-          </p>
+          <h1 className='text-foreground mb-1 text-2xl font-bold'>User Journey</h1>
+          <p className='text-muted-foreground text-sm'>Analytics and insights for your website</p>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="relative inline-block text-left">
-            <label htmlFor="steps-select" className="sr-only">
-              Number of Steps
-            </label>
+        <div className='flex flex-col-reverse items-stretch gap-x-4 gap-y-1 sm:flex-row sm:justify-between'>
+          <div className='flex grow-1 flex-col justify-end gap-x-4 gap-y-1 lg:flex-row'>
             <select
-              id="steps-select"
-              className="border rounded px-3 py-2 text-foreground bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              id='steps-select'
+              className='text-foreground bg-background focus:ring-ring h-9 grow-1 rounded border px-3 focus:ring-2 focus:outline-none'
               value={numberOfSteps}
               onChange={(e) => setNumberOfSteps(Number(e.target.value))}
             >
@@ -78,14 +63,9 @@ export default function UserJourneyClient() {
                 </option>
               ))}
             </select>
-          </div>
-          <div className="relative inline-block text-left">
-            <label htmlFor="journeys-select" className="sr-only">
-              Number of Journeys
-            </label>
             <select
-              id="journeys-select"
-              className="border rounded px-3 py-2 text-foreground bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              id='journeys-select'
+              className='text-foreground bg-background focus:ring-ring h-9 grow-1 rounded border px-3 focus:ring-2 focus:outline-none'
               value={numberOfJourneys}
               onChange={(e) => setNumberOfJourneys(Number(e.target.value))}
             >
@@ -96,42 +76,37 @@ export default function UserJourneyClient() {
               ))}
             </select>
           </div>
-          <div className="flex gap-2">
+          <div className='flex grow-1 flex-col justify-end gap-x-4 gap-y-1 lg:flex-row'>
             <QueryFiltersSelector />
             <TimeRangeSelector />
           </div>
         </div>
       </div>
 
-      <div className="mt-8 relative min-h-[400px]">
-        {!isLoading &&
-          !error &&
-          journeyData &&
-          journeyData.nodes.length > 0 && (
-            <div className="bg-card text-card-foreground p-4 rounded-lg shadow">
-              <UserJourneyChart data={journeyData} />
-            </div>
-          )}
+      <div className='relative mt-8 min-h-[400px] overflow-x-auto'>
+        {!isLoading && !error && journeyData && journeyData.nodes.length > 0 && (
+          <div className='bg-card text-card-foreground min-w-5xl rounded-lg p-4 shadow'>
+            <UserJourneyChart data={journeyData} />
+          </div>
+        )}
 
         {!isLoading && error && (
-          <div className="bg-destructive/10 p-8 rounded-md text-center">
-            <p className="text-destructive">{errorMessage}</p>
+          <div className='bg-destructive/10 rounded-md p-8 text-center'>
+            <p className='text-destructive'>{errorMessage}</p>
           </div>
         )}
 
         {journeyData?.nodes.length === 0 && (
-          <div className="bg-muted p-8 rounded-md text-center">
-            <p className="text-muted-foreground">
-              No journey data available for the selected criteria.
-            </p>
+          <div className='bg-muted rounded-md p-8 text-center'>
+            <p className='text-muted-foreground'>No journey data available for the selected criteria.</p>
           </div>
         )}
 
         {isLoading && (
-          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center rounded-lg">
-            <div className="flex flex-col items-center">
-              <Spinner size="lg" className="mb-2" />
-              <p className="text-muted-foreground">Loading journey data...</p>
+          <div className='bg-background/70 absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm'>
+            <div className='flex flex-col items-center'>
+              <Spinner size='lg' className='mb-2' />
+              <p className='text-muted-foreground'>Loading journey data...</p>
             </div>
           </div>
         )}
