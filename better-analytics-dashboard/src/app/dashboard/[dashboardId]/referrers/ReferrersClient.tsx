@@ -1,26 +1,26 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import SummaryCard from "@/components/SummaryCard";
+import { useState, useEffect } from 'react';
+import SummaryCard from '@/components/SummaryCard';
 import ReferrerDistributionChart from '@/components/charts/ReferrerDistributionChart';
 import ReferrerTrafficTrendChart from '@/components/charts/ReferrerTrafficTrendChart';
 import ReferrerTable from '@/components/charts/ReferrerTable';
-import TimeRangeSelector from "@/components/TimeRangeSelector";
-import { 
-  fetchReferrerSourceAggregationDataForSite, 
+import TimeRangeSelector from '@/components/TimeRangeSelector';
+import {
+  fetchReferrerSourceAggregationDataForSite,
   fetchReferrerSummaryDataForSite,
   fetchReferrerTableDataForSite,
-  fetchReferrerTrafficTrendBySourceDataForSite
-} from "@/app/actions";
-import { 
-  ReferrerSourceAggregation, 
+  fetchReferrerTrafficTrendBySourceDataForSite,
+} from '@/app/actions';
+import {
+  ReferrerSourceAggregation,
   ReferrerSummary,
   ReferrerTableRow,
-  ReferrerTrafficBySourceRow 
-} from "@/entities/referrers";
-import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { formatPercentage } from "@/utils/formatters";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
+  ReferrerTrafficBySourceRow,
+} from '@/entities/referrers';
+import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
+import { formatPercentage } from '@/utils/formatters';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 export default function ReferrersClient() {
   const dashboardId = useDashboardId();
@@ -30,7 +30,7 @@ export default function ReferrersClient() {
   const [tableData, setTableData] = useState<ReferrerTableRow[]>([]);
   const [loading, setLoading] = useState(true);
   const { granularity, startDate, endDate } = useTimeRangeContext();
-  
+
   useEffect(() => {
     async function loadData() {
       setLoading(true);
@@ -39,9 +39,9 @@ export default function ReferrersClient() {
           fetchReferrerSourceAggregationDataForSite(dashboardId, startDate, endDate),
           fetchReferrerTrafficTrendBySourceDataForSite(dashboardId, startDate, endDate, granularity),
           fetchReferrerSummaryDataForSite(dashboardId, startDate, endDate),
-          fetchReferrerTableDataForSite(dashboardId, startDate, endDate)
+          fetchReferrerTableDataForSite(dashboardId, startDate, endDate),
         ]);
-        
+
         setDistributionData(distributionResult.data);
         setTrendBySourceData(trendBySourceResult.data);
         setSummaryData(summaryResult.data);
@@ -52,63 +52,61 @@ export default function ReferrersClient() {
         setLoading(false);
       }
     }
-    
+
     loadData();
   }, [startDate, endDate, granularity, dashboardId]);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className='space-y-6 p-6'>
       <div>
-        <div className="flex justify-between items-center mb-6">
+        <div className='mb-6 flex flex-col justify-between gap-y-1 sm:flex-row sm:items-center'>
           <div>
-            <h1 className="text-2xl font-bold text-foreground mb-1">Referrers</h1>
-            <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
+            <h1 className='text-foreground mb-1 text-2xl font-bold'>Referrers</h1>
+            <p className='text-muted-foreground text-sm'>Analytics and insights for your website</p>
           </div>
-          <div className="flex gap-4">
-            <TimeRangeSelector />
-          </div>
+          <TimeRangeSelector />
         </div>
-        
+
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className='mb-6 grid grid-cols-1 gap-4 md:grid-cols-3'>
           <SummaryCard
-            title="Total Referrers"
-            value={(loading || !summaryData) ? "-" : summaryData.totalReferrers.toString()}
-            changeText=""
+            title='Total Referrers'
+            value={loading || !summaryData ? '-' : summaryData.totalReferrers.toString()}
+            changeText=''
           />
           <SummaryCard
-            title="Referral Traffic"
-            value={(loading || !summaryData) ? "-" : summaryData.referralTraffic.toString()}
-            changeText=""
+            title='Referral Traffic'
+            value={loading || !summaryData ? '-' : summaryData.referralTraffic.toString()}
+            changeText=''
           />
           <SummaryCard
-            title="Avg. Bounce Rate"
-            value={(loading || !summaryData) ? "-" : formatPercentage(summaryData.avgBounceRate)}
-            changeText=""
+            title='Avg. Bounce Rate'
+            value={loading || !summaryData ? '-' : formatPercentage(summaryData.avgBounceRate)}
+            changeText=''
           />
         </div>
-        
+
         {/* Charts */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-card rounded-lg p-4 shadow border border-border">
-            <div className="font-medium mb-2 text-foreground">Referrer Distribution</div>
-            <p className="text-xs text-muted-foreground mb-4">Traffic sources by category</p>
+        <div className='mb-6 grid grid-cols-1 gap-6 md:grid-cols-2'>
+          <div className='bg-card border-border rounded-lg border p-4 shadow'>
+            <div className='text-foreground mb-2 font-medium'>Referrer Distribution</div>
+            <p className='text-muted-foreground mb-4 text-xs'>Traffic sources by category</p>
             <ReferrerDistributionChart data={distributionData} loading={loading} />
           </div>
-          <div className="bg-card rounded-lg p-4 shadow border border-border">
-            <div className="font-medium mb-2 text-foreground">Referral Traffic Trends</div>
-            <p className="text-xs text-muted-foreground mb-4">Traffic by source over time</p>
+          <div className='bg-card border-border rounded-lg border p-4 shadow'>
+            <div className='text-foreground mb-2 font-medium'>Referral Traffic Trends</div>
+            <p className='text-muted-foreground mb-4 text-xs'>Traffic by source over time</p>
             <ReferrerTrafficTrendChart data={trendBySourceData} loading={loading} />
           </div>
         </div>
-        
+
         {/* Referrer Table */}
-        <div className="bg-card rounded-lg p-4 shadow border border-border">
-          <div className="font-medium mb-2 text-foreground">Referrer Details</div>
-          <p className="text-xs text-muted-foreground mb-4">Detailed breakdown of traffic sources</p>
+        <div className='bg-card border-border rounded-lg border p-4 shadow'>
+          <div className='text-foreground mb-2 font-medium'>Referrer Details</div>
+          <p className='text-muted-foreground mb-4 text-xs'>Detailed breakdown of traffic sources</p>
           <ReferrerTable data={tableData} loading={loading} />
         </div>
       </div>
     </div>
   );
-} 
+}
