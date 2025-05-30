@@ -5,10 +5,14 @@ import {
   getReferrerSummaryDataForSite,
   getReferrerTableDataForSite,
   getReferrerTrafficTrendBySourceDataForSite,
+  getTopReferrerUrlsForSite,
+  getTopChannelsForSite,
+  getTopReferrerSourcesForSite,
 } from "@/services/referrers";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { withDashboardAuthContext } from "@/auth/auth-actions";
 import { AuthContext } from "@/entities/authContext";
+import { TopReferrerUrl, TopChannel, TopReferrerSource } from "@/entities/referrers";
 
 /**
  * Fetches the referrer distribution data for a site
@@ -98,6 +102,81 @@ export const fetchReferrerTableDataForSite = withDashboardAuthContext(
       return { data };
     } catch (error) {
       console.error("Error fetching referrer table data:", error);
+      throw error;
+    }
+  }
+);
+
+/**
+ * Fetches top referrer URLs
+ */
+export const fetchTopReferrerUrlsForSite = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    limit: number = 10
+  ): Promise<TopReferrerUrl[]> => {
+    try {
+      const data = await getTopReferrerUrlsForSite(
+        ctx.siteId,
+        startDate,
+        endDate,
+        limit
+      );
+      return data;
+    } catch (error) {
+      console.error("Error fetching top referrer URLs:", error);
+      throw error;
+    }
+  }
+);
+
+/**
+ * Fetches top traffic channels
+ */
+export const fetchTopChannelsForSite = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    limit: number = 10
+  ): Promise<TopChannel[]> => {
+    try {
+      const data = await getTopChannelsForSite(
+        ctx.siteId,
+        startDate,
+        endDate,
+        limit
+      );
+      return data;
+    } catch (error) {
+      console.error("Error fetching top channels:", error);
+      throw error;
+    }
+  }
+);
+
+/**
+ * Fetches top referrer sources
+ */
+export const fetchTopReferrerSourcesForSite = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    limit: number = 10
+  ): Promise<TopReferrerSource[]> => {
+    try {
+      const data = await getTopReferrerSourcesForSite(
+        ctx.siteId,
+        startDate,
+        endDate,
+        limit
+      );
+      return data;
+    } catch (error) {
+      console.error("Error fetching top referrer sources:", error);
       throw error;
     }
   }

@@ -1,8 +1,8 @@
 'server-only';
 
-import { getReferrerDistribution, getReferrerSummary, getReferrerTableData, getReferrerTrafficTrendBySource } from '@/repositories/clickhouse';
+import { getReferrerDistribution, getReferrerSummary, getReferrerTableData, getReferrerTrafficTrendBySource, getTopReferrerUrls, getTopChannels, getTopReferrerSources } from '@/repositories/clickhouse';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { ReferrerSourceAggregation, ReferrerSummary, ReferrerTableRow, ReferrerTableRowSchema, ReferrerTrafficBySourceRow } from '@/entities/referrers';
+import { ReferrerSourceAggregation, ReferrerSummary, ReferrerTableRow, ReferrerTableRowSchema, ReferrerTrafficBySourceRow, TopReferrerUrl, TopChannel, TopReferrerSource } from '@/entities/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 
 /**
@@ -77,4 +77,49 @@ export async function getReferrerTableDataForSite(
   );
   
   return result.map(row => ReferrerTableRowSchema.parse(row));
+}
+
+/**
+ * Gets top referrer URLs
+ */
+export async function getTopReferrerUrlsForSite(
+  siteId: string,
+  startDate: Date,
+  endDate: Date,
+  limit = 10
+): Promise<TopReferrerUrl[]> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  
+  return getTopReferrerUrls(siteId, formattedStart, formattedEnd, limit);
+}
+
+/**
+ * Gets top traffic channels
+ */
+export async function getTopChannelsForSite(
+  siteId: string,
+  startDate: Date,
+  endDate: Date,
+  limit = 10
+): Promise<TopChannel[]> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  
+  return getTopChannels(siteId, formattedStart, formattedEnd, limit);
+}
+
+/**
+ * Gets top referrer sources with visit counts
+ */
+export async function getTopReferrerSourcesForSite(
+  siteId: string,
+  startDate: Date,
+  endDate: Date,
+  limit = 10
+): Promise<TopReferrerSource[]> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  
+  return getTopReferrerSources(siteId, formattedStart, formattedEnd, limit);
 }

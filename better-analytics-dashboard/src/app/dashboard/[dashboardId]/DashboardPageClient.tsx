@@ -23,6 +23,11 @@ import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
+import { 
+  fetchTopReferrerUrlsForSite,
+  fetchTopReferrerSourcesForSite
+} from "@/app/actions/referrers";
+import { fetchTopChannelsForSite } from "@/app/actions/referrers";
 
 type ActiveMetric = 'visitors' | 'pageviews' | 'bounceRate' | 'avgDuration';
 
@@ -112,6 +117,21 @@ export default function DashboardPageClient() {
   const { data: osBreakdown, isLoading: osBreakdownLoading } = useQuery({
     queryKey: ['osBreakdown', dashboardId, startDate, endDate, queryFilters],
     queryFn: () => fetchOperatingSystemBreakdownAction(dashboardId, startDate, endDate, queryFilters),
+  });
+
+  const { data: topReferrerUrls, isLoading: topReferrerUrlsLoading } = useQuery({
+    queryKey: ['topReferrerUrls', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTopReferrerUrlsForSite(dashboardId, startDate, endDate, 10),
+  });
+
+  const { data: topReferrerSources, isLoading: topReferrerSourcesLoading } = useQuery({
+    queryKey: ['topReferrerSources', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTopReferrerSourcesForSite(dashboardId, startDate, endDate, 10),
+  });
+
+  const { data: topChannels, isLoading: topChannelsLoading } = useQuery({
+    queryKey: ['topChannels', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTopChannelsForSite(dashboardId, startDate, endDate, 10),
   });
 
   const chartData = useMemo(() => {
@@ -257,6 +277,35 @@ export default function DashboardPageClient() {
                   label: "Operating Systems",
                   data: (osBreakdown ?? []).map(item => ({ label: item.os, value: item.visitors })),
                   emptyMessage: "No operating system data available"
+                }
+              ]}
+            />
+          </div>
+          <div className="flex-1">
+            <MultiProgressTable 
+              title="Traffic Sources"
+              defaultTab="referrers"
+              isLoading={topReferrerUrlsLoading || topReferrerSourcesLoading || topChannelsLoading}
+              tabs={[
+                {
+                  key: "referrers",
+                  label: "Referrers",
+                  data: (topReferrerUrls ?? [])
+                    .filter(item => item.referrer_url && item.referrer_url.trim() !== '')
+                    .map(item => ({ label: item.referrer_url, value: item.visits })),
+                  emptyMessage: "No referrer data available"
+                },
+                {
+                  key: "sources",
+                  label: "Sources",
+                  data: (topReferrerSources ?? []).map(item => ({ label: item.referrer_source, value: item.visits })),
+                  emptyMessage: "No source data available"
+                },
+                {
+                  key: "channels",
+                  label: "Channels",
+                  data: (topChannels ?? []).map(item => ({ label: item.channel, value: item.visits })),
+                  emptyMessage: "No channel data available"
                 }
               ]}
             />
