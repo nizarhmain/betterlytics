@@ -57,7 +57,7 @@ const metricConfigs: Record<ActiveMetric, MetricConfig> = {
 
 export default function DashboardPageClient() {
   const dashboardId = useDashboardId();
-  const { granularity, startDate, endDate } = useTimeRangeContext();
+  const { startDate, endDate, granularity } = useTimeRangeContext();
   const { queryFilters } = useQueryFiltersContext();
   const [activeMetric, setActiveMetric] = useState<ActiveMetric>('visitors');
 
@@ -113,56 +113,56 @@ export default function DashboardPageClient() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="flex justify-end mb-4 gap-4">
-        <QueryFiltersSelector />
-        <TimeRangeSelector />
-      </div>
+    <div className="min-h-screen">
+      <div className="p-6 space-y-6">
+        <div className="flex justify-end gap-4">
+          <QueryFiltersSelector />
+          <TimeRangeSelector />
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <SummaryCard
-          title="Unique Visitors"
-          value={summaryLoading ? '...' : summary?.uniqueVisitors?.toLocaleString() ?? '0'}
-          rawChartData={summary?.visitorsChartData}
-          valueField="unique_visitors"
-          chartColor="var(--chart-1)"
-          isLoading={summaryLoading}
-          isActive={activeMetric === 'visitors'}
-          onClick={() => handleMetricChange('visitors')}
-        />
-        <SummaryCard
-          title="Total Pageviews"
-          value={summaryLoading ? '...' : summary?.pageviews?.toLocaleString() ?? '0'}
-          rawChartData={summary?.pageviewsChartData}
-          valueField="views"
-          chartColor="var(--chart-2)"
-          isLoading={summaryLoading}
-          isActive={activeMetric === 'pageviews'}
-          onClick={() => handleMetricChange('pageviews')}
-        />
-        <SummaryCard
-          title="Bounce Rate"
-          value={summaryLoading ? '...' : summary?.bounceRate !== undefined ? `${summary.bounceRate}%` : '0%'}
-          rawChartData={summary?.bounceRateChartData}
-          valueField="bounce_rate"
-          chartColor="var(--chart-3)"
-          isLoading={summaryLoading}
-          isActive={activeMetric === 'bounceRate'}
-          onClick={() => handleMetricChange('bounceRate')}
-        />
-        <SummaryCard
-          title="Avg. Visit Duration"
-          value={summaryLoading ? '...' : formatDuration(summary?.avgVisitDuration ?? 0)}
-          rawChartData={summary?.avgVisitDurationChartData}
-          valueField="avg_visit_duration"
-          chartColor="var(--chart-4)"
-          isLoading={summaryLoading}
-          isActive={activeMetric === 'avgDuration'}
-          onClick={() => handleMetricChange('avgDuration')}
-        />
-      </div>
-      
-      <div className="mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <SummaryCard
+            title="Unique Visitors"
+            value={summaryLoading ? '...' : summary?.uniqueVisitors?.toLocaleString() ?? '0'}
+            rawChartData={summary?.visitorsChartData}
+            valueField="unique_visitors"
+            chartColor="var(--chart-1)"
+            isLoading={summaryLoading}
+            isActive={activeMetric === 'visitors'}
+            onClick={() => handleMetricChange('visitors')}
+          />
+          <SummaryCard
+            title="Total Pageviews"
+            value={summaryLoading ? '...' : summary?.pageviews?.toLocaleString() ?? '0'}
+            rawChartData={summary?.pageviewsChartData}
+            valueField="views"
+            chartColor="var(--chart-2)"
+            isLoading={summaryLoading}
+            isActive={activeMetric === 'pageviews'}
+            onClick={() => handleMetricChange('pageviews')}
+          />
+          <SummaryCard
+            title="Bounce Rate"
+            value={summaryLoading ? '...' : summary?.bounceRate !== undefined ? `${summary.bounceRate}%` : '0%'}
+            rawChartData={summary?.bounceRateChartData}
+            valueField="bounce_rate"
+            chartColor="var(--chart-3)"
+            isLoading={summaryLoading}
+            isActive={activeMetric === 'bounceRate'}
+            onClick={() => handleMetricChange('bounceRate')}
+          />
+          <SummaryCard
+            title="Avg. Visit Duration"
+            value={summaryLoading ? '...' : formatDuration(summary?.avgVisitDuration ?? 0)}
+            rawChartData={summary?.avgVisitDurationChartData}
+            valueField="avg_visit_duration"
+            chartColor="var(--chart-4)"
+            isLoading={summaryLoading}
+            isActive={activeMetric === 'avgDuration'}
+            onClick={() => handleMetricChange('avgDuration')}
+          />
+        </div>
+        
         <InteractiveChart
           title={currentMetricConfig.title}
           data={chartData}
@@ -170,27 +170,29 @@ export default function DashboardPageClient() {
           color={currentMetricConfig.color}
           formatValue={currentMetricConfig.formatValue}
         />
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            {topPagesLoading ? (
-              <div className="text-center p-8 text-muted-foreground">Loading...</div>
-            ) : (
-              <TopPagesTable pages={topPages ?? []} />
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            {deviceBreakdownLoading ? (
-              <div className="text-center p-8 text-muted-foreground">Loading...</div>
-            ) : (
-              <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />
-            )}
-          </CardContent>
-        </Card>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Card>
+              <CardContent className="pt-6">
+                {topPagesLoading ? (
+                  <div className="text-center p-8 text-muted-foreground">Loading...</div>
+                ) : (
+                  <TopPagesTable pages={topPages ?? []} />
+                )}
+              </CardContent>
+            </Card>
+          </div>
+          <Card>
+            <CardContent className="pt-6">
+              {deviceBreakdownLoading ? (
+                <div className="text-center p-8 text-muted-foreground">Loading...</div>
+              ) : (
+                <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
