@@ -2,7 +2,7 @@
 import { useState, useMemo, useCallback } from "react";
 import SummaryCard from "@/components/SummaryCard";
 import InteractiveChart from "@/components/InteractiveChart";
-import TopPagesTable from '@/components/TopPagesTable';
+import MultiProgressTable from '@/components/MultiProgressTable';
 import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useQuery } from '@tanstack/react-query';
@@ -12,6 +12,8 @@ import {
   fetchDeviceTypeBreakdownAction, 
   fetchSummaryStatsAction, 
   fetchTopPagesAction,
+  fetchTopEntryPagesAction,
+  fetchTopExitPagesAction,
   fetchUniqueVisitorsAction,
   fetchTotalPageViewsAction,
   fetchSessionMetricsAction
@@ -84,6 +86,16 @@ export default function DashboardPageClient() {
   const { data: topPages, isLoading: topPagesLoading } = useQuery({
     queryKey: ['topPages', dashboardId, startDate, endDate, queryFilters],
     queryFn: () => fetchTopPagesAction(dashboardId, startDate, endDate, 5, queryFilters),
+  });
+
+  const { data: topEntryPages, isLoading: topEntryPagesLoading } = useQuery({
+    queryKey: ['topEntryPages', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTopEntryPagesAction(dashboardId, startDate, endDate, 5, queryFilters),
+  });
+
+  const { data: topExitPages, isLoading: topExitPagesLoading } = useQuery({
+    queryKey: ['topExitPages', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTopExitPagesAction(dashboardId, startDate, endDate, 5, queryFilters),
   });
 
   const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
@@ -173,15 +185,31 @@ export default function DashboardPageClient() {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <Card>
-              <CardContent className="pt-6">
-                {topPagesLoading ? (
-                  <div className="text-center p-8 text-muted-foreground">Loading...</div>
-                ) : (
-                  <TopPagesTable pages={topPages ?? []} />
-                )}
-              </CardContent>
-            </Card>
+            <MultiProgressTable 
+              title="Top Pages"
+              defaultTab="pages"
+              isLoading={topPagesLoading || topEntryPagesLoading || topExitPagesLoading}
+              tabs={[
+                {
+                  key: "pages",
+                  label: "Pages",
+                  data: (topPages ?? []).map(page => ({ label: page.url, value: page.visitors })),
+                  emptyMessage: "No page data available"
+                },
+                {
+                  key: "entry",
+                  label: "Entry Pages", 
+                  data: (topEntryPages ?? []).map(page => ({ label: page.url, value: page.visitors })),
+                  emptyMessage: "No entry pages data available"
+                },
+                {
+                  key: "exit",
+                  label: "Exit Pages",
+                  data: (topExitPages ?? []).map(page => ({ label: page.url, value: page.visitors })),
+                  emptyMessage: "No exit pages data available"
+                }
+              ]}
+            />
           </div>
           <Card>
             <CardContent className="pt-6">

@@ -3,10 +3,13 @@
 import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { DailyPageViewRow, TotalPageViewsRow } from "@/entities/pageviews";
 import { DailySessionMetricsRow } from "@/entities/sessionMetrics";
+import { TopPageRow, TopEntryPageRow, TopExitPageRow } from "@/entities/pages";
 import {
   getPageViewsForSite,
   getTopPagesForSite,
   getTotalPageViewsForSite,
+  getTopEntryPagesForSite,
+  getTopExitPagesForSite,
 } from "@/services/pages";
 import { getSummaryStatsWithChartsForSite } from "@/services/visitors";
 import { getUniqueVisitorsForSite } from "@/services/visitors";
@@ -83,7 +86,7 @@ export const fetchTopPagesAction = withDashboardAuthContext(
     endDate: Date,
     limit: number,
     queryFilters: QueryFilter[]
-  ) => {
+  ): Promise<TopPageRow[]> => {
     return getTopPagesForSite(
       ctx.siteId,
       startDate,
@@ -107,6 +110,42 @@ export const fetchSessionMetricsAction = withDashboardAuthContext(
       toDateTimeString(startDate),
       toDateTimeString(endDate),
       granularity,
+      queryFilters
+    );
+  }
+);
+
+export const fetchTopEntryPagesAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    limit: number,
+    queryFilters: QueryFilter[]
+  ): Promise<TopEntryPageRow[]> => {
+    return getTopEntryPagesForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      limit,
+      queryFilters
+    );
+  }
+);
+
+export const fetchTopExitPagesAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    limit: number,
+    queryFilters: QueryFilter[]
+  ): Promise<TopExitPageRow[]> => {
+    return getTopExitPagesForSite(
+      ctx.siteId,
+      startDate,
+      endDate,
+      limit,
       queryFilters
     );
   }

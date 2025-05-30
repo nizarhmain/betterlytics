@@ -1,6 +1,6 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyPageViewRowSchema, DailyPageViewRow, TotalPageViewsRow, TotalPageViewRowSchema } from '@/entities/pageviews';
-import { PageAnalytics, PageAnalyticsSchema } from '@/entities/pages';
+import { PageAnalytics, PageAnalyticsSchema, TopPageRow, TopPageRowSchema, TopEntryPageRow, TopEntryPageRowSchema, TopExitPageRow, TopExitPageRowSchema } from '@/entities/pages';
 import { DateString, DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { BAQuery } from '@/lib/ba-query';
@@ -88,7 +88,7 @@ export async function getTopPages(
   endDate: DateTimeString,
   limit = 5,
   queryFilters: QueryFilter[] = []
-): Promise<{ url: string; visitors: number }[]> {
+): Promise<TopPageRow[]> {
   const filters = BAQuery.getFilterQuery(queryFilters);
 
   const queryResponse = safeSql`
@@ -115,10 +115,7 @@ export async function getTopPages(
     },
   }).toPromise() as any[];
 
-  return result.map(row => ({
-    url: row.url,
-    visitors: Number(row.visitors)
-  }));
+  return result.map(row => TopPageRowSchema.parse(row));
 }
 
 export async function getPageMetrics(
@@ -304,4 +301,93 @@ export async function getPageTrafficTimeSeries(
   }).toPromise() as unknown[];
 
   return result.map(row => TotalPageViewRowSchema.parse(row));
+}
+
+export async function getTopEntryPages(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString,
+  limit = 5,
+  queryFilters: QueryFilter[] = []
+): Promise<TopEntryPageRow[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
+  const queryResponse = safeSql`
+    WITH session_first_pages AS (
+      SELECT 
+        session_id,
+        argMin(url, timestamp) as entry_page
+      FROM analytics.events
+      WHERE site_id = {site_id:String}
+        AND event_type = 'pageview' 
+        AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+        AND ${SQL.AND(filters)}
+      GROUP BY session_id
+    )
+    SELECT
+      entry_page as url,
+      uniq(session_id) as visitors
+    FROM session_first_pages
+    GROUP BY entry_page
+    ORDER BY visitors DESC
+    LIMIT {limit:UInt64} 
+  `;
+
+  const result = await clickhouse.query(queryResponse.taggedSql, {
+    params: {
+      ...queryResponse.taggedParams,
+      site_id: siteId,
+      start: startDate,
+      end: endDate,
+      limit: limit
+    },
+  }).toPromise() as any[];
+
+  return result.map(row => TopEntryPageRowSchema.parse({
+    url: row.url,
+    visitors: Number(row.visitors)
+  }));
+}
+
+export async function getTopExitPages(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString,
+  limit = 5,
+  queryFilters: QueryFilter[] = []
+): Promise<TopExitPageRow[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
+  const queryResponse = safeSql`
+    WITH session_last_pages AS (
+      SELECT 
+        session_id,
+        argMax(url, timestamp) as exit_page
+      FROM analytics.events
+      WHERE site_id = {site_id:String}
+        AND event_type = 'pageview' 
+        AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+        AND ${SQL.AND(filters)}
+      GROUP BY session_id
+    )
+    SELECT
+      exit_page as url,
+      uniq(session_id) as visitors
+    FROM session_last_pages
+    GROUP BY exit_page
+    ORDER BY visitors DESC
+    LIMIT {limit:UInt64} 
+  `;
+
+  const result = await clickhouse.query(queryResponse.taggedSql, {
+    params: {
+      ...queryResponse.taggedParams,
+      site_id: siteId,
+      start: startDate,
+      end: endDate,
+      limit: limit
+    },
+  }).toPromise() as any[];
+
+  return result.map(row => TopExitPageRowSchema.parse(row));
 } 
