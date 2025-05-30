@@ -3,11 +3,9 @@ import { useState, useMemo, useCallback } from "react";
 import SummaryCard from "@/components/SummaryCard";
 import InteractiveChart from "@/components/InteractiveChart";
 import MultiProgressTable from '@/components/MultiProgressTable';
-import DeviceTypePieChart from '@/components/DeviceTypePieChart';
 import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useQuery } from '@tanstack/react-query';
 import { formatDuration } from "@/utils/dateFormatters";
-import { Card, CardContent } from "@/components/ui/card";
 import { 
   fetchDeviceTypeBreakdownAction, 
   fetchSummaryStatsAction, 
@@ -23,11 +21,11 @@ import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
-import { 
-  fetchTopReferrerUrlsForSite,
-  fetchTopReferrerSourcesForSite
-} from "@/app/actions/referrers";
+import { fetchTopReferrerUrlsForSite, fetchTopReferrerSourcesForSite } from "@/app/actions/referrers";
 import { fetchTopChannelsForSite } from "@/app/actions/referrers";
+import { getWorldMapData } from "@/app/actions/geography";
+import { getCountryName } from "@/utils/countryCodes";
+import LeafletMap from '@/components/LeafletMap';
 
 type ActiveMetric = 'visitors' | 'pageviews' | 'bounceRate' | 'avgDuration';
 
@@ -134,6 +132,16 @@ export default function DashboardPageClient() {
     queryFn: () => fetchTopChannelsForSite(dashboardId, startDate, endDate, 10),
   });
 
+  const { data: worldMapData, isLoading: worldMapLoading } = useQuery({
+    queryKey: ['worldMapData', dashboardId, startDate, endDate, queryFilters],
+    queryFn: async () => {
+      const result = await getWorldMapData(dashboardId, { startDate, endDate, queryFilters });
+      return result.visitorData;
+    },
+  });
+
+  const topCountries = worldMapData?.slice(0, 10) || [];
+
   const chartData = useMemo(() => {
     switch (activeMetric) {
       case 'visitors':
@@ -214,8 +222,8 @@ export default function DashboardPageClient() {
           formatValue={currentMetricConfig.formatValue}
         />
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
             <MultiProgressTable 
               title="Top Pages"
               defaultTab="pages"
@@ -242,18 +250,44 @@ export default function DashboardPageClient() {
               ]}
             />
           </div>
-          <Card>
-            <CardContent className="pt-6">
-              {deviceBreakdownLoading ? (
-                <div className="text-center p-8 text-muted-foreground">Loading...</div>
-              ) : (
-                <DeviceTypePieChart breakdown={deviceBreakdown ?? []} />
-              )}
-            </CardContent>
-          </Card>
+          <div>
+              <MultiProgressTable 
+                title="Geography"
+                defaultTab="countries"
+                isLoading={worldMapLoading}
+                tabs={[
+                  {
+                    key: "countries",
+                    label: "Top Countries",
+                    data: (topCountries ?? []).map(country => ({ 
+                      label: getCountryName(country.country_code), 
+                      value: country.visitors 
+                    })),
+                    emptyMessage: "No country data available"
+                  },
+                  {
+                    key: "worldmap",
+                    label: "World Map",
+                    data: [],
+                    emptyMessage: "No world map data available",
+                    customContent: worldMapData ? (
+                      <div className="h-[280px] w-full">
+                        <LeafletMap 
+                          visitorData={worldMapData}
+                        />
+                      </div>
+                    ) : (
+                      <div className="text-center py-12 text-muted-foreground">
+                        No world map data available
+                      </div>
+                    )
+                  }
+                ]}
+              />
+          </div>
         </div>
         
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="flex-1 lg:flex-[2]">
             <MultiProgressTable 
               title="Devices Breakdown"

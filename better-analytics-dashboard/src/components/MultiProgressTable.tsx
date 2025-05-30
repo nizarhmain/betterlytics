@@ -15,6 +15,7 @@ interface TabConfig<T extends ProgressBarData> {
   label: string;
   data: T[];
   emptyMessage: string;
+  customContent?: React.ReactNode;
 }
 
 interface MultiProgressTableProps<T extends ProgressBarData> {
@@ -68,6 +69,14 @@ function MultiProgressTable<T extends ProgressBarData>({
     );
   }, []);
 
+  const renderTabContent = useCallback((tab: TabConfig<T>) => {
+    if (tab.customContent) {
+      return tab.customContent;
+    }
+    
+    return renderProgressList(tab.data, tab.emptyMessage);
+  }, [renderProgressList]);
+
   const tabsList = useMemo(() => (
     <TabsList className={`grid grid-cols-${tabs.length} bg-muted/30 h-8`}>
       {tabs.map((tab) => (
@@ -85,10 +94,10 @@ function MultiProgressTable<T extends ProgressBarData>({
   const tabsContent = useMemo(() => (
     tabs.map((tab) => (
       <TabsContent key={tab.key} value={tab.key} className="mt-0">
-        {renderProgressList(tab.data, tab.emptyMessage)}
+        {renderTabContent(tab)}
       </TabsContent>
     ))
-  ), [tabs, renderProgressList]);
+  ), [tabs, renderTabContent]);
 
   if (isLoading) {
     return (
