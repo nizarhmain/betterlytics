@@ -115,7 +115,7 @@ const LeafletMap = ({ visitorData, maxVisitors, showZoomControls }: LeafletMapPr
       
       <style jsx global>{`
         .leaflet-container {
-          background-color: var(--color-background);
+          background-color: var(--color-card);
         }
       `}</style>
       
