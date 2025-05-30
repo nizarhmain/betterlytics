@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { ResponsiveContainer, Area, AreaChart } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, MousePointer2 } from "lucide-react";
 
 interface ChartData {
   date: string;
@@ -76,11 +76,11 @@ const SummaryCard = React.memo(<T extends ChartData = ChartData>({
   return (
     <Card 
       className={`relative overflow-hidden transition-all duration-200 group py-4 ${
-        onClick ? 'cursor-pointer hover:shadow-md hover:border-primary/20' : ''
+        onClick ? 'cursor-pointer hover:shadow-lg hover:border-primary/40 hover:scale-[1.02] hover:bg-accent/5' : ''
       } ${
         isActive 
-          ? 'border-primary/50 shadow-md ring-2 ring-primary/20' 
-          : 'hover:border-primary/10'
+          ? 'border-primary shadow-lg ring-2 ring-primary/30 bg-primary/5' 
+          : 'hover:border-primary/20'
       }`}
       onClick={onClick}
     >
@@ -109,8 +109,13 @@ const SummaryCard = React.memo(<T extends ChartData = ChartData>({
       )}
 
       <CardContent className="relative z-10 space-y-0 px-4 py-2">
-        <div className="mb-2">
+        <div className="mb-2 flex items-center justify-between">
           <span className="text-sm font-medium text-muted-foreground">{title}</span>
+          {onClick && (
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <MousePointer2 className="w-4 h-4 text-muted-foreground/60" />
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <span className="text-2xl font-bold text-foreground tracking-tight">
