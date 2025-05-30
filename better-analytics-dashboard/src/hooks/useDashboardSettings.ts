@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition, useMemo } from "react";
 import { DashboardSettings, DashboardSettingsUpdate } from "@/entities/dashboardSettings";
 import { getDashboardSettingsAction, updateDashboardSettingsAction, resetDashboardSettingsAction } from "@/app/actions/dashboardSettings";
+import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 interface UseDashboardSettingsReturn {
   settings: DashboardSettings | null;
@@ -14,7 +15,8 @@ interface UseDashboardSettingsReturn {
   refreshSettings: () => Promise<void>;
 }
 
-export function useDashboardSettings(dashboardId: string): UseDashboardSettingsReturn {
+export function useDashboardSettings(): UseDashboardSettingsReturn {
+  const dashboardId = useDashboardId();
   const [settings, setSettings] = useState<DashboardSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [pendingUpdates, setPendingUpdates] = useState<DashboardSettingsUpdate>({});

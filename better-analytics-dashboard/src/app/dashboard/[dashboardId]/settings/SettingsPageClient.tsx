@@ -18,7 +18,6 @@ import { Loader2, Save, RotateCcw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardSettingsUpdate } from "@/entities/dashboardSettings";
 import { useDashboardSettings } from "@/hooks/useDashboardSettings";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
 import DisplaySettings from "@/components/dashboardSettings/DashboardDisplaySettings";
 import DataSettings from "@/components/dashboardSettings/DashboardDataSettings";
 import ReportSettings from "@/components/dashboardSettings/DashboardReportSettings";
@@ -57,7 +56,6 @@ const SETTINGS_TABS: SettingsTabConfig[] = [
 ];
 
 export default function SettingsPageClient() {
-  const dashboardId = useDashboardId();
   const { 
     settings, 
     isLoading, 
@@ -65,7 +63,7 @@ export default function SettingsPageClient() {
     updateSetting, 
     saveSettings, 
     resetSettings 
-  } = useDashboardSettings(dashboardId);
+  } = useDashboardSettings();
   const [activeTab, setActiveTab] = useState(SETTINGS_TABS[0].id);
 
   const handleUpdate = (updates: Partial<DashboardSettingsUpdate>) => {
