@@ -76,7 +76,7 @@ const SummaryCard = React.memo(<T extends ChartData = ChartData>({
   return (
     <Card 
       className={`relative overflow-hidden transition-all duration-200 group py-4 ${
-        onClick ? 'cursor-pointer hover:shadow-lg hover:border-primary/40 hover:scale-[1.02] hover:bg-accent/5' : ''
+        onClick ? 'cursor-pointer hover:shadow-lg hover:border-primary/40 hover:scale-[1.02] hover:bg-accent/20' : ''
       } ${
         isActive 
           ? 'border-primary shadow-lg ring-2 ring-primary/30 bg-primary/5' 
@@ -85,7 +85,7 @@ const SummaryCard = React.memo(<T extends ChartData = ChartData>({
       onClick={onClick}
     >
       {rawChartData && rawChartData.length > 0 && valueField && (
-        <div className="absolute bottom-0 right-0 left-0 h-16 opacity-[0.08] group-hover:opacity-[0.12] transition-opacity duration-200 pointer-events-none">
+        <div className="absolute bottom-0 right-0 left-0 h-16 opacity-[0.2] group-hover:opacity-[0.15] transition-opacity duration-200 pointer-events-none">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={rawChartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
               <defs>
