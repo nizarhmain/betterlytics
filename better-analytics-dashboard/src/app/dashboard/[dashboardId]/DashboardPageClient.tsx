@@ -17,6 +17,7 @@ import {
   fetchSessionMetricsAction
 } from "@/app/actions";
 import { fetchBrowserBreakdownAction, fetchOperatingSystemBreakdownAction } from "@/app/actions/devices";
+import { fetchCustomEventsOverviewAction } from "@/app/actions/events";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
@@ -138,6 +139,11 @@ export default function DashboardPageClient() {
       const result = await getWorldMapData(dashboardId, { startDate, endDate, queryFilters });
       return result.visitorData;
     },
+  });
+
+  const { data: customEvents, isLoading: customEventsLoading } = useQuery({
+    queryKey: ['customEvents', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   const topCountries = worldMapData?.slice(0, 10) || [];
@@ -343,6 +349,25 @@ export default function DashboardPageClient() {
                 }
               ]}
             />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <MultiProgressTable 
+            title="Custom Events"
+            defaultTab="events"
+            isLoading={customEventsLoading}
+            tabs={[
+              {
+                key: "events",
+                label: "Events",
+                data: (customEvents ?? []).map(event => ({ label: event.event_name, value: event.count })),
+                emptyMessage: "No custom events data available"
+              }
+            ]}
+          />
+          <div>
+            {/* Placeholder for future content */}
           </div>
         </div>
       </div>
