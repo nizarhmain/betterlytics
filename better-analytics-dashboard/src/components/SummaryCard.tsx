@@ -75,7 +75,7 @@ const SummaryCard = React.memo(<T extends ChartData = ChartData>({
 
   return (
     <Card 
-      className={`relative overflow-hidden transition-all duration-200 group ${
+      className={`relative overflow-hidden transition-all duration-200 group py-4 ${
         onClick ? 'cursor-pointer hover:shadow-md hover:border-primary/20' : ''
       } ${
         isActive 
@@ -85,7 +85,7 @@ const SummaryCard = React.memo(<T extends ChartData = ChartData>({
       onClick={onClick}
     >
       {rawChartData && rawChartData.length > 0 && valueField && (
-        <div className="absolute inset-0 opacity-[0.08] group-hover:opacity-[0.12] transition-opacity duration-200 pointer-events-none">
+        <div className="absolute bottom-0 right-0 left-0 h-16 opacity-[0.08] group-hover:opacity-[0.12] transition-opacity duration-200 pointer-events-none">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={rawChartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
               <defs>
@@ -108,9 +108,14 @@ const SummaryCard = React.memo(<T extends ChartData = ChartData>({
         </div>
       )}
 
-      <CardContent className="relative z-10 space-y-0 p-6">
-        <div className="flex items-center justify-between">
+      <CardContent className="relative z-10 space-y-0 px-4 py-2">
+        <div className="mb-2">
           <span className="text-sm font-medium text-muted-foreground">{title}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl font-bold text-foreground tracking-tight">
+            {value}
+          </span>
           {trendData && trendData.direction !== 'neutral' && (
             <Badge 
               variant="outline" 
@@ -125,17 +130,6 @@ const SummaryCard = React.memo(<T extends ChartData = ChartData>({
               )}
               <span>{trendData.percentage.toFixed(1)}%</span>
             </Badge>
-          )}
-        </div>
-        <div className="mt-3">
-          {isLoading ? (
-            <div className="space-y-2">
-              <div className="h-8 w-20 bg-muted/60 animate-pulse rounded-md"></div>
-            </div>
-          ) : (
-            <span className="text-3xl font-bold text-foreground tracking-tight">
-              {value}
-            </span>
           )}
         </div>
       </CardContent>
