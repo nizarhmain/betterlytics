@@ -1,13 +1,13 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import SummaryCard from "@/components/SummaryCard";
-import PagesTable from "@/components/analytics/PagesTable";
-import TimeRangeSelector from "@/components/TimeRangeSelector";
+import SummaryCard from '@/components/SummaryCard';
+import PagesTable from '@/components/analytics/PagesTable';
+import TimeRangeSelector from '@/components/TimeRangeSelector';
 import { SummaryStats } from '@/entities/stats';
-import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from "@/app/actions";
-import { PageAnalytics } from "@/entities/pages";
-import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
+import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from '@/app/actions';
+import { PageAnalytics } from '@/entities/pages';
+import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import QueryFiltersSelector from '@/components/filters/QueryFiltersSelector';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
@@ -28,46 +28,50 @@ export default function PagesClient() {
   });
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className='space-y-6 p-6'>
+      <div className='flex flex-col justify-between gap-y-4 md:flex-row md:items-center'>
         <div>
-          <h1 className="text-2xl font-bold text-foreground mb-1">Pages</h1>
-          <p className="text-sm text-muted-foreground">Analytics and insights for your website</p>
+          <h1 className='text-foreground mb-1 text-2xl font-bold'>Pages</h1>
+          <p className='text-muted-foreground text-sm'>Analytics and insights for your website</p>
         </div>
-        <div className="flex justify-end gap-4">
+        <div className='flex flex-col justify-end gap-x-4 gap-y-1 lg:flex-row'>
           <QueryFiltersSelector />
           <TimeRangeSelector />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        <SummaryCard title='Total Pages' value={pagesLoading ? '...' : String(pages.length)} changeText='' />
         <SummaryCard
-          title="Total Pages"
-          value={pagesLoading ? '...' : String(pages.length)}
-          changeText=""
-        />
-        <SummaryCard
-          title="Avg. Page Views"
-          value={pagesLoading ? '...' : 
-            pages.length > 0 
-              ? Math.round(pages.reduce((sum, p) => sum + p.pageviews, 0) / pages.length).toLocaleString()
-              : '0'
+          title='Avg. Page Views'
+          value={
+            pagesLoading
+              ? '...'
+              : pages.length > 0
+                ? Math.round(pages.reduce((sum, p) => sum + p.pageviews, 0) / pages.length).toLocaleString()
+                : '0'
           }
-          changeText=""
+          changeText=''
         />
         <SummaryCard
-          title="Avg. Time on Page"
-          value={summaryLoading ? '...' : summary?.avgVisitDuration ? `${Math.round(summary.avgVisitDuration / 60)}m ${summary.avgVisitDuration % 60}s` : '0s'}
-          changeText=""
+          title='Avg. Time on Page'
+          value={
+            summaryLoading
+              ? '...'
+              : summary?.avgVisitDuration
+                ? `${Math.round(summary.avgVisitDuration / 60)}m ${summary.avgVisitDuration % 60}s`
+                : '0s'
+          }
+          changeText=''
         />
         <SummaryCard
-          title="Bounce Rate"
+          title='Bounce Rate'
           value={summaryLoading ? '...' : summary?.bounceRate ? `${summary.bounceRate}%` : '0%'}
-          changeText=""
+          changeText=''
         />
       </div>
 
       <PagesTable data={pages} />
     </div>
   );
-} 
+}
