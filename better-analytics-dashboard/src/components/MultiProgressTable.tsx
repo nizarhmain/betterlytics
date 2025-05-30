@@ -92,7 +92,7 @@ function MultiProgressTable<T extends ProgressBarData>({
 
   if (isLoading) {
     return (
-      <Card className="border-border/50">
+      <Card className="border-border/50 h-full">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-semibold">{title}</CardTitle>
@@ -109,7 +109,7 @@ function MultiProgressTable<T extends ProgressBarData>({
   }
 
   return (
-    <Card className="border-border/50">
+    <Card className="border-border/50 h-full">
       <CardHeader className="pb-0">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>

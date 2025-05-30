@@ -18,6 +18,7 @@ import {
   fetchTotalPageViewsAction,
   fetchSessionMetricsAction
 } from "@/app/actions";
+import { fetchBrowserBreakdownAction, fetchOperatingSystemBreakdownAction } from "@/app/actions/devices";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
@@ -101,6 +102,16 @@ export default function DashboardPageClient() {
   const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
     queryKey: ['deviceTypeBreakdown', dashboardId, startDate, endDate, queryFilters],
     queryFn: () => fetchDeviceTypeBreakdownAction(dashboardId, startDate, endDate, queryFilters),
+  });
+
+  const { data: browserBreakdown, isLoading: browserBreakdownLoading } = useQuery({
+    queryKey: ['browserBreakdown', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchBrowserBreakdownAction(dashboardId, startDate, endDate, queryFilters),
+  });
+
+  const { data: osBreakdown, isLoading: osBreakdownLoading } = useQuery({
+    queryKey: ['osBreakdown', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchOperatingSystemBreakdownAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   const chartData = useMemo(() => {
@@ -220,6 +231,36 @@ export default function DashboardPageClient() {
               )}
             </CardContent>
           </Card>
+        </div>
+        
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 lg:flex-[2]">
+            <MultiProgressTable 
+              title="Devices Breakdown"
+              defaultTab="browsers"
+              isLoading={browserBreakdownLoading || osBreakdownLoading || deviceBreakdownLoading}
+              tabs={[
+                {
+                  key: "browsers",
+                  label: "Browsers",
+                  data: (browserBreakdown ?? []).map(item => ({ label: item.browser, value: item.visitors })),
+                  emptyMessage: "No browser data available"
+                },
+                {
+                  key: "devices",
+                  label: "Devices", 
+                  data: (deviceBreakdown ?? []).map(item => ({ label: item.device_type, value: item.visitors })),
+                  emptyMessage: "No device data available"
+                },
+                {
+                  key: "os",
+                  label: "Operating Systems",
+                  data: (osBreakdown ?? []).map(item => ({ label: item.os, value: item.visitors })),
+                  emptyMessage: "No operating system data available"
+                }
+              ]}
+            />
+          </div>
         </div>
       </div>
     </div>
