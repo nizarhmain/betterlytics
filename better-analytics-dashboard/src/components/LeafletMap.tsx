@@ -12,6 +12,7 @@ import { GeoVisitor } from '@/entities/geography'
 interface LeafletMapProps {
   visitorData: GeoVisitor[];
   maxVisitors?: number;
+  showZoomControls?: boolean;
 }
 
 const geoJsonOptions = {
@@ -27,7 +28,7 @@ const MAX_WORLD_BOUNDS = L.latLngBounds(
   L.latLng(100, 220)
 )
 
-const LeafletMap = ({ visitorData, maxVisitors }: LeafletMapProps) => {
+const LeafletMap = ({ visitorData, maxVisitors, showZoomControls }: LeafletMapProps) => {
   const [worldGeoJson, setWorldGeoJson] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -122,7 +123,7 @@ const LeafletMap = ({ visitorData, maxVisitors }: LeafletMapProps) => {
         center={[20, 0]} 
         style={{ height: '100%', width: '100%' }}
         zoom={2} 
-        zoomControl={true}
+        zoomControl={showZoomControls}
         maxBounds={MAX_WORLD_BOUNDS}
         maxBoundsViscosity={0.5}
         minZoom={1}

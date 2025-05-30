@@ -65,6 +65,7 @@ export default function GeographyClient() {
         <LeafletMap
           visitorData={visitorData}
           maxVisitors={maxVisitors}
+          showZoomControls={true}
         />
       </div>
       

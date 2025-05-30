@@ -280,6 +280,7 @@ export default function DashboardPageClient() {
                       <div className="h-[280px] w-full">
                         <LeafletMap 
                           visitorData={worldMapData}
+                          showZoomControls={false}
                         />
                       </div>
                     ) : (
