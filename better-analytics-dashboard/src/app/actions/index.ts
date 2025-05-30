@@ -9,3 +9,4 @@ export * from "./pages";
 export * from "./referrers";
 export * from "./site";
 export * from "./userJourney";
+export * from "./verification";
