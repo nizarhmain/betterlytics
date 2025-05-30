@@ -1,5 +1,6 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyUniqueVisitorsRow, DailyUniqueVisitorsRowSchema } from '@/entities/visitors';
+import { DailySessionMetricsRow, DailySessionMetricsRowSchema } from '@/entities/sessionMetrics';
 import { DateString, DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { BAQuery } from "@/lib/ba-query";
@@ -64,21 +65,19 @@ export async function getTotalUniqueVisitors(
 
 export async function getSessionMetrics(
   siteId: string,
-  startDate: DateTimeString,
-  endDate: DateTimeString,
+  startDate: DateString,
+  endDate: DateString,
+  granularity: GranularityRangeValues,
   queryFilters: QueryFilter[]
-): Promise<{
-  total_sessions: number;
-  multi_page_sessions: number;
-  total_duration: number;
-  avg_duration: number;
-}> {
+): Promise<DailySessionMetricsRow[]> {
+  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
   const filters = BAQuery.getFilterQuery(queryFilters);
   
   const queryResponse = safeSql`
     WITH session_data AS (
       SELECT
         session_id,
+        ${granularityFunc}(timestamp) as date,
         count() as page_count,
         if(count() > 1,
           dateDiff('second', min(timestamp), max(timestamp)),
@@ -88,14 +87,22 @@ export async function getSessionMetrics(
       WHERE site_id = {site_id:String}
         AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
         AND ${SQL.AND(filters)}
-      GROUP BY session_id
+      GROUP BY session_id, date
     )
     SELECT 
-      count() as total_sessions,
-      countIf(page_count > 1) as multi_page_sessions,
-      sum(duration_seconds) as total_duration_seconds,
-      avgIf(duration_seconds, page_count > 1) as avg_duration_seconds
+      date,
+      if(count() > 0, 
+        round((count() - countIf(page_count > 1)) / count() * 100, 1), 
+        0
+      ) as bounce_rate,
+      if(countIf(page_count > 1) > 0,
+        round(avgIf(duration_seconds, page_count > 1), 0),
+        0
+      ) as avg_visit_duration
     FROM session_data
+    GROUP BY date
+    ORDER BY date ASC
+    LIMIT 10080
   `;
   
   const result = await clickhouse.query(queryResponse.taggedSql, {
@@ -105,18 +112,7 @@ export async function getSessionMetrics(
       start: startDate,
       end: endDate
     }
-  }).toPromise() as Array<{
-    total_sessions: string;
-    multi_page_sessions: string;
-    total_duration_seconds: string;
-    avg_duration_seconds: string;
-  }>;
+  }).toPromise() as any[];
   
-  const row = result[0];
-  return {
-    total_sessions: Number(row?.total_sessions ?? 0),
-    multi_page_sessions: Number(row?.multi_page_sessions ?? 0),
-    total_duration: Number(row?.total_duration_seconds ?? 0),
-    avg_duration: Number(row?.avg_duration_seconds ?? 0)
-  };
+  return result.map(row => DailySessionMetricsRowSchema.parse(row));
 } 
