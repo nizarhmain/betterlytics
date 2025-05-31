@@ -14,7 +14,7 @@ export default function BAMobileSidebarTrigger() {
   return (
     <Button
       variant='outline'
-      className={cn("fixed bottom-10 left-6", !isMobile && "hidden")}
+      className={cn("fixed bottom-10 left-6 z-50", !isMobile && "hidden")}
       onClick={toggleSidebar}
     >
       <MenuIcon />

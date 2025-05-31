@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { FileText, Plus, X } from "lucide-react";
-import { DashboardSettingsUpdate } from "@/entities/settings";
+import { DashboardSettingsUpdate } from "@/entities/dashboardSettings";
 import { z } from "zod";
-import SettingsCard from "./SettingsCard";
+import SettingsCard from "@/components/SettingsCard";
 
 type ReportSettingsProps = {
   formData: DashboardSettingsUpdate;

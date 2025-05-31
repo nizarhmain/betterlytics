@@ -52,6 +52,26 @@ model User {
   role String?
   
   dashboardAccess UserDashboard[]
+  settings UserSettings?
+}
+
+model UserSettings {
+  id String @id @default(cuid())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  
+  // Theme preferences
+  theme String @default("system") // "light", "dark", "system"
+  language String @default("en") // ISO language codes
+  timezone String @default("UTC")
+  
+  // Email preferences
+  emailNotifications Boolean @default(true) // Sign up, login, password reset, reminders, alerts etc.
+  marketingEmails Boolean @default(false) // Product updates, features, tips
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Dashboard {

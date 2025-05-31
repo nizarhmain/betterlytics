@@ -7,7 +7,7 @@ import { SettingsProvider } from "@/contexts/SettingsProvider";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSiteId } from "@/app/actions";
-import { getDashboardSettingsAction } from "@/app/actions/settings";
+import { getDashboardSettingsAction } from "@/app/actions/dashboardSettings";
 
 type DashboardProviderProps = {
   children: React.ReactNode;

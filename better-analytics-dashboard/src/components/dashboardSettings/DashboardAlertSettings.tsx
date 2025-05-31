@@ -5,9 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Bell } from "lucide-react";
-import { DashboardSettingsUpdate } from "@/entities/settings";
+import { DashboardSettingsUpdate } from "@/entities/dashboardSettings";
 import { ALERT_THRESHOLD_PRESETS } from "@/utils/settingsUtils";
-import SettingsCard from "./SettingsCard";
+import SettingsCard from "@/components/SettingsCard";
 
 type AlertSettingsProps = {
   formData: DashboardSettingsUpdate;

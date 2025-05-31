@@ -52,3 +52,24 @@ export function withDashboardAuthContext<
     }
   };
 }
+
+type ActionRequiringUserId<Args extends Array<unknown>, Ret> = (
+  userId: string,
+  ...args: Args
+) => Ret;
+
+export function withUserAuth<
+  Args extends Array<unknown> = unknown[],
+  Ret = unknown,
+>(action: ActionRequiringUserId<Args, Ret>) {
+  return async function (...args: Args): Promise<Awaited<Ret>> {
+    const session = await requireAuth();
+
+    try {
+      return await action(session.user.id, ...args);
+    } catch (e) {
+      console.error("Error occurred in user action:", e);
+      throw new Error("An error occurred");
+    }
+  };
+}
