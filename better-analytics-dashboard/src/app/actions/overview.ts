@@ -3,7 +3,7 @@
 import { DailyUniqueVisitorsRow } from "@/entities/visitors";
 import { DailyPageViewRow, TotalPageViewsRow } from "@/entities/pageviews";
 import { DailySessionMetricsRow } from "@/entities/sessionMetrics";
-import { TopPageRow, TopEntryPageRow, TopExitPageRow } from "@/entities/pages";
+import { TopPageRow, TopEntryPageRow, TopExitPageRow, PageAnalyticsCombined, PageAnalyticsCombinedSchema } from "@/entities/pages";
 import {
   getPageViewsForSite,
   getTopPagesForSite,
@@ -148,5 +148,27 @@ export const fetchTopExitPagesAction = withDashboardAuthContext(
       limit,
       queryFilters
     );
+  }
+);
+
+export const fetchPageAnalyticsCombinedAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    limit: number = 5,
+    queryFilters: QueryFilter[]
+  ): Promise<PageAnalyticsCombined> => {
+    const [topPages, topEntryPages, topExitPages] = await Promise.all([
+      getTopPagesForSite(ctx.siteId, startDate, endDate, limit, queryFilters),
+      getTopEntryPagesForSite(ctx.siteId, startDate, endDate, limit, queryFilters),
+      getTopExitPagesForSite(ctx.siteId, startDate, endDate, limit, queryFilters),
+    ]);
+
+    return PageAnalyticsCombinedSchema.parse({
+      topPages,
+      topEntryPages,
+      topExitPages,
+    });
   }
 );

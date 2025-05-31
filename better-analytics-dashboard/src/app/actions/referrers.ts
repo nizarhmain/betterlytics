@@ -12,7 +12,7 @@ import {
 import { GranularityRangeValues } from "@/utils/granularityRanges";
 import { withDashboardAuthContext } from "@/auth/auth-actions";
 import { AuthContext } from "@/entities/authContext";
-import { TopReferrerUrl, TopChannel, TopReferrerSource } from "@/entities/referrers";
+import { TopReferrerUrl, TopChannel, TopReferrerSource, TrafficSourcesCombined, TrafficSourcesCombinedSchema } from "@/entities/referrers";
 
 /**
  * Fetches the referrer distribution data for a site
@@ -177,6 +177,32 @@ export const fetchTopReferrerSourcesForSite = withDashboardAuthContext(
       return data;
     } catch (error) {
       console.error("Error fetching top referrer sources:", error);
+      throw error;
+    }
+  }
+);
+
+export const fetchTrafficSourcesCombinedAction = withDashboardAuthContext(
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    limit: number = 10
+  ): Promise<TrafficSourcesCombined> => {
+    try {
+      const [topReferrerUrls, topReferrerSources, topChannels] = await Promise.all([
+        getTopReferrerUrlsForSite(ctx.siteId, startDate, endDate, limit),
+        getTopReferrerSourcesForSite(ctx.siteId, startDate, endDate, limit),
+        getTopChannelsForSite(ctx.siteId, startDate, endDate, limit),
+      ]);
+
+      return TrafficSourcesCombinedSchema.parse({
+        topReferrerUrls,
+        topReferrerSources,
+        topChannels,
+      });
+    } catch (error) {
+      console.error("Error fetching combined traffic sources:", error);
       throw error;
     }
   }

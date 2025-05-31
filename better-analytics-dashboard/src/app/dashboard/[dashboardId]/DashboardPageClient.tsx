@@ -7,22 +7,19 @@ import TimeRangeSelector from "@/components/TimeRangeSelector";
 import { useQuery } from '@tanstack/react-query';
 import { formatDuration } from "@/utils/dateFormatters";
 import { 
-  fetchDeviceTypeBreakdownAction, 
   fetchSummaryStatsAction, 
-  fetchTopPagesAction,
-  fetchTopEntryPagesAction,
-  fetchTopExitPagesAction,
   fetchUniqueVisitorsAction,
   fetchTotalPageViewsAction,
-  fetchSessionMetricsAction
+  fetchSessionMetricsAction,
+  fetchPageAnalyticsCombinedAction
 } from "@/app/actions";
-import { fetchBrowserBreakdownAction, fetchOperatingSystemBreakdownAction } from "@/app/actions/devices";
+import { fetchDeviceBreakdownCombinedAction } from "@/app/actions/devices";
 import { fetchCustomEventsOverviewAction } from "@/app/actions/events";
 import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
-import { fetchTopReferrerUrlsForSite, fetchTopReferrerSourcesForSite } from "@/app/actions/referrers";
+import { fetchTopReferrerUrlsForSite, fetchTopReferrerSourcesForSite, fetchTrafficSourcesCombinedAction } from "@/app/actions/referrers";
 import { fetchTopChannelsForSite } from "@/app/actions/referrers";
 import { getWorldMapData } from "@/app/actions/geography";
 import { getCountryName } from "@/utils/countryCodes";
@@ -88,49 +85,14 @@ export default function DashboardPageClient() {
     queryFn: () => fetchSessionMetricsAction(dashboardId, startDate, endDate, granularity, queryFilters),
   });
 
-  const { data: topPages, isLoading: topPagesLoading } = useQuery({
-    queryKey: ['topPages', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchTopPagesAction(dashboardId, startDate, endDate, 5, queryFilters),
+  const { data: pageAnalyticsCombined, isLoading: pageAnalyticsLoading } = useQuery({
+    queryKey: ['pageAnalyticsCombined', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchPageAnalyticsCombinedAction(dashboardId, startDate, endDate, 5, queryFilters),
   });
 
-  const { data: topEntryPages, isLoading: topEntryPagesLoading } = useQuery({
-    queryKey: ['topEntryPages', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchTopEntryPagesAction(dashboardId, startDate, endDate, 5, queryFilters),
-  });
-
-  const { data: topExitPages, isLoading: topExitPagesLoading } = useQuery({
-    queryKey: ['topExitPages', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchTopExitPagesAction(dashboardId, startDate, endDate, 5, queryFilters),
-  });
-
-  const { data: deviceBreakdown, isLoading: deviceBreakdownLoading } = useQuery({
-    queryKey: ['deviceTypeBreakdown', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchDeviceTypeBreakdownAction(dashboardId, startDate, endDate, queryFilters),
-  });
-
-  const { data: browserBreakdown, isLoading: browserBreakdownLoading } = useQuery({
-    queryKey: ['browserBreakdown', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchBrowserBreakdownAction(dashboardId, startDate, endDate, queryFilters),
-  });
-
-  const { data: osBreakdown, isLoading: osBreakdownLoading } = useQuery({
-    queryKey: ['osBreakdown', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchOperatingSystemBreakdownAction(dashboardId, startDate, endDate, queryFilters),
-  });
-
-  const { data: topReferrerUrls, isLoading: topReferrerUrlsLoading } = useQuery({
-    queryKey: ['topReferrerUrls', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchTopReferrerUrlsForSite(dashboardId, startDate, endDate, 10),
-  });
-
-  const { data: topReferrerSources, isLoading: topReferrerSourcesLoading } = useQuery({
-    queryKey: ['topReferrerSources', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchTopReferrerSourcesForSite(dashboardId, startDate, endDate, 10),
-  });
-
-  const { data: topChannels, isLoading: topChannelsLoading } = useQuery({
-    queryKey: ['topChannels', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchTopChannelsForSite(dashboardId, startDate, endDate, 10),
+  const { data: deviceBreakdownCombined, isLoading: deviceBreakdownLoading } = useQuery({
+    queryKey: ['deviceBreakdownCombined', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchDeviceBreakdownCombinedAction(dashboardId, startDate, endDate, queryFilters),
   });
 
   const { data: worldMapData, isLoading: worldMapLoading } = useQuery({
@@ -144,6 +106,11 @@ export default function DashboardPageClient() {
   const { data: customEvents, isLoading: customEventsLoading } = useQuery({
     queryKey: ['customEvents', dashboardId, startDate, endDate, queryFilters],
     queryFn: () => fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, queryFilters),
+  });
+
+  const { data: trafficSourcesCombined, isLoading: trafficSourcesLoading } = useQuery({
+    queryKey: ['trafficSourcesCombined', dashboardId, startDate, endDate, queryFilters],
+    queryFn: () => fetchTrafficSourcesCombinedAction(dashboardId, startDate, endDate, 10),
   });
 
   const topCountries = worldMapData?.slice(0, 10) || [];
@@ -233,24 +200,24 @@ export default function DashboardPageClient() {
             <MultiProgressTable 
               title="Top Pages"
               defaultTab="pages"
-              isLoading={topPagesLoading || topEntryPagesLoading || topExitPagesLoading}
+              isLoading={pageAnalyticsLoading}
               tabs={[
                 {
                   key: "pages",
                   label: "Pages",
-                  data: (topPages ?? []).map(page => ({ label: page.url, value: page.visitors })),
+                  data: (pageAnalyticsCombined?.topPages ?? []).map(page => ({ label: page.url, value: page.visitors })),
                   emptyMessage: "No page data available"
                 },
                 {
                   key: "entry",
                   label: "Entry Pages", 
-                  data: (topEntryPages ?? []).map(page => ({ label: page.url, value: page.visitors })),
+                  data: (pageAnalyticsCombined?.topEntryPages ?? []).map(page => ({ label: page.url, value: page.visitors })),
                   emptyMessage: "No entry pages data available"
                 },
                 {
                   key: "exit",
                   label: "Exit Pages",
-                  data: (topExitPages ?? []).map(page => ({ label: page.url, value: page.visitors })),
+                  data: (pageAnalyticsCombined?.topExitPages ?? []).map(page => ({ label: page.url, value: page.visitors })),
                   emptyMessage: "No exit pages data available"
                 }
               ]}
@@ -299,24 +266,24 @@ export default function DashboardPageClient() {
             <MultiProgressTable 
               title="Devices Breakdown"
               defaultTab="browsers"
-              isLoading={browserBreakdownLoading || osBreakdownLoading || deviceBreakdownLoading}
+              isLoading={deviceBreakdownLoading}
               tabs={[
                 {
                   key: "browsers",
                   label: "Browsers",
-                  data: (browserBreakdown ?? []).map(item => ({ label: item.browser, value: item.visitors })),
+                  data: (deviceBreakdownCombined?.browsers ?? []).map(item => ({ label: item.browser, value: item.visitors })),
                   emptyMessage: "No browser data available"
                 },
                 {
                   key: "devices",
                   label: "Devices", 
-                  data: (deviceBreakdown ?? []).map(item => ({ label: item.device_type, value: item.visitors })),
+                  data: (deviceBreakdownCombined?.devices ?? []).map(item => ({ label: item.device_type, value: item.visitors })),
                   emptyMessage: "No device data available"
                 },
                 {
                   key: "os",
                   label: "Operating Systems",
-                  data: (osBreakdown ?? []).map(item => ({ label: item.os, value: item.visitors })),
+                  data: (deviceBreakdownCombined?.operatingSystems ?? []).map(item => ({ label: item.os, value: item.visitors })),
                   emptyMessage: "No operating system data available"
                 }
               ]}
@@ -326,12 +293,12 @@ export default function DashboardPageClient() {
             <MultiProgressTable 
               title="Traffic Sources"
               defaultTab="referrers"
-              isLoading={topReferrerUrlsLoading || topReferrerSourcesLoading || topChannelsLoading}
+              isLoading={trafficSourcesLoading}
               tabs={[
                 {
                   key: "referrers",
                   label: "Referrers",
-                  data: (topReferrerUrls ?? [])
+                  data: (trafficSourcesCombined?.topReferrerUrls ?? [])
                     .filter(item => item.referrer_url && item.referrer_url.trim() !== '')
                     .map(item => ({ label: item.referrer_url, value: item.visits })),
                   emptyMessage: "No referrer data available"
@@ -339,13 +306,13 @@ export default function DashboardPageClient() {
                 {
                   key: "sources",
                   label: "Sources",
-                  data: (topReferrerSources ?? []).map(item => ({ label: item.referrer_source, value: item.visits })),
+                  data: (trafficSourcesCombined?.topReferrerSources ?? []).map(item => ({ label: item.referrer_source, value: item.visits })),
                   emptyMessage: "No source data available"
                 },
                 {
                   key: "channels",
                   label: "Channels",
-                  data: (topChannels ?? []).map(item => ({ label: item.channel, value: item.visits })),
+                  data: (trafficSourcesCombined?.topChannels ?? []).map(item => ({ label: item.channel, value: item.visits })),
                   emptyMessage: "No channel data available"
                 }
               ]}

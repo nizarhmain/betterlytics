@@ -2,7 +2,7 @@
 
 import { getDeviceTypeBreakdown, getBrowserBreakdown, getOperatingSystemBreakdown, getDeviceUsageTrend } from '@/repositories/clickhouse/devices';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { DeviceType, BrowserInfo, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema, OperatingSystemInfo, OperatingSystemStats, OperatingSystemStatsSchema, DeviceUsageTrendRow, DeviceUsageTrendRowSchema } from '@/entities/devices';
+import { DeviceType, BrowserInfo, BrowserStats, BrowserStatsSchema, DeviceSummary, DeviceSummarySchema, OperatingSystemInfo, OperatingSystemStats, OperatingSystemStatsSchema, DeviceUsageTrendRow, DeviceUsageTrendRowSchema, DeviceBreakdownCombined, DeviceBreakdownCombinedSchema } from '@/entities/devices';
 import { getDeviceLabel } from '@/constants/deviceTypes';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { QueryFilter } from '@/entities/filter';
