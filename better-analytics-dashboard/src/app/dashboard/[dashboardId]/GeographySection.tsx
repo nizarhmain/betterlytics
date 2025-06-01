@@ -1,12 +1,8 @@
 "use client";
 import MultiProgressTable from '@/components/MultiProgressTable';
 import LeafletMap from '@/components/LeafletMap';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { getWorldMapData } from "@/app/actions/geography";
 import { getCountryName } from "@/utils/countryCodes";
-import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
 import { use } from 'react';
 
 type GeographySectionProps = {

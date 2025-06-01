@@ -10,8 +10,9 @@ import GeographySection from "./GeographySection"
 import DevicesSection from "./DevicesSection"
 import TrafficSourcesSection from "./TrafficSourcesSection"
 import CustomEventsSection from "./CustomEventsSection"
-import { fetchPageAnalyticsCombinedAction, getWorldMapData } from '@/app/actions';
+import { fetchDeviceBreakdownCombinedAction, fetchPageAnalyticsCombinedAction, fetchSessionMetricsAction, fetchSummaryStatsAction, fetchTotalPageViewsAction, fetchUniqueVisitorsAction, getWorldMapData } from '@/app/actions';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
+import { GranularityRangeValues } from "@/utils/granularityRanges"
 
 const SummaryAndChartSkeleton = () => (
   <div className='space-y-6'>
@@ -41,14 +42,25 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
   const analyticsCombinedPromise = fetchPageAnalyticsCombinedAction(dashboardId, startDate, endDate, 5, []);
   const worldMapPromise = getWorldMapData(dashboardId, { startDate, endDate, queryFilters: [] });
 
+  const summaryAndChartPromise = Promise.all(
+    [
+      fetchSummaryStatsAction(dashboardId, startDate, endDate, []),
+      fetchUniqueVisitorsAction(dashboardId, startDate, endDate, granularity, []),
+      fetchTotalPageViewsAction(dashboardId, startDate, endDate, granularity, []),
+      fetchSessionMetricsAction(dashboardId, startDate, endDate, granularity, []),
+    ]
+  );
+
+  const devicePromise = fetchDeviceBreakdownCombinedAction(dashboardId, startDate, endDate, []);
+
   return (
     <div className='min-h-screen'>
       <div className='space-y-6 p-6'>
         <DashboardFilters />
 
-        {/* <Suspense fallback={<SummaryAndChartSkeleton />}>
-          <SummaryAndChartSection />
-        </Suspense> */}
+        <Suspense fallback={<SummaryAndChartSkeleton />}>
+          <SummaryAndChartSection data={summaryAndChartPromise} />
+        </Suspense>
 
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
           <Suspense fallback={<TableSkeleton />}>
@@ -61,9 +73,9 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
 
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
           <div className='flex-1 lg:flex-[2]'>
-            {/* <Suspense fallback={<TableSkeleton />}>
-              <DevicesSection />
-            </Suspense> */}
+            <Suspense fallback={<TableSkeleton />}>
+              <DevicesSection deviceBreakdownCombinedPromise={devicePromise} />
+            </Suspense>
           </div>
           <div className='flex-1'>
             {/* <Suspense fallback={<TableSkeleton />}>
@@ -84,12 +96,12 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
 }
 
 const parseBASearchParams = async (
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity: string }>,
+  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>,
 ) => {
-  const { startDate: startDateStr, endDate: endDateStr, granularity } = await searchParams;
+  const { startDate: startDateStr, endDate: endDateStr, granularity: granularityStr } = await searchParams;
 
   const startDate = new Date(+(startDateStr ?? Date.now()) - 100_000_000);
   const endDate = new Date(+(endDateStr ?? Date.now()));
-
+  const granularity = (granularityStr ?? 'day') as GranularityRangeValues;
   return { startDate, endDate, granularity };
 };

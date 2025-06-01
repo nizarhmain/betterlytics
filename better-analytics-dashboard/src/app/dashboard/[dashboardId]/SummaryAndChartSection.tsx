@@ -1,8 +1,7 @@
 "use client";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, use } from "react";
 import SummaryCard from "@/components/SummaryCard";
 import InteractiveChart from "@/components/InteractiveChart";
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { formatDuration } from "@/utils/dateFormatters";
 import { 
   fetchSummaryStatsAction, 
@@ -10,9 +9,6 @@ import {
   fetchTotalPageViewsAction,
   fetchSessionMetricsAction,
 } from "@/app/actions";
-import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
 
 type ActiveMetric = 'visitors' | 'pageviews' | 'bounceRate' | 'avgDuration';
 
@@ -48,32 +44,21 @@ const metricConfigs: Record<ActiveMetric, MetricConfig> = {
   },
 };
 
-export default function SummaryAndChartSection() {
-  const dashboardId = useDashboardId();
-  const { startDate, endDate, granularity } = useTimeRangeContext();
-  const { queryFilters } = useQueryFiltersContext();
+type SummaryAndChartSectionProps = {
+  data: Promise<[
+    Awaited<ReturnType<typeof fetchSummaryStatsAction>>,
+    visitorsData: Awaited<ReturnType<typeof fetchUniqueVisitorsAction>>,
+    pageviewsData: Awaited<ReturnType<typeof fetchTotalPageViewsAction>>,
+    sessionMetricsData: Awaited<ReturnType<typeof fetchSessionMetricsAction>>,
+  ]>
+};
+
+export default function SummaryAndChartSection({ data }: SummaryAndChartSectionProps) {
+  
+  const [ summary, visitorsData, pageviewsData, sessionMetricsData ] = use(data);
+
   const [activeMetric, setActiveMetric] = useState<ActiveMetric>('visitors');
-
-  const { data: summary } = useSuspenseQuery({
-    queryKey: ['summaryStatsWithCharts', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchSummaryStatsAction(dashboardId, startDate, endDate, queryFilters),
-  });
-
-  const { data: visitorsData } = useSuspenseQuery({
-    queryKey: ['visitors', dashboardId, startDate, endDate, granularity, queryFilters],
-    queryFn: () => fetchUniqueVisitorsAction(dashboardId, startDate, endDate, granularity, queryFilters),
-  });
-
-  const { data: pageviewsData } = useSuspenseQuery({
-    queryKey: ['pageviews', dashboardId, startDate, endDate, granularity, queryFilters],
-    queryFn: () => fetchTotalPageViewsAction(dashboardId, startDate, endDate, granularity, queryFilters),
-  });
-
-  const { data: sessionMetricsData } = useSuspenseQuery({
-    queryKey: ['sessionMetrics', dashboardId, startDate, endDate, granularity, queryFilters],
-    queryFn: () => fetchSessionMetricsAction(dashboardId, startDate, endDate, granularity, queryFilters),
-  });
-
+  
   const handleMetricChange = useCallback((metric: ActiveMetric) => {
     setActiveMetric(metric);
   }, []);
