@@ -21,7 +21,9 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Self {
-        dotenv::dotenv().ok();
+        // Load environment variables from the root directory (parent of backend)
+        let root_env_path = PathBuf::from("../.env");
+        dotenv::from_path(&root_env_path).ok();
 
         Config {
             server_port: env::var("SERVER_PORT")
