@@ -1,7 +1,8 @@
 import { getDateRangeForTimePresets } from "@/utils/timeRanges";
 import { GranularityRangeValues } from "@/utils/granularityRanges";
-import React, { Dispatch, SetStateAction, useCallback } from "react";
+import React, { Dispatch, SetStateAction, useCallback, useEffect } from 'react';
 import { startOfDay, endOfDay } from 'date-fns';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 type TimeRangeContextProps = {
   startDate: Date;
@@ -14,20 +15,20 @@ type TimeRangeContextProps = {
   compareStartDate?: Date;
   compareEndDate?: Date;
   setCompareDateRange: (startDate: Date, endDate: Date) => void;
-}
+};
 
 const TimeRangeContext = React.createContext<TimeRangeContextProps>({} as TimeRangeContextProps);
 
 type TimeRangeContextProviderProps = {
   children: React.ReactNode;
-}
+};
 
 export function TimeRangeContextProvider({ children }: TimeRangeContextProviderProps) {
-  const initialRangeDetails = getDateRangeForTimePresets("7d");
+  const initialRangeDetails = getDateRangeForTimePresets('7d');
   const [startDate, setStartDate] = React.useState<Date>(initialRangeDetails.startDate);
   const [endDate, setEndDate] = React.useState<Date>(initialRangeDetails.endDate);
 
-  const [granularity, setGranularity] = React.useState<GranularityRangeValues>("day");
+  const [granularity, setGranularity] = React.useState<GranularityRangeValues>('day');
   const [compareEnabled, setCompareEnabled] = React.useState<boolean>(false);
   const [compareStartDate, setCompareStartDate] = React.useState<Date | undefined>(undefined);
   const [compareEndDate, setCompareEndDate] = React.useState<Date | undefined>(undefined);
@@ -42,22 +43,36 @@ export function TimeRangeContextProvider({ children }: TimeRangeContextProviderP
     setCompareEndDate(endOfDay(ceDate));
   }, []);
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('startDate', `${startDate.valueOf()}`);
+    params.set('endDate', `${endDate.valueOf()}`);
+    params.set('granularity', granularity);
+    router.replace(`?${params.toString()}`);
+    router.refresh();
+  }, [startDate, endDate, granularity, router]);
+
   return (
-    <TimeRangeContext.Provider value={{
-      startDate,
-      endDate,
-      setPeriod,
-      granularity,
-      setGranularity,
-      compareEnabled,
-      setCompareEnabled,
-      compareStartDate,
-      compareEndDate,
-      setCompareDateRange: handleSetCompareDateRange
-    }}>
+    <TimeRangeContext.Provider
+      value={{
+        startDate,
+        endDate,
+        setPeriod,
+        granularity,
+        setGranularity,
+        compareEnabled,
+        setCompareEnabled,
+        compareStartDate,
+        compareEndDate,
+        setCompareDateRange: handleSetCompareDateRange,
+      }}
+    >
       {children}
     </TimeRangeContext.Provider>
-  )
+  );
 }
 
 export function useTimeRangeContext() {

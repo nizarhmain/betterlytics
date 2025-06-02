@@ -1,20 +1,14 @@
 "use client";
 import MultiProgressTable from '@/components/MultiProgressTable';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { fetchDeviceBreakdownCombinedAction } from "@/app/actions/devices";
-import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
+import { use } from 'react';
 
-export default function DevicesSection() {
-  const dashboardId = useDashboardId();
-  const { startDate, endDate } = useTimeRangeContext();
-  const { queryFilters } = useQueryFiltersContext();
+type DevicesSectionProps = {
+  deviceBreakdownCombinedPromise: ReturnType<typeof fetchDeviceBreakdownCombinedAction>
+}
 
-  const { data: deviceBreakdownCombined } = useSuspenseQuery({
-    queryKey: ['deviceBreakdownCombined', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchDeviceBreakdownCombinedAction(dashboardId, startDate, endDate, queryFilters),
-  });
+export default function DevicesSection({ deviceBreakdownCombinedPromise }: DevicesSectionProps) {
+  const deviceBreakdownCombined = use(deviceBreakdownCombinedPromise);
 
   return (
     <MultiProgressTable 
