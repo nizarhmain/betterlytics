@@ -1,6 +1,6 @@
 import { Hash } from 'lucide-react';
-import { EventTypeRow } from "@/entities/events";
-import { PropertyRow } from './PropertyRow';
+import { EventTypeRow } from '@/entities/events';
+import { PropertyRow } from '../../../../components/events/PropertyRow';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 import { useEventProperties } from '@/hooks/use-event-properties';
 import { QueryFilter } from '@/entities/filter';
@@ -29,21 +29,21 @@ export function ExpandedEventContent({
     event.event_name,
     startDate,
     endDate,
-    queryFilters
+    queryFilters,
   );
 
   return (
-    <div className="bg-muted/20 border-l-2 border-primary/30">
+    <div className='bg-muted/20 border-primary/30 border-l-2'>
       {propertiesLoading ? (
-        <div className="flex flex-col items-center gap-4 py-12">
-          <div className="relative">
-            <Spinner size="sm" />
+        <div className='flex flex-col items-center gap-4 py-12'>
+          <div className='relative'>
+            <Spinner size='sm' />
           </div>
-          <p className="text-sm text-muted-foreground">Loading properties...</p>
+          <p className='text-muted-foreground text-sm'>Loading properties...</p>
         </div>
       ) : propertiesData?.properties.length ? (
-        <div className="py-4 pl-8 pr-6">
-          <div className="space-y-4">
+        <div className='py-4 pr-6 pl-8'>
+          <div className='space-y-4'>
             {propertiesData.properties.map((property) => (
               <PropertyRow
                 key={property.propertyName}
@@ -55,16 +55,14 @@ export function ExpandedEventContent({
           </div>
         </div>
       ) : (
-        <div className="text-center py-12 pl-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted/40 mb-3">
-            <Hash className="h-6 w-6 text-muted-foreground/60" />
+        <div className='py-12 pl-8 text-center'>
+          <div className='bg-muted/40 mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full'>
+            <Hash className='text-muted-foreground/60 h-6 w-6' />
           </div>
-          <h4 className="text-sm font-medium text-foreground mb-1">No Properties</h4>
-          <p className="text-xs text-muted-foreground">
-            This event has no custom properties.
-          </p>
+          <h4 className='text-foreground mb-1 text-sm font-medium'>No Properties</h4>
+          <p className='text-muted-foreground text-xs'>This event has no custom properties.</p>
         </div>
       )}
     </div>
   );
-} 
+}
