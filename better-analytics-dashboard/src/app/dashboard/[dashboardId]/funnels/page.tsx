@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { Suspense } from 'react';
 import { fetchFunnelsAction } from '@/app/actions';
 import FunnelsListSection from './FunnelsListSection';
+import { CreateFunnelDialog } from './CreateFunnelDialog';
 import DashboardFilters from '@/components/dashboard/DashboardFilters';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -30,7 +31,10 @@ export default async function FunnelsPage({ params, searchParams }: FunnelsPageP
             <h1 className='text-foreground mb-1 text-2xl font-bold'>Funnels</h1>
             <p className='text-muted-foreground text-sm'>Analyze user conversion paths</p>
           </div>
-          <DashboardFilters />
+          <div className='flex items-center gap-4'>
+            <CreateFunnelDialog />
+            <DashboardFilters />
+          </div>
         </div>
 
         <Suspense
