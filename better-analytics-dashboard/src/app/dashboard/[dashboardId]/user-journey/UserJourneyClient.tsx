@@ -10,14 +10,14 @@ import QueryFiltersSelector from "@/components/filters/QueryFiltersSelector";
 import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
 import { Spinner } from "@/components/ui/spinner";
 import { useDashboardId } from "@/hooks/use-dashboard-id";
+import { useUserJourneyFilter } from "@/contexts/UserJourneyFilterContextProvider";
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
 const JOURNEY_OPTIONS = [5, 10, 20, 50, 100];
 
 export default function UserJourneyClient() {
   const dashboardId = useDashboardId();
-  const [numberOfSteps, setNumberOfSteps] = useState<number>(3);
-  const [numberOfJourneys, setNumberOfJourneys] = useState<number>(10);
+  const { numberOfSteps, setNumberOfSteps, numberOfJourneys, setNumberOfJourneys } = useUserJourneyFilter();
 
   const { startDate, endDate } = useTimeRangeContext();
   const { queryFilters } = useQueryFiltersContext();
