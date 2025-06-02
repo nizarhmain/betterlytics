@@ -1,30 +1,27 @@
-import { getServerSession } from "next-auth"
-import { redirect } from "next/navigation"
-import { authOptions } from "@/lib/auth"
-import { Suspense } from "react"
-import DashboardFilters from "../../../components/dashboard/DashboardFilters"
-import { TableSkeleton, SummaryCardSkeleton, ChartSkeleton } from "@/components/skeleton"
-import SummaryAndChartSection from "./SummaryAndChartSection"
-import PagesAnalyticsSection from "./PagesAnalyticsSection"
-import GeographySection from "./GeographySection"
-import DevicesSection from "./DevicesSection"
-import TrafficSourcesSection from "./TrafficSourcesSection"
-import CustomEventsSection from "./CustomEventsSection"
-import { fetchDeviceBreakdownCombinedAction, fetchPageAnalyticsCombinedAction, fetchSessionMetricsAction, fetchSummaryStatsAction, fetchTotalPageViewsAction, fetchUniqueVisitorsAction, getWorldMapData } from '@/app/actions';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
+import { Suspense } from 'react';
+import DashboardFilters from '../../../components/dashboard/DashboardFilters';
+import { TableSkeleton, SummaryCardsSkeleton, ChartSkeleton } from '@/components/skeleton';
+import SummaryAndChartSection from './SummaryAndChartSection';
+import PagesAnalyticsSection from './PagesAnalyticsSection';
+import GeographySection from './GeographySection';
+import DevicesSection from './DevicesSection';
+import TrafficSourcesSection from './TrafficSourcesSection';
+import CustomEventsSection from './CustomEventsSection';
+import {
+  fetchDeviceBreakdownCombinedAction,
+  fetchPageAnalyticsCombinedAction,
+  fetchSessionMetricsAction,
+  fetchSummaryStatsAction,
+  fetchTotalPageViewsAction,
+  fetchUniqueVisitorsAction,
+  getWorldMapData,
+} from '@/app/actions';
 import { fetchTrafficSourcesCombinedAction } from '@/app/actions/referrers';
 import { fetchCustomEventsOverviewAction } from '@/app/actions/events';
-import { GranularityRangeValues } from "@/utils/granularityRanges"
-
-const SummaryAndChartSkeleton = () => (
-  <div className='space-y-6'>
-    <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4'>
-      {[1, 2, 3, 4].map((i) => (
-        <SummaryCardSkeleton key={i} />
-      ))}
-    </div>
-    <ChartSkeleton />
-  </div>
-);
+import { GranularityRangeValues } from '@/utils/granularityRanges';
 
 type DashboardPageParams = {
   params: Promise<{ dashboardId: string }>;
@@ -43,14 +40,12 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
   const analyticsCombinedPromise = fetchPageAnalyticsCombinedAction(dashboardId, startDate, endDate, 5, []);
   const worldMapPromise = getWorldMapData(dashboardId, { startDate, endDate, queryFilters: [] });
 
-  const summaryAndChartPromise = Promise.all(
-    [
-      fetchSummaryStatsAction(dashboardId, startDate, endDate, []),
-      fetchUniqueVisitorsAction(dashboardId, startDate, endDate, granularity, []),
-      fetchTotalPageViewsAction(dashboardId, startDate, endDate, granularity, []),
-      fetchSessionMetricsAction(dashboardId, startDate, endDate, granularity, []),
-    ]
-  );
+  const summaryAndChartPromise = Promise.all([
+    fetchSummaryStatsAction(dashboardId, startDate, endDate, []),
+    fetchUniqueVisitorsAction(dashboardId, startDate, endDate, granularity, []),
+    fetchTotalPageViewsAction(dashboardId, startDate, endDate, granularity, []),
+    fetchSessionMetricsAction(dashboardId, startDate, endDate, granularity, []),
+  ]);
 
   const devicePromise = fetchDeviceBreakdownCombinedAction(dashboardId, startDate, endDate, []);
   const trafficSourcesPromise = fetchTrafficSourcesCombinedAction(dashboardId, startDate, endDate, 10);
@@ -61,7 +56,14 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
       <div className='space-y-6 p-6'>
         <DashboardFilters />
 
-        <Suspense fallback={<SummaryAndChartSkeleton />}>
+        <Suspense
+          fallback={
+            <div className='space-y-6'>
+              <SummaryCardsSkeleton />
+              <ChartSkeleton />
+            </div>
+          }
+        >
           <SummaryAndChartSection data={summaryAndChartPromise} />
         </Suspense>
 
