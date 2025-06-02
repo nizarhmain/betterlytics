@@ -21,11 +21,11 @@ import {
 } from '@/app/actions';
 import { fetchTrafficSourcesCombinedAction } from '@/app/actions/referrers';
 import { fetchCustomEventsOverviewAction } from '@/app/actions/events';
-import { GranularityRangeValues } from '@/utils/granularityRanges';
+import { BAFilterSearchParams } from '@/utils/filterSearchParams';
 
 type DashboardPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{ startDate: Date; endDate: Date; granularity: string }>;
+  searchParams: Promise<{ filters: string }>;
 };
 
 export default async function DashboardPage({ params, searchParams }: DashboardPageParams) {
@@ -35,21 +35,28 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
     redirect('/');
   }
   const { dashboardId } = await params;
-  const { startDate, endDate, granularity } = await parseBASearchParams(searchParams);
+  const { startDate, endDate, granularity, queryFilters } =
+    await BAFilterSearchParams.decodeFromParams(searchParams);
 
-  const analyticsCombinedPromise = fetchPageAnalyticsCombinedAction(dashboardId, startDate, endDate, 5, []);
-  const worldMapPromise = getWorldMapData(dashboardId, { startDate, endDate, queryFilters: [] });
+  const analyticsCombinedPromise = fetchPageAnalyticsCombinedAction(
+    dashboardId,
+    startDate,
+    endDate,
+    5,
+    queryFilters,
+  );
+  const worldMapPromise = getWorldMapData(dashboardId, { startDate, endDate, queryFilters });
 
   const summaryAndChartPromise = Promise.all([
-    fetchSummaryStatsAction(dashboardId, startDate, endDate, []),
-    fetchUniqueVisitorsAction(dashboardId, startDate, endDate, granularity, []),
-    fetchTotalPageViewsAction(dashboardId, startDate, endDate, granularity, []),
-    fetchSessionMetricsAction(dashboardId, startDate, endDate, granularity, []),
+    fetchSummaryStatsAction(dashboardId, startDate, endDate, queryFilters),
+    fetchUniqueVisitorsAction(dashboardId, startDate, endDate, granularity, queryFilters),
+    fetchTotalPageViewsAction(dashboardId, startDate, endDate, granularity, queryFilters),
+    fetchSessionMetricsAction(dashboardId, startDate, endDate, granularity, queryFilters),
   ]);
 
-  const devicePromise = fetchDeviceBreakdownCombinedAction(dashboardId, startDate, endDate, []);
+  const devicePromise = fetchDeviceBreakdownCombinedAction(dashboardId, startDate, endDate, queryFilters);
   const trafficSourcesPromise = fetchTrafficSourcesCombinedAction(dashboardId, startDate, endDate, 10);
-  const customEventsPromise = fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, []);
+  const customEventsPromise = fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, queryFilters);
 
   return (
     <div className='min-h-screen'>
@@ -99,14 +106,3 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
     </div>
   );
 }
-
-const parseBASearchParams = async (
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>,
-) => {
-  const { startDate: startDateStr, endDate: endDateStr, granularity: granularityStr } = await searchParams;
-
-  const startDate = new Date(+(startDateStr ?? Date.now()) - 100_000_000);
-  const endDate = new Date(+(endDateStr ?? Date.now()));
-  const granularity = (granularityStr ?? 'day') as GranularityRangeValues;
-  return { startDate, endDate, granularity };
-};

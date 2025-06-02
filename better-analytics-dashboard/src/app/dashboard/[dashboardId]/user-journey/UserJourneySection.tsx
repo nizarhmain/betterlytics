@@ -6,6 +6,7 @@ import UserJourneyChart from '@/app/dashboard/[dashboardId]/user-journey/UserJou
 import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
+import { useUserJourneyFilter } from '@/contexts/UserJourneyFilterContextProvider';
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
 const JOURNEY_OPTIONS = [5, 10, 20, 50, 100];
@@ -16,8 +17,7 @@ type UserJourneySectionProps = {
 
 export default function UserJourneySection({ userJourneyPromise }: UserJourneySectionProps) {
   const dashboardId = useDashboardId();
-  const [numberOfSteps, setNumberOfSteps] = useState<number>(3);
-  const [numberOfJourneys, setNumberOfJourneys] = useState<number>(10);
+  const { numberOfSteps, setNumberOfSteps, numberOfJourneys, setNumberOfJourneys } = useUserJourneyFilter();
   const [currentPromise, setCurrentPromise] = useState(userJourneyPromise);
 
   const { startDate, endDate } = useTimeRangeContext();

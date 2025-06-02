@@ -1,8 +1,7 @@
-import { getDateRangeForTimePresets } from "@/utils/timeRanges";
-import { GranularityRangeValues } from "@/utils/granularityRanges";
-import React, { Dispatch, SetStateAction, useCallback, useEffect } from 'react';
+import React, { Dispatch, SetStateAction, useCallback } from 'react';
+import { getDateRangeForTimePresets } from '@/utils/timeRanges';
+import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { startOfDay, endOfDay } from 'date-fns';
-import { useRouter, useSearchParams } from 'next/navigation';
 
 type TimeRangeContextProps = {
   startDate: Date;
@@ -42,18 +41,6 @@ export function TimeRangeContextProvider({ children }: TimeRangeContextProviderP
     setCompareStartDate(startOfDay(csDate));
     setCompareEndDate(endOfDay(ceDate));
   }, []);
-
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('startDate', `${startDate.valueOf()}`);
-    params.set('endDate', `${endDate.valueOf()}`);
-    params.set('granularity', granularity);
-    router.replace(`?${params.toString()}`);
-    router.refresh();
-  }, [startDate, endDate, granularity, router]);
 
   return (
     <TimeRangeContext.Provider
