@@ -11,7 +11,8 @@ import DevicesSection from "./DevicesSection"
 import TrafficSourcesSection from "./TrafficSourcesSection"
 import CustomEventsSection from "./CustomEventsSection"
 import { fetchDeviceBreakdownCombinedAction, fetchPageAnalyticsCombinedAction, fetchSessionMetricsAction, fetchSummaryStatsAction, fetchTotalPageViewsAction, fetchUniqueVisitorsAction, getWorldMapData } from '@/app/actions';
-import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
+import { fetchTrafficSourcesCombinedAction } from '@/app/actions/referrers';
+import { fetchCustomEventsOverviewAction } from '@/app/actions/events';
 import { GranularityRangeValues } from "@/utils/granularityRanges"
 
 const SummaryAndChartSkeleton = () => (
@@ -52,6 +53,8 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
   );
 
   const devicePromise = fetchDeviceBreakdownCombinedAction(dashboardId, startDate, endDate, []);
+  const trafficSourcesPromise = fetchTrafficSourcesCombinedAction(dashboardId, startDate, endDate, 10);
+  const customEventsPromise = fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, []);
 
   return (
     <div className='min-h-screen'>
@@ -78,16 +81,16 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
             </Suspense>
           </div>
           <div className='flex-1'>
-            {/* <Suspense fallback={<TableSkeleton />}>
-              <TrafficSourcesSection />
-            </Suspense> */}
+            <Suspense fallback={<TableSkeleton />}>
+              <TrafficSourcesSection trafficSourcesCombinedPromise={trafficSourcesPromise} />
+            </Suspense>
           </div>
         </div>
 
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-          {/* <Suspense fallback={<TableSkeleton />}>
-            <CustomEventsSection />
-          </Suspense> */}
+          <Suspense fallback={<TableSkeleton />}>
+            <CustomEventsSection customEventsPromise={customEventsPromise} />
+          </Suspense>
           <div>{/* Placeholder for future content */}</div>
         </div>
       </div>

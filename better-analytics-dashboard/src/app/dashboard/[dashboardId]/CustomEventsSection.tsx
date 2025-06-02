@@ -1,20 +1,15 @@
 "use client";
+
 import MultiProgressTable from '@/components/MultiProgressTable';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { fetchCustomEventsOverviewAction } from "@/app/actions/events";
-import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
+import { use } from 'react';
 
-export default function CustomEventsSection() {
-  const dashboardId = useDashboardId();
-  const { startDate, endDate } = useTimeRangeContext();
-  const { queryFilters } = useQueryFiltersContext();
+type CustomEventsSectionProps = {
+  customEventsPromise: ReturnType<typeof fetchCustomEventsOverviewAction>;
+};
 
-  const { data: customEvents } = useSuspenseQuery({
-    queryKey: ['customEvents', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, queryFilters),
-  });
+export default function CustomEventsSection({ customEventsPromise }: CustomEventsSectionProps) {
+  const customEvents = use(customEventsPromise);
 
   return (
     <MultiProgressTable 

@@ -1,21 +1,15 @@
 "use client";
 
 import MultiProgressTable from '@/components/MultiProgressTable';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { fetchTrafficSourcesCombinedAction } from "@/app/actions/referrers";
-import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { useQueryFiltersContext } from "@/contexts/QueryFiltersContextProvider";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
+import { use } from 'react';
 
-export default function TrafficSourcesSection() {
-  const dashboardId = useDashboardId();
-  const { startDate, endDate } = useTimeRangeContext();
-  const { queryFilters } = useQueryFiltersContext();
+type TrafficSourcesSectionProps = {
+  trafficSourcesCombinedPromise: ReturnType<typeof fetchTrafficSourcesCombinedAction>;
+};
 
-  const { data: trafficSourcesCombined } = useSuspenseQuery({
-    queryKey: ['trafficSourcesCombined', dashboardId, startDate, endDate, queryFilters],
-    queryFn: () => fetchTrafficSourcesCombinedAction(dashboardId, startDate, endDate, 10),
-  });
+export default function TrafficSourcesSection({ trafficSourcesCombinedPromise }: TrafficSourcesSectionProps) {
+  const trafficSourcesCombined = use(trafficSourcesCombinedPromise);
 
   return (
     <MultiProgressTable 
