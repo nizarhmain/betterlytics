@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 import DeviceTypeChart from '@/components/analytics/DeviceTypeChart';
-import DeviceUsageTrendChart from '@/components/charts/DeviceUsageTrendChart';
+import DeviceUsageTrendChart from '@/app/dashboard/[dashboardId]/devices/DeviceUsageTrendChart';
 import { fetchDeviceTypeBreakdownAction, fetchDeviceUsageTrendAction } from '@/app/actions';
 
 type DevicesChartsSectionProps = {

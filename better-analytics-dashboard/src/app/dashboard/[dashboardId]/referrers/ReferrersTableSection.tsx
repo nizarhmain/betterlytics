@@ -1,7 +1,7 @@
 'use client';
 
 import { use } from 'react';
-import ReferrerTable from '@/components/charts/ReferrerTable';
+import ReferrerTable from '@/app/dashboard/[dashboardId]/referrers/ReferrerTable';
 import { fetchReferrerTableDataForSite } from '@/app/actions';
 
 type ReferrersTableSectionProps = {

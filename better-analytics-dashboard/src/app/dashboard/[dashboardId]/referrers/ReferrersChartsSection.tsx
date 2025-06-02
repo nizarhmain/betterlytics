@@ -1,8 +1,8 @@
 'use client';
 
 import { use } from 'react';
-import ReferrerDistributionChart from '@/components/charts/ReferrerDistributionChart';
-import ReferrerTrafficTrendChart from '@/components/charts/ReferrerTrafficTrendChart';
+import ReferrerDistributionChart from '@/app/dashboard/[dashboardId]/referrers/ReferrerDistributionChart';
+import ReferrerTrafficTrendChart from '@/app/dashboard/[dashboardId]/referrers/ReferrerTrafficTrendChart';
 import {
   fetchReferrerSourceAggregationDataForSite,
   fetchReferrerTrafficTrendBySourceDataForSite,
