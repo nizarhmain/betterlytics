@@ -1,12 +1,11 @@
 'use client';
 
 import { use, useMemo, ReactNode } from 'react';
-import { FunnelDetails } from '@/entities/funnels';
 import { fetchFunnelsAction } from '@/app/actions';
 import { Badge } from '@/components/ui/badge';
 import { analyzeFunnel } from './analytics';
-import Link from 'next/link';
 import { ArrowRightCircleIcon } from 'lucide-react';
+import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
 
 type FunnelsListSectionProps = {
   funnelsPromise: ReturnType<typeof fetchFunnelsAction>;
@@ -40,9 +39,12 @@ export default function FunnelsListSection({ funnelsPromise, dashboardId }: Funn
             </Badge>
           </div>
           <div className='col-span-1 flex justify-end'>
-            <Link className='mr-2 text-right' href={`/dashboard/${dashboardId}/funnels/${funnel.id}`}>
+            <FilterPreservingLink
+              className='mr-2 text-right'
+              href={`/dashboard/${dashboardId}/funnels/${funnel.id}`}
+            >
               <ArrowRightCircleIcon />
-            </Link>
+            </FilterPreservingLink>
           </div>
           <div className='col-span-4 row-span-4 grid gap-2 md:row-span-1 md:grid-cols-4'>
             <InlineDataDisplay title={'Conversion rate'} value={`${Math.floor(100 * funnel.conversionRate)}%`} />

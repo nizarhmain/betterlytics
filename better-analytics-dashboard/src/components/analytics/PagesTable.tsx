@@ -1,11 +1,12 @@
 'use client';
 
 import { ArrowUpRight } from 'lucide-react';
-import Link from 'next/link';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/DataTable';
-import { PageAnalytics } from "@/entities/pages";
+import { PageAnalytics } from '@/entities/pages';
 import { formatDuration } from '@/utils/dateFormatters';
+import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
+import { useNavigateWithFilters } from '@/hooks/use-navigate-with-filters';
 
 interface PagesTableProps {
   data: PageAnalytics[];
@@ -16,10 +17,11 @@ const generatePageDetailUrl = (path: string): string => {
 };
 
 const formatPath = (path: string): string => {
-  return path || "/";
+  return path || '/';
 };
 
 export default function PagesTable({ data }: PagesTableProps) {
+  const { navigate } = useNavigateWithFilters();
 
   const columns: ColumnDef<PageAnalytics>[] = [
     {
@@ -53,13 +55,13 @@ export default function PagesTable({ data }: PagesTableProps) {
       cell: ({ row }) => {
         const pageDetailUrl = generatePageDetailUrl(row.original.path);
         return (
-          <Link 
-            href={pageDetailUrl} 
-            className="text-gray-400 hover:text-gray-600 flex justify-end"
+          <FilterPreservingLink
+            href={pageDetailUrl}
+            className='flex justify-end text-gray-400 hover:text-gray-600'
             onClick={(e) => e.stopPropagation()} // Prevent row click from firing
           >
             <ArrowUpRight size={16} />
-          </Link>
+          </FilterPreservingLink>
         );
       },
       enableSorting: false,
@@ -68,14 +70,14 @@ export default function PagesTable({ data }: PagesTableProps) {
 
   const handleRowClick = (row: PageAnalytics) => {
     const pageDetailUrl = generatePageDetailUrl(row.path);
-    window.location.href = pageDetailUrl;
+    navigate(pageDetailUrl);
   };
 
   return (
-    <div className="bg-card rounded-lg shadow border border-border p-6">
-      <h2 className="text-lg font-bold text-foreground mb-1">All Pages</h2>
-      <p className="text-sm text-muted-foreground mb-4">Analytics for all tracked pages</p>
-      <div className="overflow-x-auto">
+    <div className='bg-card border-border rounded-lg border p-6 shadow'>
+      <h2 className='text-foreground mb-1 text-lg font-bold'>All Pages</h2>
+      <p className='text-muted-foreground mb-4 text-sm'>Analytics for all tracked pages</p>
+      <div className='overflow-x-auto'>
         <DataTable
           columns={columns}
           data={data}
@@ -85,4 +87,4 @@ export default function PagesTable({ data }: PagesTableProps) {
       </div>
     </div>
   );
-} 
+}
