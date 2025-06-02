@@ -8,10 +8,11 @@ import { SummaryCardsSkeleton, TableSkeleton } from '@/components/skeleton';
 import PagesSummarySection from '@/app/dashboard/[dashboardId]/pages/PagesSummarySection';
 import PagesTableSection from './PagesTableSection';
 import DashboardFilters from '@/components/dashboard/DashboardFilters';
+import { BAFilterSearchParams } from '@/utils/filterSearchParams';
 
 type PagesPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>;
+  searchParams: Promise<{ filters: string }>;
 };
 
 export default async function PagesPage({ params, searchParams }: PagesPageParams) {
@@ -22,7 +23,7 @@ export default async function PagesPage({ params, searchParams }: PagesPageParam
   }
 
   const { dashboardId } = await params;
-  const { startDate, endDate } = await parsePagesSearchParams(searchParams);
+  const { startDate, endDate } = await BAFilterSearchParams.decodeFromParams(searchParams);
 
   const summaryStatsPromise = fetchSummaryStatsAction(dashboardId, startDate, endDate, []);
   const pageAnalyticsPromise = fetchPageAnalyticsAction(dashboardId, startDate, endDate, []);

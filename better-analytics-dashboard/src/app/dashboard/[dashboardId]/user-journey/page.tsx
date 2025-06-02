@@ -3,20 +3,14 @@ import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { Suspense } from 'react';
 import { fetchUserJourneyAction } from '@/app/actions/userJourney';
-import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { Spinner } from '@/components/ui/spinner';
 import UserJourneySection from '@/app/dashboard/[dashboardId]/user-journey/UserJourneySection';
 import DashboardFilters from '@/components/dashboard/DashboardFilters';
+import { BAFilterSearchParams } from '@/utils/filterSearchParams';
 
 type UserJourneyPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{
-    startDate?: Date;
-    endDate?: Date;
-    granularity?: string;
-    numberOfSteps?: string;
-    numberOfJourneys?: string;
-  }>;
+  searchParams: Promise<{ filters: string }>;
 };
 
 export default async function UserJourneyPage({ params, searchParams }: UserJourneyPageParams) {
@@ -27,15 +21,16 @@ export default async function UserJourneyPage({ params, searchParams }: UserJour
   }
 
   const { dashboardId } = await params;
-  const { startDate, endDate, numberOfSteps, numberOfJourneys } = await parseUserJourneySearchParams(searchParams);
+  const { startDate, endDate, userJourney, queryFilters } =
+    await BAFilterSearchParams.decodeFromParams(searchParams);
 
   const userJourneyPromise = fetchUserJourneyAction(
     dashboardId,
     startDate,
     endDate,
-    numberOfSteps,
-    numberOfJourneys,
-    [],
+    userJourney.numberOfSteps,
+    userJourney.numberOfJourneys,
+    queryFilters,
   );
 
   return (
@@ -67,30 +62,3 @@ export default async function UserJourneyPage({ params, searchParams }: UserJour
     </div>
   );
 }
-
-// TODO: We need to likely also include steps and number of journey in the search params
-const parseUserJourneySearchParams = async (
-  searchParams: Promise<{
-    startDate?: Date;
-    endDate?: Date;
-    granularity?: string;
-    numberOfSteps?: string;
-    numberOfJourneys?: string;
-  }>,
-) => {
-  const {
-    startDate: startDateStr,
-    endDate: endDateStr,
-    granularity: granularityStr,
-    numberOfSteps: numberOfStepsStr,
-    numberOfJourneys: numberOfJourneysStr,
-  } = await searchParams;
-
-  const startDate = new Date(+(startDateStr ?? Date.now()) - 100_000_000);
-  const endDate = new Date(+(endDateStr ?? Date.now()));
-  const granularity = (granularityStr ?? 'day') as GranularityRangeValues;
-  const numberOfSteps = parseInt(numberOfStepsStr ?? '3', 10);
-  const numberOfJourneys = parseInt(numberOfJourneysStr ?? '10', 10);
-
-  return { startDate, endDate, granularity, numberOfSteps, numberOfJourneys };
-};

@@ -3,15 +3,15 @@ import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { Suspense } from 'react';
 import { fetchCustomEventsOverviewAction } from '@/app/actions/events';
-import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { TableSkeleton } from '@/components/skeleton';
 import EventsTableSection from './EventsTableSection';
 import { EventLog } from '@/app/dashboard/[dashboardId]/events/EventLog';
 import DashboardFilters from '@/components/dashboard/DashboardFilters';
+import { BAFilterSearchParams } from '@/utils/filterSearchParams';
 
 type EventsPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>;
+  searchParams: Promise<{ filters: string }>;
 };
 
 export default async function EventsPage({ params, searchParams }: EventsPageParams) {
@@ -22,9 +22,9 @@ export default async function EventsPage({ params, searchParams }: EventsPagePar
   }
 
   const { dashboardId } = await params;
-  const { startDate, endDate } = await parseEventsSearchParams(searchParams);
+  const { startDate, endDate, queryFilters } = await BAFilterSearchParams.decodeFromParams(searchParams);
 
-  const eventsPromise = fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, []);
+  const eventsPromise = fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, queryFilters);
 
   return (
     <div className='min-h-screen'>
@@ -46,14 +46,3 @@ export default async function EventsPage({ params, searchParams }: EventsPagePar
     </div>
   );
 }
-
-const parseEventsSearchParams = async (
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>,
-) => {
-  const { startDate: startDateStr, endDate: endDateStr, granularity: granularityStr } = await searchParams;
-
-  const startDate = new Date(+(startDateStr ?? Date.now()) - 100_000_000);
-  const endDate = new Date(+(endDateStr ?? Date.now()));
-  const granularity = (granularityStr ?? 'day') as GranularityRangeValues;
-  return { startDate, endDate, granularity };
-};

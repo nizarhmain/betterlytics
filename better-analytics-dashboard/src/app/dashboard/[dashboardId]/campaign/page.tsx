@@ -10,13 +10,13 @@ import {
   fetchCampaignTermBreakdownAction,
   fetchCampaignLandingPagePerformanceAction,
 } from '@/app/actions';
-import { GranularityRangeValues } from '@/utils/granularityRanges';
 import CampaignTabs from './CampaignTabs';
 import DashboardFilters from '@/components/dashboard/DashboardFilters';
+import { BAFilterSearchParams } from '@/utils/filterSearchParams';
 
 type CampaignPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>;
+  searchParams: Promise<{ filters: string }>;
 };
 
 export default async function CampaignPage({ params, searchParams }: CampaignPageParams) {
@@ -27,7 +27,7 @@ export default async function CampaignPage({ params, searchParams }: CampaignPag
   }
 
   const { dashboardId } = await params;
-  const { startDate, endDate } = await parseCampaignSearchParams(searchParams);
+  const { startDate, endDate } = await BAFilterSearchParams.decodeFromParams(searchParams);
 
   const campaignPerformancePromise = fetchCampaignPerformanceAction(dashboardId, startDate, endDate);
   const sourceBreakdownPromise = fetchCampaignSourceBreakdownAction(dashboardId, startDate, endDate);
@@ -61,14 +61,3 @@ export default async function CampaignPage({ params, searchParams }: CampaignPag
     </div>
   );
 }
-
-const parseCampaignSearchParams = async (
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>,
-) => {
-  const { startDate: startDateStr, endDate: endDateStr, granularity: granularityStr } = await searchParams;
-
-  const startDate = new Date(+(startDateStr ?? Date.now()) - 100_000_000);
-  const endDate = new Date(+(endDateStr ?? Date.now()));
-  const granularity = (granularityStr ?? 'day') as GranularityRangeValues;
-  return { startDate, endDate, granularity };
-};

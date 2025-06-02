@@ -8,16 +8,16 @@ import {
   fetchReferrerTableDataForSite,
   fetchReferrerTrafficTrendBySourceDataForSite,
 } from '@/app/actions';
-import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { SummaryCardsSkeleton, TableSkeleton, ChartSkeleton } from '@/components/skeleton';
 import ReferrersSummarySection from './ReferrersSummarySection';
 import ReferrersChartsSection from './ReferrersChartsSection';
 import ReferrersTableSection from './ReferrersTableSection';
 import DashboardFilters from '@/components/dashboard/DashboardFilters';
+import { BAFilterSearchParams } from '@/utils/filterSearchParams';
 
 type ReferrersPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>;
+  searchParams: Promise<{ filters: string }>;
 };
 
 export default async function ReferrersPage({ params, searchParams }: ReferrersPageParams) {
@@ -28,7 +28,7 @@ export default async function ReferrersPage({ params, searchParams }: ReferrersP
   }
 
   const { dashboardId } = await params;
-  const { startDate, endDate, granularity } = await parseReferrersSearchParams(searchParams);
+  const { startDate, endDate, granularity } = await BAFilterSearchParams.decodeFromParams(searchParams);
 
   const referrerSummaryPromise = fetchReferrerSummaryDataForSite(dashboardId, startDate, endDate);
   const distributionPromise = fetchReferrerSourceAggregationDataForSite(dashboardId, startDate, endDate);
@@ -68,14 +68,3 @@ export default async function ReferrersPage({ params, searchParams }: ReferrersP
     </div>
   );
 }
-
-const parseReferrersSearchParams = async (
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>,
-) => {
-  const { startDate: startDateStr, endDate: endDateStr, granularity: granularityStr } = await searchParams;
-
-  const startDate = new Date(+(startDateStr ?? Date.now()) - 100_000_000);
-  const endDate = new Date(+(endDateStr ?? Date.now()));
-  const granularity = (granularityStr ?? 'day') as GranularityRangeValues;
-  return { startDate, endDate, granularity };
-};

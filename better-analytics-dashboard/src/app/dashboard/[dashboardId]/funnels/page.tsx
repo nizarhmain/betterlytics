@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 type FunnelsPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>;
+  searchParams: Promise<{ filters: string }>;
 };
 
 export default async function FunnelsPage({ params, searchParams }: FunnelsPageParams) {

@@ -6,10 +6,11 @@ import { getWorldMapData } from '@/app/actions/geography';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import GeographySection from '@/app/dashboard/[dashboardId]/geography/GeographySection';
 import DashboardFilters from '@/components/dashboard/DashboardFilters';
+import { BAFilterSearchParams } from '@/utils/filterSearchParams';
 
 type GeographyPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>;
+  searchParams: Promise<{ filters: string }>;
 };
 
 export default async function GeographyPage({ params, searchParams }: GeographyPageParams) {
@@ -20,9 +21,9 @@ export default async function GeographyPage({ params, searchParams }: GeographyP
   }
 
   const { dashboardId } = await params;
-  const { startDate, endDate } = await parseGeographySearchParams(searchParams);
+  const { startDate, endDate, queryFilters } = await BAFilterSearchParams.decodeFromParams(searchParams);
 
-  const worldMapPromise = getWorldMapData(dashboardId, { startDate, endDate, queryFilters: [] });
+  const worldMapPromise = getWorldMapData(dashboardId, { startDate, endDate, queryFilters });
 
   return (
     <div className='relative flex h-full w-full flex-col'>

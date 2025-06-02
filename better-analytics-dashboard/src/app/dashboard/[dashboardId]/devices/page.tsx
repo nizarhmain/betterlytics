@@ -9,16 +9,16 @@ import {
   fetchOperatingSystemBreakdownAction,
   fetchDeviceUsageTrendAction,
 } from '@/app/actions';
-import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { SummaryCardsSkeleton, TableSkeleton, ChartSkeleton } from '@/components/skeleton';
 import DevicesSummarySection from './DevicesSummarySection';
 import DevicesChartsSection from './DevicesChartsSection';
 import DevicesTablesSection from './DevicesTablesSection';
 import DashboardFilters from '@/components/dashboard/DashboardFilters';
+import { BAFilterSearchParams } from '@/utils/filterSearchParams';
 
 type DevicesPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>;
+  searchParams: Promise<{ filters: string }>;
 };
 
 export default async function DevicesPage({ params, searchParams }: DevicesPageParams) {
@@ -29,13 +29,20 @@ export default async function DevicesPage({ params, searchParams }: DevicesPageP
   }
 
   const { dashboardId } = await params;
-  const { startDate, endDate, granularity } = await parseDevicesSearchParams(searchParams);
+  const { startDate, endDate, granularity, queryFilters } =
+    await BAFilterSearchParams.decodeFromParams(searchParams);
 
-  const deviceSummaryPromise = fetchDeviceSummaryAction(dashboardId, startDate, endDate, []);
-  const deviceBreakdownPromise = fetchDeviceTypeBreakdownAction(dashboardId, startDate, endDate, []);
-  const browserStatsPromise = fetchBrowserBreakdownAction(dashboardId, startDate, endDate, []);
-  const osStatsPromise = fetchOperatingSystemBreakdownAction(dashboardId, startDate, endDate, []);
-  const deviceUsageTrendPromise = fetchDeviceUsageTrendAction(dashboardId, startDate, endDate, granularity, []);
+  const deviceSummaryPromise = fetchDeviceSummaryAction(dashboardId, startDate, endDate, queryFilters);
+  const deviceBreakdownPromise = fetchDeviceTypeBreakdownAction(dashboardId, startDate, endDate, queryFilters);
+  const browserStatsPromise = fetchBrowserBreakdownAction(dashboardId, startDate, endDate, queryFilters);
+  const osStatsPromise = fetchOperatingSystemBreakdownAction(dashboardId, startDate, endDate, queryFilters);
+  const deviceUsageTrendPromise = fetchDeviceUsageTrendAction(
+    dashboardId,
+    startDate,
+    endDate,
+    granularity,
+    queryFilters,
+  );
 
   return (
     <div className='min-h-screen'>
@@ -80,14 +87,3 @@ export default async function DevicesPage({ params, searchParams }: DevicesPageP
     </div>
   );
 }
-
-const parseDevicesSearchParams = async (
-  searchParams: Promise<{ startDate?: Date; endDate?: Date; granularity?: string }>,
-) => {
-  const { startDate: startDateStr, endDate: endDateStr, granularity: granularityStr } = await searchParams;
-
-  const startDate = new Date(+(startDateStr ?? Date.now()) - 100_000_000);
-  const endDate = new Date(+(endDateStr ?? Date.now()));
-  const granularity = (granularityStr ?? 'day') as GranularityRangeValues;
-  return { startDate, endDate, granularity };
-};
