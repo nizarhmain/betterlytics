@@ -22,6 +22,7 @@ services:
       - .env
     volumes:
       - clickhouse_data:/var/lib/clickhouse/
+      - clickhouse_users:/etc/clickhouse-server/users.d/
       - ./clickhouse-logs:/var/log/clickhouse-server/
       - ./clickhouse-config/config.d/config.xml:/etc/clickhouse-server/config.d/config.xml
       - ./clickhouse-config/setup/:/docker-entrypoint-initdb.d/
@@ -43,4 +44,5 @@ services:
 
 volumes:
   clickhouse_data:
+  clickhouse_users:
   postgres_data:

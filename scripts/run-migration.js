@@ -15,7 +15,6 @@ if (!url || !db) {
 
 const command = `clickhouse-migrations migrate --host=${url} --db=${db} --migrations-home=./migrations --user=${user} --password=${password}`;
 
-console.log("[+] Waiting for Clickhouse to start");
 try {
   execSync(command, { stdio: "inherit" })
 } catch(error) {

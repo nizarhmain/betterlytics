@@ -12,7 +12,7 @@
   <tcp_port>9000</tcp_port>
   <user_directories>
     <local_directory>
-      <path>/var/lib/clickhouse/access/</path>
+      <path>/etc/clickhouse-server/users.d/</path>
     </local_directory>
   </user_directories>
 </clickhouse>

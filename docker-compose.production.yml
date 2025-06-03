@@ -7,6 +7,7 @@ services:
     hostname: static
     volumes:
       - ./static:/usr/share/nginx/html:ro
+    restart: unless-stopped
     ports:
       - 3006:80
 
@@ -14,8 +15,8 @@ services:
     build:
       context: ./backend
       dockerfile: ./Dockerfile
+    restart: unless-stopped
     container_name: backend
-    hostname: backend
     ports:
       - 3001:3001
     env_file:
@@ -30,8 +31,18 @@ services:
     build:
       context: ./better-analytics-dashboard
       dockerfile: ./Dockerfile
+      args:
+        NEXTAUTH_URL: ${NEXTAUTH_URL}
+        NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+        ADMIN_EMAIL: ${ADMIN_EMAIL}
+        ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+        CLICKHOUSE_URL: ${CLICKHOUSE_URL}
+        CLICKHOUSE_DASHBOARD_USER: ${CLICKHOUSE_DASHBOARD_USER}
+        CLICKHOUSE_DASHBOARD_PASSWORD: ${CLICKHOUSE_DASHBOARD_PASSWORD}
     env_file:
       - .env.production
+    restart: unless-stopped
+    container_name: dashboard
     ports:
       - 3000:3000
     depends_on:
@@ -46,10 +57,12 @@ services:
     user: 101:101
     container_name: clickhouse
     hostname: clickhouse
+    restart: unless-stopped
     env_file:
       - .env.production
     volumes:
-      - clickhouse_data:/var/lib/clickhouse/
+      - clickhouse_prod_data:/var/lib/clickhouse/
+      - clickhouse_prod_users:/etc/clickhouse-server/users.d/
       - ./clickhouse-logs:/var/log/clickhouse-server/
       - ./clickhouse-config/config.d/config.xml:/etc/clickhouse-server/config.d/config.xml
       - ./clickhouse-config/setup/:/docker-entrypoint-initdb.d/
@@ -70,10 +83,11 @@ services:
     image: postgres:latest
     container_name: postgres
     hostname: postgres
+    restart: unless-stopped
     env_file:
       - .env.production
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_prod_data:/var/lib/postgresql/data/
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 30s
@@ -98,16 +112,14 @@ services:
       - /bin/sh
       - -c
       - |
-        export PNPM_HOME="/pnpm"
-        export PATH="$PNPM_HOME:$PATH"
-        corepack enable
+        apt-get update -y && apt-get install -y openssl
+        npm install -g pnpm
         cd /app
         pnpm install
-        pnpm run prod-migrate
+        pnpm run migrate-clickhouse
         cd ./better-analytics-dashboard
         pnpm install
         pnpm prisma migrate deploy
-        pnpm prisma db seed
     depends_on:
       clickhouse:
         condition: service_healthy
@@ -118,8 +130,9 @@ services:
       - clickhouse_network
 
 volumes:
-  clickhouse_data:
-  postgres_data:
+  clickhouse_prod_data:
+  clickhouse_prod_users:
+  postgres_prod_data:
 
 networks:
   postgres_network:
