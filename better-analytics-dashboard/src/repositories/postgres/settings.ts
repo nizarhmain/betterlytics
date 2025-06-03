@@ -31,9 +31,7 @@ export async function updateSettings(
   try {
     const validatedUpdates = DashboardSettingsUpdateSchema.parse(updates);
 
-    const data = Object.fromEntries(
-      Object.entries(validatedUpdates).filter(([key, value]) => value !== undefined),
-    );
+    const data = Object.fromEntries(Object.entries(validatedUpdates).filter(([, value]) => value !== undefined));
 
     const updatedSettings = await prisma.dashboardSettings.update({
       where: { dashboardId },
