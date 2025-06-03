@@ -1,17 +1,17 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import TimeRangeSelector from "@/components/TimeRangeSelector";
-import SummaryCard from "@/components/SummaryCard";
-import { fetchPageDetailAction, fetchPageTrafficTimeSeriesAction } from "@/app/actions";
-import { PageAnalytics } from "@/entities/pages";
-import { formatDuration } from "@/utils/dateFormatters";
-import PageTrafficChart from "@/components/PageTrafficChart";
-import { useTimeRangeContext } from "@/contexts/TimeRangeContextProvider";
-import { TotalPageViewsRow } from "@/entities/pageviews";
+import { ArrowLeft } from 'lucide-react';
+import TimeRangeSelector from '@/components/TimeRangeSelector';
+import SummaryCard from '@/components/SummaryCard';
+import { fetchPageDetailAction, fetchPageTrafficTimeSeriesAction } from '@/app/actions';
+import { PageAnalytics } from '@/entities/pages';
+import { formatDuration } from '@/utils/dateFormatters';
+import PageTrafficChart from '@/components/PageTrafficChart';
+import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
+import { TotalPageViewsRow } from '@/entities/pageviews';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
+import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
 
 interface PageDetailClientProps {
   path: string;
@@ -26,7 +26,9 @@ export default function PageDetailClient({ path }: PageDetailClientProps) {
     queryFn: () => fetchPageDetailAction(dashboardId, path, startDate, endDate),
   });
 
-  const { data: pageTrafficData = [] as TotalPageViewsRow[], isLoading: isLoadingPageTraffic } = useQuery<TotalPageViewsRow[]>({
+  const { data: pageTrafficData = [] as TotalPageViewsRow[], isLoading: isLoadingPageTraffic } = useQuery<
+    TotalPageViewsRow[]
+  >({
     queryKey: ['pageTraffic', dashboardId, path, startDate, endDate, granularity],
     queryFn: () => fetchPageTrafficTimeSeriesAction(dashboardId, path, startDate, endDate, granularity),
   });
@@ -34,45 +36,41 @@ export default function PageDetailClient({ path }: PageDetailClientProps) {
   const displayTitle = path;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Link href="/dashboard/pages" className="text-gray-500 hover:text-gray-700">
+    <div className='space-y-6 p-6'>
+      <div className='mb-4 flex items-center justify-between'>
+        <div className='flex items-center gap-2'>
+          <FilterPreservingLink
+            href={`/dashboard/${dashboardId}/pages`}
+            className='text-gray-500 hover:text-gray-700'
+          >
             <ArrowLeft size={18} />
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Page Details</h1>
+          </FilterPreservingLink>
+          <h1 className='text-2xl font-bold text-gray-900'>Page Details</h1>
         </div>
-        
+
         <TimeRangeSelector />
       </div>
 
-      <h2 className="text-xl font-semibold mb-6 ml-1 break-all">{displayTitle}</h2>
+      <h2 className='mb-6 ml-1 text-xl font-semibold break-all'>{displayTitle}</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className='mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <SummaryCard
-          title="Visitors"
-          value={isLoadingPageDetail ? '...' : (pageDetail?.visitors.toLocaleString() || '0')}
-          changeText=""
+          title='Visitors'
+          value={isLoadingPageDetail ? '...' : pageDetail?.visitors.toLocaleString() || '0'}
         />
         <SummaryCard
-          title="Page Views"
-          value={isLoadingPageDetail ? '...' : (pageDetail?.pageviews.toLocaleString() || '0')}
-          changeText=""
+          title='Page Views'
+          value={isLoadingPageDetail ? '...' : pageDetail?.pageviews.toLocaleString() || '0'}
         />
+        <SummaryCard title='Bounce Rate' value={isLoadingPageDetail ? '...' : `${pageDetail?.bounceRate || 0}%`} />
         <SummaryCard
-          title="Bounce Rate"
-          value={isLoadingPageDetail ? '...' : `${pageDetail?.bounceRate || 0}%`}
-          changeText=""
-        />
-        <SummaryCard
-          title="Avg. Time on Page"
+          title='Avg. Time on Page'
           value={isLoadingPageDetail ? '...' : formatDuration(pageDetail?.avgTime || 0)}
-          changeText=""
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Traffic Over Time</h2>
+      <div className='rounded-lg bg-white p-6 shadow'>
+        <h2 className='mb-4 text-lg font-bold text-gray-900'>Traffic Over Time</h2>
         <PageTrafficChart
           pageTrafficData={pageTrafficData}
           isLoading={isLoadingPageTraffic}
@@ -80,12 +78,10 @@ export default function PageDetailClient({ path }: PageDetailClientProps) {
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Referral Sources</h2>
-        <div className="text-gray-500 text-center py-8">
-          Referral sources placeholder
-        </div>
+      <div className='rounded-lg bg-white p-6 shadow'>
+        <h2 className='mb-4 text-lg font-bold text-gray-900'>Referral Sources</h2>
+        <div className='py-8 text-center text-gray-500'>Referral sources placeholder</div>
       </div>
     </div>
   );
-} 
+}

@@ -1,5 +1,5 @@
-import PageDetailClient from "./PageDetailClient";
-import { redirect } from "next/navigation";
+import PageDetailClient from './PageDetailClient';
+import { redirect } from 'next/navigation';
 
 interface SearchParams {
   path?: string;
@@ -9,10 +9,10 @@ export default async function PageDetailPage({ searchParams }: { searchParams: P
   const params = await searchParams;
 
   if (!params.path) {
-    redirect("/");
+    redirect('/');
   }
 
-  let decodedPath = decodeURIComponent(params.path);
-  
+  const decodedPath = decodeURIComponent(params.path);
+
   return <PageDetailClient path={decodedPath} />;
-} 
+}

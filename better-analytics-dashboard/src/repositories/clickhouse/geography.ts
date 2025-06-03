@@ -7,14 +7,17 @@ import { BAQuery } from '@/lib/ba-query';
 
 /**
  * Retrieves visitor data aggregated by country code
+ * @param limit Limit for top countries. Defaults to 1000 to get all countries in practice.
  */
 export async function getVisitorsByCountry(
   siteId: string,
   startDate: DateTimeString,
   endDate: DateTimeString,
-  queryFilters: QueryFilter[]
+  queryFilters: QueryFilter[],
+  limit: number = 1000
 ): Promise<GeoVisitor[]> {
   const filters = BAQuery.getFilterQuery(queryFilters);
+  
   const query = safeSql`
     SELECT
       country_code,
@@ -27,6 +30,7 @@ export async function getVisitorsByCountry(
       AND ${SQL.AND(filters)}
     GROUP BY country_code
     ORDER BY visitors DESC
+    LIMIT {limit:UInt32}
   `;
 
   const result = await clickhouse.query(query.taggedSql, {
@@ -35,6 +39,7 @@ export async function getVisitorsByCountry(
       site_id: siteId,
       start: startDate,
       end: endDate,
+      limit,
     },
   }).toPromise() as any[];
 

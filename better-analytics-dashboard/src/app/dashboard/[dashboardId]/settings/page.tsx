@@ -1,5 +1,27 @@
-import SettingsPageClient from "./SettingsPageClient";
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
+import SettingsSection from './SettingsSection';
 
 export default async function SettingsPage() {
-  return <SettingsPageClient />;
-} 
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect('/');
+  }
+
+  return (
+    <div className='min-h-screen'>
+      <div className='container mx-auto max-w-4xl p-6'>
+        <div className='mb-8'>
+          <h1 className='text-foreground mb-2 text-3xl font-bold'>Dashboard Settings</h1>
+          <p className='text-muted-foreground'>
+            Configure your dashboard preferences and data collection settings
+          </p>
+        </div>
+
+        <SettingsSection />
+      </div>
+    </div>
+  );
+}

@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, Info, Clipboard, Check, Code, RefreshCw, Circle } from "lucide-react";
-import { CodeBlock } from "./CodeBlock";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
-import { useQuery } from "@tanstack/react-query";
-import { fetchSiteId } from "@/app/actions";
-import { useTrackingVerification } from "@/hooks/use-tracking-verification";
-import React from "react";
+import { useState } from 'react';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CheckCircle, Info, Clipboard, Check, Code, RefreshCw, Circle } from 'lucide-react';
+import { CodeBlock } from './CodeBlock';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
+import { useQuery } from '@tanstack/react-query';
+import { fetchSiteId } from '@/app/actions';
+import { useTrackingVerification } from '@/hooks/use-tracking-verification';
+import React from 'react';
 
 interface IntegrationSheetProps {
   open: boolean;
@@ -37,20 +37,22 @@ export function IntegrationSheet({ open, onOpenChange }: IntegrationSheetProps) 
 
   const dashboardId = useDashboardId();
   const { isVerifying, isVerified, verify } = useTrackingVerification();
-  
+
   const { data: siteId, isLoading } = useQuery({
     queryKey: ['siteId', dashboardId],
     queryFn: () => fetchSiteId(dashboardId),
   });
 
   React.useEffect(() => {
-    setIntegrationStatus(prev => ({
+    setIntegrationStatus((prev) => ({
       ...prev,
       dataReceiving: isVerified,
     }));
   }, [isVerified]);
 
-  const trackingScript = siteId ? `<script async src="https://analytics.example.com/tracker.js" data-site-id="${siteId}"></script>` : '';
+  const trackingScript = siteId
+    ? `<script async src="https://analytics.example.com/tracker.js" data-site-id="${siteId}"></script>`
+    : '';
 
   const handleVerifyInstallation = async () => {
     await verify();
@@ -61,8 +63,8 @@ export function IntegrationSheet({ open, onOpenChange }: IntegrationSheetProps) 
       await navigator.clipboard.writeText(text);
       setCopiedIdentifier(identifier);
       setTimeout(() => setCopiedIdentifier(null), 2000);
-    } catch (err) {
-      toast.error("Failed to copy");
+    } catch {
+      toast.error('Failed to copy');
     }
   };
 
@@ -124,159 +126,218 @@ export default App;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full max-w-2xl lg:max-w-3xl xl:max-w-4xl p-0 overflow-y-auto">
-        <div className="flex flex-col h-full">
-          <SheetHeader className="p-6 border-b border-border space-y-1.5">
-            <div className="flex items-center justify-between">
-              <SheetTitle className="text-xl">Website Integration</SheetTitle>
-              <div className="flex items-center">
-                {integrationStatus.accountCreated && integrationStatus.siteIdGenerated && integrationStatus.dataReceiving ? (
-                  <Badge className="mr-3 px-2 py-1 text-xs font-medium bg-green-600/20 text-green-500 dark:bg-green-500/30 dark:text-green-400 rounded">Fully Integrated</Badge>
+      <SheetContent className='w-full max-w-2xl overflow-y-auto p-0 lg:max-w-3xl xl:max-w-4xl'>
+        <div className='flex h-full flex-col'>
+          <SheetHeader className='border-border space-y-1.5 border-b p-6'>
+            <div className='flex items-center justify-between'>
+              <SheetTitle className='text-xl'>Website Integration</SheetTitle>
+              <div className='flex items-center'>
+                {integrationStatus.accountCreated &&
+                integrationStatus.siteIdGenerated &&
+                integrationStatus.dataReceiving ? (
+                  <Badge className='mr-3 rounded bg-green-600/20 px-2 py-1 text-xs font-medium text-green-500 dark:bg-green-500/30 dark:text-green-400'>
+                    Fully Integrated
+                  </Badge>
                 ) : (
-                  <Badge className="mr-3 px-2 py-1 text-xs font-medium bg-red-600/20 text-red-500 dark:bg-red-500/30 dark:text-red-400 rounded">Not Fully Integrated</Badge>
+                  <Badge className='mr-3 rounded bg-red-600/20 px-2 py-1 text-xs font-medium text-red-500 dark:bg-red-500/30 dark:text-red-400'>
+                    Not Fully Integrated
+                  </Badge>
                 )}
               </div>
             </div>
-            <SheetDescription className="text-sm text-muted-foreground">
+            <SheetDescription className='text-muted-foreground text-sm'>
               Add the tracking script to your website to start collecting analytics data
             </SheetDescription>
           </SheetHeader>
 
-          <div className="flex-grow overflow-y-auto p-6 space-y-6">
+          <div className='flex-grow space-y-6 overflow-y-auto p-6'>
             {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
-                <span className="ml-2 text-muted-foreground">Loading integration details...</span>
+              <div className='flex items-center justify-center py-8'>
+                <RefreshCw className='text-muted-foreground h-6 w-6 animate-spin' />
+                <span className='text-muted-foreground ml-2'>Loading integration details...</span>
               </div>
             ) : !siteId ? (
-              <div className="flex items-center justify-center py-8">
-                <span className="text-muted-foreground">Unable to load site ID</span>
+              <div className='flex items-center justify-center py-8'>
+                <span className='text-muted-foreground'>Unable to load site ID</span>
               </div>
             ) : (
               <>
-                <Card className="bg-card border-border">
-                  <CardHeader className="flex flex-row items-start space-x-3">
-                    <Info className="h-5 w-5 text-blue-500 dark:text-blue-400 mt-1 flex-shrink-0" />
+                <Card className='bg-card border-border'>
+                  <CardHeader className='flex flex-row items-start space-x-3'>
+                    <Info className='mt-1 h-5 w-5 flex-shrink-0 text-blue-500 dark:text-blue-400' />
                     <div>
-                      <CardTitle className="text-base font-medium text-card-foreground">Important</CardTitle>
-                      <CardDescription className="text-sm text-muted-foreground">
-                        Add this script to the <code className="bg-muted px-1 py-0.5 rounded text-xs text-orange-600 dark:text-orange-400">&lt;head&gt;</code> section of your root layout or individual pages.
+                      <CardTitle className='text-card-foreground text-base font-medium'>Important</CardTitle>
+                      <CardDescription className='text-muted-foreground text-sm'>
+                        Add this script to the{' '}
+                        <code className='bg-muted rounded px-1 py-0.5 text-xs text-orange-600 dark:text-orange-400'>
+                          &lt;head&gt;
+                        </code>{' '}
+                        section of your root layout or individual pages.
                       </CardDescription>
                     </div>
                   </CardHeader>
                 </Card>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <label htmlFor="siteIdDisplay" className="text-sm font-medium text-muted-foreground">Your Site ID</label>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={() => handleCopy(siteId, "siteId")}
+                <div className='space-y-2'>
+                  <div className='mb-1 flex items-center justify-between'>
+                    <label htmlFor='siteIdDisplay' className='text-muted-foreground text-sm font-medium'>
+                      Your Site ID
+                    </label>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='text-muted-foreground hover:text-foreground h-8 gap-1.5 text-xs'
+                      onClick={() => handleCopy(siteId, 'siteId')}
                     >
-                      {copiedIdentifier === "siteId" ? (
+                      {copiedIdentifier === 'siteId' ? (
                         <>
-                          <Check className="h-3.5 w-3.5" />
+                          <Check className='h-3.5 w-3.5' />
                           Copied
                         </>
                       ) : (
                         <>
-                          <Clipboard className="h-3.5 w-3.5" />
+                          <Clipboard className='h-3.5 w-3.5' />
                           Copy
                         </>
                       )}
                     </Button>
                   </div>
                   <div
-                    id="siteIdDisplay"
-                    className="w-full bg-input border border-border rounded-md p-2 text-sm text-foreground"
-                    aria-readonly="true"
+                    id='siteIdDisplay'
+                    className='bg-input border-border text-foreground w-full rounded-md border p-2 text-sm'
+                    aria-readonly='true'
                   >
                     {siteId}
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <label htmlFor="trackingScriptDisplay" className="text-sm font-medium text-muted-foreground">Tracking Script</label>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={() => handleCopy(trackingScript, "trackingScript")}
+                <div className='space-y-2'>
+                  <div className='mb-1 flex items-center justify-between'>
+                    <label htmlFor='trackingScriptDisplay' className='text-muted-foreground text-sm font-medium'>
+                      Tracking Script
+                    </label>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='text-muted-foreground hover:text-foreground h-8 gap-1.5 text-xs'
+                      onClick={() => handleCopy(trackingScript, 'trackingScript')}
                     >
-                      {copiedIdentifier === "trackingScript" ? (
+                      {copiedIdentifier === 'trackingScript' ? (
                         <>
-                          <Check className="h-3.5 w-3.5" />
+                          <Check className='h-3.5 w-3.5' />
                           Copied
                         </>
                       ) : (
                         <>
-                          <Clipboard className="h-3.5 w-3.5" />
+                          <Clipboard className='h-3.5 w-3.5' />
                           Copy
                         </>
                       )}
                     </Button>
                   </div>
-                  <div id="trackingScriptDisplay" className="w-full bg-input border border-border rounded-md p-2 text-sm text-foreground overflow-x-auto">
+                  <div
+                    id='trackingScriptDisplay'
+                    className='bg-input border-border text-foreground w-full overflow-x-auto rounded-md border p-2 text-sm'
+                  >
                     {trackingScript}
                   </div>
                 </div>
 
-                <Tabs defaultValue="html" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 bg-muted border-border">
-                    <TabsTrigger value="html" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">HTML</TabsTrigger>
-                    <TabsTrigger value="nextjs" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">Next.js</TabsTrigger>
-                    <TabsTrigger value="react" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground">React</TabsTrigger>
+                <Tabs defaultValue='html' className='w-full'>
+                  <TabsList className='bg-muted border-border grid w-full grid-cols-3'>
+                    <TabsTrigger
+                      value='html'
+                      className='data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground'
+                    >
+                      HTML
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value='nextjs'
+                      className='data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground'
+                    >
+                      Next.js
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value='react'
+                      className='data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground'
+                    >
+                      React
+                    </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="html" className="p-4 bg-card rounded-md border-border">
-                    <h3 className="text-sm font-medium text-card-foreground mb-2 flex items-center">
-                      <Code className="h-4 w-4 mr-2 text-muted-foreground" /> HTML Installation
+                  <TabsContent value='html' className='bg-card border-border rounded-md p-4'>
+                    <h3 className='text-card-foreground mb-2 flex items-center text-sm font-medium'>
+                      <Code className='text-muted-foreground mr-2 h-4 w-4' /> HTML Installation
                     </h3>
-                    <CodeBlock code={htmlExample} language="html" />
+                    <CodeBlock code={htmlExample} language='html' />
                   </TabsContent>
-                  <TabsContent value="nextjs" className="p-4 bg-card rounded-md border-border">
-                    <h3 className="text-sm font-medium text-card-foreground mb-2 flex items-center">
-                      <Code className="h-4 w-4 mr-2 text-muted-foreground" /> Next.js Installation
+                  <TabsContent value='nextjs' className='bg-card border-border rounded-md p-4'>
+                    <h3 className='text-card-foreground mb-2 flex items-center text-sm font-medium'>
+                      <Code className='text-muted-foreground mr-2 h-4 w-4' /> Next.js Installation
                     </h3>
-                    <CodeBlock code={nextJsExample} language="javascript" />
+                    <CodeBlock code={nextJsExample} language='javascript' />
                   </TabsContent>
-                  <TabsContent value="react" className="p-4 bg-card rounded-md border-border">
-                    <h3 className="text-sm font-medium text-card-foreground mb-2 flex items-center">
-                      <Code className="h-4 w-4 mr-2 text-muted-foreground" /> React Installation
+                  <TabsContent value='react' className='bg-card border-border rounded-md p-4'>
+                    <h3 className='text-card-foreground mb-2 flex items-center text-sm font-medium'>
+                      <Code className='text-muted-foreground mr-2 h-4 w-4' /> React Installation
                     </h3>
-                    <CodeBlock code={reactExample} language="javascript" />
+                    <CodeBlock code={reactExample} language='javascript' />
                   </TabsContent>
                 </Tabs>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="bg-card border-border">
+                <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+                  <Card className='bg-card border-border'>
                     <CardHeader>
-                      <CardTitle className="text-base font-medium text-card-foreground">Integration Status</CardTitle>
-                      <CardDescription className="text-sm text-muted-foreground">Track your progress</CardDescription>
+                      <CardTitle className='text-card-foreground text-base font-medium'>
+                        Integration Status
+                      </CardTitle>
+                      <CardDescription className='text-muted-foreground text-sm'>
+                        Track your progress
+                      </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-3">
-                      <StatusItem label="Account Created" description="Your account is ready" isComplete={integrationStatus.accountCreated} />
-                      <StatusItem label="Site ID Generated" description="Your unique identifier" isComplete={integrationStatus.siteIdGenerated} />
-                      <StatusItem label="Data Receiving" description="Analytics data flowing" isComplete={integrationStatus.dataReceiving} />
+                    <CardContent className='space-y-3'>
+                      <StatusItem
+                        label='Account Created'
+                        description='Your account is ready'
+                        isComplete={integrationStatus.accountCreated}
+                      />
+                      <StatusItem
+                        label='Site ID Generated'
+                        description='Your unique identifier'
+                        isComplete={integrationStatus.siteIdGenerated}
+                      />
+                      <StatusItem
+                        label='Data Receiving'
+                        description='Analytics data flowing'
+                        isComplete={integrationStatus.dataReceiving}
+                      />
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-card border-border">
+                  <Card className='bg-card border-border'>
                     <CardHeader>
-                      <CardTitle className="text-base font-medium text-card-foreground">Need Help?</CardTitle>
-                      <CardDescription className="text-sm text-muted-foreground">Resources to get started</CardDescription>
+                      <CardTitle className='text-card-foreground text-base font-medium'>Need Help?</CardTitle>
+                      <CardDescription className='text-muted-foreground text-sm'>
+                        Resources to get started
+                      </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-2">
-                      <Link href="/docs" className="flex items-center text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
-                        <Info className="h-4 w-4 mr-2" /> Documentation
+                    <CardContent className='space-y-2'>
+                      <Link
+                        href='/docs'
+                        className='flex items-center text-sm text-blue-500 hover:text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300'
+                      >
+                        <Info className='mr-2 h-4 w-4' /> Documentation
                       </Link>
-                      <Link href="/docs/troubleshooting" className="flex items-center text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
-                        <Info className="h-4 w-4 mr-2" /> Troubleshooting
+                      <Link
+                        href='/docs/troubleshooting'
+                        className='flex items-center text-sm text-blue-500 hover:text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300'
+                      >
+                        <Info className='mr-2 h-4 w-4' /> Troubleshooting
                       </Link>
-                      <Link href="/contact" className="flex items-center text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 hover:underline">
-                        <Info className="h-4 w-4 mr-2" /> Contact Support
+                      <Link
+                        href='/contact'
+                        className='flex items-center text-sm text-blue-500 hover:text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300'
+                      >
+                        <Info className='mr-2 h-4 w-4' /> Contact Support
                       </Link>
                     </CardContent>
                   </Card>
@@ -285,16 +346,21 @@ export default App;
             )}
           </div>
 
-          <div className="p-6 border-t border-border flex justify-end mt-auto sticky bg-background">
-            <Button variant="outline" onClick={handleVerifyInstallation} disabled={isVerifying || !siteId} size="sm">
+          <div className='border-border bg-background sticky mt-auto flex justify-end border-t p-6'>
+            <Button
+              variant='outline'
+              onClick={handleVerifyInstallation}
+              disabled={isVerifying || !siteId}
+              size='sm'
+            >
               {isVerifying ? (
                 <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
                   Verifying...
                 </>
               ) : (
                 <>
-                  <RefreshCw className="mr-2 h-4 w-4" />
+                  <RefreshCw className='mr-2 h-4 w-4' />
                   Verify Installation
                 </>
               )}
@@ -304,19 +370,23 @@ export default App;
       </SheetContent>
     </Sheet>
   );
-} 
+}
 
-const StatusItem: React.FC<{ label: string, description: string, isComplete: boolean }> = ({ label, description, isComplete }) => {
+const StatusItem: React.FC<{ label: string; description: string; isComplete: boolean }> = ({
+  label,
+  description,
+  isComplete,
+}) => {
   return (
     <div className={`flex items-center ${isComplete ? '' : 'opacity-60'}`}>
       {isComplete ? (
-        <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+        <CheckCircle className='mr-3 h-5 w-5 flex-shrink-0 text-green-500' />
       ) : (
-        <Circle className="h-5 w-5 text-muted-foreground mr-3 flex-shrink-0"></Circle>
+        <Circle className='text-muted-foreground mr-3 h-5 w-5 flex-shrink-0'></Circle>
       )}
       <div>
-        <p className="text-sm font-medium text-foreground">{label}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <p className='text-foreground text-sm font-medium'>{label}</p>
+        <p className='text-muted-foreground text-xs'>{description}</p>
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ const worldMapResponseSchema = z.object({
 });
 
 /**
- * Server action to fetch geographic visitor data
+ * Server action to fetch geographic visitor data for world map
  */
 export const getWorldMapData = withDashboardAuthContext(
   async (
@@ -37,11 +37,11 @@ export const getWorldMapData = withDashboardAuthContext(
       throw new Error(`Invalid parameters: ${validatedParams.error.message}`);
     }
 
-    const { siteId, startDate, endDate, queryFilters } = validatedParams.data;
+    const { startDate, endDate, queryFilters } = validatedParams.data;
 
     try {
       const geoVisitors = await fetchVisitorsByGeography(
-        siteId,
+        ctx.siteId,
         startDate,
         endDate,
         queryFilters

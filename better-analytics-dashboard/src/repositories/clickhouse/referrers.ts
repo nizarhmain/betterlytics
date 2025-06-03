@@ -1,4 +1,4 @@
-import { ReferrerSourceAggregation, ReferrerSourceAggregationSchema, ReferrerSummary, ReferrerSummarySchema, ReferrerTrafficBySourceRow, ReferrerTrafficBySourceRowSchema } from '@/entities/referrers';
+import { ReferrerSourceAggregation, ReferrerSourceAggregationSchema, ReferrerSummary, ReferrerSummarySchema, ReferrerTrafficBySourceRow, ReferrerTrafficBySourceRowSchema, TopReferrerUrl, TopReferrerUrlSchema, TopChannel, TopChannelSchema, TopReferrerSource, TopReferrerSourceSchema } from '@/entities/referrers';
 import { clickhouse } from '@/lib/clickhouse';
 import { DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
@@ -214,4 +214,111 @@ export async function getReferrerTableData(
   }).toPromise() as any[];
   
   return result;
+}
+
+/**
+ * Get top referrer URLs with visit counts
+ */
+export async function getTopReferrerUrls(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString,
+  limit = 10
+): Promise<TopReferrerUrl[]> {
+  const query = safeSql`
+    SELECT
+      referrer_url,
+      count() as visits
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND referrer_source != 'internal'
+      AND referrer_url != ''
+    GROUP BY referrer_url
+    ORDER BY visits DESC
+    LIMIT {limit:UInt32}
+  `;
+
+  const result = await clickhouse.query(query.taggedSql, {
+    params: {
+      ...query.taggedParams,
+      site_id: siteId, 
+      start: startDate, 
+      end: endDate,
+      limit: limit
+    },
+  }).toPromise() as any[];
+  
+  return TopReferrerUrlSchema.array().parse(result);
+}
+
+/**
+ * Get top traffic channels (aggregated by referrer_source) with visit counts
+ */
+export async function getTopChannels(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString,
+  limit = 10
+): Promise<TopChannel[]> {
+  const query = safeSql`
+    SELECT
+      referrer_source as channel,
+      count() as visits
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND referrer_source != 'internal'
+    GROUP BY referrer_source
+    ORDER BY visits DESC
+    LIMIT {limit:UInt32}
+  `;
+
+  const result = await clickhouse.query(query.taggedSql, {
+    params: {
+      ...query.taggedParams,
+      site_id: siteId, 
+      start: startDate, 
+      end: endDate,
+      limit: limit
+    },
+  }).toPromise() as any[];
+  
+  return TopChannelSchema.array().parse(result);
+}
+
+/**
+ * Get top referrer sources with visit counts
+ */
+export async function getTopReferrerSources(
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString,
+  limit = 10
+): Promise<TopReferrerSource[]> {
+  const query = safeSql`
+    SELECT
+      referrer_source_name as referrer_source,
+      count() as visits
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND referrer_source != 'internal'
+      AND referrer_source_name != ''
+    GROUP BY referrer_source_name
+    ORDER BY visits DESC
+    LIMIT {limit:UInt32}
+  `;
+
+  const result = await clickhouse.query(query.taggedSql, {
+    params: {
+      ...query.taggedParams,
+      site_id: siteId, 
+      start: startDate, 
+      end: endDate,
+      limit: limit
+    },
+  }).toPromise() as any[];
+  
+  return TopReferrerSourceSchema.array().parse(result);
 } 

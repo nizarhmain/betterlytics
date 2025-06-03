@@ -1,15 +1,11 @@
 'server-only';
 
-import {
-  getUniqueVisitors,
-  getTotalUniqueVisitors,
-  getTotalPageviews,
-  getSessionMetrics
-} from '@/repositories/clickhouse';
+import { getUniqueVisitors, getSessionMetrics } from '@/repositories/clickhouse';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { SummaryStatsSchema } from '@/entities/stats';
+import { SummaryStatsWithChartsSchema } from '@/entities/stats';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { QueryFilter } from '@/entities/filter';
+import { getTotalPageViewsForSite } from '@/services/pages';
 
 export async function getUniqueVisitorsForSite(siteId: string, startDate: Date, endDate: Date, granularity: GranularityRangeValues, queryFilters: QueryFilter[]) {
   const formattedStart = toDateTimeString(startDate);
@@ -17,23 +13,36 @@ export async function getUniqueVisitorsForSite(siteId: string, startDate: Date, 
   return getUniqueVisitors(siteId, formattedStart, formattedEnd, granularity, queryFilters);
 }
 
-export async function getSummaryStatsForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
-  const [uniqueVisitors, pageviews, sessionMetrics] = await Promise.all([
-    getTotalUniqueVisitors(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters),
-    getTotalPageviews(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters),
-    getSessionMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate), queryFilters)
+export async function getSummaryStatsWithChartsForSite(siteId: string, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) {
+  const dailyGranularity: GranularityRangeValues = 'day'; // Always daily for summary cards as lower granularities becomes too noisy
+  
+  const [visitorsChartData, pageviewsChartData, sessionMetricsChartData] = await Promise.all([
+    getUniqueVisitorsForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
+    getTotalPageViewsForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
+    getSessionMetrics(siteId, toDateTimeString(startDate), toDateTimeString(endDate), dailyGranularity, queryFilters)
   ]);
 
-  const stats = {
+  const uniqueVisitors = visitorsChartData.reduce((sum: number, row) => sum + row.unique_visitors, 0);
+  const pageviews = pageviewsChartData.reduce((sum: number, row) => sum + row.views, 0);
+
+  const totalBounceRate = sessionMetricsChartData.length > 0 
+    ? sessionMetricsChartData.reduce((sum: number, row) => sum + row.bounce_rate, 0) / sessionMetricsChartData.length
+    : 0;
+  
+  const totalAvgVisitDuration = sessionMetricsChartData.length > 0
+    ? sessionMetricsChartData.reduce((sum: number, row) => sum + row.avg_visit_duration, 0) / sessionMetricsChartData.length
+    : 0;
+
+  const statsWithCharts = {
     uniqueVisitors,
     pageviews,
-    bounceRate: sessionMetrics.total_sessions > 0 
-      ? Math.round((sessionMetrics.total_sessions - sessionMetrics.multi_page_sessions) / sessionMetrics.total_sessions * 100)
-      : 0,
-    avgVisitDuration: sessionMetrics.multi_page_sessions > 0 
-      ? Math.round(sessionMetrics.total_duration / sessionMetrics.multi_page_sessions)
-      : 0
+    bounceRate: Math.round(totalBounceRate),
+    avgVisitDuration: Math.round(totalAvgVisitDuration),
+    visitorsChartData,
+    pageviewsChartData,
+    bounceRateChartData: sessionMetricsChartData,
+    avgVisitDurationChartData: sessionMetricsChartData
   };
 
-  return SummaryStatsSchema.parse(stats);
+  return SummaryStatsWithChartsSchema.parse(statsWithCharts);
 }

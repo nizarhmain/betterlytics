@@ -7,10 +7,12 @@ import {
   getPageDetailMetrics,
   getTotalPageViews,
   getPageTrafficTimeSeries,
+  getTopEntryPages,
+  getTopExitPages,
 } from '@/repositories/clickhouse';
 import { DailyPageViewRow, TotalPageViewsRow } from '@/entities/pageviews';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { PageAnalytics } from '@/entities/pages';
+import { PageAnalytics, TopPageRow, TopEntryPageRow, TopExitPageRow } from '@/entities/pages';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { QueryFilter } from '@/entities/filter';
 
@@ -26,7 +28,7 @@ export async function getPageViewsForSite(siteId: string, startDate: Date, endDa
   return getPageViews(siteId, formattedStart, formattedEnd, granularity);
 }
 
-export async function getTopPagesForSite(siteId: string, startDate: Date, endDate: Date, limit = 5, queryFilters: QueryFilter[] = []) {
+export async function getTopPagesForSite(siteId: string, startDate: Date, endDate: Date, limit = 5, queryFilters: QueryFilter[] = []): Promise<TopPageRow[]> {
   return getTopPages(siteId, toDateTimeString(startDate), toDateTimeString(endDate), limit, queryFilters);
 }
 
@@ -50,4 +52,12 @@ export async function getPageTrafficForTimePeriod(
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
   return getPageTrafficTimeSeries(siteId, path, formattedStart, formattedEnd, granularity);
+}
+
+export async function getTopEntryPagesForSite(siteId: string, startDate: Date, endDate: Date, limit = 5, queryFilters: QueryFilter[] = []): Promise<TopEntryPageRow[]> {
+  return getTopEntryPages(siteId, toDateTimeString(startDate), toDateTimeString(endDate), limit, queryFilters);
+}
+
+export async function getTopExitPagesForSite(siteId: string, startDate: Date, endDate: Date, limit = 5, queryFilters: QueryFilter[] = []): Promise<TopExitPageRow[]> {
+  return getTopExitPages(siteId, toDateTimeString(startDate), toDateTimeString(endDate), limit, queryFilters);
 }

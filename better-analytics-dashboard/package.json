@@ -8,9 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "unit-tests": "vitest run",
-    "migrate": "pnpx prisma migrate dev",
-    "generate": "pnpx prisma generate",
-    "seed": "pnpx prisma db seed"
+    "migrate": "pnpm prisma migrate dev",
+    "generate": "pnpm prisma generate",
+    "seed": "pnpm prisma db seed"
   },
   "prisma": {
     "schema": "./prisma/schema.prisma",
