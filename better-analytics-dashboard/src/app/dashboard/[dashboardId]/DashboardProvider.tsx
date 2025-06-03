@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react"
-import { TimeRangeContextProvider } from "@/contexts/TimeRangeContextProvider";
-import { QueryFiltersContextProvider } from "@/contexts/QueryFiltersContextProvider";
-import { SettingsProvider } from "@/contexts/SettingsProvider";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
-import { useQuery } from "@tanstack/react-query";
-import { fetchSiteId } from "@/app/actions";
-import { getDashboardSettingsAction } from "@/app/actions/settings";
+import React, { useEffect } from 'react';
+import { TimeRangeContextProvider } from '@/contexts/TimeRangeContextProvider';
+import { QueryFiltersContextProvider } from '@/contexts/QueryFiltersContextProvider';
+import { SettingsProvider } from '@/contexts/SettingsProvider';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
+import { useQuery } from '@tanstack/react-query';
+import { fetchSiteId } from '@/app/actions';
 import { useSyncURLFilters } from '@/hooks/use-sync-url-filters';
 import { UserJourneyFilterProvider } from '@/contexts/UserJourneyFilterContextProvider';
+import { getDashboardSettingsAction } from '@/app/actions/dashboardSettings';
 
 type DashboardProviderProps = {
   children: React.ReactNode;
@@ -64,4 +64,3 @@ function SyncURLFilters() {
   useSyncURLFilters();
   return undefined;
 }
-

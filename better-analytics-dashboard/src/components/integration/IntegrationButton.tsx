@@ -4,8 +4,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { IntegrationSheet } from "./IntegrationSheet";
 
-const MOCK_SITE_ID = "default-site";
-
 export function IntegrationButton() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -17,7 +15,6 @@ export function IntegrationButton() {
       <IntegrationSheet
         open={isSheetOpen}
         onOpenChange={setIsSheetOpen}
-        siteId={MOCK_SITE_ID}
       />
     </>
   );

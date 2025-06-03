@@ -45,7 +45,7 @@ type BASidebarProps = {
 
 export default async function BASidebar({ dashboardId }: BASidebarProps) {
   return (
-    <Sidebar variant='floating' collapsible='icon'>
+    <Sidebar variant='floating' collapsible='icon' className='top-14 h-[calc(100vh-3.5rem)]'>
       <SidebarHeader>
         <BASidebarHeader />
       </SidebarHeader>
