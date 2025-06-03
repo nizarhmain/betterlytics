@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Moon, Settings as SettingsIcon, X } from 'lucide-react';
+import { Moon, Sun, Settings as SettingsIcon, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 interface SettingsPopoverProps {
@@ -13,8 +14,15 @@ interface SettingsPopoverProps {
 }
 
 export default function SettingsPopover({ onClose }: SettingsPopoverProps) {
-  const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
   const dashboardId = useDashboardId();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDarkTheme = mounted ? theme === 'dark' : false;
 
   return (
     <div className='bg-popover border-border text-popover-foreground w-72 rounded-md border shadow-lg'>
@@ -27,19 +35,23 @@ export default function SettingsPopover({ onClose }: SettingsPopoverProps) {
 
       <div className='space-y-4 p-3'>
         <div className='flex items-center justify-between'>
-          <Label htmlFor='dark-theme-toggle' className='flex cursor-pointer items-center gap-2'>
-            <Moon size={16} className='text-muted-foreground' />
-            <span className='text-foreground text-sm font-medium'>Dark Theme</span>
+          <Label htmlFor='theme-toggle' className='flex cursor-pointer items-center gap-2'>
+            <span className='text-foreground text-sm font-medium'>Theme</span>
           </Label>
-          <Switch id='dark-theme-toggle' checked={isDarkTheme} onCheckedChange={setIsDarkTheme} />
-        </div>
-
-        <div className='flex items-center justify-between'>
-          <Label htmlFor='dark-theme-toggle' className='flex cursor-pointer items-center gap-2'>
-            <Moon size={16} className='text-muted-foreground' />
-            <span className='text-foreground text-sm font-medium'>Dark Theme</span>
-          </Label>
-          <Switch id='dark-theme-toggle' checked={isDarkTheme} onCheckedChange={setIsDarkTheme} />
+          <div className='flex items-center gap-2'>
+            {mounted &&
+              (isDarkTheme ? (
+                <Sun size={16} className='text-muted-foreground' />
+              ) : (
+                <Moon size={16} className='text-muted-foreground' />
+              ))}
+            <Switch
+              id='theme-toggle'
+              checked={isDarkTheme}
+              onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+              disabled={!mounted}
+            />
+          </div>
         </div>
       </div>
 
