@@ -16,14 +16,14 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Loader2, Save, RotateCcw, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { DashboardSettingsUpdate } from '@/entities/settings';
-import { updateDashboardSettingsAction, resetDashboardSettingsAction } from '@/app/actions/settings';
 import { useSettings } from '@/contexts/SettingsProvider';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
-import DisplaySettings from '@/components/settings/DisplaySettings';
-import DataSettings from '@/components/settings/DataSettings';
-import ReportSettings from '@/components/settings/ReportSettings';
-import AlertSettings from '@/components/settings/AlertSettings';
+import { resetDashboardSettingsAction, updateDashboardSettingsAction } from '@/app/actions/dashboardSettings';
+import { DashboardSettingsUpdate } from '@/entities/dashboardSettings';
+import DisplayDashboardSettings from '@/components/dashboardSettings/DashboardDisplaySettings';
+import DataDashboardSettings from '@/components/dashboardSettings/DashboardDataSettings';
+import ReportDashboardSettings from '@/components/dashboardSettings/DashboardReportSettings';
+import AlertDashboardSettings from '@/components/dashboardSettings/DashboardAlertSettings';
 
 interface SettingsTabConfig {
   id: string;
@@ -38,22 +38,22 @@ const SETTINGS_TABS: SettingsTabConfig[] = [
   {
     id: 'display',
     label: 'Display',
-    component: DisplaySettings,
+    component: DisplayDashboardSettings,
   },
   {
     id: 'data',
     label: 'Data',
-    component: DataSettings,
+    component: DataDashboardSettings,
   },
   {
     id: 'reports',
     label: 'Reports',
-    component: ReportSettings,
+    component: ReportDashboardSettings,
   },
   {
     id: 'alerts',
     label: 'Alerts',
-    component: AlertSettings,
+    component: AlertDashboardSettings,
   },
 ];
 
