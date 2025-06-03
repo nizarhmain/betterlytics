@@ -20,7 +20,7 @@ export default function FunnelsListSection({ funnelsPromise, dashboardId }: Funn
     return (
       <div className='text-center text-gray-500'>
         <p>No funnels found.</p>
-        <p>Click "Create Funnel" to get started.</p>
+        <p>Click &ldquo;Create Funnel&rdquo; to get started.</p>
       </div>
     );
   }

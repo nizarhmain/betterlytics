@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { Suspense } from 'react';
 import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from '@/app/actions';
-import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { SummaryCardsSkeleton, TableSkeleton } from '@/components/skeleton';
 import PagesSummarySection from '@/app/dashboard/[dashboardId]/pages/PagesSummarySection';
 import PagesTableSection from './PagesTableSection';

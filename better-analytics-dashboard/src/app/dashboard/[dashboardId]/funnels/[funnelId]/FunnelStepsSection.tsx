@@ -1,7 +1,6 @@
 'use client';
 
 import { use, useMemo } from 'react';
-import { FunnelDetails } from '@/entities/funnels';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { analyzeFunnel } from '../analytics';

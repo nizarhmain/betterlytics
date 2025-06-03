@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import {
   LayoutDashboard,
   FileText,
@@ -26,7 +25,6 @@ import {
 import BASidebarCollapsibleSignOutButton from './BASidebarCollapsibleSignOutButton';
 import SettingsButton from '../SettingsButton';
 import { IntegrationButton } from '@/components/integration/IntegrationButton';
-import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
 
 const navItems = [

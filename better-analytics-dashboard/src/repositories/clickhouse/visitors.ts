@@ -1,14 +1,19 @@
 import { clickhouse } from '@/lib/clickhouse';
 import { DailyUniqueVisitorsRow, DailyUniqueVisitorsRowSchema } from '@/entities/visitors';
 import { DailySessionMetricsRow, DailySessionMetricsRowSchema } from '@/entities/sessionMetrics';
-import { DateString, DateTimeString } from '@/types/dates';
-import { GranularityRangeValues } from "@/utils/granularityRanges";
-import { BAQuery } from "@/lib/ba-query";
-import { QueryFilter } from "@/entities/filter";
-import { safeSql, SQL } from "@/lib/safe-sql";
+import { DateString } from '@/types/dates';
+import { GranularityRangeValues } from '@/utils/granularityRanges';
+import { BAQuery } from '@/lib/ba-query';
+import { QueryFilter } from '@/entities/filter';
+import { safeSql, SQL } from '@/lib/safe-sql';
 
-export async function getUniqueVisitors(siteId: string, startDate: DateString, endDate: DateString, granularity: GranularityRangeValues, queryFilters: QueryFilter[]): Promise<DailyUniqueVisitorsRow[]> {
-  
+export async function getUniqueVisitors(
+  siteId: string,
+  startDate: DateString,
+  endDate: DateString,
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[],
+): Promise<DailyUniqueVisitorsRow[]> {
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
   const filters = BAQuery.getFilterQuery(queryFilters);
 
@@ -24,26 +29,28 @@ export async function getUniqueVisitors(siteId: string, startDate: DateString, e
     ORDER BY date ASC
     LIMIT 10080
   `;
-  
-  const result = await clickhouse.query(query.taggedSql, {
-    params: {
-      ...query.taggedParams,
-      site_id: siteId,
-      start: startDate,
-      end: endDate,
-    },
-  }).toPromise() as any[];
-  return result.map(row => DailyUniqueVisitorsRowSchema.parse(row));
+
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+      },
+    })
+    .toPromise()) as any[];
+  return result.map((row) => DailyUniqueVisitorsRowSchema.parse(row));
 }
 
 export async function getTotalUniqueVisitors(
   siteId: string,
   startDate: DateString,
   endDate: DateString,
-  queryFilters: QueryFilter[]
+  queryFilters: QueryFilter[],
 ): Promise<number> {
   const filters = BAQuery.getFilterQuery(queryFilters);
-  
+
   const queryResponse = safeSql`
     SELECT uniq(session_id) as unique_sessions
     FROM analytics.events
@@ -52,14 +59,16 @@ export async function getTotalUniqueVisitors(
       AND ${SQL.AND(filters)}
   `;
 
-  const result = await clickhouse.query(queryResponse.taggedSql, {
-    params: {
-      ...queryResponse.taggedParams,
-      site_id: siteId,
-      start: startDate,
-      end: endDate,
-    },
-  }).toPromise() as any[];
+  const result = (await clickhouse
+    .query(queryResponse.taggedSql, {
+      params: {
+        ...queryResponse.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+      },
+    })
+    .toPromise()) as any[];
   return Number(result[0]?.unique_sessions ?? 0);
 }
 
@@ -68,11 +77,11 @@ export async function getSessionMetrics(
   startDate: DateString,
   endDate: DateString,
   granularity: GranularityRangeValues,
-  queryFilters: QueryFilter[]
+  queryFilters: QueryFilter[],
 ): Promise<DailySessionMetricsRow[]> {
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
   const filters = BAQuery.getFilterQuery(queryFilters);
-  
+
   const queryResponse = safeSql`
     WITH session_data AS (
       SELECT
@@ -104,15 +113,17 @@ export async function getSessionMetrics(
     ORDER BY date ASC
     LIMIT 10080
   `;
-  
-  const result = await clickhouse.query(queryResponse.taggedSql, {
-    params: {
-      ...queryResponse.taggedParams,
-      site_id: siteId,
-      start: startDate,
-      end: endDate
-    }
-  }).toPromise() as any[];
-  
-  return result.map(row => DailySessionMetricsRowSchema.parse(row));
-} 
+
+  const result = (await clickhouse
+    .query(queryResponse.taggedSql, {
+      params: {
+        ...queryResponse.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+      },
+    })
+    .toPromise()) as any[];
+
+  return result.map((row) => DailySessionMetricsRowSchema.parse(row));
+}

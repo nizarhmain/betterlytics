@@ -81,7 +81,7 @@ export default function SettingsSection() {
         await updateDashboardSettingsAction(dashboardId, formData);
         await refreshSettings();
         toast.success('Settings saved successfully');
-      } catch (error) {
+      } catch {
         toast.error('Failed to save settings');
       }
     });
@@ -93,7 +93,7 @@ export default function SettingsSection() {
         await resetDashboardSettingsAction(dashboardId);
         await refreshSettings();
         toast.success('Settings reset to defaults');
-      } catch (error) {
+      } catch {
         toast.error('Failed to reset settings');
       }
     });

@@ -16,7 +16,6 @@ import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Spinner } from '@/components/ui/spinner';
 import { ExpandedEventContent } from './ExpandedEventContent';
 import { calculatePercentage } from '@/utils/mathUtils';
 import { formatTimeAgo } from '@/utils/dateFormatters';
@@ -62,9 +61,11 @@ export function EventsTable({ data }: EventsTableProps) {
       const currentState = prev[eventName] || { isExpanded: true, expandedProperties: new Set() };
       const newExpandedProperties = new Set(currentState.expandedProperties);
 
-      newExpandedProperties.has(propertyName)
-        ? newExpandedProperties.delete(propertyName)
-        : newExpandedProperties.add(propertyName);
+      if (newExpandedProperties.has(propertyName)) {
+        newExpandedProperties.delete(propertyName);
+      } else {
+        newExpandedProperties.add(propertyName);
+      }
 
       return {
         ...prev,

@@ -137,4 +137,6 @@ const SummaryCard = React.memo(
   },
 );
 
+SummaryCard.displayName = 'SummaryCard';
+
 export default SummaryCard;
