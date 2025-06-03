@@ -6,7 +6,6 @@ use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
 use tracing::{info, error};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use dotenv::dotenv;
 
 mod config;
 mod analytics;
@@ -27,8 +26,6 @@ use geoip_updater::GeoIpUpdater;
 
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
-
     let config = Arc::new(config::Config::new());
 
     tracing_subscriber::registry()
