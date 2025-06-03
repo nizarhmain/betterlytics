@@ -1,6 +1,7 @@
 import { use } from 'react';
 import { fetchDeviceSummaryAction } from '@/app/actions';
 import SummaryCardsSection, { SummaryCardData } from '@/components/dashboard/SummaryCardsSection';
+import { formatPercentage } from '@/utils/formatters';
 
 type DevicesSummarySectionProps = {
   deviceSummaryPromise: ReturnType<typeof fetchDeviceSummaryAction>;
@@ -12,23 +13,19 @@ export default function DevicesSummarySection({ deviceSummaryPromise }: DevicesS
   const cards: SummaryCardData[] = [
     {
       title: 'Distinct Device Types',
-      value: deviceSummary?.distinctDeviceCount.toString() ?? '0',
+      value: deviceSummary.distinctDeviceCount.toString(),
     },
     {
       title: 'Most Popular Device',
-      value: deviceSummary?.topDevice
-        ? `${deviceSummary.topDevice.name} (${deviceSummary.topDevice.percentage}%)`
-        : 'Unknown',
+      value: `${deviceSummary.topDevice.name} (${formatPercentage(deviceSummary.topDevice.percentage)})`,
     },
     {
       title: 'Most Popular Operating System',
-      value: deviceSummary?.topOs ? `${deviceSummary.topOs.name} (${deviceSummary.topOs.percentage}%)` : 'Unknown',
+      value: `${deviceSummary.topOs.name} (${formatPercentage(deviceSummary.topOs.percentage)})`,
     },
     {
       title: 'Most Popular Browser',
-      value: deviceSummary?.topBrowser
-        ? `${deviceSummary.topBrowser.name} (${deviceSummary.topBrowser.percentage}%)`
-        : 'Unknown',
+      value: `${deviceSummary.topBrowser.name} (${formatPercentage(deviceSummary.topBrowser.percentage)})`,
     },
   ];
 

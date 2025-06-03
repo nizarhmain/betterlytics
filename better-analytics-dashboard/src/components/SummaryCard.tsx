@@ -23,7 +23,6 @@ interface SummaryCardProps<T extends ChartData = ChartData> {
   // Interactive props
   isActive?: boolean;
   onClick?: () => void;
-  isLoading?: boolean;
 }
 
 interface TrendData {
@@ -64,7 +63,6 @@ const SummaryCard = React.memo(
     chartColor = 'var(--chart-1)',
     isActive = false,
     onClick,
-    isLoading = false,
   }: SummaryCardProps<T>) => {
     const trendData = useMemo(
       () => (rawChartData && valueField ? calculateTrend(rawChartData, valueField) : null),

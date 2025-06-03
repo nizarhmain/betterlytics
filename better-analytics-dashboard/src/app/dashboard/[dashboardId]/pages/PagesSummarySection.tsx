@@ -2,6 +2,7 @@ import { use } from 'react';
 import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from '@/app/actions';
 import SummaryCardsSection, { SummaryCardData } from '@/components/dashboard/SummaryCardsSection';
 import { formatPercentage } from '@/utils/formatters';
+import { formatDuration } from '@/utils/dateFormatters';
 
 type PagesSummarySectionProps = {
   summaryStatsPromise: ReturnType<typeof fetchSummaryStatsAction>;
@@ -29,9 +30,7 @@ export default function PagesSummarySection({
     },
     {
       title: 'Avg. Time on Page',
-      value: summary.avgVisitDuration
-        ? `${Math.round(summary.avgVisitDuration / 60)}m ${summary.avgVisitDuration % 60}s`
-        : '0s',
+      value: `${formatDuration(summary.avgVisitDuration)}`,
     },
     {
       title: 'Bounce Rate',

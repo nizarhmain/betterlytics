@@ -1,9 +1,9 @@
 import { use, useMemo } from 'react';
-import { FunnelDetails } from '@/entities/funnels';
 import SummaryCardsSection, { SummaryCardData } from '@/components/dashboard/SummaryCardsSection';
 import { ArrowRight } from 'lucide-react';
 import { analyzeFunnel } from '../analytics';
 import { fetchFunnelDetailsAction } from '@/app/actions';
+import { formatPercentage } from '@/utils/formatters';
 
 type FunnelSummarySectionProps = {
   funnelPromise: ReturnType<typeof fetchFunnelDetailsAction>;
@@ -16,7 +16,7 @@ export default function FunnelSummarySection({ funnelPromise }: FunnelSummarySec
   const cards: SummaryCardData[] = [
     {
       title: 'Overall conversion',
-      value: `${Math.floor(100 * funnelData.conversionRate)}%`,
+      value: `${formatPercentage(Math.floor(100 * funnelData.conversionRate))}`,
     },
     {
       title: 'Total visitors',
