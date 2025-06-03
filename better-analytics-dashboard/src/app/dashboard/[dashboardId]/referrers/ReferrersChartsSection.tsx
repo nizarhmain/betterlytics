@@ -28,12 +28,12 @@ export default function ReferrersChartsSection({
       <div className='bg-card border-border rounded-lg border p-4 shadow'>
         <div className='text-foreground mb-2 font-medium'>Referrer Distribution</div>
         <p className='text-muted-foreground mb-4 text-xs'>Traffic sources by category</p>
-        <ReferrerDistributionChart data={distributionData} loading={false} />
+        <ReferrerDistributionChart data={distributionData} />
       </div>
       <div className='bg-card border-border rounded-lg border p-4 shadow'>
         <div className='text-foreground mb-2 font-medium'>Referral Traffic Trends</div>
         <p className='text-muted-foreground mb-4 text-xs'>Traffic by source over time</p>
-        <ReferrerTrafficTrendChart data={trendData} loading={false} />
+        <ReferrerTrafficTrendChart data={trendData} />
       </div>
     </div>
   );

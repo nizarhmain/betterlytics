@@ -22,12 +22,12 @@ export default function DevicesChartsSection({
       <div className='bg-card border-border rounded-lg border p-6 shadow'>
         <h2 className='text-foreground mb-1 text-lg font-bold'>Device Types</h2>
         <p className='text-muted-foreground mb-4 text-sm'>Visitors by device category</p>
-        <DeviceTypeChart data={deviceBreakdown} isLoading={false} />
+        <DeviceTypeChart data={deviceBreakdown} />
       </div>
       <div className='bg-card border-border rounded-lg border p-6 shadow'>
         <h2 className='text-foreground mb-1 text-lg font-bold'>Device Usage Trend</h2>
         <p className='text-muted-foreground mb-4 text-sm'>Visitor trends by device type</p>
-        <DeviceUsageTrendChart data={deviceUsageTrend} loading={false} />
+        <DeviceUsageTrendChart data={deviceUsageTrend} />
       </div>
     </div>
   );

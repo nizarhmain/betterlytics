@@ -8,7 +8,6 @@ import ReferrerLegend from './ReferrerLegend';
 
 interface ReferrerDistributionChartProps {
   data?: ReferrerSourceAggregation[];
-  loading?: boolean;
 }
 
 const CustomTooltip = ({ active, payload }: any) => {
@@ -31,24 +30,13 @@ const getPercentageDistribution = (data: ReferrerSourceAggregation[]) => {
   }));
 };
 
-export default function ReferrerDistributionChart({ data, loading = false }: ReferrerDistributionChartProps) {
+export default function ReferrerDistributionChart({ data }: ReferrerDistributionChartProps) {
   const chartData = useMemo(() => {
     if (!data || data.length === 0) {
       return [];
     }
     return getPercentageDistribution(data);
   }, [data]);
-
-  if (loading) {
-    return (
-      <div className='flex h-[300px] items-center justify-center'>
-        <div className='flex flex-col items-center gap-3'>
-          <div className='border-accent border-t-primary h-10 w-10 animate-spin rounded-full border-4'></div>
-          <p className='text-muted-foreground'>Loading data...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (!data || data.length === 0 || chartData.length === 0) {
     return (

@@ -9,5 +9,5 @@ type EventsTableSectionProps = {
 export default function EventsTableSection({ eventsPromise }: EventsTableSectionProps) {
   const events = use(eventsPromise);
 
-  return <EventsTable data={events} isLoading={false} />;
+  return <EventsTable data={events} />;
 }

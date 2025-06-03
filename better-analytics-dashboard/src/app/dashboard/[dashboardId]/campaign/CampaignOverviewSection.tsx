@@ -19,8 +19,8 @@ export default function CampaignOverviewSection({
 
   return (
     <div className='space-y-6'>
-      <CampaignPerformanceTable data={campaignPerformance} isLoading={false} />
-      <CampaignVisitorTrendChart data={visitorTrend} isLoading={false} />
+      <CampaignPerformanceTable data={campaignPerformance} />
+      <CampaignVisitorTrendChart data={visitorTrend} />
     </div>
   );
 }

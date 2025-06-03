@@ -35,7 +35,6 @@ export default function CampaignUTMSection({
         <div className='lg:col-span-2'>
           <CampaignEngagementTable
             data={sourceBreakdown}
-            isLoading={false}
             title='Source Engagement Metrics'
             subtitle='Engagement details for each campaign source'
             dataKey='source'
@@ -43,7 +42,6 @@ export default function CampaignUTMSection({
         </div>
         <CampaignPieChart
           data={sourceBreakdown}
-          isLoading={false}
           dataKey={CampaignDataKey.SOURCE}
           title='Campaign Traffic by Source'
           subtitle='Distribution of campaign visitors by source'
@@ -58,7 +56,6 @@ export default function CampaignUTMSection({
         <div className='lg:col-span-2'>
           <CampaignEngagementTable
             data={mediumBreakdown}
-            isLoading={false}
             title='Medium Engagement Metrics'
             subtitle='Engagement details for each campaign medium'
             dataKey='medium'
@@ -66,7 +63,6 @@ export default function CampaignUTMSection({
         </div>
         <CampaignPieChart
           data={mediumBreakdown}
-          isLoading={false}
           dataKey={CampaignDataKey.MEDIUM}
           title='Campaign Traffic by Medium'
           subtitle='Distribution of campaign visitors by medium'
@@ -81,7 +77,6 @@ export default function CampaignUTMSection({
         <div className='lg:col-span-2'>
           <CampaignEngagementTable
             data={contentBreakdown}
-            isLoading={false}
             title='Content Engagement Metrics'
             subtitle='Engagement details for each campaign content'
             dataKey='content'
@@ -89,7 +84,6 @@ export default function CampaignUTMSection({
         </div>
         <CampaignPieChart
           data={contentBreakdown}
-          isLoading={false}
           dataKey={CampaignDataKey.CONTENT}
           title='Campaign Traffic by Content'
           subtitle='Distribution of campaign visitors by content'
@@ -104,7 +98,6 @@ export default function CampaignUTMSection({
         <div className='lg:col-span-2'>
           <CampaignEngagementTable
             data={termBreakdown}
-            isLoading={false}
             title='Term/Keyword Engagement Metrics'
             subtitle='Engagement details for each campaign term/keyword'
             dataKey='term'
@@ -112,7 +105,6 @@ export default function CampaignUTMSection({
         </div>
         <CampaignPieChart
           data={termBreakdown}
-          isLoading={false}
           dataKey={CampaignDataKey.TERM}
           title='Campaign Traffic by Term/Keyword'
           subtitle='Distribution of campaign visitors by term/keyword'

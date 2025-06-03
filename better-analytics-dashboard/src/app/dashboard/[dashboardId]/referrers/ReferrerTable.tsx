@@ -18,7 +18,7 @@ export const ReferrerTab = {
   Other: 'other',
 } as const;
 
-export type ReferrerTabKey = typeof ReferrerTab[keyof typeof ReferrerTab];
+export type ReferrerTabKey = (typeof ReferrerTab)[keyof typeof ReferrerTab];
 export type ReferrerTabValue = keyof typeof ReferrerTab;
 
 const SourceTypeBadge = ({ type }: { type: string }) => {
@@ -31,7 +31,7 @@ const SourceTypeBadge = ({ type }: { type: string }) => {
   };
 
   return (
-    <span className="px-2 py-1 rounded-full text-xs font-bold" style={bgColorStyle}>
+    <span className='rounded-full px-2 py-1 text-xs font-bold' style={bgColorStyle}>
       {type}
     </span>
   );
@@ -39,10 +39,9 @@ const SourceTypeBadge = ({ type }: { type: string }) => {
 
 interface ReferrerTableProps {
   data?: ReferrerTableRow[];
-  loading: boolean;
 }
 
-export default function ReferrerTable({ data = [], loading }: ReferrerTableProps) {
+export default function ReferrerTable({ data = [] }: ReferrerTableProps) {
   const [activeTab, setActiveTab] = useState<ReferrerTabKey>(ReferrerTab.All);
 
   const totalVisits = data.reduce((sum, row) => sum + row.visits, 0);
@@ -60,18 +59,18 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
       cell: ({ row }) => {
         const data = row.original;
         return (
-          <div className="font-medium">
-            <div className="flex items-center gap-2">
+          <div className='font-medium'>
+            <div className='flex items-center gap-2'>
               {data.source_type.toLowerCase() === 'direct' ? (
-                <Globe className="h-4 w-4 text-gray-500" />
+                <Globe className='h-4 w-4 text-gray-500' />
               ) : (
-                <Link className="h-4 w-4 text-gray-500" />
+                <Link className='h-4 w-4 text-gray-500' />
               )}
               {data.source_url
                 ? data.source_url
                 : data.source_type.toLowerCase() === 'direct'
-                ? 'Direct'
-                : 'Unknown'}
+                  ? 'Direct'
+                  : 'Unknown'}
             </div>
           </div>
         );
@@ -113,32 +112,29 @@ export default function ReferrerTable({ data = [], loading }: ReferrerTableProps
 
   return (
     <div>
-      <div className="border-b border-border mb-4">
-        <div className="flex space-x-4 overflow-x-auto">
-          {(Object.entries(ReferrerTab) as [ReferrerTabValue, ReferrerTabKey][]).map(
-            ([key, value]) => (
-              <button
-                key={value}
-                className={`px-3 py-2 text-sm font-medium border-b-2 whitespace-nowrap ${
-                  activeTab === value
-                    ? 'border-gray-800 text-gray-800'
-                    : 'border-transparent hover:border-gray-300 text-gray-600'
-                }`}
-                onClick={() => setActiveTab(value)}
-              >
-                {key}
-              </button>
-            )
-          )}
+      <div className='border-border mb-4 border-b'>
+        <div className='flex space-x-4 overflow-x-auto'>
+          {(Object.entries(ReferrerTab) as [ReferrerTabValue, ReferrerTabKey][]).map(([key, value]) => (
+            <button
+              key={value}
+              className={`border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap ${
+                activeTab === value
+                  ? 'border-gray-800 text-gray-800'
+                  : 'border-transparent text-gray-600 hover:border-gray-300'
+              }`}
+              onClick={() => setActiveTab(value)}
+            >
+              {key}
+            </button>
+          ))}
         </div>
       </div>
 
-      <DataTable 
-        columns={columns} 
-        data={filteredData} 
-        loading={loading} 
+      <DataTable
+        columns={columns}
+        data={filteredData}
         defaultSorting={[{ id: 'visits', desc: true }]}
-        className="rounded-md"
+        className='rounded-md'
       />
     </div>
   );

@@ -14,15 +14,15 @@ export default function ReferrersSummarySection({ referrerSummaryPromise }: Refe
   const cards: SummaryCardData[] = [
     {
       title: 'Total Referrers',
-      value: summaryData?.totalReferrers.toString() ?? '0',
+      value: summaryData.totalReferrers.toString(),
     },
     {
       title: 'Referral Traffic',
-      value: summaryData?.referralTraffic.toString() ?? '0',
+      value: summaryData.referralTraffic.toString(),
     },
     {
       title: 'Avg. Bounce Rate',
-      value: summaryData ? formatPercentage(summaryData.avgBounceRate) : '0%',
+      value: formatPercentage(summaryData.avgBounceRate),
     },
   ];
 

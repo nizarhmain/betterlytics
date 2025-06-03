@@ -15,7 +15,7 @@ export default function CampaignLandingPagesSection({
 
   return (
     <div>
-      <CampaignLandingPagePerformanceTable data={landingPagePerformance} isLoading={false} />
+      <CampaignLandingPagePerformanceTable data={landingPagePerformance} />
     </div>
   );
 }
