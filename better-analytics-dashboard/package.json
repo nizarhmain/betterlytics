@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "unit-tests": "vitest run",
-    "migrate": "pnpm prisma migrate dev",
-    "generate": "pnpm prisma generate"
+    "migrate": "cd .. && pnpm prisma migrate dev --schema better-analytics-dashboard/prisma/schema.prisma",
+    "generate": "cd .. && pnpm prisma generate --schema better-analytics-dashboard/prisma/schema.prisma"
   },
   "prisma": {
     "schema": "./prisma/schema.prisma"
