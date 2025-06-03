@@ -16,9 +16,9 @@ if (!url || !db) {
 const command = `clickhouse-migrations migrate --host=${url} --db=${db} --migrations-home=./migrations --user=${user} --password=${password}`;
 
 console.log("[+] Waiting for Clickhouse to start");
-new Promise((resolve) => setTimeout(resolve, 5_000))
-  .then(() => execSync(command, { stdio: "inherit" }))
-  .catch(() => {
-    console.error("Migration failed:", error.message);
-    process.exit(1);
-  });
+try {
+  execSync(command, { stdio: "inherit" })
+} catch(error) {
+  console.error("Migration failed:", error.message);
+  process.exit(1);
+};

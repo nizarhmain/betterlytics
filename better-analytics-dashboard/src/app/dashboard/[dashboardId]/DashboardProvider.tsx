@@ -34,7 +34,7 @@ export function DashboardProvider({ children }: DashboardProviderProps) {
     }
     const script = document.createElement('script');
     script.async = true;
-    script.src = 'http://localhost:3001/analytics.js';
+    script.src = 'http://localhost:3006/analytics.js';
     script.setAttribute('data-site-id', siteId);
     document.head.appendChild(script);
     return () => {

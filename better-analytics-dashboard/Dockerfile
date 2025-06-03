@@ -1,0 +1,49 @@
+FROM node:20-slim AS base
+
+# Setup pnpm
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+RUN apt-get update -y && apt-get install -y openssl
+
+# --------------------------
+
+FROM base as builder
+
+WORKDIR /app
+
+RUN pnpm install -g prisma
+
+RUN printenv > ../.env
+
+COPY package*.json .
+RUN pnpm fetch --prod
+
+COPY ./prisma ./prisma
+
+RUN pnpm prisma generate
+
+COPY . .
+
+RUN pnpm run build
+
+# --------------------------
+
+FROM base as runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV HOSTNAME="0.0.0.0"
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+CMD node server.js

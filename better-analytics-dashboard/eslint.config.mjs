@@ -22,6 +22,7 @@ const eslintConfig = [
         { allowSameFolder: true, rootDir: "src" },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
+      "no-unused-vars": "warn"
     },
   },
 ];

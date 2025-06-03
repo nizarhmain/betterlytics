@@ -47,7 +47,6 @@ pnpm run dashboard
 - 🐳 **Starts Docker services** (ClickHouse, PostgreSQL)
 - 📦 **Installs dependencies** for all components
 - 🗃️ **Runs database migrations** automatically
-- 🌱 **Seeds sample data** for testing
 - 🚀 **Generates Prisma client** for the dashboard
 
 **Next step**: Login to your dashboard using the login credentials defined in your dashboard/.env configuration file.

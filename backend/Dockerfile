@@ -1,0 +1,34 @@
+FROM rust:bookworm as builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    build-essential \
+    cmake \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY . .
+
+RUN cargo fetch
+
+RUN cargo build --release
+
+# --------------------
+
+FROM debian:bookworm-slim as runner
+
+# Install OpenSSL runtime libs
+RUN apt-get update && apt-get install -y \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy just the compiled binary
+COPY --from=builder /app/target/release/better-analytics /app/app
+
+CMD ./app
