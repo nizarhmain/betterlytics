@@ -6,11 +6,12 @@
     "dashboard": "pnpm --filter better-analytics-dashboard dev",
     "build": "pnpm --filter better-analytics-dashboard build",
     "start": "pnpm --filter better-analytics-dashboard start",
-    "compose": "docker compose up -d && pnpm run migrate && pnpm run generate && pnpm run seed",
+    "compose": "docker compose up -d && pnpm run migrate && pnpm run generate",
     "compose-down": "docker compose down",
-    "migrate": "pnpm --filter better-analytics-dashboard migrate && node scripts/run-migration.js",
+    "migrate": "pnpm run migrate-dashboard && pnpm run migrate-clickhouse",
+    "migrate-dashboard": "pnpm --filter better-analytics-dashboard migrate",
+    "migrate-clickhouse": "node scripts/run-migration.js",
     "generate": "pnpm --filter better-analytics-dashboard generate",
-    "seed": "pnpm --filter better-analytics-dashboard seed",
     "simulate": "node simulate-events.js",
     "performance": "k6 run -e TARGET_URL=http://localhost:3001/track -e VUS=100 -e DURATION=30s k6-perf-test.js",
     "unit-tests": "pnpm --filter better-analytics-dashboard unit-tests"
@@ -20,14 +21,6 @@
     "clickhouse": "^2.6.0",
     "clickhouse-migrations": "^1.0.4",
     "@clickhouse/client": "^1.11.1",
-    "date-fns": "^4.1.0",
-    "dotenv": "^16.5.0",
-    "lucide-react": "^0.503.0",
-    "next-themes": "^0.4.6",
-    "recharts": "^2.15.3"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.4",
-    "eslint-plugin-no-relative-import-paths": "^1.6.1"
+    "dotenv": "^16.5.0"
   }
 }
