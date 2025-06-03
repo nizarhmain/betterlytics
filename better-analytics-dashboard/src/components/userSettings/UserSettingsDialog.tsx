@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Shield, CreditCard, FileText, AlertTriangle, Loader2, Save } from 'lucide-react';
+import { Settings, Shield, AlertTriangle, Loader2, Save } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { UserSettingsUpdate } from '@/entities/userSettings';
 import { toast } from 'sonner';
@@ -108,7 +108,7 @@ export default function UserSettingsDialog({ open, onOpenChange }: UserSettingsD
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          <TabsList className='grid w-full grid-cols-5'>
+          <TabsList className={`grid w-full grid-cols-${USER_SETTINGS_TABS.length}`}>
             {USER_SETTINGS_TABS.map((tab) => {
               const Icon = tab.icon;
               return (
