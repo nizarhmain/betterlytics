@@ -1,15 +1,29 @@
 version: "3.8"
 
 services:
-  static:
-    image: nginx:alpine
-    container_name: static
-    hostname: static
+  proxy:
+    build:
+      context: ./proxy
+      dockerfile: ./Dockerfile
+      args:
+        BASE64_ENCODED_SSL_CERT: ${BASE64_ENCODED_SSL_CERT}
+        BASE64_ENCODED_SSL_KEY: ${BASE64_ENCODED_SSL_KEY}
+    container_name: proxy
+    hostname: proxy
     volumes:
       - ./static:/usr/share/nginx/html:ro
     restart: unless-stopped
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      backend:
+        condition: service_started
+      dashboard:
+        condition: service_started
     ports:
-      - 3006:80
+      - 443:443
+    networks:
+      - proxy_network
 
   backend:
     build:
@@ -17,6 +31,7 @@ services:
       dockerfile: ./Dockerfile
     restart: unless-stopped
     container_name: backend
+    hostname: backend
     ports:
       - 3001:3001
     env_file:
@@ -25,6 +40,7 @@ services:
       init:
         condition: service_completed_successfully
     networks:
+      - proxy_network
       - clickhouse_network
 
   dashboard:
@@ -44,12 +60,14 @@ services:
       - .env.production
     restart: unless-stopped
     container_name: dashboard
+    hostname: dashboard
     ports:
       - 3000:3000
     depends_on:
       init:
         condition: service_completed_successfully
     networks:
+      - proxy_network
       - postgres_network
       - clickhouse_network
 
@@ -136,5 +154,6 @@ volumes:
   postgres_prod_data:
 
 networks:
+  proxy_network:
   postgres_network:
   clickhouse_network:
