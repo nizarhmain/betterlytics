@@ -37,5 +37,5 @@ export default function FunnelSummarySection({ funnelPromise }: FunnelSummarySec
     },
   ];
 
-  return <SummaryCardsSection cards={cards} />;
+  return <SummaryCardsSection cards={cards} className='!grid-cols-1' />;
 }

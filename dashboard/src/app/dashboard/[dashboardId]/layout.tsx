@@ -39,11 +39,7 @@ export default async function DashboardLayout({ children, params }: DashboardLay
       <SidebarProvider>
         <BASidebar dashboardId={dashboardId} />
         <BAMobileSidebarTrigger />
-        <div className='bg-background flex min-h-screen w-full'>
-          <main className='flex flex-1 flex-col'>
-            <div className='flex-1'>{children}</div>
-          </main>
-        </div>
+        <main className='bg-background w-full max-w-svw overflow-x-hidden'>{children}</main>
         {/* Conditionally render tracking script based on server-side feature flag */}
         {shouldEnableTracking && siteId && <TrackingScript siteId={siteId} />}
       </SidebarProvider>

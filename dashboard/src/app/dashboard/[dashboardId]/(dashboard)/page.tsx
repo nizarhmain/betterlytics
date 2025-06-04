@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { Suspense } from 'react';
-import DashboardFilters from '../../../components/dashboard/DashboardFilters';
+import DashboardFilters from '@/components/dashboard/DashboardFilters';
 import { TableSkeleton, SummaryCardsSkeleton, ChartSkeleton } from '@/components/skeleton';
 import SummaryAndChartSection from './SummaryAndChartSection';
 import PagesAnalyticsSection from './PagesAnalyticsSection';

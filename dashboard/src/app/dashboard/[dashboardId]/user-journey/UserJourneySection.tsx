@@ -46,46 +46,36 @@ export default function UserJourneySection({ userJourneyPromise }: UserJourneySe
 
   return (
     <div className='space-y-6'>
-      <div className='flex items-center justify-end space-x-4'>
-        <div className='relative inline-block text-left'>
-          <label htmlFor='steps-select' className='sr-only'>
-            Number of Steps
-          </label>
-          <select
-            id='steps-select'
-            className='text-foreground bg-background focus:ring-ring rounded border px-3 py-2 focus:ring-2 focus:outline-none'
-            value={numberOfSteps}
-            onChange={(e) => handleStepsChange(Number(e.target.value))}
-          >
-            {STEP_OPTIONS.map((steps) => (
-              <option key={steps} value={steps}>
-                {steps} Steps
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className='relative inline-block text-left'>
-          <label htmlFor='journeys-select' className='sr-only'>
-            Number of Journeys
-          </label>
-          <select
-            id='journeys-select'
-            className='text-foreground bg-background focus:ring-ring rounded border px-3 py-2 focus:ring-2 focus:outline-none'
-            value={numberOfJourneys}
-            onChange={(e) => handleJourneysChange(Number(e.target.value))}
-          >
-            {JOURNEY_OPTIONS.map((journeys) => (
-              <option key={journeys} value={journeys}>
-                Top {journeys} Journeys
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className='flex grow-1 flex-col justify-end gap-x-4 gap-y-1 md:flex-row'>
+        <select
+          id='steps-select'
+          className='text-foreground bg-background focus:ring-ring h-9 grow-1 rounded border px-3 focus:ring-2 md:grow-0 focus:outline-none md:w-[200px]'
+          value={numberOfSteps}
+          onChange={(e) => handleStepsChange(Number(e.target.value))}
+        >
+          {STEP_OPTIONS.map((steps) => (
+            <option key={steps} value={steps}>
+              {steps} Steps
+            </option>
+          ))}
+        </select>
+        <select
+          id='journeys-select'
+          className='text-foreground bg-background focus:ring-ring h-9 grow-1 rounded border px-3 focus:ring-2 md:grow-0 focus:outline-none md:w-[200px]'
+          value={numberOfJourneys}
+          onChange={(e) => handleJourneysChange(Number(e.target.value))}
+        >
+          {JOURNEY_OPTIONS.map((journeys) => (
+            <option key={journeys} value={journeys}>
+              Top {journeys} Journeys
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className='relative min-h-[400px]'>
+      <div className='relative mt-8 min-h-[400px] overflow-x-auto'>
         {journeyData && journeyData.nodes.length > 0 && (
-          <div className='bg-card text-card-foreground rounded-lg p-4 shadow'>
+          <div className='bg-card text-card-foreground min-w-5xl rounded-lg p-4 shadow'>
             <UserJourneyChart data={journeyData} />
           </div>
         )}

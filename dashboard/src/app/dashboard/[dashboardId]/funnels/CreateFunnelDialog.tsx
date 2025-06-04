@@ -99,7 +99,7 @@ export function CreateFunnelDialog() {
         </DialogHeader>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 overflow-hidden">
           <div className="flex flex-col h-full overflow-hidden">
-            <div className="flex items-start gap-4 pb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 items-start gap-4 pb-4">
               <div className="flex-grow">
                 <Label htmlFor="name" className="block mb-1 text-foreground">
                   Name
