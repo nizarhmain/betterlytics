@@ -1,5 +1,5 @@
 {
-  "name": "better-analytics-dashboard",
+  "name": "dashboard",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "unit-tests": "vitest run",
-    "migrate": "cd .. && pnpm prisma migrate dev --schema better-analytics-dashboard/prisma/schema.prisma",
-    "generate": "cd .. && pnpm prisma generate --schema better-analytics-dashboard/prisma/schema.prisma"
+    "migrate": "cd .. && pnpm prisma migrate dev --schema dashboard/prisma/schema.prisma",
+    "generate": "cd .. && pnpm prisma generate --schema dashboard/prisma/schema.prisma"
   },
   "prisma": {
     "schema": "./prisma/schema.prisma"

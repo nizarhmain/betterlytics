@@ -3,18 +3,18 @@
   "private": true,
   "scripts": {
     "backend": "pnpm --filter backend dev",
-    "dashboard": "pnpm --filter better-analytics-dashboard dev",
-    "build": "pnpm --filter better-analytics-dashboard build",
-    "start": "pnpm --filter better-analytics-dashboard start",
+    "dashboard": "pnpm --filter dashboard dev",
+    "build": "pnpm --filter dashboard build",
+    "start": "pnpm --filter dashboard start",
     "compose": "docker compose up -d && pnpm run migrate && pnpm run generate",
     "compose-down": "docker compose down",
     "migrate": "pnpm run migrate-dashboard && pnpm run migrate-clickhouse",
-    "migrate-dashboard": "pnpm --filter better-analytics-dashboard migrate",
+    "migrate-dashboard": "pnpm --filter dashboard migrate",
     "migrate-clickhouse": "node scripts/run-migration.js",
-    "generate": "pnpm --filter better-analytics-dashboard generate",
+    "generate": "pnpm --filter dashboard generate",
     "simulate": "node simulate-events.js",
     "performance": "k6 run -e TARGET_URL=http://localhost:3001/track -e VUS=100 -e DURATION=30s k6-perf-test.js",
-    "unit-tests": "pnpm --filter better-analytics-dashboard unit-tests"
+    "unit-tests": "pnpm --filter dashboard unit-tests"
   },
   "packageManager": "pnpm@10.9.0",
   "dependencies": {
