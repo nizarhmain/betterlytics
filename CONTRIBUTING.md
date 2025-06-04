@@ -4,9 +4,9 @@
 
 **Help us build the future of privacy-first analytics**
 
-[![Contributors](https://img.shields.io/github/contributors/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/Lindharden/better-analytics.svg)](https://github.com/Lindharden/better-analytics/pulls)
+[![Contributors](https://img.shields.io/github/contributors/betterlytics/betterlytics.svg)](https://github.com/betterlytics/betterlytics/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/betterlytics/betterlytics.svg)](https://github.com/betterlytics/betterlytics/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/betterlytics/betterlytics.svg)](https://github.com/betterlytics/betterlytics/pulls)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 [🚀 Quick Start](#-quick-start) • [🛠️ Development](#️-development-workflow) • [🧪 Testing](#-testing) • [📝 Code Style](#-code-style) • [🔄 Pull Requests](#-pull-request-process) • [🐛 Issues](#-issue-guidelines-not-strictly-required-to-adhere-to-yet) • [🆘 Help](#-getting-help)
@@ -38,11 +38,11 @@ Get your development environment ready in minutes:
 
 ```bash
 # Fork on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/better-analytics.git
-cd better-analytics
+git clone https://github.com/YOUR_USERNAME/betterlytics.git
+cd betterlytics
 
 # Add upstream remote
-git remote add upstream https://github.com/Lindharden/better-analytics.git
+git remote add upstream https://github.com/betterlytics/betterlytics.git
 ```
 
 </td>
@@ -465,7 +465,7 @@ Real-time help and discussion
 
 ### 🐛 GitHub Issues
 
-[![Issues](https://img.shields.io/badge/Issues-Report-red.svg)](https://github.com/Lindharden/better-analytics/issues)
+[![Issues](https://img.shields.io/badge/Issues-Report-red.svg)](https://github.com/betterlytics/betterlytics/issues)
 
 Bug reports and feature requests
 
@@ -474,7 +474,7 @@ Bug reports and feature requests
 
 ### 💡 Discussions
 
-[![Discussions](https://img.shields.io/badge/Discussions-Ask-blue.svg)](https://github.com/Lindharden/better-analytics/discussions)
+[![Discussions](https://img.shields.io/badge/Discussions-Ask-blue.svg)](https://github.com/betterlytics/betterlytics/discussions)
 
 Questions and ideas
 
@@ -533,7 +533,7 @@ By contributing to Betterlytics, you agree that your contributions will be licen
 
 <div align="center">
 
-**Ready to contribute?** 🚀 [Fork the repository](https://github.com/Lindharden/better-analytics/fork) and start building!
+**Ready to contribute?** 🚀 [Fork the repository](https://github.com/betterlytics/betterlytics/fork) and start building!
 
 Made with ❤️ by the Betterlytics team
 

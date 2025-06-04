@@ -29,6 +29,6 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy just the compiled binary
-COPY --from=builder /app/target/release/better-analytics /app/app
+COPY --from=builder /app/target/release/betterlytics /app/app
 
 CMD ./app

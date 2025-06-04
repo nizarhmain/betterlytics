@@ -36,7 +36,7 @@ impl GeoIpUpdater {
         let (watch_tx, watch_rx) = watch::channel(None);
 
         let updater = Self {
-            client: Client::builder().user_agent("better-analytics-updater/0.1").build()?,
+            client: Client::builder().user_agent("betterlytics-updater/0.1").build()?,
             db_path: config.geoip_db_path.clone(),
             update_interval: config.geoip_update_interval,
             config,

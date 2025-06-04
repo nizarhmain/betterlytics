@@ -26,8 +26,8 @@ Get up and running in under 5 minutes:
 ### ⚡ Express Setup
 
 ```bash
-git clone https://github.com/Lindharden/better-analytics.git
-cd better-analytics
+git clone https://github.com/betterlytics/betterlytics.git
+cd betterlytics
 pnpm install
 pnpm run compose
 pnpm run backend
@@ -121,8 +121,8 @@ Before you begin, ensure you have these tools installed:
 ### 1️⃣ Clone & Navigate
 
 ```bash
-git clone https://github.com/Lindharden/better-analytics.git
-cd better-analytics
+git clone https://github.com/betterlytics/betterlytics.git
+cd betterlytics
 ```
 
 ### 2️⃣ Environment Configuration
@@ -245,7 +245,7 @@ docker-compose down -v
 
 <div align="center">
 
-**Need help?** Join our [Discord](https://discord.gg/vwqSvPn6sP) or [open an issue](https://github.com/Lindharden/better-analytics/issues)
+**Need help?** Join our [Discord](https://discord.gg/vwqSvPn6sP) or [open an issue](https://github.com/betterlytics/betterlytics/issues)
 
 Made with ❤️ by the Betterlytics team
 
