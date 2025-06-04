@@ -1,3 +1,3 @@
-   packages:
-     - 'backend'
-     - 'better-analytics-dashboard'
+packages:
+  - "backend"
+  - "dashboard"
