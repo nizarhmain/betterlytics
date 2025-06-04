@@ -208,7 +208,7 @@ We're constantly working to improve Betterlytics. Here's what's coming next:
 
 Have an idea for Betterlytics? We'd love to hear it!
 
-- Open an [issue](https://github.com/Lindharden/better-analytics/issues) to suggest new features
+- Open an [issue](https://github.com/betterlytics/betterlytics/issues) to suggest new features
 - Join our discussions to share your thoughts
 - Contribute code to help us build these features faster
 
@@ -220,5 +220,5 @@ Join our small community of developers and privacy advocates:
 
 - 💬 **[Discord](https://discord.gg/vwqSvPn6sP)** - Get help, share ideas, and connect with other users and developers
 - 🦋 **[Bluesky](https://bsky.app/profile/betterlytics.bsky.social)** - Follow us for updates and announcements
-- 🐛 **[GitHub Issues](https://github.com/Lindharden/better-analytics/issues)** - Report bugs and request features
-- 💡 **[GitHub Discussions](https://github.com/Lindharden/better-analytics/discussions)** - Ask questions and share feedback
+- 🐛 **[GitHub Issues](https://github.com/betterlytics/betterlytics/issues)** - Report bugs and request features
+- 💡 **[GitHub Discussions](https://github.com/betterlytics/betterlytics/discussions)** - Ask questions and share feedback

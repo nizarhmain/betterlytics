@@ -1,5 +1,5 @@
 {
-  "name": "better-analytics",
+  "name": "betterlytics",
   "private": true,
   "scripts": {
     "backend": "pnpm --filter backend dev",
