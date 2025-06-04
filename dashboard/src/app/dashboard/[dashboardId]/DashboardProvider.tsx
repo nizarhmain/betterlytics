@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSyncURLFilters } from '@/hooks/use-sync-url-filters';
 import { UserJourneyFilterProvider } from '@/contexts/UserJourneyFilterContextProvider';
 import { getDashboardSettingsAction } from '@/app/actions/dashboardSettings';
+import DashboardLoading from '@/components/loading/DashboardLoading';
 
 type DashboardProviderProps = {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export function DashboardProvider({ children }: DashboardProviderProps) {
   });
 
   if (!initialSettings) {
-    return <div>Loading dashboard...</div>;
+    return <DashboardLoading />;
   }
 
   return (
