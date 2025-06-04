@@ -6,7 +6,6 @@ use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
 use tracing::{info, error};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use dotenv::dotenv;
 
 mod config;
 mod analytics;
@@ -27,8 +26,6 @@ use geoip_updater::GeoIpUpdater;
 
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
-
     let config = Arc::new(config::Config::new());
 
     tracing_subscriber::registry()
@@ -72,14 +69,6 @@ async fn main() {
         .route("/health", get(health_check))
         .route("/track", post(track_event))
         .route("/site-id", get(generate_site_id_handler))
-        .route("/test", get(|| async { 
-            let html = include_str!("../../static/test.html");
-            Html(html)
-        }))
-        .route("/analytics.js", get(|| async {
-            let js = include_str!("../../static/analytics.js");
-            (StatusCode::OK, js)
-        }))
         .with_state((db, processor))
         .layer(CorsLayer::permissive());
 

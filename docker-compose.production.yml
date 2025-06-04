@@ -1,0 +1,140 @@
+version: "3.8"
+
+services:
+  static:
+    image: nginx:alpine
+    container_name: static
+    hostname: static
+    volumes:
+      - ./static:/usr/share/nginx/html:ro
+    restart: unless-stopped
+    ports:
+      - 3006:80
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    container_name: backend
+    ports:
+      - 3001:3001
+    env_file:
+      - .env.production
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    networks:
+      - clickhouse_network
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: ./Dockerfile
+      args:
+        NEXTAUTH_URL: ${NEXTAUTH_URL}
+        NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+        ADMIN_EMAIL: ${ADMIN_EMAIL}
+        ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+        CLICKHOUSE_URL: ${CLICKHOUSE_URL}
+        CLICKHOUSE_DASHBOARD_USER: ${CLICKHOUSE_DASHBOARD_USER}
+        CLICKHOUSE_DASHBOARD_PASSWORD: ${CLICKHOUSE_DASHBOARD_PASSWORD}
+        ENABLE_DASHBOARD_TRACKING: ${ENABLE_DASHBOARD_TRACKING:-false}
+    env_file:
+      - .env.production
+    restart: unless-stopped
+    container_name: dashboard
+    ports:
+      - 3000:3000
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    networks:
+      - postgres_network
+      - clickhouse_network
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    user: 101:101
+    container_name: clickhouse
+    hostname: clickhouse
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    volumes:
+      - clickhouse_prod_data:/var/lib/clickhouse/
+      - clickhouse_prod_users:/etc/clickhouse-server/users.d/
+      - ./clickhouse-logs:/var/log/clickhouse-server/
+      - ./clickhouse-config/config.d/config.xml:/etc/clickhouse-server/config.d/config.xml
+      - ./clickhouse-config/setup/:/docker-entrypoint-initdb.d/
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 10s
+    networks:
+      - clickhouse_network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    hostname: postgres
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - postgres_network
+
+  init:
+    image: node:20-slim
+    container_name: init
+    hostname: init
+    env_file:
+      - .env.production
+    volumes:
+      - ./package.json:/app/package.json:ro
+      - ./migrations:/app/migrations:ro
+      - ./scripts:/app/scripts:ro
+      - ./dashboard/package.json:/app/dashboard/package.json:ro
+      - ./dashboard/prisma:/app/dashboard/prisma:ro
+    command:
+      - /bin/sh
+      - -c
+      - |
+        apt-get update -y && apt-get install -y openssl
+        npm install -g pnpm
+        cd /app
+        pnpm install
+        pnpm run migrate-clickhouse
+        cd ./dashboard
+        pnpm install
+        pnpm prisma migrate deploy
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - postgres_network
+      - clickhouse_network
+
+volumes:
+  clickhouse_prod_data:
+  clickhouse_prod_users:
+  postgres_prod_data:
+
+networks:
+  postgres_network:
+  clickhouse_network:
