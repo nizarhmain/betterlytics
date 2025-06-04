@@ -10,6 +10,7 @@ import { fetchSiteId } from '@/app/actions';
 import { useSyncURLFilters } from '@/hooks/use-sync-url-filters';
 import { UserJourneyFilterProvider } from '@/contexts/UserJourneyFilterContextProvider';
 import { getDashboardSettingsAction } from '@/app/actions/dashboardSettings';
+import DashboardLoading from '@/components/loading/DashboardLoading';
 
 type DashboardProviderProps = {
   children: React.ReactNode;
@@ -43,7 +44,7 @@ export function DashboardProvider({ children }: DashboardProviderProps) {
   }, [siteId]);
 
   if (!initialSettings) {
-    return <div>Loading dashboard...</div>;
+    return <DashboardLoading />;
   }
 
   return (
