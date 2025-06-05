@@ -9,6 +9,7 @@ import { formatDuration } from '@/utils/dateFormatters';
 import { useMemo } from 'react';
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { Button } from '@/components/ui/button';
+import { formatPercentage } from '@/utils/formatters';
 
 interface TabbedPagesTableProps {
   allPagesData: PageAnalytics[];
@@ -23,8 +24,8 @@ const formatPath = (path: string): string => {
 export default function TabbedPagesTable({ allPagesData, entryPagesData, exitPagesData }: TabbedPagesTableProps) {
   const { addQueryFilter } = useQueryFiltersContext();
 
-  const getColumns = (excludeColumns: string[] = []): ColumnDef<PageAnalytics>[] => {
-    const allColumns = [
+  const getBaseColumns = (): ColumnDef<PageAnalytics>[] => {
+    return [
       {
         accessorKey: 'path',
         header: 'Path',
@@ -58,24 +59,51 @@ export default function TabbedPagesTable({ allPagesData, entryPagesData, exitPag
         header: 'Pageviews',
         cell: ({ row }: { row: { original: PageAnalytics } }) => row.original.pageviews.toLocaleString(),
       },
-      {
+    ];
+  };
+
+  const getTabSpecificColumns = (): Record<string, ColumnDef<PageAnalytics>> => {
+    return {
+      bounceRate: {
         accessorKey: 'bounceRate',
         header: 'Bounce Rate',
-        cell: ({ row }: { row: { original: PageAnalytics } }) => `${row.original.bounceRate}%`,
+        cell: ({ row }: { row: { original: PageAnalytics } }) => formatPercentage(row.original.bounceRate),
       },
-      {
+      avgTime: {
         accessorKey: 'avgTime',
         header: 'Avg. Time',
         cell: ({ row }: { row: { original: PageAnalytics } }) => formatDuration(row.original.avgTime),
       },
-    ];
-
-    return allColumns.filter((column) => !excludeColumns.includes(column.accessorKey as string));
+      entryRate: {
+        accessorKey: 'entryRate',
+        header: 'Entry Rate',
+        cell: ({ row }: { row: { original: PageAnalytics } }) => formatPercentage(row.original.entryRate ?? 0),
+      },
+      exitRate: {
+        accessorKey: 'exitRate',
+        header: 'Exit Rate',
+        cell: ({ row }: { row: { original: PageAnalytics } }) => formatPercentage(row.original.exitRate ?? 0),
+      },
+    };
   };
 
-  const allPagesColumns = useMemo(() => getColumns(), []);
-  const entryPagesColumns = useMemo(() => getColumns(), []);
-  const exitPagesColumns = useMemo(() => getColumns(['bounceRate']), []);
+  const allPagesColumns = useMemo(() => {
+    const base = getBaseColumns();
+    const specific = getTabSpecificColumns();
+    return [...base, specific.bounceRate, specific.avgTime];
+  }, []);
+
+  const entryPagesColumns = useMemo(() => {
+    const base = getBaseColumns();
+    const specific = getTabSpecificColumns();
+    return [...base, specific.bounceRate, specific.avgTime, specific.entryRate];
+  }, []);
+
+  const exitPagesColumns = useMemo(() => {
+    const base = getBaseColumns();
+    const specific = getTabSpecificColumns();
+    return [...base, specific.bounceRate, specific.avgTime, specific.exitRate];
+  }, []);
 
   return (
     <Card className='bg-card border-border rounded-lg border shadow'>

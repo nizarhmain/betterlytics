@@ -7,6 +7,8 @@ export const PageAnalyticsSchema = z.object({
   pageviews: z.number(),
   bounceRate: z.number(),
   avgTime: z.number(),
+  entryRate: z.number().optional(),
+  exitRate: z.number().optional(),
 });
 
 export const TopPageRowSchema = z.object({

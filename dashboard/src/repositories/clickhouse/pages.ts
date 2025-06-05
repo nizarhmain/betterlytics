@@ -456,6 +456,14 @@ export async function getEntryPageAnalytics(
 
   const query = safeSql`
     WITH 
+      all_pageviews AS (
+        SELECT count() as total_pageviews
+        FROM analytics.events
+        WHERE site_id = {site_id:String}
+          AND event_type = 'pageview' 
+          AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+          AND ${SQL.AND(filters)}
+      ),
       session_entry_pages AS (
         SELECT 
           session_id,
@@ -502,7 +510,8 @@ export async function getEntryPageAnalytics(
           uniq(pvd.session_id) as visitors, 
           count() as pageviews,
           avgIf(pvd.duration_seconds, pvd.duration_seconds IS NOT NULL) as avg_time_seconds,
-          countIf(spc.page_count = 1) as single_page_sessions
+          countIf(spc.page_count = 1) as single_page_sessions,
+          count() as entry_pageviews
         FROM session_entry_pages sep
         JOIN page_view_durations pvd ON sep.entry_page = pvd.path AND sep.session_id = pvd.session_id
         JOIN session_page_counts spc ON pvd.session_id = spc.session_id
@@ -513,8 +522,9 @@ export async function getEntryPageAnalytics(
       visitors, 
       pageviews, 
       if(visitors > 0, round(single_page_sessions / visitors * 100, 2), 0) as bounceRate,
-      avg_time_seconds as avgTime
-    FROM entry_page_aggregates 
+      avg_time_seconds as avgTime,
+      if(ap.total_pageviews > 0, round(entry_pageviews / ap.total_pageviews * 100, 2), 0) as entryRate
+    FROM entry_page_aggregates, all_pageviews ap
     ORDER BY visitors DESC, pageviews DESC 
     LIMIT {limit:UInt64}
   `;
@@ -539,6 +549,7 @@ export async function getEntryPageAnalytics(
     pageviews: Number(row.pageviews),
     bounceRate: Number(row.bounceRate ?? 0),
     avgTime: Number(row.avgTime ?? 0),
+    entryRate: Number(row.entryRate ?? 0),
   }));
 
   return PageAnalyticsSchema.array().parse(mappedResults);
@@ -555,6 +566,14 @@ export async function getExitPageAnalytics(
 
   const query = safeSql`
     WITH 
+      all_pageviews AS (
+        SELECT count() as total_pageviews
+        FROM analytics.events
+        WHERE site_id = {site_id:String}
+          AND event_type = 'pageview' 
+          AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+          AND ${SQL.AND(filters)}
+      ),
       session_exit_pages AS (
         SELECT 
           session_id,
@@ -601,7 +620,8 @@ export async function getExitPageAnalytics(
           uniq(pvd.session_id) as visitors, 
           count() as pageviews,
           avgIf(pvd.duration_seconds, pvd.duration_seconds IS NOT NULL) as avg_time_seconds,
-          countIf(spc.page_count = 1) as single_page_sessions
+          countIf(spc.page_count = 1) as single_page_sessions,
+          count() as exit_pageviews
         FROM session_exit_pages sep
         JOIN page_view_durations pvd ON sep.exit_page = pvd.path AND sep.session_id = pvd.session_id
         JOIN session_page_counts spc ON pvd.session_id = spc.session_id
@@ -612,8 +632,9 @@ export async function getExitPageAnalytics(
       visitors, 
       pageviews, 
       if(visitors > 0, round(single_page_sessions / visitors * 100, 2), 0) as bounceRate,
-      avg_time_seconds as avgTime
-    FROM exit_page_aggregates 
+      avg_time_seconds as avgTime,
+      if(ap.total_pageviews > 0, round(exit_pageviews / ap.total_pageviews * 100, 2), 0) as exitRate
+    FROM exit_page_aggregates, all_pageviews ap
     ORDER BY visitors DESC, pageviews DESC 
     LIMIT {limit:UInt64}
   `;
@@ -638,6 +659,7 @@ export async function getExitPageAnalytics(
     pageviews: Number(row.pageviews),
     bounceRate: Number(row.bounceRate ?? 0),
     avgTime: Number(row.avgTime ?? 0),
+    exitRate: Number(row.exitRate ?? 0),
   }));
 
   return PageAnalyticsSchema.array().parse(mappedResults);
