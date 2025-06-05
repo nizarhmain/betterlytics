@@ -11,10 +11,10 @@ import {
   getTopExitPages,
   getEntryPageAnalytics as getEntryPageAnalyticsRepo,
   getExitPageAnalytics as getExitPageAnalyticsRepo,
-  getDailyUniquePages,
   getDailyAverageTimeOnPage,
   getDailyBounceRate,
 } from '@/repositories/clickhouse';
+import { getSessionMetrics } from '@/repositories/clickhouse/visitors';
 import { DailyPageViewRow, TotalPageViewsRow } from '@/entities/pageviews';
 import { toDateTimeString } from '@/utils/dateFormatters';
 import {
@@ -22,7 +22,6 @@ import {
   TopPageRow,
   TopEntryPageRow,
   TopExitPageRow,
-  DailyUniquePagesRow,
   DailyAverageTimeRow,
   DailyBounceRateRow,
 } from '@/entities/pages';
@@ -152,26 +151,35 @@ export async function getPagesSummaryWithChartsForSite(
 ) {
   const dailyGranularity: GranularityRangeValues = 'day';
 
-  const [pageAnalytics, pageviewsChartData, dailyUniquePagesData, dailyAvgTimeData, dailyBounceRateData] =
+  const [pageAnalytics, pageviewsChartData, dailyAvgTimeData, dailyBounceRateData, sessionMetricsData] =
     await Promise.all([
       getPageAnalytics(siteId, startDate, endDate, queryFilters),
       getTotalPageViewsForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
-      getDailyUniquePagesForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
       getDailyAverageTimeOnPageForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
       getDailyBounceRateForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
+      getSessionMetrics(
+        siteId,
+        toDateTimeString(startDate),
+        toDateTimeString(endDate),
+        dailyGranularity,
+        queryFilters,
+      ),
     ]);
 
   const totalPages = pageAnalytics.length;
   const totalPageviews = pageAnalytics.reduce((sum, page) => sum + page.pageviews, 0);
   const avgPageviews = totalPages > 0 ? Math.round(totalPageviews / totalPages) : 0;
-  const avgTimeOnPage =
-    totalPages > 0 ? pageAnalytics.reduce((sum, page) => sum + page.avgTime, 0) / totalPages : 0;
-  const avgBounceRate =
-    totalPages > 0 ? pageAnalytics.reduce((sum, page) => sum + page.bounceRate, 0) / totalPages : 0;
+  const avgTimeOnPage = pageAnalytics.reduce((sum, page) => sum + page.avgTime, 0) / Math.max(totalPages, 1);
+  const avgBounceRate = pageAnalytics.reduce((sum, page) => sum + page.bounceRate, 0) / Math.max(totalPages, 1);
 
-  const totalPagesChartData = dailyUniquePagesData.map((row) => ({
+  const avgPagesPerSession =
+    sessionMetricsData.length > 0
+      ? sessionMetricsData.reduce((sum, row) => sum + row.pages_per_session, 0) / sessionMetricsData.length
+      : 0;
+
+  const pagesPerSessionChartData = sessionMetricsData.map((row) => ({
     date: row.date,
-    value: row.uniquePages,
+    value: row.pages_per_session,
   }));
 
   const avgTimeChartData = dailyAvgTimeData.map((row) => ({
@@ -189,23 +197,12 @@ export async function getPagesSummaryWithChartsForSite(
     avgPageviews,
     avgTimeOnPage: Math.round(avgTimeOnPage),
     avgBounceRate: Math.round(avgBounceRate),
-    totalPagesChartData,
+    pagesPerSession: Number(avgPagesPerSession.toFixed(1)),
+    pagesPerSessionChartData,
     avgTimeChartData,
     bounceRateChartData,
     pageviewsChartData,
   };
-}
-
-export async function getDailyUniquePagesForSite(
-  siteId: string,
-  startDate: Date,
-  endDate: Date,
-  granularity: GranularityRangeValues,
-  queryFilters: QueryFilter[],
-): Promise<DailyUniquePagesRow[]> {
-  const formattedStart = toDateTimeString(startDate);
-  const formattedEnd = toDateTimeString(endDate);
-  return getDailyUniquePages(siteId, formattedStart, formattedEnd, granularity, queryFilters);
 }
 
 export async function getDailyAverageTimeOnPageForSite(

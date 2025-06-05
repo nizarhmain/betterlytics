@@ -665,44 +665,6 @@ export async function getExitPageAnalytics(
   return PageAnalyticsSchema.array().parse(mappedResults);
 }
 
-export async function getDailyUniquePages(
-  siteId: string,
-  startDate: DateString,
-  endDate: DateString,
-  granularity: GranularityRangeValues,
-  queryFilters: QueryFilter[],
-): Promise<DailyUniquePagesRow[]> {
-  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
-  const filters = BAQuery.getFilterQuery(queryFilters);
-
-  const query = safeSql`
-    SELECT
-      ${granularityFunc}(timestamp) as date,
-      uniq(url) as uniquePages
-    FROM analytics.events
-    WHERE site_id = {site_id:String}
-      AND event_type = 'pageview' 
-      AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
-      AND ${SQL.AND(filters)}
-    GROUP BY date
-    ORDER BY date ASC
-    LIMIT 10080
-  `;
-
-  const result = (await clickhouse
-    .query(query.taggedSql, {
-      params: {
-        ...query.taggedParams,
-        site_id: siteId,
-        start_date: startDate,
-        end_date: endDate,
-      },
-    })
-    .toPromise()) as unknown[];
-
-  return result.map((row) => DailyUniquePagesRowSchema.parse(row));
-}
-
 export async function getDailyAverageTimeOnPage(
   siteId: string,
   startDate: DateString,

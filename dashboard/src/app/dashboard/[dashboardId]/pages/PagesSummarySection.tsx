@@ -14,9 +14,9 @@ export default function PagesSummarySection({ pagesSummaryWithChartsPromise }: P
 
   const cards: SummaryCardData[] = [
     {
-      title: 'Total Pages',
-      value: String(summaryWithCharts.totalPages),
-      rawChartData: summaryWithCharts.totalPagesChartData,
+      title: 'Pages per Session',
+      value: summaryWithCharts.pagesPerSession.toLocaleString(),
+      rawChartData: summaryWithCharts.pagesPerSessionChartData,
       valueField: 'value',
       chartColor: 'var(--chart-1)',
     },

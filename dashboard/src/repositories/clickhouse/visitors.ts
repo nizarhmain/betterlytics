@@ -107,7 +107,11 @@ export async function getSessionMetrics(
       if(countIf(page_count > 1) > 0,
         round(avgIf(duration_seconds, page_count > 1), 0),
         0
-      ) as avg_visit_duration
+      ) as avg_visit_duration,
+      if(count() > 0,
+        round(sum(page_count) / count(), 1),
+        0
+      ) as pages_per_session
     FROM session_data
     GROUP BY date
     ORDER BY date ASC

@@ -32,11 +32,6 @@ export const PageAnalyticsCombinedSchema = z.object({
   topExitPages: z.array(TopExitPageRowSchema),
 });
 
-export const DailyUniquePagesRowSchema = z.object({
-  date: z.string(),
-  uniquePages: z.number(),
-});
-
 export const DailyAverageTimeRowSchema = z.object({
   date: z.string(),
   avgTime: z.number(),
@@ -53,6 +48,5 @@ export type TopEntryPageRow = z.infer<typeof TopEntryPageRowSchema>;
 export type TopExitPageRow = z.infer<typeof TopExitPageRowSchema>;
 export type PageAnalyticsCombined = z.infer<typeof PageAnalyticsCombinedSchema>;
 
-export type DailyUniquePagesRow = z.infer<typeof DailyUniquePagesRowSchema>;
 export type DailyAverageTimeRow = z.infer<typeof DailyAverageTimeRowSchema>;
 export type DailyBounceRateRow = z.infer<typeof DailyBounceRateRowSchema>;
