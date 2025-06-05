@@ -1,7 +1,7 @@
 'use client';
 
 import { use } from 'react';
-import TabbedPagesTable from '@/components/analytics/TabbedPagesTable';
+import TabbedPagesTable from '@/app/dashboard/[dashboardId]/pages/TabbedPagesTable';
 import {
   fetchPageAnalyticsAction,
   fetchEntryPageAnalyticsAction,

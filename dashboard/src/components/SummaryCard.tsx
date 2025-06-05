@@ -76,12 +76,18 @@ const SummaryCard = React.memo(
             ? 'hover:border-primary/40 hover:bg-accent/20 cursor-pointer hover:scale-[1.02] hover:shadow-lg'
             : ''
         } ${
-          isActive ? 'border-primary ring-primary/30 bg-primary/5 shadow-lg ring-2' : 'hover:border-primary/20'
+          isActive
+            ? 'border-primary ring-primary/30 bg-primary/5 shadow-lg ring-2'
+            : onClick
+              ? 'hover:border-primary/20'
+              : ''
         }`}
         onClick={onClick}
       >
         {rawChartData && rawChartData.length > 0 && valueField && (
-          <div className='pointer-events-none absolute right-0 bottom-0 left-0 h-16 opacity-[0.2] transition-opacity duration-200 group-hover:opacity-[0.15]'>
+          <div
+            className={`pointer-events-none absolute right-0 bottom-0 left-0 h-16 opacity-[0.2] transition-opacity duration-200 ${onClick ? 'group-hover:opacity-[0.15]' : ''}`}
+          >
             <ResponsiveContainer width='100%' height='100%'>
               <AreaChart data={rawChartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                 <defs>
