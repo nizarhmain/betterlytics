@@ -35,7 +35,7 @@ services:
     ports:
       - 3001:3001
     env_file:
-      - .env.production
+      - .env
     depends_on:
       init:
         condition: service_completed_successfully
@@ -57,7 +57,7 @@ services:
         CLICKHOUSE_DASHBOARD_PASSWORD: ${CLICKHOUSE_DASHBOARD_PASSWORD}
         ENABLE_DASHBOARD_TRACKING: ${ENABLE_DASHBOARD_TRACKING:-false}
     env_file:
-      - .env.production
+      - .env
     restart: unless-stopped
     container_name: dashboard
     hostname: dashboard
@@ -78,7 +78,7 @@ services:
     hostname: clickhouse
     restart: unless-stopped
     env_file:
-      - .env.production
+      - .env
     volumes:
       - clickhouse_prod_data:/var/lib/clickhouse/
       - clickhouse_prod_users:/etc/clickhouse-server/users.d/
@@ -104,7 +104,7 @@ services:
     hostname: postgres
     restart: unless-stopped
     env_file:
-      - .env.production
+      - .env
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data/
     healthcheck:
@@ -120,7 +120,7 @@ services:
     container_name: init
     hostname: init
     env_file:
-      - .env.production
+      - .env
     volumes:
       - ./package.json:/app/package.json:ro
       - ./migrations:/app/migrations:ro
