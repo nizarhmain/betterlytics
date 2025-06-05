@@ -24,6 +24,8 @@ import {
   TopExitPageRow,
   DailyAverageTimeRow,
   DailyBounceRateRow,
+  PagesSummaryWithCharts,
+  PagesSummaryWithChartsSchema,
 } from '@/entities/pages';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { QueryFilter } from '@/entities/filter';
@@ -148,7 +150,7 @@ export async function getPagesSummaryWithChartsForSite(
   startDate: Date,
   endDate: Date,
   queryFilters: QueryFilter[],
-) {
+): Promise<PagesSummaryWithCharts> {
   const dailyGranularity: GranularityRangeValues = 'day';
 
   const [pageAnalytics, pageviewsChartData, dailyAvgTimeData, dailyBounceRateData, sessionMetricsData] =
@@ -168,7 +170,6 @@ export async function getPagesSummaryWithChartsForSite(
 
   const totalPages = pageAnalytics.length;
   const totalPageviews = pageAnalytics.reduce((sum, page) => sum + page.pageviews, 0);
-  const avgPageviews = totalPages > 0 ? Math.round(totalPageviews / totalPages) : 0;
   const avgTimeOnPage = pageAnalytics.reduce((sum, page) => sum + page.avgTime, 0) / Math.max(totalPages, 1);
   const avgBounceRate = pageAnalytics.reduce((sum, page) => sum + page.bounceRate, 0) / Math.max(totalPages, 1);
 
@@ -192,9 +193,8 @@ export async function getPagesSummaryWithChartsForSite(
     value: Math.round(row.bounceRate),
   }));
 
-  return {
-    totalPages,
-    avgPageviews,
+  return PagesSummaryWithChartsSchema.parse({
+    totalPageviews,
     avgTimeOnPage: Math.round(avgTimeOnPage),
     avgBounceRate: Math.round(avgBounceRate),
     pagesPerSession: Number(avgPagesPerSession.toFixed(1)),
@@ -202,7 +202,7 @@ export async function getPagesSummaryWithChartsForSite(
     avgTimeChartData,
     bounceRateChartData,
     pageviewsChartData,
-  };
+  });
 }
 
 export async function getDailyAverageTimeOnPageForSite(

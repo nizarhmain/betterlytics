@@ -42,6 +42,37 @@ export const DailyBounceRateRowSchema = z.object({
   bounceRate: z.number(),
 });
 
+export const PageviewsChartDataPointSchema = z.object({
+  date: z.string(),
+  views: z.number(),
+});
+
+export const PagesSummaryWithChartsSchema = z.object({
+  totalPageviews: z.number(),
+  avgTimeOnPage: z.number(),
+  avgBounceRate: z.number(),
+  pagesPerSession: z.number(),
+  pagesPerSessionChartData: z.array(
+    z.object({
+      date: z.string(),
+      value: z.number(),
+    }),
+  ),
+  avgTimeChartData: z.array(
+    z.object({
+      date: z.string(),
+      value: z.number(),
+    }),
+  ),
+  bounceRateChartData: z.array(
+    z.object({
+      date: z.string(),
+      value: z.number(),
+    }),
+  ),
+  pageviewsChartData: z.array(PageviewsChartDataPointSchema),
+});
+
 export type PageAnalytics = z.infer<typeof PageAnalyticsSchema>;
 export type TopPageRow = z.infer<typeof TopPageRowSchema>;
 export type TopEntryPageRow = z.infer<typeof TopEntryPageRowSchema>;
@@ -50,3 +81,6 @@ export type PageAnalyticsCombined = z.infer<typeof PageAnalyticsCombinedSchema>;
 
 export type DailyAverageTimeRow = z.infer<typeof DailyAverageTimeRowSchema>;
 export type DailyBounceRateRow = z.infer<typeof DailyBounceRateRowSchema>;
+
+export type PageviewsChartDataPoint = z.infer<typeof PageviewsChartDataPointSchema>;
+export type PagesSummaryWithCharts = z.infer<typeof PagesSummaryWithChartsSchema>;

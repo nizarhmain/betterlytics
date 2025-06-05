@@ -22,7 +22,7 @@ export default function PagesSummarySection({ pagesSummaryWithChartsPromise }: P
     },
     {
       title: 'Total Pageviews',
-      value: summaryWithCharts.avgPageviews.toLocaleString(),
+      value: summaryWithCharts.totalPageviews.toLocaleString(),
       rawChartData: summaryWithCharts.pageviewsChartData,
       valueField: 'views',
       chartColor: 'var(--chart-2)',
