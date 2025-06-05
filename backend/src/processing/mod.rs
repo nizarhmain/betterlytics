@@ -134,6 +134,7 @@ impl EventProcessor {
             }
         };
 
+        debug!("Site ID: {}", processed.site_id);
         debug!("Session ID: {}", processed.session_id);
 
         if let Err(e) = self.detect_device_type_from_resolution(&mut processed).await {

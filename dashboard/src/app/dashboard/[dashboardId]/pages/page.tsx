@@ -2,7 +2,12 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { Suspense } from 'react';
-import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from '@/app/actions';
+import {
+  fetchPageAnalyticsAction,
+  fetchEntryPageAnalyticsAction,
+  fetchExitPageAnalyticsAction,
+  fetchPagesSummaryWithChartsAction,
+} from '@/app/actions';
 import { SummaryCardsSkeleton, TableSkeleton } from '@/components/skeleton';
 import PagesSummarySection from '@/app/dashboard/[dashboardId]/pages/PagesSummarySection';
 import PagesTableSection from './PagesTableSection';
@@ -22,10 +27,17 @@ export default async function PagesPage({ params, searchParams }: PagesPageParam
   }
 
   const { dashboardId } = await params;
-  const { startDate, endDate } = await BAFilterSearchParams.decodeFromParams(searchParams);
+  const { startDate, endDate, queryFilters } = await BAFilterSearchParams.decodeFromParams(searchParams);
 
-  const summaryStatsPromise = fetchSummaryStatsAction(dashboardId, startDate, endDate, []);
-  const pageAnalyticsPromise = fetchPageAnalyticsAction(dashboardId, startDate, endDate, []);
+  const pagesSummaryWithChartsPromise = fetchPagesSummaryWithChartsAction(
+    dashboardId,
+    startDate,
+    endDate,
+    queryFilters,
+  );
+  const pageAnalyticsPromise = fetchPageAnalyticsAction(dashboardId, startDate, endDate, queryFilters);
+  const entryPageAnalyticsPromise = fetchEntryPageAnalyticsAction(dashboardId, startDate, endDate, queryFilters);
+  const exitPageAnalyticsPromise = fetchExitPageAnalyticsAction(dashboardId, startDate, endDate, queryFilters);
 
   return (
     <div className='min-h-screen'>
@@ -39,14 +51,15 @@ export default async function PagesPage({ params, searchParams }: PagesPageParam
         </div>
 
         <Suspense fallback={<SummaryCardsSkeleton />}>
-          <PagesSummarySection
-            summaryStatsPromise={summaryStatsPromise}
-            pageAnalyticsPromise={pageAnalyticsPromise}
-          />
+          <PagesSummarySection pagesSummaryWithChartsPromise={pagesSummaryWithChartsPromise} />
         </Suspense>
 
         <Suspense fallback={<TableSkeleton />}>
-          <PagesTableSection pageAnalyticsPromise={pageAnalyticsPromise} />
+          <PagesTableSection
+            pageAnalyticsPromise={pageAnalyticsPromise}
+            entryPageAnalyticsPromise={entryPageAnalyticsPromise}
+            exitPageAnalyticsPromise={exitPageAnalyticsPromise}
+          />
         </Suspense>
       </div>
     </div>
