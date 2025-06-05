@@ -132,3 +132,51 @@ export async function getExitPageAnalyticsForSite(
     queryFilters,
   );
 }
+
+export async function getPagesSummaryWithChartsForSite(
+  siteId: string,
+  startDate: Date,
+  endDate: Date,
+  queryFilters: QueryFilter[],
+) {
+  const dailyGranularity: GranularityRangeValues = 'day';
+
+  const [pageAnalytics, pageviewsChartData] = await Promise.all([
+    getPageAnalytics(siteId, startDate, endDate, queryFilters),
+    getTotalPageViewsForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
+  ]);
+
+  const totalPages = pageAnalytics.length;
+  const totalPageviews = pageAnalytics.reduce((sum, page) => sum + page.pageviews, 0);
+  const avgPageviews = totalPages > 0 ? Math.round(totalPageviews / totalPages) : 0;
+  const avgTimeOnPage =
+    totalPages > 0 ? pageAnalytics.reduce((sum, page) => sum + page.avgTime, 0) / totalPages : 0;
+  const avgBounceRate =
+    totalPages > 0 ? pageAnalytics.reduce((sum, page) => sum + page.bounceRate, 0) / totalPages : 0;
+
+  const totalPagesChartData = pageviewsChartData.map((row) => ({
+    date: row.date,
+    value: totalPages,
+  }));
+
+  const avgTimeChartData = pageviewsChartData.map((row) => ({
+    date: row.date,
+    value: Math.round(avgTimeOnPage),
+  }));
+
+  const bounceRateChartData = pageviewsChartData.map((row) => ({
+    date: row.date,
+    value: Math.round(avgBounceRate),
+  }));
+
+  return {
+    totalPages,
+    avgPageviews,
+    avgTimeOnPage: Math.round(avgTimeOnPage),
+    avgBounceRate: Math.round(avgBounceRate),
+    totalPagesChartData,
+    avgTimeChartData,
+    bounceRateChartData,
+    pageviewsChartData,
+  };
+}

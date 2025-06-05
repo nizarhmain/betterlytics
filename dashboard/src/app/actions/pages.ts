@@ -6,6 +6,7 @@ import {
   getPageTrafficForTimePeriod,
   getEntryPageAnalyticsForSite,
   getExitPageAnalyticsForSite,
+  getPagesSummaryWithChartsForSite,
 } from '@/services/pages';
 import { PageAnalytics } from '@/entities/pages';
 import { TotalPageViewsRow } from '@/entities/pageviews';
@@ -50,6 +51,12 @@ export const fetchExitPageAnalyticsAction = withDashboardAuthContext(
     queryFilters: QueryFilter[],
   ): Promise<PageAnalytics[]> => {
     return getExitPageAnalyticsForSite(ctx.siteId, startDate, endDate, queryFilters);
+  },
+);
+
+export const fetchPagesSummaryWithChartsAction = withDashboardAuthContext(
+  async (ctx: AuthContext, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) => {
+    return getPagesSummaryWithChartsForSite(ctx.siteId, startDate, endDate, queryFilters);
   },
 );
 
