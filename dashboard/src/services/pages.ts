@@ -11,10 +11,21 @@ import {
   getTopExitPages,
   getEntryPageAnalytics as getEntryPageAnalyticsRepo,
   getExitPageAnalytics as getExitPageAnalyticsRepo,
+  getDailyUniquePages,
+  getDailyAverageTimeOnPage,
+  getDailyBounceRate,
 } from '@/repositories/clickhouse';
 import { DailyPageViewRow, TotalPageViewsRow } from '@/entities/pageviews';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { PageAnalytics, TopPageRow, TopEntryPageRow, TopExitPageRow } from '@/entities/pages';
+import {
+  PageAnalytics,
+  TopPageRow,
+  TopEntryPageRow,
+  TopExitPageRow,
+  DailyUniquePagesRow,
+  DailyAverageTimeRow,
+  DailyBounceRateRow,
+} from '@/entities/pages';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { QueryFilter } from '@/entities/filter';
 
@@ -141,10 +152,14 @@ export async function getPagesSummaryWithChartsForSite(
 ) {
   const dailyGranularity: GranularityRangeValues = 'day';
 
-  const [pageAnalytics, pageviewsChartData] = await Promise.all([
-    getPageAnalytics(siteId, startDate, endDate, queryFilters),
-    getTotalPageViewsForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
-  ]);
+  const [pageAnalytics, pageviewsChartData, dailyUniquePagesData, dailyAvgTimeData, dailyBounceRateData] =
+    await Promise.all([
+      getPageAnalytics(siteId, startDate, endDate, queryFilters),
+      getTotalPageViewsForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
+      getDailyUniquePagesForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
+      getDailyAverageTimeOnPageForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
+      getDailyBounceRateForSite(siteId, startDate, endDate, dailyGranularity, queryFilters),
+    ]);
 
   const totalPages = pageAnalytics.length;
   const totalPageviews = pageAnalytics.reduce((sum, page) => sum + page.pageviews, 0);
@@ -154,19 +169,19 @@ export async function getPagesSummaryWithChartsForSite(
   const avgBounceRate =
     totalPages > 0 ? pageAnalytics.reduce((sum, page) => sum + page.bounceRate, 0) / totalPages : 0;
 
-  const totalPagesChartData = pageviewsChartData.map((row) => ({
+  const totalPagesChartData = dailyUniquePagesData.map((row) => ({
     date: row.date,
-    value: totalPages,
+    value: row.uniquePages,
   }));
 
-  const avgTimeChartData = pageviewsChartData.map((row) => ({
+  const avgTimeChartData = dailyAvgTimeData.map((row) => ({
     date: row.date,
-    value: Math.round(avgTimeOnPage),
+    value: Math.round(row.avgTime),
   }));
 
-  const bounceRateChartData = pageviewsChartData.map((row) => ({
+  const bounceRateChartData = dailyBounceRateData.map((row) => ({
     date: row.date,
-    value: Math.round(avgBounceRate),
+    value: Math.round(row.bounceRate),
   }));
 
   return {
@@ -179,4 +194,40 @@ export async function getPagesSummaryWithChartsForSite(
     bounceRateChartData,
     pageviewsChartData,
   };
+}
+
+export async function getDailyUniquePagesForSite(
+  siteId: string,
+  startDate: Date,
+  endDate: Date,
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[],
+): Promise<DailyUniquePagesRow[]> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  return getDailyUniquePages(siteId, formattedStart, formattedEnd, granularity, queryFilters);
+}
+
+export async function getDailyAverageTimeOnPageForSite(
+  siteId: string,
+  startDate: Date,
+  endDate: Date,
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[],
+): Promise<DailyAverageTimeRow[]> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  return getDailyAverageTimeOnPage(siteId, formattedStart, formattedEnd, granularity, queryFilters);
+}
+
+export async function getDailyBounceRateForSite(
+  siteId: string,
+  startDate: Date,
+  endDate: Date,
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[],
+): Promise<DailyBounceRateRow[]> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  return getDailyBounceRate(siteId, formattedStart, formattedEnd, granularity, queryFilters);
 }

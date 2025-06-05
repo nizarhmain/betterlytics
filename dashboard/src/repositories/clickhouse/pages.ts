@@ -14,6 +14,12 @@ import {
   TopEntryPageRowSchema,
   TopExitPageRow,
   TopExitPageRowSchema,
+  DailyUniquePagesRow,
+  DailyUniquePagesRowSchema,
+  DailyAverageTimeRow,
+  DailyAverageTimeRowSchema,
+  DailyBounceRateRow,
+  DailyBounceRateRowSchema,
 } from '@/entities/pages';
 import { DateString, DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
@@ -635,4 +641,153 @@ export async function getExitPageAnalytics(
   }));
 
   return PageAnalyticsSchema.array().parse(mappedResults);
+}
+
+export async function getDailyUniquePages(
+  siteId: string,
+  startDate: DateString,
+  endDate: DateString,
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[],
+): Promise<DailyUniquePagesRow[]> {
+  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
+  const query = safeSql`
+    SELECT
+      ${granularityFunc}(timestamp) as date,
+      uniq(url) as uniquePages
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND event_type = 'pageview' 
+      AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
+      AND ${SQL.AND(filters)}
+    GROUP BY date
+    ORDER BY date ASC
+    LIMIT 10080
+  `;
+
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start_date: startDate,
+        end_date: endDate,
+      },
+    })
+    .toPromise()) as unknown[];
+
+  return result.map((row) => DailyUniquePagesRowSchema.parse(row));
+}
+
+export async function getDailyAverageTimeOnPage(
+  siteId: string,
+  startDate: DateString,
+  endDate: DateString,
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[],
+): Promise<DailyAverageTimeRow[]> {
+  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
+  const query = safeSql`
+    WITH 
+      page_view_durations AS (
+        SELECT
+          session_id,
+          url,
+          timestamp,
+          ${granularityFunc}(timestamp) as date,
+          leadInFrame(timestamp) OVER (
+              PARTITION BY site_id, session_id 
+              ORDER BY timestamp 
+              ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+          ) as next_timestamp,
+          if(
+            next_timestamp IS NOT NULL AND timestamp <= next_timestamp, 
+            toFloat64(next_timestamp - timestamp),
+            NULL
+          ) as duration_seconds
+        FROM analytics.events
+        WHERE site_id = {site_id:String}
+          AND event_type = 'pageview' 
+          AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
+          AND ${SQL.AND(filters)}
+      )
+    SELECT 
+      date,
+      avgIf(duration_seconds, duration_seconds IS NOT NULL) as avgTime
+    FROM page_view_durations
+    GROUP BY date
+    ORDER BY date ASC
+    LIMIT 10080
+  `;
+
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start_date: startDate,
+        end_date: endDate,
+      },
+    })
+    .toPromise()) as unknown[];
+
+  return result.map((row) => DailyAverageTimeRowSchema.parse(row));
+}
+
+export async function getDailyBounceRate(
+  siteId: string,
+  startDate: DateString,
+  endDate: DateString,
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[],
+): Promise<DailyBounceRateRow[]> {
+  const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
+  const query = safeSql`
+    WITH 
+      session_events AS (
+        SELECT 
+          session_id,
+          timestamp,
+          ${granularityFunc}(timestamp) as event_date
+        FROM analytics.events
+        WHERE site_id = {site_id:String}
+          AND event_type = 'pageview' 
+          AND date BETWEEN {start_date:DateTime} AND {end_date:DateTime}
+          AND ${SQL.AND(filters)}
+      ),
+      daily_sessions AS (
+        SELECT 
+          session_id,
+          min(event_date) as session_date,
+          count() as page_count
+        FROM session_events
+        GROUP BY session_id
+      )
+    SELECT 
+      session_date as date,
+      if(count() > 0, round(countIf(page_count = 1) / count() * 100, 2), 0) as bounceRate
+    FROM daily_sessions
+    GROUP BY session_date
+    ORDER BY session_date ASC
+    LIMIT 10080
+  `;
+
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start_date: startDate,
+        end_date: endDate,
+      },
+    })
+    .toPromise()) as unknown[];
+
+  return result.map((row) => DailyBounceRateRowSchema.parse(row));
 }
