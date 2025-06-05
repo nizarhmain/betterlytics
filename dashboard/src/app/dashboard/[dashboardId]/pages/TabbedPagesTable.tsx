@@ -59,21 +59,21 @@ export default function TabbedPagesTable({ allPagesData, entryPagesData, exitPag
         header: 'Pageviews',
         cell: ({ row }: { row: { original: PageAnalytics } }) => row.original.pageviews.toLocaleString(),
       },
+      {
+        accessorKey: 'bounceRate',
+        header: 'Bounce Rate',
+        cell: ({ row }: { row: { original: PageAnalytics } }) => formatPercentage(row.original.bounceRate),
+      },
+      {
+        accessorKey: 'avgTime',
+        header: 'Avg. Time',
+        cell: ({ row }: { row: { original: PageAnalytics } }) => formatDuration(row.original.avgTime),
+      },
     ];
   };
 
   const getTabSpecificColumns = (): Record<string, ColumnDef<PageAnalytics>> => {
     return {
-      bounceRate: {
-        accessorKey: 'bounceRate',
-        header: 'Bounce Rate',
-        cell: ({ row }: { row: { original: PageAnalytics } }) => formatPercentage(row.original.bounceRate),
-      },
-      avgTime: {
-        accessorKey: 'avgTime',
-        header: 'Avg. Time',
-        cell: ({ row }: { row: { original: PageAnalytics } }) => formatDuration(row.original.avgTime),
-      },
       entryRate: {
         accessorKey: 'entryRate',
         header: 'Entry Rate',
@@ -88,21 +88,19 @@ export default function TabbedPagesTable({ allPagesData, entryPagesData, exitPag
   };
 
   const allPagesColumns = useMemo(() => {
-    const base = getBaseColumns();
-    const specific = getTabSpecificColumns();
-    return [...base, specific.bounceRate, specific.avgTime];
+    return getBaseColumns();
   }, []);
 
   const entryPagesColumns = useMemo(() => {
     const base = getBaseColumns();
     const specific = getTabSpecificColumns();
-    return [...base, specific.bounceRate, specific.avgTime, specific.entryRate];
+    return [...base, specific.entryRate];
   }, []);
 
   const exitPagesColumns = useMemo(() => {
     const base = getBaseColumns();
     const specific = getTabSpecificColumns();
-    return [...base, specific.bounceRate, specific.avgTime, specific.exitRate];
+    return [...base, specific.exitRate];
   }, []);
 
   return (
