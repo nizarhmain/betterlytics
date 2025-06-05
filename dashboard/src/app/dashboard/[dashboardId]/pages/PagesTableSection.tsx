@@ -1,15 +1,27 @@
 'use client';
 
 import { use } from 'react';
-import PagesTable from '@/components/analytics/PagesTable';
-import { fetchPageAnalyticsAction } from '@/app/actions';
+import TabbedPagesTable from '@/components/analytics/TabbedPagesTable';
+import {
+  fetchPageAnalyticsAction,
+  fetchEntryPageAnalyticsAction,
+  fetchExitPageAnalyticsAction,
+} from '@/app/actions';
 
 type PagesTableSectionProps = {
   pageAnalyticsPromise: ReturnType<typeof fetchPageAnalyticsAction>;
+  entryPageAnalyticsPromise: ReturnType<typeof fetchEntryPageAnalyticsAction>;
+  exitPageAnalyticsPromise: ReturnType<typeof fetchExitPageAnalyticsAction>;
 };
 
-export default function PagesTableSection({ pageAnalyticsPromise }: PagesTableSectionProps) {
+export default function PagesTableSection({
+  pageAnalyticsPromise,
+  entryPageAnalyticsPromise,
+  exitPageAnalyticsPromise,
+}: PagesTableSectionProps) {
   const pages = use(pageAnalyticsPromise);
+  const entryPages = use(entryPageAnalyticsPromise);
+  const exitPages = use(exitPageAnalyticsPromise);
 
-  return <PagesTable data={pages} />;
+  return <TabbedPagesTable allPagesData={pages} entryPagesData={entryPages} exitPagesData={exitPages} />;
 }
