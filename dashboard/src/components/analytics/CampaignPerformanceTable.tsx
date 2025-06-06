@@ -22,14 +22,14 @@ const columns: ColumnDef<CampaignPerformance>[] = [
   },
   {
     accessorKey: 'visitors',
-    header: () => <div className='text-right'>Visitors</div>,
-    cell: ({ row }) => <div className='text-right'>{row.original.visitors.toLocaleString()}</div>,
+    header: 'Visitors',
+    cell: ({ row }) => <div>{row.original.visitors.toLocaleString()}</div>,
   },
   {
     accessorKey: 'bounceRate',
-    header: () => <div className='text-right'>Bounce Rate</div>,
+    header: 'Bounce Rate',
     cell: ({ row }) => (
-      <div className={`text-right font-medium ${getBounceRateColor(row.original.bounceRate)}`}>
+      <div className={`font-medium ${getBounceRateColor(row.original.bounceRate)}`}>
         {formatPercentage(row.original.bounceRate)}
       </div>
     ),
@@ -37,14 +37,14 @@ const columns: ColumnDef<CampaignPerformance>[] = [
   },
   {
     accessorKey: 'avgSessionDuration',
-    header: () => <div className='text-right'>Avg. Session Duration</div>,
-    cell: ({ row }) => <div className='text-right'>{row.original.avgSessionDuration}</div>,
+    header: 'Avg. Session Duration',
+    cell: ({ row }) => <div>{row.original.avgSessionDuration}</div>,
     size: 180,
   },
   {
     accessorKey: 'pagesPerSession',
-    header: () => <div className='text-right'>Pages / Session</div>,
-    cell: ({ row }) => <div className='text-right'>{row.original.pagesPerSession.toFixed(1)}</div>,
+    header: 'Pages / Session',
+    cell: ({ row }) => <div>{row.original.pagesPerSession.toFixed(1)}</div>,
     size: 150,
   },
 ];
