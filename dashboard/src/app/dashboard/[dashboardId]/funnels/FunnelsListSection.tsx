@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { analyzeFunnel } from './analytics';
 import { ArrowRightCircleIcon } from 'lucide-react';
 import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
+import { FunnelsEmptyState } from './FunnelsEmptyState';
 
 type FunnelsListSectionProps = {
   funnelsPromise: ReturnType<typeof fetchFunnelsAction>;
@@ -17,12 +18,7 @@ export default function FunnelsListSection({ funnelsPromise, dashboardId }: Funn
   const funnelsData = useMemo(() => funnels.map((funnel) => analyzeFunnel(funnel)), [funnels]);
 
   if (funnelsData.length === 0) {
-    return (
-      <div className='text-center text-gray-500'>
-        <p>No funnels found.</p>
-        <p>Click &ldquo;Create Funnel&rdquo; to get started.</p>
-      </div>
-    );
+    return <FunnelsEmptyState />;
   }
 
   return (
