@@ -9,9 +9,9 @@ export const deviceIcons = {
 
 export type DeviceType = keyof typeof deviceIcons;
 
-export const deviceLabels: Record<string, string> = {
+export const deviceLabels = {
   desktop: 'Desktop',
   mobile: 'Mobile',
   tablet: 'Tablet',
   laptop: 'Laptop',
-};
+} as const;

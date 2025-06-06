@@ -1,6 +1,6 @@
-export { DeviceIcon, getDeviceTypeLabel } from './DeviceIcon';
-export { BrowserIcon, getBrowserLabel } from './BrowserIcon';
-export { OSIcon, getOSLabel } from './OSIcon';
+export { DeviceIcon } from './DeviceIcon';
+export { BrowserIcon } from './BrowserIcon';
+export { OSIcon } from './OSIcon';
 
 export type { DeviceType } from '@/constants/deviceIcons';
 export type { BrowserType } from '@/constants/browserIcons';

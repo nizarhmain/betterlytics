@@ -1,6 +1,6 @@
 import React from 'react';
 import { Monitor } from 'lucide-react';
-import { deviceIcons, deviceLabels, type DeviceType } from '@/constants/deviceIcons';
+import { deviceIcons, type DeviceType } from '@/constants/deviceIcons';
 
 interface DeviceIconProps {
   type: string;
@@ -14,7 +14,3 @@ export const DeviceIcon = React.memo<DeviceIconProps>(({ type, className = 'h-3.
 });
 
 DeviceIcon.displayName = 'DeviceIcon';
-
-export const getDeviceTypeLabel = (deviceType: string): string => {
-  return deviceLabels[deviceType.toLowerCase()] || deviceType;
-};

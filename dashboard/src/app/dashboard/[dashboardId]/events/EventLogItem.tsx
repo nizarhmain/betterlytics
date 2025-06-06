@@ -39,21 +39,25 @@ const formatUrl = (url: string) => {
   }
 };
 
-const MetadataItem = ({
-  icon,
-  children,
-  className = '',
-}: {
-  icon: React.ComponentType<{ className?: string }> | React.ReactElement;
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <div className={`text-muted-foreground flex items-center gap-1.5 ${className}`}>
-    {React.isValidElement(icon)
-      ? icon
-      : React.createElement(icon as React.ComponentType<{ className?: string }>, { className: 'h-3.5 w-3.5' })}
-    {children}
-  </div>
+const MetadataItem = React.memo(
+  ({
+    icon,
+    children,
+    className = '',
+  }: {
+    icon: React.ComponentType<{ className?: string }> | React.ReactElement;
+    children: React.ReactNode;
+    className?: string;
+  }) => {
+    return (
+      <div className={`text-muted-foreground flex items-center gap-1.5 ${className}`}>
+        {React.isValidElement(icon)
+          ? icon
+          : React.createElement(icon as React.ComponentType<{ className?: string }>, { className: 'h-3.5 w-3.5' })}
+        {children}
+      </div>
+    );
+  },
 );
 
 export const EventLogItem = React.memo(function EventLogItem({ event, isNearEnd, onRef }: EventLogItemProps) {

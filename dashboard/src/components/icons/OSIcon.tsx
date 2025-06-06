@@ -31,7 +31,3 @@ export const OSIcon = React.memo<OSIconProps>(({ name, className = 'h-3.5 w-3.5'
 });
 
 OSIcon.displayName = 'OSIcon';
-
-export const getOSLabel = (osName: string): string => {
-  return osLabels[osName.toLowerCase().replace(/\s+/g, '')] || osName;
-};

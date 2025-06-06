@@ -43,7 +43,7 @@ export const osIconNamesThemed = {
 
 export type OSType = keyof typeof osIconNamesThemed;
 
-export const osLabels: Record<string, string> = {
+export const osLabels = {
   windows: 'Windows',
   windows11: 'Windows 11',
   windows10: 'Windows 10',
@@ -54,4 +54,4 @@ export const osLabels: Record<string, string> = {
   android: 'Android',
   linux: 'Linux',
   ubuntu: 'Ubuntu',
-};
+} as const;

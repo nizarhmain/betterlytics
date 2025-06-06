@@ -20,7 +20,3 @@ export const BrowserIcon = React.memo<BrowserIconProps>(({ name, className = 'h-
 });
 
 BrowserIcon.displayName = 'BrowserIcon';
-
-export const getBrowserLabel = (browserName: string): string => {
-  return browserLabels[browserName.toLowerCase().replace(/\s+/g, '')] || browserName;
-};
