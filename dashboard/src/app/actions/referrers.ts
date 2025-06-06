@@ -2,7 +2,7 @@
 
 import {
   getReferrerSourceAggregationDataForSite,
-  getReferrerSummaryDataForSite,
+  getReferrerSummaryWithChartsForSite,
   getReferrerTableDataForSite,
   getReferrerTrafficTrendBySourceDataForSite,
   getTopReferrerUrlsForSite,
@@ -64,15 +64,15 @@ export const fetchReferrerTrafficTrendBySourceDataForSite = withDashboardAuthCon
 );
 
 /**
- * Fetches the summary data for referrers including referral sessions, total sessions, top referrer source, and avg session duration
+ * Fetches the summary data with charts for referrers including referral sessions, total sessions, top referrer source, avg session duration, and chart data
  */
-export const fetchReferrerSummaryDataForSite = withDashboardAuthContext(
+export const fetchReferrerSummaryWithChartsDataForSite = withDashboardAuthContext(
   async (ctx: AuthContext, startDate: Date, endDate: Date, queryFilters: QueryFilter[]) => {
     try {
-      const data = await getReferrerSummaryDataForSite(ctx.siteId, startDate, endDate, queryFilters);
+      const data = await getReferrerSummaryWithChartsForSite(ctx.siteId, startDate, endDate, queryFilters);
       return { data };
     } catch (error) {
-      console.error('Error fetching referrer summary data:', error);
+      console.error('Error fetching referrer summary with charts data:', error);
       throw error;
     }
   },

@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { Suspense } from 'react';
 import {
   fetchReferrerSourceAggregationDataForSite,
-  fetchReferrerSummaryDataForSite,
+  fetchReferrerSummaryWithChartsDataForSite,
   fetchReferrerTableDataForSite,
   fetchReferrerTrafficTrendBySourceDataForSite,
 } from '@/app/actions';
@@ -31,7 +31,12 @@ export default async function ReferrersPage({ params, searchParams }: ReferrersP
   const { startDate, endDate, granularity, queryFilters } =
     await BAFilterSearchParams.decodeFromParams(searchParams);
 
-  const referrerSummaryPromise = fetchReferrerSummaryDataForSite(dashboardId, startDate, endDate, queryFilters);
+  const referrerSummaryWithChartsPromise = fetchReferrerSummaryWithChartsDataForSite(
+    dashboardId,
+    startDate,
+    endDate,
+    queryFilters,
+  );
   const distributionPromise = fetchReferrerSourceAggregationDataForSite(
     dashboardId,
     startDate,
@@ -59,7 +64,7 @@ export default async function ReferrersPage({ params, searchParams }: ReferrersP
         </div>
 
         <Suspense fallback={<SummaryCardsSkeleton count={4} />}>
-          <ReferrersSummarySection referrerSummaryPromise={referrerSummaryPromise} />
+          <ReferrersSummarySection referrerSummaryWithChartsPromise={referrerSummaryWithChartsPromise} />
         </Suspense>
 
         <Suspense

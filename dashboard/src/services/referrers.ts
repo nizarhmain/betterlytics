@@ -2,17 +2,21 @@
 
 import {
   getReferrerDistribution,
-  getReferrerSummary,
   getReferrerTableData,
   getReferrerTrafficTrendBySource,
   getTopReferrerUrls,
   getTopChannels,
   getTopReferrerSources,
+  getDailyReferralSessions,
+  getDailyReferralTrafficPercentage,
+  getDailyReferralSessionDuration,
+  getTopReferrerSource,
 } from '@/repositories/clickhouse';
-import { toDateTimeString } from '@/utils/dateFormatters';
+import { toDateTimeString, toDateString } from '@/utils/dateFormatters';
 import {
   ReferrerSourceAggregation,
-  ReferrerSummary,
+  ReferrerSummaryWithCharts,
+  ReferrerSummaryWithChartsSchema,
   ReferrerTableRow,
   ReferrerTableRowSchema,
   ReferrerTrafficBySourceRow,
@@ -52,26 +56,6 @@ export async function getReferrerTrafficTrendBySourceDataForSite(
   const formattedEnd = toDateTimeString(endDate);
 
   return getReferrerTrafficTrendBySource(siteId, formattedStart, formattedEnd, granularity, queryFilters);
-}
-
-/**
- * Gets summary data about referrers for a given site and time period
- */
-export async function getReferrerSummaryDataForSite(
-  siteId: string,
-  startDate: Date,
-  endDate: Date,
-  queryFilters: QueryFilter[],
-): Promise<ReferrerSummary> {
-  const formattedStart = toDateTimeString(startDate);
-  const formattedEnd = toDateTimeString(endDate);
-
-  const result = await getReferrerSummary(siteId, formattedStart, formattedEnd, queryFilters);
-
-  return {
-    ...result,
-    avgSessionDuration: Number(result.avgSessionDuration.toFixed(1)),
-  };
 }
 
 /**
@@ -138,4 +122,69 @@ export async function getTopReferrerSourcesForSite(
   const formattedEnd = toDateTimeString(endDate);
 
   return getTopReferrerSources(siteId, formattedStart, formattedEnd, queryFilters, limit);
+}
+
+/**
+ * Gets summary data about referrers with chart data for a given site and time period
+ */
+export async function getReferrerSummaryWithChartsForSite(
+  siteId: string,
+  startDate: Date,
+  endDate: Date,
+  queryFilters: QueryFilter[],
+): Promise<ReferrerSummaryWithCharts> {
+  const formattedStart = toDateTimeString(startDate);
+  const formattedEnd = toDateTimeString(endDate);
+  const formattedDateStart = toDateString(startDate);
+  const formattedDateEnd = toDateString(endDate);
+  const dailyGranularity: GranularityRangeValues = 'day';
+
+  const [referralSessionsChartData, referralPercentageChartData, avgSessionDurationChartData, topReferrerSource] =
+    await Promise.all([
+      getDailyReferralSessions(siteId, formattedDateStart, formattedDateEnd, dailyGranularity, queryFilters),
+      getDailyReferralTrafficPercentage(
+        siteId,
+        formattedDateStart,
+        formattedDateEnd,
+        dailyGranularity,
+        queryFilters,
+      ),
+      getDailyReferralSessionDuration(
+        siteId,
+        formattedDateStart,
+        formattedDateEnd,
+        dailyGranularity,
+        queryFilters,
+      ),
+      getTopReferrerSource(siteId, formattedStart, formattedEnd, queryFilters),
+    ]);
+
+  const referralSessions = referralSessionsChartData.reduce((sum, day) => sum + day.referralSessions, 0);
+
+  const avgReferralPercentage =
+    referralPercentageChartData.length > 0
+      ? referralPercentageChartData.reduce((sum, day) => sum + day.referralPercentage, 0) /
+        referralPercentageChartData.length
+      : 0;
+
+  const totalSessions =
+    avgReferralPercentage > 0 ? Math.round(referralSessions / (avgReferralPercentage / 100)) : referralSessions;
+
+  const avgSessionDuration =
+    avgSessionDurationChartData.length > 0
+      ? avgSessionDurationChartData.reduce((sum, day) => sum + day.avgSessionDuration, 0) /
+        avgSessionDurationChartData.length
+      : 0;
+
+  const result = {
+    referralSessions,
+    totalSessions,
+    topReferrerSource,
+    avgSessionDuration: Number(avgSessionDuration.toFixed(1)),
+    referralSessionsChartData,
+    referralPercentageChartData,
+    avgSessionDurationChartData,
+  };
+
+  return ReferrerSummaryWithChartsSchema.parse(result);
 }
