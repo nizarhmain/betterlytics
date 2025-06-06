@@ -87,7 +87,7 @@ export function CreateFunnelDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant='outline'>
-          <Plus className='size-6' />
+          <Plus className='size-5' />
           Create Funnel
         </Button>
       </DialogTrigger>
