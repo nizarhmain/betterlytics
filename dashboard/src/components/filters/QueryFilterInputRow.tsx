@@ -80,7 +80,7 @@ export function QueryFilterInputRow<TEntity>({
         </SelectContent>
       </Select>
       <Input
-        className='w-52'
+        className='w-52 flex-grow'
         value={filter.value}
         onChange={(evt) => onFilterUpdate({ ...filter, value: evt.target.value })}
       />

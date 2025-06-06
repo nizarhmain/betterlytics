@@ -11,10 +11,9 @@ import { OpenProvider } from '@/contexts/OpenContextProvider';
 
 type FunnelsPageParams = {
   params: Promise<{ dashboardId: string }>;
-  searchParams: Promise<{ filters: string }>;
 };
 
-export default async function FunnelsPage({ params, searchParams }: FunnelsPageParams) {
+export default async function FunnelsPage({ params }: FunnelsPageParams) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
