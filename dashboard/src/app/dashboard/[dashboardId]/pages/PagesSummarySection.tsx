@@ -1,40 +1,45 @@
+'use client';
+
 import { use } from 'react';
-import { fetchSummaryStatsAction, fetchPageAnalyticsAction } from '@/app/actions';
+import { fetchPagesSummaryWithChartsAction } from '@/app/actions';
 import SummaryCardsSection, { SummaryCardData } from '@/components/dashboard/SummaryCardsSection';
-import { formatPercentage } from '@/utils/formatters';
 import { formatDuration } from '@/utils/dateFormatters';
 
 type PagesSummarySectionProps = {
-  summaryStatsPromise: ReturnType<typeof fetchSummaryStatsAction>;
-  pageAnalyticsPromise: ReturnType<typeof fetchPageAnalyticsAction>;
+  pagesSummaryWithChartsPromise: ReturnType<typeof fetchPagesSummaryWithChartsAction>;
 };
 
-export default function PagesSummarySection({
-  summaryStatsPromise,
-  pageAnalyticsPromise,
-}: PagesSummarySectionProps) {
-  const summary = use(summaryStatsPromise);
-  const pages = use(pageAnalyticsPromise);
+export default function PagesSummarySection({ pagesSummaryWithChartsPromise }: PagesSummarySectionProps) {
+  const summaryWithCharts = use(pagesSummaryWithChartsPromise);
 
   const cards: SummaryCardData[] = [
     {
-      title: 'Total Pages',
-      value: String(pages.length),
+      title: 'Pages per Session',
+      value: summaryWithCharts.pagesPerSession.toLocaleString(),
+      rawChartData: summaryWithCharts.pagesPerSessionChartData,
+      valueField: 'value',
+      chartColor: 'var(--chart-1)',
     },
     {
-      title: 'Avg. Page Views',
-      value:
-        pages.length > 0
-          ? Math.round(pages.reduce((sum, p) => sum + p.pageviews, 0) / pages.length).toLocaleString()
-          : '0',
+      title: 'Total Pageviews',
+      value: summaryWithCharts.totalPageviews.toLocaleString(),
+      rawChartData: summaryWithCharts.pageviewsChartData,
+      valueField: 'views',
+      chartColor: 'var(--chart-2)',
     },
     {
       title: 'Avg. Time on Page',
-      value: `${formatDuration(summary.avgVisitDuration)}`,
+      value: formatDuration(summaryWithCharts.avgTimeOnPage),
+      rawChartData: summaryWithCharts.avgTimeChartData,
+      valueField: 'value',
+      chartColor: 'var(--chart-3)',
     },
     {
-      title: 'Bounce Rate',
-      value: formatPercentage(summary.bounceRate),
+      title: 'Avg. Bounce Rate',
+      value: `${summaryWithCharts.avgBounceRate}%`,
+      rawChartData: summaryWithCharts.bounceRateChartData,
+      valueField: 'value',
+      chartColor: 'var(--chart-4)',
     },
   ];
 
