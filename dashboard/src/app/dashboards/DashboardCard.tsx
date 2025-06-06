@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import { Dashboard } from '@/entities/dashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ExternalLink, Globe, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ExternalLink, Globe, Calendar, Settings } from 'lucide-react';
 
 interface DashboardCardProps {
   dashboard: Dashboard;
@@ -16,9 +19,15 @@ export default function DashboardCard({ dashboard }: DashboardCardProps) {
       })
     : 'Unknown';
 
+  const handleSettingsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.href = `/dashboard/${dashboard.id}/settings`;
+  };
+
   return (
-    <Link href={`/dashboard/${dashboard.id}`}>
-      <Card className='group hover:border-primary/30 border-border/50 h-full cursor-pointer transition-all duration-200 hover:shadow-lg'>
+    <Card className='group hover:border-primary/30 border-border/50 h-full cursor-pointer transition-all duration-200 hover:shadow-lg'>
+      <Link href={`/dashboard/${dashboard.id}`} className='block h-full'>
         <CardHeader className='pb-4'>
           <div className='flex items-start justify-between'>
             <div className='flex items-center gap-3'>
@@ -32,18 +41,33 @@ export default function DashboardCard({ dashboard }: DashboardCardProps) {
                 <p className='text-muted-foreground mt-1 text-sm'>{dashboard.siteId}</p>
               </div>
             </div>
-            <ExternalLink className='text-muted-foreground h-4 w-4 flex-shrink-0 opacity-0 transition-opacity group-hover:opacity-100' />
+            <div className='flex w-8 justify-center'>
+              <ExternalLink className='text-muted-foreground h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100' />
+            </div>
           </div>
         </CardHeader>
         <CardContent className='pt-0'>
           <div className='flex items-center justify-between'>
-            <div className='text-muted-foreground flex items-center gap-2 text-xs'>
-              <Calendar className='h-3 w-3' />
-              <span>Created {formattedDate}</span>
+            <div className='flex items-center gap-3'>
+              <div className='flex w-9 justify-center'>
+                <Calendar className='text-muted-foreground h-3 w-3' />
+              </div>
+              <span className='text-muted-foreground text-xs'>Created {formattedDate}</span>
+            </div>
+            <div className='flex w-8 justify-center'>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='hover:bg-muted h-8 w-8 cursor-pointer p-0'
+                onClick={handleSettingsClick}
+                title='Dashboard Settings'
+              >
+                <Settings className='text-muted-foreground h-4 w-4' />
+              </Button>
             </div>
           </div>
         </CardContent>
-      </Card>
-    </Link>
+      </Link>
+    </Card>
   );
 }
