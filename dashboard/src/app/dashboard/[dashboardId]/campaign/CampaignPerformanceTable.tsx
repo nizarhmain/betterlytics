@@ -2,7 +2,6 @@ import React from 'react';
 import { CampaignPerformance } from '@/entities/campaign';
 import { DataTable } from '@/components/DataTable';
 import { ColumnDef } from '@tanstack/react-table';
-import { getBounceRateColor } from '@/utils/bounceRateColors';
 import { formatPercentage } from '@/utils/formatters';
 
 interface CampaignPerformanceTableProps {
@@ -28,11 +27,7 @@ const columns: ColumnDef<CampaignPerformance>[] = [
   {
     accessorKey: 'bounceRate',
     header: 'Bounce Rate',
-    cell: ({ row }) => (
-      <div className={`font-medium ${getBounceRateColor(row.original.bounceRate)}`}>
-        {formatPercentage(row.original.bounceRate)}
-      </div>
-    ),
+    cell: ({ row }) => <div className='font-medium'>{formatPercentage(row.original.bounceRate)}</div>,
     size: 120,
   },
   {
