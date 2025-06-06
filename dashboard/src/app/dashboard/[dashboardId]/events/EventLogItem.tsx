@@ -1,8 +1,9 @@
 import React from 'react';
-import { Globe, Monitor, User, ExternalLink, Activity } from 'lucide-react';
+import { Globe, User, ExternalLink, Activity } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { EventLogEntry } from '@/entities/events';
 import { formatTimeAgo } from '@/utils/dateFormatters';
+import { DeviceIcon, BrowserIcon } from '@/components/icons';
 
 const MAX_PROPERTIES_DISPLAY = 3;
 
@@ -15,12 +16,14 @@ interface EventLogItemProps {
 const formatEventProperties = (jsonString: string) => {
   try {
     const props = JSON.parse(jsonString);
-    return Object.entries(props).slice(0, MAX_PROPERTIES_DISPLAY).map(([key, value]) => (
-      <Badge key={key} variant="secondary" className="text-xs font-normal">
-        <span className="text-muted-foreground">{key}:</span>
-        <span className="ml-1">{String(value)}</span>
-      </Badge>
-    ));
+    return Object.entries(props)
+      .slice(0, MAX_PROPERTIES_DISPLAY)
+      .map(([key, value]) => (
+        <Badge key={key} variant='secondary' className='text-xs font-normal'>
+          <span className='text-muted-foreground'>{key}:</span>
+          <span className='ml-1'>{String(value)}</span>
+        </Badge>
+      ));
   } catch {
     return null;
   }
@@ -36,72 +39,86 @@ const formatUrl = (url: string) => {
   }
 };
 
-const MetadataItem = ({ icon: Icon, children, className = "" }: { 
-  icon: React.ComponentType<{ className?: string }>, 
-  children: React.ReactNode,
-  className?: string 
-}) => (
-  <div className={`flex items-center gap-1.5 text-muted-foreground ${className}`}>
-    <Icon className="h-3.5 w-3.5" />
-    {children}
-  </div>
+const MetadataItem = React.memo(
+  ({
+    icon,
+    children,
+    className = '',
+  }: {
+    icon: React.ComponentType<{ className?: string }> | React.ReactElement;
+    children: React.ReactNode;
+    className?: string;
+  }) => {
+    return (
+      <div className={`text-muted-foreground flex items-center gap-1.5 ${className}`}>
+        {React.isValidElement(icon)
+          ? icon
+          : React.createElement(icon as React.ComponentType<{ className?: string }>, { className: 'h-3.5 w-3.5' })}
+        {children}
+      </div>
+    );
+  },
 );
 
 export const EventLogItem = React.memo(function EventLogItem({ event, isNearEnd, onRef }: EventLogItemProps) {
   return (
-    <div 
-      className="group relative p-4 hover:bg-muted/40 transition-all duration-200 border-l-2 border-l-transparent hover:border-l-primary/50"
+    <div
+      className='group hover:bg-muted/40 hover:border-l-primary/50 relative border-l-2 border-l-transparent p-4 transition-all duration-200'
       ref={isNearEnd ? onRef : null}
     >
-      <div className="relative flex items-start gap-4">
-        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border/30">
-          <Activity className="h-3.5 w-3.5 text-primary" />
+      <div className='relative flex items-start gap-4'>
+        <div className='bg-muted/50 border-border/30 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border'>
+          <Activity className='text-primary h-3.5 w-3.5' />
         </div>
-        
-        <div className="flex-1 min-w-0 space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-foreground text-sm leading-tight">
-                {event.event_name}
-              </h3>
-              <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
-              <Badge variant="secondary" className="text-xs font-medium">
+
+        <div className='min-w-0 flex-1 space-y-3'>
+          <div className='flex items-center justify-between gap-3'>
+            <div className='flex items-center gap-2'>
+              <h3 className='text-foreground text-sm leading-tight font-semibold'>{event.event_name}</h3>
+              <div className='bg-muted-foreground/40 h-1 w-1 rounded-full' />
+              <Badge variant='secondary' className='text-xs font-medium'>
                 {formatTimeAgo(new Date(event.timestamp))}
               </Badge>
             </div>
           </div>
-          
-          <div className="flex items-center gap-4 text-xs flex-wrap">
+
+          <div className='flex flex-wrap items-center gap-4 text-xs'>
             <MetadataItem icon={User}>
-              <span className="font-mono bg-muted/60 px-1.5 py-0.5 rounded text-[10px] font-medium">
+              <span className='bg-muted/60 rounded px-1.5 py-0.5 font-mono text-[10px] font-medium'>
                 {event.visitor_id.slice(-6)}
               </span>
             </MetadataItem>
-            
-            <MetadataItem icon={Monitor}> {/* TODO: Add device icon */}
-              <span className="capitalize">{event.device_type}</span>
+
+            <MetadataItem icon={<DeviceIcon type={event.device_type} />}>
+              <span className='capitalize'>{event.device_type}</span>
             </MetadataItem>
-            
-            {event.country_code && (
-              <MetadataItem icon={Globe}> {/* TODO: Add flag icon */}
-                <span className="uppercase font-medium">{event.country_code}</span>
+
+            {event.browser && (
+              <MetadataItem icon={<BrowserIcon name={event.browser} />}>
+                <span className='capitalize'>{event.browser}</span>
               </MetadataItem>
             )}
-            
+
+            {event.country_code && (
+              <MetadataItem icon={Globe}>
+                {' '}
+                {/* TODO: Add flag icon */}
+                <span className='font-medium uppercase'>{event.country_code}</span>
+              </MetadataItem>
+            )}
+
             <MetadataItem icon={ExternalLink}>
-              <span className="font-mono bg-muted/60 px-1.5 py-0.5 rounded text-[10px] font-medium">
+              <span className='bg-muted/60 rounded px-1.5 py-0.5 font-mono text-[10px] font-medium'>
                 {formatUrl(event.url)}
               </span>
             </MetadataItem>
           </div>
 
           {event.custom_event_json && event.custom_event_json !== '{}' && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              {formatEventProperties(event.custom_event_json)}
-            </div>
+            <div className='flex flex-wrap gap-2 pt-1'>{formatEventProperties(event.custom_event_json)}</div>
           )}
         </div>
       </div>
     </div>
   );
-}); 
+});

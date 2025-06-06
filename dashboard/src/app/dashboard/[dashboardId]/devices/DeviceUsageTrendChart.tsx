@@ -8,17 +8,32 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip as RechartsTooltip,
-  Legend,
 } from 'recharts';
+import React, { useMemo } from 'react';
 import { DeviceUsageTrendRow } from '@/entities/devices';
 import { getDeviceColor } from '@/utils/deviceColors';
-import { useMemo } from 'react';
+import { DeviceIcon } from '@/components/icons';
 import { format } from 'date-fns';
 import { capitalizeFirstLetter } from '@/utils/formatters';
 
 interface DeviceUsageTrendChartProps {
   data?: DeviceUsageTrendRow[];
 }
+
+const CustomLegend = React.memo(({ deviceTypes }: { deviceTypes: string[] }) => (
+  <div className='mt-4 flex justify-center gap-4'>
+    {deviceTypes.map((deviceType) => (
+      <div key={deviceType} className='flex items-center gap-1 text-sm'>
+        <span
+          className='inline-block h-3 w-3 rounded-full'
+          style={{ backgroundColor: getDeviceColor(deviceType) }}
+        />
+        <DeviceIcon type={deviceType} className='h-4 w-4' />
+        <span className='text-foreground font-medium'>{capitalizeFirstLetter(deviceType)}</span>
+      </div>
+    ))}
+  </div>
+));
 
 const calculateDeviceTypeTotals = (data: DeviceUsageTrendRow[]): Record<string, number> => {
   if (!data || data.length === 0) {
@@ -115,42 +130,44 @@ export default function DeviceUsageTrendChart({ data }: DeviceUsageTrendChartPro
   }
 
   return (
-    <div className='h-[300px] w-full'>
-      <ResponsiveContainer width='100%' height='100%'>
-        <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-          <CartesianGrid strokeDasharray='3 3' vertical={false} stroke='#f1f5f9' />
-          <XAxis
-            dataKey='date'
-            tickLine={false}
-            axisLine={false}
-            tick={{ fontSize: 12 }}
-            tickMargin={10}
-            tickFormatter={(value) => format(new Date(value), 'MMM dd')}
-          />
-          <YAxis
-            tickLine={false}
-            axisLine={false}
-            tick={{ fontSize: 12 }}
-            tickMargin={10}
-            tickFormatter={(val) => val.toLocaleString()}
-          />
-          <RechartsTooltip content={<CustomTooltip />} />
-          <Legend verticalAlign='bottom' height={36} />
-
-          {sortedDeviceTypes.map((deviceType) => (
-            <Area
-              key={deviceType}
-              type='monotone'
-              dataKey={deviceType}
-              stackId='1'
-              stroke={getDeviceColor(deviceType)}
-              fill={getDeviceColor(deviceType)}
-              fillOpacity={0.7}
-              name={capitalizeFirstLetter(deviceType)}
+    <div className='w-full'>
+      <div className='h-[250px] w-full'>
+        <ResponsiveContainer width='100%' height='100%'>
+          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+            <CartesianGrid strokeDasharray='3 3' vertical={false} stroke='#f1f5f9' />
+            <XAxis
+              dataKey='date'
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 12 }}
+              tickMargin={10}
+              tickFormatter={(value) => format(new Date(value), 'MMM dd')}
             />
-          ))}
-        </AreaChart>
-      </ResponsiveContainer>
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 12 }}
+              tickMargin={10}
+              tickFormatter={(val) => val.toLocaleString()}
+            />
+            <RechartsTooltip content={<CustomTooltip />} />
+
+            {sortedDeviceTypes.map((deviceType) => (
+              <Area
+                key={deviceType}
+                type='monotone'
+                dataKey={deviceType}
+                stackId='1'
+                stroke={getDeviceColor(deviceType)}
+                fill={getDeviceColor(deviceType)}
+                fillOpacity={0.7}
+                name={capitalizeFirstLetter(deviceType)}
+              />
+            ))}
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+      <CustomLegend deviceTypes={sortedDeviceTypes} />
     </div>
   );
 }

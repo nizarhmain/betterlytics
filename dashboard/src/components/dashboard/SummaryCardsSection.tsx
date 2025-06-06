@@ -4,6 +4,7 @@ import SummaryCard from '@/components/SummaryCard';
 export interface SummaryCardData {
   title: string;
   value: ReactNode;
+  icon?: ReactNode;
   rawChartData?: any[];
   valueField?: string;
   chartColor?: string;
@@ -24,6 +25,7 @@ export default function SummaryCardsSection({ cards, className }: SummaryCardsSe
           key={`${card.title}-${index}`}
           title={card.title}
           value={card.value}
+          icon={card.icon}
           rawChartData={card.rawChartData}
           valueField={card.valueField}
           chartColor={card.chartColor}

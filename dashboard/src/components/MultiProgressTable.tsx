@@ -8,6 +8,7 @@ import { PropertyValueBar } from '@/components/events/PropertyValueBar';
 interface ProgressBarData {
   label: string;
   value: number;
+  icon?: React.ReactElement;
 }
 
 interface TabConfig<T extends ProgressBarData> {
@@ -47,10 +48,12 @@ function MultiProgressTable<T extends ProgressBarData>({ title, tabs, defaultTab
             <div key={item.label} className='group relative'>
               <PropertyValueBar
                 value={{
-                  value: `${index + 1}. ${item.label}`,
+                  value: item.label,
                   count: item.value,
                   percentage: Math.max(percentage, 2),
                 }}
+                icon={item.icon}
+                index={index + 1}
               />
             </div>
           );
