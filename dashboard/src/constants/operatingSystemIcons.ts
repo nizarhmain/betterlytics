@@ -3,6 +3,22 @@ export const osIconNamesThemed = {
     light: 'mdi:microsoft-windows',
     dark: 'mdi:microsoft-windows',
   },
+  windows11: {
+    light: 'mdi:microsoft-windows',
+    dark: 'mdi:microsoft-windows',
+  },
+  windows10: {
+    light: 'mdi:microsoft-windows',
+    dark: 'mdi:microsoft-windows',
+  },
+  windows8: {
+    light: 'mdi:microsoft-windows',
+    dark: 'mdi:microsoft-windows',
+  },
+  windows7: {
+    light: 'mdi:microsoft-windows',
+    dark: 'mdi:microsoft-windows',
+  },
   macos: {
     light: 'logos:apple',
     dark: 'simple-icons:apple',
@@ -29,6 +45,10 @@ export type OSType = keyof typeof osIconNamesThemed;
 
 export const osLabels: Record<string, string> = {
   windows: 'Windows',
+  windows11: 'Windows 11',
+  windows10: 'Windows 10',
+  windows8: 'Windows 8',
+  windows7: 'Windows 7',
   macos: 'macOS',
   ios: 'iOS',
   android: 'Android',
