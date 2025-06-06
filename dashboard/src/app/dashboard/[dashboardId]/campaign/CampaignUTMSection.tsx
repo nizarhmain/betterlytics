@@ -1,6 +1,7 @@
 'use client';
 
 import UTMBreakdownTabbedTable from './UTMBreakdownTabbedTable';
+import UTMBreakdownTabbedChart from './UTMBreakdownTabbedChart';
 import {
   fetchCampaignSourceBreakdownAction,
   fetchCampaignMediumBreakdownAction,
@@ -22,11 +23,24 @@ export default function CampaignUTMSection({
   termBreakdownPromise,
 }: CampaignUTMSectionProps) {
   return (
-    <UTMBreakdownTabbedTable
-      sourceBreakdownPromise={sourceBreakdownPromise}
-      mediumBreakdownPromise={mediumBreakdownPromise}
-      contentBreakdownPromise={contentBreakdownPromise}
-      termBreakdownPromise={termBreakdownPromise}
-    />
+    <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+      <div className='lg:col-span-2'>
+        <UTMBreakdownTabbedTable
+          sourceBreakdownPromise={sourceBreakdownPromise}
+          mediumBreakdownPromise={mediumBreakdownPromise}
+          contentBreakdownPromise={contentBreakdownPromise}
+          termBreakdownPromise={termBreakdownPromise}
+        />
+      </div>
+
+      <div className='lg:col-span-1'>
+        <UTMBreakdownTabbedChart
+          sourceBreakdownPromise={sourceBreakdownPromise}
+          mediumBreakdownPromise={mediumBreakdownPromise}
+          contentBreakdownPromise={contentBreakdownPromise}
+          termBreakdownPromise={termBreakdownPromise}
+        />
+      </div>
+    </div>
   );
 }
