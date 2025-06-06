@@ -24,6 +24,7 @@ import { FunnelPreviewDisplay } from './FunnelPreviewDisplay';
 import { fetchFunnelPreviewAction } from '@/app/actions/funnels';
 import { FunnelDetails } from '@/entities/funnels';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useOpenContext } from '@/contexts/OpenContextProvider';
 
 type Page = {
   value: string;
@@ -47,7 +48,7 @@ export function CreateFunnelDialog() {
     isStrict: true,
   });
 
-  const [open, setOpen] = useState<boolean>(false);
+  const { isOpen, setIsOpen } = useOpenContext();
 
   const queryClient = useQueryClient();
 
@@ -78,13 +79,13 @@ export function CreateFunnelDialog() {
       .then(() => {
         toast.success('Funnel created!');
         queryClient.invalidateQueries({ queryKey: ['funnels', dashboardId] });
-        setOpen(false);
+        setIsOpen(false);
       })
       .catch(() => toast.error('Funnel creation failed!'));
   }, [funnel, queryClient, dashboardId]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant='outline'>
           <Plus className='size-5' />

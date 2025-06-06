@@ -1,7 +1,10 @@
 import { LineChart, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useOpenContext } from '@/contexts/OpenContextProvider';
 
 export function FunnelsEmptyState() {
+  const { open } = useOpenContext();
+
   return (
     <div className='mx-auto flex min-h-[600px] max-w-md flex-col items-center justify-center px-4 text-center'>
       <div className='mb-6'>
@@ -22,7 +25,7 @@ export function FunnelsEmptyState() {
         start analyzing conversion paths and optimize your user experience.
       </p>
 
-      <Button size='lg' className='mb-8'>
+      <Button size='lg' className='mb-8' onClick={open}>
         <Plus className='mr-2 h-5 w-5' />
         Create Your First Funnel
       </Button>
