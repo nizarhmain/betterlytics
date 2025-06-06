@@ -25,6 +25,13 @@ interface CampaignBreakdownItem {
   [key: string]: unknown; // source, medium, term, content
 }
 
+interface ChartDataItem {
+  name: string;
+  value: number;
+  color: string;
+  percent: number;
+}
+
 export const CampaignDataKey = {
   SOURCE: 'source',
   MEDIUM: 'medium',
@@ -41,15 +48,19 @@ function UTMPieChart({
   dataKey: string;
   emptyMessage: string;
 }) {
-  const chartData = useMemo(() => {
+  const chartData = useMemo((): ChartDataItem[] => {
     if (!data || data.length === 0) return [];
     const totalVisitors = data.reduce((sum, item) => sum + item.visitors, 0);
-    return data.map((item) => ({
-      name: item[dataKey],
-      value: item.visitors,
-      color: getCampaignSourceColor(item[dataKey] as string),
-      percent: totalVisitors > 0 ? Math.round((item.visitors / totalVisitors) * 100) : 0,
-    }));
+    return data.map((item): ChartDataItem => {
+      const keyValue = item[dataKey];
+      const name = typeof keyValue === 'string' ? keyValue : String(keyValue);
+      return {
+        name,
+        value: item.visitors,
+        color: getCampaignSourceColor(name),
+        percent: totalVisitors > 0 ? Math.round((item.visitors / totalVisitors) * 100) : 0,
+      };
+    });
   }, [data, dataKey]);
 
   if (chartData.length === 0) {
@@ -75,12 +86,12 @@ function UTMPieChart({
             nameKey='name'
           >
             {chartData.map((entry) => (
-              <Cell key={entry.name as string} fill={entry.color as string} />
+              <Cell key={entry.name} fill={entry.color} />
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number, name: string, props: any) => [
-              `${value.toLocaleString()} visitors (${props.payload.percent}%)`,
+            formatter={(value: number, name: string, props: { payload?: ChartDataItem }) => [
+              `${value.toLocaleString()} visitors (${formatPercentage(props.payload?.percent ?? 0)})`,
               name,
             ]}
           />
@@ -90,13 +101,13 @@ function UTMPieChart({
       {/* Legend */}
       <div className='mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm'>
         {chartData.map((entry) => (
-          <div key={entry.name as string} className='flex items-center'>
+          <div key={entry.name} className='flex items-center'>
             <span
               className='mr-1.5 inline-block h-3 w-3 rounded-full'
-              style={{ backgroundColor: entry.color as string }}
+              style={{ backgroundColor: entry.color }}
             ></span>
             <span className='text-muted-foreground'>
-              {entry.name as string} ({formatPercentage(entry.percent)})
+              {entry.name} ({formatPercentage(entry.percent)})
             </span>
           </div>
         ))}
