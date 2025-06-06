@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ export function CreateDashboardDialog({ open, onOpenChange }: CreateDashboardDia
   const [domain, setDomain] = useState<string>('');
   const [validationError, setValidationError] = useState<string>('');
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const isFormValid = useMemo(() => {
     if (!domain.trim()) return false;
@@ -43,11 +45,13 @@ export function CreateDashboardDialog({ open, onOpenChange }: CreateDashboardDia
 
     startTransition(async () => {
       try {
-        await createDashboardAction(result.data);
-        toast.success('Dashboard created successfully!');
+        const newDashboard = await createDashboardAction(result.data);
+        toast.success('Dashboard created! Setting up integration...');
         onOpenChange(false);
         setDomain('');
         setValidationError('');
+
+        router.push(`/dashboard/${newDashboard.id}?showIntegration=true`);
       } catch (err) {
         console.error(err);
         toast.error('Failed to create dashboard.');
