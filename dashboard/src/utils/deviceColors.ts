@@ -1,5 +1,8 @@
 const DEVICE_COLORS: Record<string, string> = {
-  pc: '#3b82f6', // blue-500
+  mobile: '#22c55e', // green-500
+  tablet: '#f59e0b', // amber-500
+  laptop: '#8b5cf6', // violet-500
+  desktop: '#3b82f6', // blue-500
   unknown: '#9ca3af', // gray-400
 };
 
