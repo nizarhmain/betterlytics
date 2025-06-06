@@ -50,7 +50,7 @@ export default async function DevicesPage({ params, searchParams }: DevicesPageP
         <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
           <div>
             <h1 className='text-foreground mb-1 text-2xl font-bold'>Devices</h1>
-            <p className='text-muted-foreground text-sm'>Analytics and insights for your website</p>
+            <p className='text-muted-foreground text-sm'>Visitor device breakdown and usage analytics</p>
           </div>
           <DashboardFilters />
         </div>
