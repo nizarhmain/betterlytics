@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const ReferrerSourceAggregationSchema = z.object({
   referrer_source: z.string(),
@@ -12,9 +12,10 @@ export const ReferrerTrafficBySourceRowSchema = z.object({
 });
 
 export const ReferrerSummarySchema = z.object({
-  totalReferrers: z.number().int().min(0),
-  referralTraffic: z.number().int().min(0),
-  avgBounceRate: z.number().min(0).max(100),
+  referralSessions: z.number().int().min(0),
+  totalSessions: z.number().int().min(0),
+  topReferrerSource: z.string(),
+  avgSessionDuration: z.number().min(0),
 });
 
 export const ReferrerTableRowSchema = z.object({

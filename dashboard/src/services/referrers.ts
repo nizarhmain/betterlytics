@@ -1,22 +1,41 @@
 'server-only';
 
-import { getReferrerDistribution, getReferrerSummary, getReferrerTableData, getReferrerTrafficTrendBySource, getTopReferrerUrls, getTopChannels, getTopReferrerSources } from '@/repositories/clickhouse';
+import {
+  getReferrerDistribution,
+  getReferrerSummary,
+  getReferrerTableData,
+  getReferrerTrafficTrendBySource,
+  getTopReferrerUrls,
+  getTopChannels,
+  getTopReferrerSources,
+} from '@/repositories/clickhouse';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { ReferrerSourceAggregation, ReferrerSummary, ReferrerTableRow, ReferrerTableRowSchema, ReferrerTrafficBySourceRow, TopReferrerUrl, TopChannel, TopReferrerSource } from '@/entities/referrers';
+import {
+  ReferrerSourceAggregation,
+  ReferrerSummary,
+  ReferrerTableRow,
+  ReferrerTableRowSchema,
+  ReferrerTrafficBySourceRow,
+  TopReferrerUrl,
+  TopChannel,
+  TopReferrerSource,
+} from '@/entities/referrers';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
+import { QueryFilter } from '@/entities/filter';
 
 /**
  * Gets the aggregated referrers by source for a given site and time period
  */
 export async function getReferrerSourceAggregationDataForSite(
-  siteId: string, 
+  siteId: string,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  queryFilters: QueryFilter[],
 ): Promise<ReferrerSourceAggregation[]> {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  
-  return getReferrerDistribution(siteId, formattedStart, formattedEnd);
+
+  return getReferrerDistribution(siteId, formattedStart, formattedEnd, queryFilters);
 }
 
 /**
@@ -26,12 +45,13 @@ export async function getReferrerTrafficTrendBySourceDataForSite(
   siteId: string,
   startDate: Date,
   endDate: Date,
-  granularity: GranularityRangeValues
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[],
 ): Promise<ReferrerTrafficBySourceRow[]> {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  
-  return getReferrerTrafficTrendBySource(siteId, formattedStart, formattedEnd, granularity);
+
+  return getReferrerTrafficTrendBySource(siteId, formattedStart, formattedEnd, granularity, queryFilters);
 }
 
 /**
@@ -40,20 +60,17 @@ export async function getReferrerTrafficTrendBySourceDataForSite(
 export async function getReferrerSummaryDataForSite(
   siteId: string,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  queryFilters: QueryFilter[],
 ): Promise<ReferrerSummary> {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  
-  const result = await getReferrerSummary(
-    siteId, 
-    formattedStart, 
-    formattedEnd
-  );
-  
+
+  const result = await getReferrerSummary(siteId, formattedStart, formattedEnd, queryFilters);
+
   return {
     ...result,
-    avgBounceRate: Number(result.avgBounceRate.toFixed(1))
+    avgSessionDuration: Number(result.avgSessionDuration.toFixed(1)),
   };
 }
 
@@ -64,19 +81,15 @@ export async function getReferrerTableDataForSite(
   siteId: string,
   startDate: Date,
   endDate: Date,
-  limit = 100
+  queryFilters: QueryFilter[],
+  limit = 100,
 ): Promise<ReferrerTableRow[]> {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  
-  const result = await getReferrerTableData(
-    siteId, 
-    formattedStart, 
-    formattedEnd, 
-    limit
-  );
-  
-  return result.map(row => ReferrerTableRowSchema.parse(row));
+
+  const result = await getReferrerTableData(siteId, formattedStart, formattedEnd, queryFilters, limit);
+
+  return result.map((row) => ReferrerTableRowSchema.parse(row));
 }
 
 /**
@@ -86,12 +99,13 @@ export async function getTopReferrerUrlsForSite(
   siteId: string,
   startDate: Date,
   endDate: Date,
-  limit = 10
+  queryFilters: QueryFilter[],
+  limit = 10,
 ): Promise<TopReferrerUrl[]> {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  
-  return getTopReferrerUrls(siteId, formattedStart, formattedEnd, limit);
+
+  return getTopReferrerUrls(siteId, formattedStart, formattedEnd, queryFilters, limit);
 }
 
 /**
@@ -101,12 +115,13 @@ export async function getTopChannelsForSite(
   siteId: string,
   startDate: Date,
   endDate: Date,
-  limit = 10
+  queryFilters: QueryFilter[],
+  limit = 10,
 ): Promise<TopChannel[]> {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  
-  return getTopChannels(siteId, formattedStart, formattedEnd, limit);
+
+  return getTopChannels(siteId, formattedStart, formattedEnd, queryFilters, limit);
 }
 
 /**
@@ -116,10 +131,11 @@ export async function getTopReferrerSourcesForSite(
   siteId: string,
   startDate: Date,
   endDate: Date,
-  limit = 10
+  queryFilters: QueryFilter[],
+  limit = 10,
 ): Promise<TopReferrerSource[]> {
   const formattedStart = toDateTimeString(startDate);
   const formattedEnd = toDateTimeString(endDate);
-  
-  return getTopReferrerSources(siteId, formattedStart, formattedEnd, limit);
+
+  return getTopReferrerSources(siteId, formattedStart, formattedEnd, queryFilters, limit);
 }

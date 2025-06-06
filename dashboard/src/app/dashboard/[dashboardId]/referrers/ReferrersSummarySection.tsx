@@ -1,6 +1,7 @@
 import { use } from 'react';
 import { fetchReferrerSummaryDataForSite } from '@/app/actions';
 import SummaryCardsSection, { SummaryCardData } from '@/components/dashboard/SummaryCardsSection';
+import { formatDuration } from '@/utils/dateFormatters';
 import { formatPercentage } from '@/utils/formatters';
 
 type ReferrersSummarySectionProps = {
@@ -11,18 +12,25 @@ export default function ReferrersSummarySection({ referrerSummaryPromise }: Refe
   const summaryResult = use(referrerSummaryPromise);
   const summaryData = summaryResult.data;
 
+  const referralPercentage =
+    summaryData.totalSessions > 0 ? (summaryData.referralSessions / summaryData.totalSessions) * 100 : 0;
+
   const cards: SummaryCardData[] = [
     {
-      title: 'Total Referrers',
-      value: summaryData.totalReferrers.toString(),
+      title: 'Referral Sessions',
+      value: summaryData.referralSessions.toLocaleString(),
     },
     {
-      title: 'Referral Traffic',
-      value: summaryData.referralTraffic.toString(),
+      title: 'Referral Traffic %',
+      value: formatPercentage(referralPercentage),
     },
     {
-      title: 'Avg. Bounce Rate',
-      value: formatPercentage(summaryData.avgBounceRate),
+      title: 'Top Referrer Source',
+      value: summaryData.topReferrerSource,
+    },
+    {
+      title: 'Avg. Session Duration',
+      value: formatDuration(summaryData.avgSessionDuration),
     },
   ];
 

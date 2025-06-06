@@ -1,18 +1,35 @@
-import { ReferrerSourceAggregation, ReferrerSourceAggregationSchema, ReferrerSummary, ReferrerSummarySchema, ReferrerTrafficBySourceRow, ReferrerTrafficBySourceRowSchema, TopReferrerUrl, TopReferrerUrlSchema, TopChannel, TopChannelSchema, TopReferrerSource, TopReferrerSourceSchema } from '@/entities/referrers';
+import {
+  ReferrerSourceAggregation,
+  ReferrerSourceAggregationSchema,
+  ReferrerSummary,
+  ReferrerSummarySchema,
+  ReferrerTrafficBySourceRow,
+  ReferrerTrafficBySourceRowSchema,
+  TopReferrerUrl,
+  TopReferrerUrlSchema,
+  TopChannel,
+  TopChannelSchema,
+  TopReferrerSource,
+  TopReferrerSourceSchema,
+} from '@/entities/referrers';
 import { clickhouse } from '@/lib/clickhouse';
 import { DateTimeString } from '@/types/dates';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { BAQuery } from '@/lib/ba-query';
-import { safeSql } from '@/lib/safe-sql';
+import { safeSql, SQL } from '@/lib/safe-sql';
+import { QueryFilter } from '@/entities/filter';
 
 /**
  * Get the distribution of referrers by source type using unique sessions
  */
 export async function getReferrerDistribution(
-  siteId: string, 
-  startDate: DateTimeString, 
-  endDate: DateTimeString
+  siteId: string,
+  startDate: DateTimeString,
+  endDate: DateTimeString,
+  queryFilters: QueryFilter[],
 ): Promise<ReferrerSourceAggregation[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
   const query = safeSql`
     SELECT 
       referrer_source,
@@ -22,19 +39,22 @@ export async function getReferrerDistribution(
       AND timestamp >= {start:DateTime}
       AND timestamp <= {end:DateTime}
       AND referrer_source != 'internal'
+      AND ${SQL.AND(filters)}
     GROUP BY referrer_source
     ORDER BY visitorCount DESC
   `;
 
-  const result = await clickhouse.query(query.taggedSql, {
-    params: {
-      ...query.taggedParams,
-      site_id: siteId, 
-      start: startDate, 
-      end: endDate 
-    },
-  }).toPromise() as any[];
-  
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+      },
+    })
+    .toPromise()) as any[];
+
   return ReferrerSourceAggregationSchema.array().parse(result);
 }
 
@@ -45,99 +65,124 @@ export async function getReferrerTrafficTrendBySource(
   siteId: string,
   startDate: DateTimeString,
   endDate: DateTimeString,
-  granularity: GranularityRangeValues
+  granularity: GranularityRangeValues,
+  queryFilters: QueryFilter[],
 ): Promise<ReferrerTrafficBySourceRow[]> {
   const granularityFunc = BAQuery.getGranularitySQLFunctionFromGranularityRange(granularity);
-  
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
   const query = safeSql`
     SELECT 
       ${granularityFunc}(timestamp) as date,
       referrer_source,
-      count() as count
+      uniq(session_id) as count
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
       AND referrer_source != 'internal'
+      AND ${SQL.AND(filters)}
     GROUP BY date, referrer_source
-    ORDER BY date ASC
+    ORDER BY date ASC, count DESC
   `;
 
-  const result = await clickhouse.query(query.taggedSql, {
-    params: {
-      ...query.taggedParams,
-      site_id: siteId,
-      start: startDate,
-      end: endDate
-    },
-  }).toPromise() as any[];
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+      },
+    })
+    .toPromise()) as any[];
 
-  return result.map(row => ReferrerTrafficBySourceRowSchema.parse(row));
+  return ReferrerTrafficBySourceRowSchema.array().parse(result);
 }
 
 /**
- * Get summary data about referrers including total count, traffic, and bounce rate
- * 
- * The query is a bit complex so here's a breakdown:
- * 1. Pre-calculate session counts once
- * 2. Calculate total referrers by counting distinct referrer sources
- * 3. Calculate referral traffic by counting unique sessions from referrers
- * 4. Calculate bounce rate by counting sessions with exactly one page view
+ * Get summary data about referrers including referral sessions, total sessions,
+ * top referrer source, and average session duration
  */
 export async function getReferrerSummary(
   siteId: string,
   startDate: DateTimeString,
-  endDate: DateTimeString
+  endDate: DateTimeString,
+  queryFilters: QueryFilter[],
 ): Promise<ReferrerSummary> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
   const query = safeSql`
-    WITH session_view_counts AS (
+    WITH session_durations AS (
       SELECT 
-        session_id, 
-        count() as page_views
+        session_id,
+        referrer_source,
+        max(timestamp) - min(timestamp) as session_duration_seconds
       FROM analytics.events
       WHERE site_id = {site_id:String}
         AND timestamp >= {start:DateTime}
         AND timestamp <= {end:DateTime}
-      GROUP BY session_id
+        AND ${SQL.AND(filters)}
+      GROUP BY session_id, referrer_source
+    ),
+    
+    referrer_source_counts AS (
+      SELECT 
+        referrer_source,
+        uniq(session_id) as session_count
+      FROM analytics.events
+      WHERE site_id = {site_id:String}
+        AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+        AND referrer_source != 'direct'
+        AND referrer_source != 'internal'
+        AND ${SQL.AND(filters)}
+      GROUP BY referrer_source
+      ORDER BY session_count DESC
+      LIMIT 1
     )
     
     SELECT
-      count(DISTINCT referrer_source) as totalReferrers,
-      count() as referralTraffic,
-      (
-        SELECT count()
-        FROM session_view_counts
-        WHERE page_views = 1 
-          AND session_id IN (
-            SELECT DISTINCT session_id
-            FROM analytics.events
-            WHERE site_id = {site_id:String}
-              AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-              AND referrer_source != 'direct'
-              AND referrer_source != 'internal'
-          )
-      ) / uniq(session_id) * 100 as avgBounceRate
-    FROM analytics.events
-    WHERE site_id = {site_id:String}
-      AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-      AND referrer_source != 'direct'
-      AND referrer_source != 'internal'
+      -- Total sessions across all traffic
+      (SELECT uniq(session_id) FROM analytics.events 
+        WHERE site_id = {site_id:String} 
+        AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+        AND ${SQL.AND(filters)}) as totalSessions,
+      
+      -- Referral sessions (excluding direct and internal)
+      uniq(e.session_id) as referralSessions,
+      
+      -- Top referrer source
+      (SELECT referrer_source FROM referrer_source_counts LIMIT 1) as topReferrerSource,
+      
+      -- Average session duration for referral traffic (in seconds)
+      avg(sd.session_duration_seconds) as avgSessionDuration
+      
+    FROM analytics.events e
+    LEFT JOIN session_durations sd ON e.session_id = sd.session_id
+    WHERE e.site_id = {site_id:String}
+      AND e.timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND e.referrer_source != 'direct'
+      AND e.referrer_source != 'internal'
+      AND ${SQL.AND(filters)}
   `;
 
-  const result = await clickhouse.query(query.taggedSql, {
-    params: {
-      ...query.taggedParams,
-      site_id: siteId, 
-      start: startDate, 
-      end: endDate 
-    },
-  }).toPromise() as any[];
-  
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+      },
+    })
+    .toPromise()) as any[];
+
   const summary = {
-    totalReferrers: Number(result[0]?.totalReferrers) || 0,
-    referralTraffic: Number(result[0]?.referralTraffic) || 0,
-    avgBounceRate: Number(result[0]?.avgBounceRate) || 0
+    referralSessions: Number(result[0]?.referralSessions) || 0,
+    totalSessions: Number(result[0]?.totalSessions) || 0,
+    topReferrerSource: result[0]?.topReferrerSource || 'N/A',
+    avgSessionDuration: Number(result[0]?.avgSessionDuration) || 0,
   };
-  
+
   return ReferrerSummarySchema.parse(summary);
 }
 
@@ -149,70 +194,61 @@ export async function getReferrerTableData(
   siteId: string,
   startDate: DateTimeString,
   endDate: DateTimeString,
-  limit = 100
+  queryFilters: QueryFilter[],
+  limit: number = 100,
 ): Promise<any[]> {
-  const query = safeSql`
-    WITH 
-      -- Calculate sessions with a single page view (bounces)
-      session_pages AS (
-        SELECT 
-          session_id,
-          count() as page_count
-        FROM analytics.events
-        WHERE site_id = {site_id:String}
-          AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-        GROUP BY session_id
-      ),
-      
-      -- Calculate visit durations
-      visit_durations AS (
-        SELECT
-          referrer_source,
-          session_id,
-          max(timestamp) - min(timestamp) as duration_seconds
-        FROM analytics.events
-        WHERE site_id = {site_id:String}
-          AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-        GROUP BY referrer_source, session_id
-      )
+  const filters = BAQuery.getFilterQuery(queryFilters);
 
-    SELECT
-      r.referrer_source as source_type,
-      r.referrer_source_name as source_name,
-      r.referrer_url as source_url,
+  const query = safeSql`
+    WITH session_data AS (
+      SELECT
+        session_id,
+        referrer_source as source_type,
+        referrer_source_name as source_name,
+        referrer_url as source_url,
+        count() as page_count,
+        if(count() > 1,
+          dateDiff('second', min(timestamp), max(timestamp)),
+          0
+        ) as duration_seconds
+      FROM analytics.events
+      WHERE site_id = {site_id:String}
+        AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+        AND referrer_source != 'internal'
+        AND ${SQL.AND(filters)}
+      GROUP BY session_id, source_type, source_name, source_url
+    )
+    SELECT 
+      source_type,
+      source_name,
+      source_url,
       count() as visits,
-      -- Calculate bounce rate for this referrer
-      round(
-        countIf(sp.page_count = 1) / uniq(r.session_id) * 100,
-        1
+      if(count() > 0, 
+        round((count() - countIf(page_count > 1)) / count() * 100, 1), 
+        0
       ) as bounce_rate,
-      -- Calculate average visit duration
-      round(
-        avg(vd.duration_seconds),
-        1
+      if(countIf(page_count > 1) > 0,
+        avgIf(duration_seconds, page_count > 1),
+        0
       ) as avg_visit_duration
-    FROM analytics.events as r
-    LEFT JOIN session_pages as sp ON r.session_id = sp.session_id
-    LEFT JOIN visit_durations as vd ON r.session_id = vd.session_id
-    WHERE r.site_id = {site_id:String}
-      AND r.timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-      AND r.referrer_source != 'internal'
-    GROUP BY r.referrer_source, r.referrer_source_name, r.referrer_url
+    FROM session_data
+    GROUP BY source_type, source_name, source_url
     ORDER BY visits DESC
     LIMIT {limit:UInt32}
   `;
 
-  const result = await clickhouse.query(query.taggedSql, {
-    params: {
-      ...query.taggedParams,
-      site_id: siteId, 
-      start: startDate, 
-      end: endDate,
-      limit: limit
-    },
-    format: 'JSONEachRow'
-  }).toPromise() as any[];
-  
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+        limit,
+      },
+    })
+    .toPromise()) as any[];
+
   return result;
 }
 
@@ -223,32 +259,39 @@ export async function getTopReferrerUrls(
   siteId: string,
   startDate: DateTimeString,
   endDate: DateTimeString,
-  limit = 10
+  queryFilters: QueryFilter[],
+  limit: number = 10,
 ): Promise<TopReferrerUrl[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
   const query = safeSql`
-    SELECT
+    SELECT 
       referrer_url,
-      count() as visits
+      uniq(session_id) as visits
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
-      AND referrer_source != 'internal'
       AND referrer_url != ''
+      AND referrer_source != 'direct'
+      AND referrer_source != 'internal'
+      AND ${SQL.AND(filters)}
     GROUP BY referrer_url
     ORDER BY visits DESC
     LIMIT {limit:UInt32}
   `;
 
-  const result = await clickhouse.query(query.taggedSql, {
-    params: {
-      ...query.taggedParams,
-      site_id: siteId, 
-      start: startDate, 
-      end: endDate,
-      limit: limit
-    },
-  }).toPromise() as any[];
-  
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+        limit,
+      },
+    })
+    .toPromise()) as any[];
+
   return TopReferrerUrlSchema.array().parse(result);
 }
 
@@ -259,31 +302,37 @@ export async function getTopChannels(
   siteId: string,
   startDate: DateTimeString,
   endDate: DateTimeString,
-  limit = 10
+  queryFilters: QueryFilter[],
+  limit: number = 10,
 ): Promise<TopChannel[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
   const query = safeSql`
-    SELECT
+    SELECT 
       referrer_source as channel,
-      count() as visits
+      uniq(session_id) as visits
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
       AND referrer_source != 'internal'
-    GROUP BY referrer_source
+      AND ${SQL.AND(filters)}
+    GROUP BY channel
     ORDER BY visits DESC
     LIMIT {limit:UInt32}
   `;
 
-  const result = await clickhouse.query(query.taggedSql, {
-    params: {
-      ...query.taggedParams,
-      site_id: siteId, 
-      start: startDate, 
-      end: endDate,
-      limit: limit
-    },
-  }).toPromise() as any[];
-  
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+        limit,
+      },
+    })
+    .toPromise()) as any[];
+
   return TopChannelSchema.array().parse(result);
 }
 
@@ -294,31 +343,37 @@ export async function getTopReferrerSources(
   siteId: string,
   startDate: DateTimeString,
   endDate: DateTimeString,
-  limit = 10
+  queryFilters: QueryFilter[],
+  limit: number = 10,
 ): Promise<TopReferrerSource[]> {
+  const filters = BAQuery.getFilterQuery(queryFilters);
+
   const query = safeSql`
-    SELECT
-      referrer_source_name as referrer_source,
-      count() as visits
+    SELECT 
+      referrer_source,
+      uniq(session_id) as visits
     FROM analytics.events
     WHERE site_id = {site_id:String}
       AND timestamp BETWEEN {start:DateTime} AND {end:DateTime}
+      AND referrer_source != 'direct'
       AND referrer_source != 'internal'
-      AND referrer_source_name != ''
-    GROUP BY referrer_source_name
+      AND ${SQL.AND(filters)}
+    GROUP BY referrer_source
     ORDER BY visits DESC
     LIMIT {limit:UInt32}
   `;
 
-  const result = await clickhouse.query(query.taggedSql, {
-    params: {
-      ...query.taggedParams,
-      site_id: siteId, 
-      start: startDate, 
-      end: endDate,
-      limit: limit
-    },
-  }).toPromise() as any[];
-  
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        start: startDate,
+        end: endDate,
+        limit,
+      },
+    })
+    .toPromise()) as any[];
+
   return TopReferrerSourceSchema.array().parse(result);
-} 
+}
