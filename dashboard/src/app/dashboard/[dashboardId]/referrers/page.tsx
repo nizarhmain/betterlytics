@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { Suspense } from 'react';
 import {
   fetchReferrerSourceAggregationDataForSite,
-  fetchReferrerSummaryDataForSite,
+  fetchReferrerSummaryWithChartsDataForSite,
   fetchReferrerTableDataForSite,
   fetchReferrerTrafficTrendBySourceDataForSite,
 } from '@/app/actions';
@@ -28,12 +28,29 @@ export default async function ReferrersPage({ params, searchParams }: ReferrersP
   }
 
   const { dashboardId } = await params;
-  const { startDate, endDate, granularity } = await BAFilterSearchParams.decodeFromParams(searchParams);
+  const { startDate, endDate, granularity, queryFilters } =
+    await BAFilterSearchParams.decodeFromParams(searchParams);
 
-  const referrerSummaryPromise = fetchReferrerSummaryDataForSite(dashboardId, startDate, endDate);
-  const distributionPromise = fetchReferrerSourceAggregationDataForSite(dashboardId, startDate, endDate);
-  const trendPromise = fetchReferrerTrafficTrendBySourceDataForSite(dashboardId, startDate, endDate, granularity);
-  const tablePromise = fetchReferrerTableDataForSite(dashboardId, startDate, endDate);
+  const referrerSummaryWithChartsPromise = fetchReferrerSummaryWithChartsDataForSite(
+    dashboardId,
+    startDate,
+    endDate,
+    queryFilters,
+  );
+  const distributionPromise = fetchReferrerSourceAggregationDataForSite(
+    dashboardId,
+    startDate,
+    endDate,
+    queryFilters,
+  );
+  const trendPromise = fetchReferrerTrafficTrendBySourceDataForSite(
+    dashboardId,
+    startDate,
+    endDate,
+    granularity,
+    queryFilters,
+  );
+  const tablePromise = fetchReferrerTableDataForSite(dashboardId, startDate, endDate, queryFilters, 100);
 
   return (
     <div className='min-h-screen'>
@@ -46,8 +63,8 @@ export default async function ReferrersPage({ params, searchParams }: ReferrersP
           <DashboardFilters />
         </div>
 
-        <Suspense fallback={<SummaryCardsSkeleton count={3} />}>
-          <ReferrersSummarySection referrerSummaryPromise={referrerSummaryPromise} />
+        <Suspense fallback={<SummaryCardsSkeleton count={4} />}>
+          <ReferrersSummarySection referrerSummaryWithChartsPromise={referrerSummaryWithChartsPromise} />
         </Suspense>
 
         <Suspense
