@@ -56,7 +56,7 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
   ]);
 
   const devicePromise = fetchDeviceBreakdownCombinedAction(dashboardId, startDate, endDate, queryFilters);
-  const trafficSourcesPromise = fetchTrafficSourcesCombinedAction(dashboardId, startDate, endDate, 10);
+  const trafficSourcesPromise = fetchTrafficSourcesCombinedAction(dashboardId, startDate, endDate, queryFilters);
   const customEventsPromise = fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, queryFilters);
 
   return (
