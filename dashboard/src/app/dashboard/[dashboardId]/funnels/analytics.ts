@@ -13,7 +13,10 @@ export function analyzeFunnel(funnel: FunnelDetails | FunnelPreview) {
   };
 
   const steps = stepVisitors.map(({ filter, visitors }, index) => {
-    const previousStep = stepVisitors[index - 1] ?? { visitors: visitorCount.max, step: '' };
+    const previousStep =
+      stepVisitors[index - 1] && stepVisitors[index - 1].visitors
+        ? stepVisitors[index - 1]
+        : { visitors: visitorCount.max || 1, filter: '' };
     return {
       filter,
       visitors,
@@ -38,7 +41,7 @@ export function analyzeFunnel(funnel: FunnelDetails | FunnelPreview) {
     },
   );
 
-  const conversionRate = visitorCount.min / visitorCount.max;
+  const conversionRate = visitorCount.min / (visitorCount.max || 1);
 
   return {
     visitorCount,
