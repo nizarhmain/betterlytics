@@ -14,6 +14,7 @@ interface ChartData {
 interface SummaryCardProps<T extends ChartData = ChartData> {
   title: React.ReactNode;
   value: React.ReactNode;
+  icon?: React.ReactNode;
 
   // Mini chart data
   rawChartData?: T[];
@@ -58,6 +59,7 @@ const SummaryCard = React.memo(
   <T extends ChartData = ChartData>({
     title,
     value,
+    icon,
     rawChartData,
     valueField,
     chartColor = 'var(--chart-1)',
@@ -120,6 +122,7 @@ const SummaryCard = React.memo(
             )}
           </div>
           <div className='flex items-center gap-2'>
+            {icon && <div className='text-muted-foreground pt-1'>{icon}</div>}
             <span className='text-foreground text-2xl font-bold tracking-tight'>{value}</span>
             {trendData && trendData.direction !== 'neutral' && (
               <Badge

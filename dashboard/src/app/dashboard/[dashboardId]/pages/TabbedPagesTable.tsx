@@ -1,15 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { DataTable } from '@/components/DataTable';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageAnalytics } from '@/entities/pages';
 import { formatDuration } from '@/utils/dateFormatters';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { Button } from '@/components/ui/button';
 import { formatPercentage } from '@/utils/formatters';
+import TabbedTable, { TabDefinition } from '@/components/TabbedTable';
 
 interface TabbedPagesTableProps {
   allPagesData: PageAnalytics[];
@@ -24,7 +22,18 @@ const formatPath = (path: string): string => {
 export default function TabbedPagesTable({ allPagesData, entryPagesData, exitPagesData }: TabbedPagesTableProps) {
   const { addQueryFilter } = useQueryFiltersContext();
 
-  const getBaseColumns = (): ColumnDef<PageAnalytics>[] => {
+  const handlePathClick = useCallback(
+    (path: string) => {
+      addQueryFilter({
+        column: 'url',
+        operator: '=',
+        value: path,
+      });
+    },
+    [addQueryFilter],
+  );
+
+  const getBaseColumns = useCallback((): ColumnDef<PageAnalytics>[] => {
     return [
       {
         accessorKey: 'path',
@@ -34,13 +43,7 @@ export default function TabbedPagesTable({ allPagesData, entryPagesData, exitPag
           return (
             <Button
               variant='ghost'
-              onClick={() =>
-                addQueryFilter({
-                  column: 'url',
-                  operator: '=',
-                  value: path,
-                })
-              }
+              onClick={() => handlePathClick(path)}
               className='cursor-pointer bg-transparent text-left font-medium transition-colors'
               title={`Filter by ${path}`}
             >
@@ -70,9 +73,9 @@ export default function TabbedPagesTable({ allPagesData, entryPagesData, exitPag
         cell: ({ row }: { row: { original: PageAnalytics } }) => formatDuration(row.original.avgTime),
       },
     ];
-  };
+  }, [handlePathClick]);
 
-  const getTabSpecificColumns = (): Record<string, ColumnDef<PageAnalytics>> => {
+  const getTabSpecificColumns = useCallback((): Record<string, ColumnDef<PageAnalytics>> => {
     return {
       entryRate: {
         accessorKey: 'entryRate',
@@ -85,80 +88,55 @@ export default function TabbedPagesTable({ allPagesData, entryPagesData, exitPag
         cell: ({ row }: { row: { original: PageAnalytics } }) => formatPercentage(row.original.exitRate ?? 0),
       },
     };
-  };
-
-  const allPagesColumns = useMemo(() => {
-    return getBaseColumns();
   }, []);
+
+  const allPagesColumns = useMemo(() => getBaseColumns(), [getBaseColumns]);
 
   const entryPagesColumns = useMemo(() => {
     const base = getBaseColumns();
     const specific = getTabSpecificColumns();
     return [...base, specific.entryRate];
-  }, []);
+  }, [getBaseColumns, getTabSpecificColumns]);
 
   const exitPagesColumns = useMemo(() => {
     const base = getBaseColumns();
     const specific = getTabSpecificColumns();
     return [...base, specific.exitRate];
-  }, []);
+  }, [getBaseColumns, getTabSpecificColumns]);
+
+  const tableTabs: TabDefinition<PageAnalytics>[] = useMemo(
+    () => [
+      {
+        key: 'all',
+        label: 'All Pages',
+        data: allPagesData,
+        columns: allPagesColumns,
+        defaultSorting: [{ id: 'pageviews', desc: true }],
+      },
+      {
+        key: 'entry',
+        label: 'Entry Pages',
+        data: entryPagesData,
+        columns: entryPagesColumns,
+        defaultSorting: [{ id: 'pageviews', desc: true }],
+      },
+      {
+        key: 'exit',
+        label: 'Exit Pages',
+        data: exitPagesData,
+        columns: exitPagesColumns,
+        defaultSorting: [{ id: 'pageviews', desc: true }],
+      },
+    ],
+    [allPagesData, entryPagesData, exitPagesData, allPagesColumns, entryPagesColumns, exitPagesColumns],
+  );
 
   return (
-    <Card className='bg-card border-border rounded-lg border shadow'>
-      <Tabs defaultValue='all'>
-        <CardHeader className='pb-0'>
-          <div className='flex flex-col items-center justify-between sm:flex-row'>
-            <div>
-              <CardTitle className='mb-1 text-lg font-semibold'>Page Analytics</CardTitle>
-              <p className='text-muted-foreground text-sm'>Analytics for all tracked pages</p>
-            </div>
-            <TabsList className='bg-muted/30 grid h-8 w-auto grid-cols-3'>
-              <TabsTrigger value='all' className='px-3 py-1 text-xs font-medium'>
-                All Pages
-              </TabsTrigger>
-              <TabsTrigger value='entry' className='px-3 py-1 text-xs font-medium'>
-                Entry Pages
-              </TabsTrigger>
-              <TabsTrigger value='exit' className='px-3 py-1 text-xs font-medium'>
-                Exit Pages
-              </TabsTrigger>
-            </TabsList>
-          </div>
-        </CardHeader>
-        <CardContent className='px-6 pt-0 pb-4'>
-          <TabsContent value='all'>
-            <div>
-              <div className='overflow-x-auto'>
-                <DataTable
-                  columns={allPagesColumns}
-                  data={allPagesData}
-                  defaultSorting={[{ id: 'pageviews', desc: true }]}
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value='entry'>
-            <div className='overflow-x-auto'>
-              <DataTable
-                columns={entryPagesColumns}
-                data={entryPagesData}
-                defaultSorting={[{ id: 'pageviews', desc: true }]}
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value='exit'>
-            <div className='overflow-x-auto'>
-              <DataTable
-                columns={exitPagesColumns}
-                data={exitPagesData}
-                defaultSorting={[{ id: 'pageviews', desc: true }]}
-              />
-            </div>
-          </TabsContent>
-        </CardContent>
-      </Tabs>
-    </Card>
+    <TabbedTable
+      title='Page Analytics'
+      description='Analytics for all tracked pages'
+      tabs={tableTabs}
+      defaultTab='all'
+    />
   );
 }
