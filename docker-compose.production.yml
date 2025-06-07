@@ -128,16 +128,9 @@ services:
     hostname: proxy
     volumes:
       - ./static:/usr/share/nginx/html:ro
-      - ./ssl/letsencrypt:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt
       - ./ssl/certbot:/var/www/certbot
     restart: unless-stopped
-    depends_on:
-      init:
-        condition: service_completed_successfully
-      backend:
-        condition: service_started
-      dashboard:
-        condition: service_started
     ports:
       - 80:80
       - 443:443
