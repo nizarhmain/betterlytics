@@ -10,6 +10,7 @@ import {
 import { withDashboardAuthContext } from '@/auth/auth-actions';
 import { type AuthContext } from '@/entities/authContext';
 import { type QueryFilter } from '@/entities/filter';
+import { revalidatePath } from 'next/cache';
 
 export const postFunnelAction = withDashboardAuthContext(
   async (ctx: AuthContext, name: string, queryFilters: QueryFilter[], isStrict: boolean): Promise<Funnel> => {
@@ -19,6 +20,7 @@ export const postFunnelAction = withDashboardAuthContext(
       queryFilters,
       isStrict,
     });
+    revalidatePath(`/dashboard/${ctx.dashboardId}/funnels`);
     return createFunnelForDashboard(funnel);
   },
 );
