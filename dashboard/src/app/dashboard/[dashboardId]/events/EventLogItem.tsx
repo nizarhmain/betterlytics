@@ -60,6 +60,8 @@ const MetadataItem = React.memo(
   },
 );
 
+MetadataItem.displayName = 'MetadataItem';
+
 export const EventLogItem = React.memo(function EventLogItem({ event, isNearEnd, onRef }: EventLogItemProps) {
   return (
     <div
