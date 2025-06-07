@@ -1,7 +1,7 @@
 'use client';
 
 import { use } from 'react';
-import CampaignLandingPagePerformanceTable from '@/components/analytics/CampaignLandingPagePerformanceTable';
+import CampaignLandingPagePerformanceTable from '@/app/dashboard/[dashboardId]/campaign/CampaignLandingPagePerformanceTable';
 import { fetchCampaignLandingPagePerformanceAction } from '@/app/actions';
 
 type CampaignLandingPagesSectionProps = {

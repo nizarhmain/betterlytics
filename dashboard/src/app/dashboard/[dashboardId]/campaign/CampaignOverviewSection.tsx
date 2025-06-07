@@ -1,8 +1,8 @@
 'use client';
 
 import { use } from 'react';
-import CampaignPerformanceTable from '@/components/analytics/CampaignPerformanceTable';
-import CampaignVisitorTrendChart from '@/components/analytics/CampaignVisitorTrendChart';
+import CampaignPerformanceTable from '@/app/dashboard/[dashboardId]/campaign/CampaignPerformanceTable';
+import CampaignVisitorTrendChart from '@/app/dashboard/[dashboardId]/campaign/CampaignVisitorTrendChart';
 import { fetchCampaignPerformanceAction, fetchCampaignVisitorTrendAction } from '@/app/actions';
 
 type CampaignOverviewSectionProps = {
