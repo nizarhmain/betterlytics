@@ -143,6 +143,7 @@ services:
       dashboard:
         condition: service_started
     ports:
+      - 80:80
       - 443:443
     networks:
       - proxy_network
