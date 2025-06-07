@@ -14,8 +14,6 @@ import {
   TopEntryPageRowSchema,
   TopExitPageRow,
   TopExitPageRowSchema,
-  DailyUniquePagesRow,
-  DailyUniquePagesRowSchema,
   DailyAverageTimeRow,
   DailyAverageTimeRowSchema,
   DailyBounceRateRow,
