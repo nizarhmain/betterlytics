@@ -1,11 +1,13 @@
-import { useCallback, useMemo, useState } from 'react';
-import { ChevronDownIcon, FilterIcon, PlusIcon, SaveIcon, SettingsIcon, Undo2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ChevronDownIcon, FilterIcon, PlusIcon, SettingsIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Button } from '../ui/button';
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { QueryFilterInputRow } from './QueryFilterInputRow';
 import { useInstantLocalQueryFilters } from '@/hooks/use-instant-local-query-filters';
 import { Separator } from '../ui/separator';
+import VisualDot from '../VisualDot';
+import { isQueryFiltersEqual } from '@/utils/queryFilters';
 
 export default function QueryFiltersSelector() {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -19,29 +21,27 @@ export default function QueryFiltersSelector() {
     updateQueryFilter,
   } = useInstantLocalQueryFilters();
 
+  useEffect(() => {
+    setLocalQueryFilters(contextQueryFilters);
+  }, [contextQueryFilters]);
+
   const saveFilters = useCallback(() => {
     setQueryFilters(queryFilters);
+    setIsPopoverOpen(false);
   }, [queryFilters]);
 
   const cancelFilters = useCallback(() => {
     setLocalQueryFilters(contextQueryFilters);
+    setIsPopoverOpen(false);
   }, [contextQueryFilters]);
 
   const isFiltersModified = useMemo(() => {
-    if (contextQueryFilters.length !== queryFilters.length) {
-      return true;
-    }
-
     return (
-      queryFilters.every((filter, index) => {
+      contextQueryFilters.length !== queryFilters.length ||
+      queryFilters.some((filter, index) => {
         const ctxFilter = contextQueryFilters[index];
-        return (
-          ctxFilter.id === filter.id &&
-          ctxFilter.column === filter.column &&
-          ctxFilter.operator === filter.operator &&
-          ctxFilter.value === filter.value
-        );
-      }) === false
+        return isQueryFiltersEqual(ctxFilter, filter) === false;
+      })
     );
   }, [contextQueryFilters, queryFilters]);
 
@@ -56,9 +56,9 @@ export default function QueryFiltersSelector() {
           <ChevronDownIcon className={`ml-2 h-4 w-4 shrink-0 opacity-50`} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-[540px] max-w-[90svw] space-y-4 border p-4 shadow-2xl' align='end'>
+      <PopoverContent className='w-[620px] max-w-[90svw] border py-4 shadow-2xl' align='end'>
         {queryFilters.length > 0 || isFiltersModified ? (
-          <div className='space-y-2 pb-2'>
+          <div className='space-y-2'>
             <div className='space-y-3'>
               {queryFilters.map((filter) => (
                 <QueryFilterInputRow
@@ -68,29 +68,33 @@ export default function QueryFiltersSelector() {
                   requestRemoval={(_filter) => removeQueryFilter(_filter.id)}
                 />
               ))}
-              {queryFilters.length === 0 && <span className='text-muted-foreground'>No filters</span>}
+              {queryFilters.length === 0 && (
+                <div className='text-muted-foreground flex h-9 items-center gap-2'>
+                  <VisualDot color='blue' /> No filters selected - apply to save
+                </div>
+              )}
             </div>
             <Separator />
             <div className='flex justify-between'>
-              <Button className='h-7' onClick={addEmptyQueryFilter}>
-                <PlusIcon />
+              <Button className='h-8 w-28' onClick={addEmptyQueryFilter} variant='outline'>
+                Add filter
               </Button>
               <div className='flex items-center justify-end gap-3'>
                 <Button
-                  className='h-7 w-28'
+                  className='h-8 w-28'
                   disabled={isFiltersModified === false}
                   onClick={cancelFilters}
                   variant={isFiltersModified ? 'destructive' : 'ghost'}
                 >
-                  <Undo2 /> Cancel
+                  Cancel
                 </Button>
                 <Button
-                  className='h-7 w-28'
+                  className='h-8 w-28'
                   disabled={isFiltersModified === false}
                   onClick={saveFilters}
                   variant={isFiltersModified ? 'default' : 'ghost'}
                 >
-                  <SaveIcon /> Save
+                  Apply
                 </Button>
               </div>
             </div>

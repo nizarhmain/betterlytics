@@ -3,6 +3,7 @@
 import { DeviceType } from '@/entities/devices';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { getDeviceLabel, getDeviceColor } from '@/constants/deviceTypes';
+import { DeviceIcon } from '@/components/icons';
 import { useMemo } from 'react';
 
 interface DeviceTypeChartProps {
@@ -47,6 +48,7 @@ export default function DeviceTypeChart({ data }: DeviceTypeChartProps) {
         {chartData.map((entry) => (
           <div key={entry.label} className='flex items-center gap-1 text-sm'>
             <span className='inline-block h-3 w-3 rounded-full' style={{ backgroundColor: entry.color }}></span>
+            <DeviceIcon type={entry.device_type} className='h-4 w-4' />
             <span className='text-foreground font-medium'>{entry.label}</span>
             <span className='text-muted-foreground'>{entry.percent}%</span>
           </div>

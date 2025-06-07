@@ -32,23 +32,23 @@ const columns: ColumnDef<CampaignLandingPagePerformanceItem>[] = [
   },
   {
     accessorKey: 'visitors',
-    header: () => <div className='text-right'>Visitors</div>,
-    cell: ({ row }) => <div className='text-right'>{row.original.visitors.toLocaleString()}</div>,
+    header: 'Visitors',
+    cell: ({ row }) => <div>{row.original.visitors.toLocaleString()}</div>,
   },
   {
     accessorKey: 'bounceRate',
-    header: () => <div className='text-right'>Bounce Rate</div>,
-    cell: ({ row }) => <div className='text-right'>{row.original.bounceRate.toFixed(1)}%</div>,
+    header: 'Bounce Rate',
+    cell: ({ row }) => <div>{row.original.bounceRate.toFixed(1)}%</div>,
   },
   {
     accessorKey: 'avgSessionDuration',
-    header: () => <div className='text-right'>Avg. Session Duration</div>,
-    cell: ({ row }) => <div className='text-right'>{row.original.avgSessionDuration}</div>,
+    header: 'Avg. Session Duration',
+    cell: ({ row }) => <div>{row.original.avgSessionDuration}</div>,
   },
   {
     accessorKey: 'pagesPerSession',
-    header: () => <div className='text-right'>Pages / Session</div>,
-    cell: ({ row }) => <div className='text-right'>{row.original.pagesPerSession.toFixed(1)}</div>,
+    header: 'Pages / Session',
+    cell: ({ row }) => <div>{row.original.pagesPerSession.toFixed(1)}</div>,
   },
 ];
 
