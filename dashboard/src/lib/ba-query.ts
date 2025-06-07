@@ -7,8 +7,8 @@ import { safeSql, SQL } from './safe-sql';
 
 // Utility for filter query
 const INTERNAL_FILTER_OPERATORS = {
-  '=': 'LIKE',
-  '!=': 'NOT LIKE',
+  '=': 'ILIKE',
+  '!=': 'NOT ILIKE',
 } as const;
 
 const TransformQueryFilterSchema = QueryFilterSchema.transform((filter) => ({

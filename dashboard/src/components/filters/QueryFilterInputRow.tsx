@@ -44,12 +44,12 @@ export function QueryFilterInputRow<TEntity>({
   disableDeletion,
 }: QueryFilterInputRowProps<TEntity>) {
   return (
-    <div className='flex justify-between gap-1'>
+    <div className='grid grid-cols-12 grid-rows-2 gap-1 rounded border p-1 md:grid-rows-1 md:border-0'>
       <Select
         value={filter.column}
         onValueChange={(column: FilterColumn) => onFilterUpdate({ ...filter, column })}
       >
-        <SelectTrigger className='w-46'>
+        <SelectTrigger className='col-span-8 w-full md:col-span-4'>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -68,7 +68,7 @@ export function QueryFilterInputRow<TEntity>({
         value={filter.operator}
         onValueChange={(operator: FilterOperator) => onFilterUpdate({ ...filter, operator })}
       >
-        <SelectTrigger className='w-22'>
+        <SelectTrigger className='col-span-4 w-full md:col-span-2'>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -80,11 +80,16 @@ export function QueryFilterInputRow<TEntity>({
         </SelectContent>
       </Select>
       <Input
-        className='w-52'
+        className='col-span-10 md:col-span-5'
         value={filter.value}
         onChange={(evt) => onFilterUpdate({ ...filter, value: evt.target.value })}
       />
-      <Button variant='outline' onClick={() => requestRemoval(filter)} disabled={disableDeletion}>
+      <Button
+        variant='outline'
+        className='col-span-2 md:col-span-1'
+        onClick={() => requestRemoval(filter)}
+        disabled={disableDeletion}
+      >
         <Trash2 />
       </Button>
     </div>
