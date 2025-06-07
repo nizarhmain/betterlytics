@@ -1,4 +1,4 @@
-import { LineChart, Plus } from 'lucide-react';
+import { LucideFunnel, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useOpenContext } from '@/contexts/OpenContextProvider';
 
@@ -10,7 +10,7 @@ export function FunnelsEmptyState() {
       <div className='mb-6'>
         <div className='relative'>
           <div className='mx-auto flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20'>
-            <LineChart className='h-12 w-12 text-blue-500' />
+            <LucideFunnel className='h-12 w-12 text-blue-500' />
           </div>
           <div className='absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-500'>
             <Plus className='h-4 w-4 text-white' />
