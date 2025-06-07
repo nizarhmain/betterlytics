@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Dashboard } from '@/entities/dashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { ExternalLink, Globe, Calendar, Settings } from 'lucide-react';
 
 interface DashboardCardProps {
@@ -18,12 +17,6 @@ export default function DashboardCard({ dashboard }: DashboardCardProps) {
         year: 'numeric',
       })
     : 'Unknown';
-
-  const handleSettingsClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    window.location.href = `/dashboard/${dashboard.id}/settings`;
-  };
 
   return (
     <Card className='group hover:border-primary/30 border-border/50 h-full cursor-pointer transition-all duration-200 hover:shadow-lg'>
@@ -55,15 +48,14 @@ export default function DashboardCard({ dashboard }: DashboardCardProps) {
               <span className='text-muted-foreground text-xs'>Created {formattedDate}</span>
             </div>
             <div className='flex w-8 justify-center'>
-              <Button
-                variant='ghost'
-                size='sm'
-                className='hover:bg-muted h-8 w-8 cursor-pointer p-0'
-                onClick={handleSettingsClick}
+              <Link
+                href={`/dashboard/${dashboard.id}/settings`}
+                className='hover:bg-muted inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md p-0 transition-colors'
                 title='Dashboard Settings'
+                onClick={(e) => e.stopPropagation()}
               >
                 <Settings className='text-muted-foreground h-4 w-4' />
-              </Button>
+              </Link>
             </div>
           </div>
         </CardContent>

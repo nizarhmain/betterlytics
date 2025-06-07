@@ -3,19 +3,23 @@
 import { useState, useTransition, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Plus } from 'lucide-react';
 import { createDashboardAction } from '@/app/actions/dashboard';
 import { domainValidation } from '@/entities/dashboard';
 
-interface CreateDashboardDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export function CreateDashboardDialog({ open, onOpenChange }: CreateDashboardDialogProps) {
+export function CreateDashboardDialog() {
+  const [open, setOpen] = useState(false);
   const [domain, setDomain] = useState<string>('');
   const [validationError, setValidationError] = useState<string>('');
   const [isPending, startTransition] = useTransition();
@@ -47,7 +51,7 @@ export function CreateDashboardDialog({ open, onOpenChange }: CreateDashboardDia
       try {
         const newDashboard = await createDashboardAction(result.data);
         toast.success('Dashboard created! Setting up integration...');
-        onOpenChange(false);
+        setOpen(false);
         setDomain('');
         setValidationError('');
 
@@ -61,7 +65,7 @@ export function CreateDashboardDialog({ open, onOpenChange }: CreateDashboardDia
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!isPending) {
-      onOpenChange(newOpen);
+      setOpen(newOpen);
       if (!newOpen) {
         setDomain('');
         setValidationError('');
@@ -71,6 +75,12 @@ export function CreateDashboardDialog({ open, onOpenChange }: CreateDashboardDia
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant='outline' className='gap-2'>
+          <Plus className='h-4 w-4' />
+          Create Dashboard
+        </Button>
+      </DialogTrigger>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Create New Dashboard</DialogTitle>

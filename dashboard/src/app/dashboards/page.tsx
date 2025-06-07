@@ -1,5 +1,5 @@
 import { getAllUserDashboardsAction } from '@/app/actions/dashboard';
-import CreateDashboardButton from '@/app/dashboards/CreateDashboardButton';
+import { CreateDashboardDialog } from '@/app/dashboards/CreateDashboardDialog';
 import DashboardCard from '@/app/dashboards/DashboardCard';
 
 export default async function DashboardsPage() {
@@ -12,7 +12,7 @@ export default async function DashboardsPage() {
           <h1 className='mb-2 text-3xl font-bold tracking-tight'>Your Dashboards</h1>
           <p className='text-muted-foreground'>Manage and monitor analytics for all your websites.</p>
         </div>
-        <CreateDashboardButton />
+        <CreateDashboardDialog />
       </div>
 
       {dashboards.length > 0 ? (
@@ -28,7 +28,7 @@ export default async function DashboardsPage() {
             <p className='text-muted-foreground mb-6 text-sm'>
               Create your first dashboard to start tracking analytics for your website.
             </p>
-            <CreateDashboardButton />
+            <CreateDashboardDialog />
           </div>
         </div>
       )}
