@@ -5,6 +5,7 @@ import { env } from './env';
  */
 export const featureFlags = {
   enableDashboardTracking: env.ENABLE_DASHBOARD_TRACKING,
+  enableRegistration: env.ENABLE_REGISTRATION,
 } as const;
 
 export function isFeatureEnabled(flag: keyof typeof featureFlags): boolean {
