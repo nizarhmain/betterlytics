@@ -1,4 +1,4 @@
-import { QueryFilterWithId } from '@/hooks/use-instant-local-query-filters';
+import { QueryFilterWithId } from '@/hooks/use-query-filters';
 import { type FilterColumn, type QueryFilter, type FilterOperator } from '@/entities/filter';
 
 /**

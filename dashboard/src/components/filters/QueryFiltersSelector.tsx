@@ -4,9 +4,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Button } from '../ui/button';
 import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { QueryFilterInputRow } from './QueryFilterInputRow';
-import { useInstantLocalQueryFilters } from '@/hooks/use-instant-local-query-filters';
+import { useQueryFilters } from '@/hooks/use-query-filters';
 import { Separator } from '../ui/separator';
-import VisualDot from '../VisualDot';
 import { isQueryFiltersEqual } from '@/utils/queryFilters';
 
 export default function QueryFiltersSelector() {
@@ -19,7 +18,7 @@ export default function QueryFiltersSelector() {
     addEmptyQueryFilter,
     removeQueryFilter,
     updateQueryFilter,
-  } = useInstantLocalQueryFilters();
+  } = useQueryFilters();
 
   useEffect(() => {
     setLocalQueryFilters(contextQueryFilters);
@@ -70,7 +69,7 @@ export default function QueryFiltersSelector() {
               ))}
               {queryFilters.length === 0 && (
                 <div className='text-muted-foreground flex h-9 items-center gap-2'>
-                  <VisualDot color='blue' /> No filters selected - apply to save
+                  No filters selected - apply to save
                 </div>
               )}
             </div>

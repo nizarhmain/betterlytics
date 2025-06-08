@@ -1,6 +1,6 @@
-import React, { type Dispatch, type SetStateAction, useCallback, useState } from 'react';
+import React, { type Dispatch, type SetStateAction } from 'react';
 import { type QueryFilter } from '@/entities/filter';
-import { type QueryFilterWithId, useInstantLocalQueryFilters } from '@/hooks/use-instant-local-query-filters';
+import { type QueryFilterWithId, useQueryFilters } from '@/hooks/use-query-filters';
 
 type QueryFiltersContextProps = {
   queryFilters: QueryFilterWithId[];
@@ -18,7 +18,7 @@ type QueryFiltersContextProviderProps = {
 };
 
 export function QueryFiltersContextProvider({ children }: QueryFiltersContextProviderProps) {
-  const localQueryFilters = useInstantLocalQueryFilters();
+  const localQueryFilters = useQueryFilters();
 
   return <QueryFiltersContext.Provider value={localQueryFilters}>{children}</QueryFiltersContext.Provider>;
 }

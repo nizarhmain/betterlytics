@@ -2,10 +2,7 @@ import { type QueryFilter } from '@/entities/filter';
 import { generateTempId } from '@/utils/temporaryId';
 import { useCallback, useState } from 'react';
 
-/**
- * Query filters handlers with instant updates
- */
-export function useInstantLocalQueryFilters() {
+export function useQueryFilters() {
   const [queryFilters, setQueryFilters] = useState<QueryFilterWithId[]>([]);
 
   const addQueryFilter = useCallback((queryFilter: QueryFilter) => {
