@@ -18,18 +18,18 @@ export default function FunnelStepsSection({ funnelPromise }: FunnelStepsSection
     <div className='text-sm font-semibold'>
       <div className='mb-3 flex items-center gap-3'>
         <h1 className='text-xl font-semibold'>{funnel.name}</h1>
-        <Badge className='mt-1 h-[50%] rounded-full text-gray-800' variant='outline'>
+        <Badge className='text-muted-foreground mt-0.5 h-[1.5rem] rounded-full' variant='outline'>
           {funnelData.steps.length} steps
         </Badge>
       </div>
       {funnelData.steps.map((step, index) => (
-        <div key={step.page}>
+        <div key={step.filter}>
           <div className='flex items-end justify-between'>
             <div className='flex items-center gap-3'>
-              <p className='flex size-6 items-center justify-center rounded-full bg-gray-200 text-xs font-medium'>
+              <p className='bg-muted flex size-6 items-center justify-center rounded-full border text-xs font-medium'>
                 {index + 1}
               </p>
-              <p>{step.page}</p>
+              <p>{step.filter}</p>
             </div>
             <p className='mt-3'>{step.visitors} users</p>
           </div>

@@ -13,16 +13,16 @@ export function analyzeFunnel(funnel: FunnelDetails | FunnelPreview) {
   };
 
   const steps = stepVisitors.map(({ filter, visitors }, index) => {
-    const previousStep =
-      stepVisitors[index - 1] && stepVisitors[index - 1].visitors
-        ? stepVisitors[index - 1]
-        : { visitors: visitorCount.max || 1, filter: '' };
+    const previousStep = stepVisitors[index - 1]
+      ? stepVisitors[index - 1]
+      : { visitors: visitorCount.max, filter: '' };
+    const dropoffRatio = previousStep.visitors ? 1 - visitors / previousStep.visitors : 0;
     return {
       filter,
       visitors,
       visitorsRatio: visitors / visitorCount.max,
-      dropoffCount: (previousStep.visitors || visitorCount.max) - visitors,
-      dropoffRatio: 1 - visitors / (previousStep.visitors || visitorCount.max),
+      dropoffCount: previousStep.visitors - visitors,
+      dropoffRatio: dropoffRatio,
       stepStep: [previousStep.filter, filter],
     };
   });
