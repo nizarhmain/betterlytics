@@ -34,12 +34,12 @@ export default function FunnelStepsSection({ funnelPromise }: FunnelStepsSection
             <p className='mt-3'>{step.visitors} users</p>
           </div>
           <div className='p-3 text-gray-600'>
-            <Progress className='h-4' value={100 * step.visitorsRatio} color='#22C55E' />
+            <Progress className='h-4' value={100 * step.visitorsRatio} color='var(--primary)' />
             <div className='flex items-end justify-between'>
               <p>{step.visitors} users</p>
               <p className='text-right'>{Math.floor(100 * step.visitorsRatio)}%</p>
             </div>
-            <Progress className='mt-2' value={100 * step.dropoffRatio} color='#F97315' />
+            <Progress className='mt-2' value={100 * step.dropoffRatio} color='var(--destructive)' />
             <div className='flex items-end justify-between'>
               <p>{step.dropoffCount} users dropped-off</p>
               <p className='text-right'>{Math.floor(100 * step.dropoffRatio)}%</p>
