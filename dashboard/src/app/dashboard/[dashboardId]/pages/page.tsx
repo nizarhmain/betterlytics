@@ -50,7 +50,6 @@ export default async function PagesPage({ params, searchParams }: PagesPageParam
           </div>
           <DashboardFilters />
         </div>
-        <ActiveQueryFilters />
 
         <Suspense fallback={<SummaryCardsSkeleton />}>
           <PagesSummarySection pagesSummaryWithChartsPromise={pagesSummaryWithChartsPromise} />
