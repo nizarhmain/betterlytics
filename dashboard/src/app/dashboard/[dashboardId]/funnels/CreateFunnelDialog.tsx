@@ -24,7 +24,7 @@ import { fetchFunnelPreviewAction } from '@/app/actions/funnels';
 import { type FunnelPreview } from '@/entities/funnels';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useOpenContext } from '@/contexts/OpenContextProvider';
-import { useInstantLocalQueryFilters } from '@/hooks/use-instant-local-query-filters';
+import { useQueryFilters } from '@/hooks/use-query-filters';
 import { QueryFilterInputRow } from '@/components/filters/QueryFilterInputRow';
 
 type Page = {
@@ -52,8 +52,7 @@ export function CreateFunnelDialog() {
     isStrict: false,
   });
 
-  const { queryFilters, addEmptyQueryFilter, updateQueryFilter, removeQueryFilter } =
-    useInstantLocalQueryFilters();
+  const { queryFilters, addEmptyQueryFilter, updateQueryFilter, removeQueryFilter } = useQueryFilters();
 
   const queryClient = useQueryClient();
 
