@@ -22,6 +22,7 @@ export const FILTER_COLUMNS = [
 export const FILTER_OPERATORS = ['=', '!='] as const;
 
 export const QueryFilterSchema = z.object({
+  id: z.string(),
   column: z.enum(FILTER_COLUMNS),
   operator: z.enum(FILTER_OPERATORS),
   value: z.string(),

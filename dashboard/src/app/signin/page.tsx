@@ -3,12 +3,15 @@ import { authOptions } from '@/lib/auth';
 import LoginForm from '@/components/LoginForm';
 import Logo from '@/components/logo';
 import { getServerSession } from 'next-auth';
+import Link from 'next/link';
+import { isFeatureEnabled } from '@/lib/feature-flags';
 
 export default async function SignInPage() {
   const session = await getServerSession(authOptions);
+  const registrationEnabled = isFeatureEnabled('enableRegistration');
 
   if (session) {
-    redirect('/dashboard');
+    redirect('/dashboards');
   }
 
   return (
@@ -23,6 +26,16 @@ export default async function SignInPage() {
         </div>
         <div className='bg-card rounded-lg border p-8 shadow-sm'>
           <LoginForm />
+          {registrationEnabled && (
+            <div className='mt-6 text-center'>
+              <p className='text-muted-foreground text-sm'>
+                Don&apos;t have an account?{' '}
+                <Link href='/register' className='text-primary hover:text-primary/80 font-medium underline'>
+                  Create one
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

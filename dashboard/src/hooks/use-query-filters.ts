@@ -2,16 +2,13 @@ import { type QueryFilter } from '@/entities/filter';
 import { generateTempId } from '@/utils/temporaryId';
 import { useCallback, useState } from 'react';
 
-/**
- * Query filters handlers with instant updates
- */
-export function useInstantLocalQueryFilters() {
-  const [queryFilters, setQueryFilters] = useState<QueryFilterWithId[]>([]);
+export function useQueryFilters() {
+  const [queryFilters, setQueryFilters] = useState<QueryFilter[]>([]);
 
-  const addQueryFilter = useCallback((queryFilter: QueryFilter) => {
+  const addQueryFilter = useCallback((queryFilter: QueryFilter | Omit<QueryFilter, 'id'>) => {
     const filter = {
       ...queryFilter,
-      id: generateTempId(),
+      id: 'id' in queryFilter ? queryFilter.id : generateTempId(),
     };
     setQueryFilters((filters) => [...filters, filter]);
   }, []);
@@ -24,7 +21,7 @@ export function useInstantLocalQueryFilters() {
     setQueryFilters((filters) => filters.filter((filter) => filter.id !== id));
   }, []);
 
-  const updateQueryFilter = useCallback((queryFilter: QueryFilterWithId) => {
+  const updateQueryFilter = useCallback((queryFilter: QueryFilter) => {
     setQueryFilters((filters) =>
       filters.with(
         filters.findIndex((filter) => filter.id === queryFilter.id),
@@ -42,7 +39,3 @@ export function useInstantLocalQueryFilters() {
     setQueryFilters,
   };
 }
-
-export type QueryFilterWithId = QueryFilter & {
-  id: string;
-};

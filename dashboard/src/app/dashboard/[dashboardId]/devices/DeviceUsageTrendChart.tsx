@@ -35,6 +35,8 @@ const CustomLegend = React.memo(({ deviceTypes }: { deviceTypes: string[] }) => 
   </div>
 ));
 
+CustomLegend.displayName = 'CustomLegend';
+
 const calculateDeviceTypeTotals = (data: DeviceUsageTrendRow[]): Record<string, number> => {
   if (!data || data.length === 0) {
     return {};
@@ -72,6 +74,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   }
   return null;
 };
+
+CustomTooltip.displayName = 'CustomTooltip';
 
 const prepareChartData = (
   rawData: DeviceUsageTrendRow[],

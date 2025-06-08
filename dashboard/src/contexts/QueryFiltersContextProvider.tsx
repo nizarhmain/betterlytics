@@ -1,14 +1,14 @@
-import React, { type Dispatch, type SetStateAction, useCallback, useState } from 'react';
+import React, { type Dispatch, type SetStateAction } from 'react';
 import { type QueryFilter } from '@/entities/filter';
-import { type QueryFilterWithId, useInstantLocalQueryFilters } from '@/hooks/use-instant-local-query-filters';
+import { useQueryFilters } from '@/hooks/use-query-filters';
 
 type QueryFiltersContextProps = {
-  queryFilters: QueryFilterWithId[];
+  queryFilters: QueryFilter[];
   addQueryFilter: Dispatch<QueryFilter>;
   addEmptyQueryFilter: Dispatch<void>;
   removeQueryFilter: Dispatch<string>;
-  updateQueryFilter: Dispatch<QueryFilterWithId>;
-  setQueryFilters: Dispatch<SetStateAction<QueryFilterWithId[]>>;
+  updateQueryFilter: Dispatch<QueryFilter>;
+  setQueryFilters: Dispatch<SetStateAction<QueryFilter[]>>;
 };
 
 const QueryFiltersContext = React.createContext<QueryFiltersContextProps>({} as QueryFiltersContextProps);
@@ -18,7 +18,7 @@ type QueryFiltersContextProviderProps = {
 };
 
 export function QueryFiltersContextProvider({ children }: QueryFiltersContextProviderProps) {
-  const localQueryFilters = useInstantLocalQueryFilters();
+  const localQueryFilters = useQueryFilters();
 
   return <QueryFiltersContext.Provider value={localQueryFilters}>{children}</QueryFiltersContext.Provider>;
 }
