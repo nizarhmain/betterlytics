@@ -16,7 +16,7 @@ export async function getFunnelDetails(
 
   const levelsArray = new Array(filters.length).fill(0).map((_, i) => i + 1);
 
-  const whereConditions = [];
+  const whereConditions = [safeSql`1=1`];
 
   if (startDate && endDate) {
     whereConditions.push(
@@ -32,9 +32,6 @@ export async function getFunnelDetails(
   } else {
     funnelWindowFunctionDefinition = safeSql`windowFunnel(${SQL.UInt32({ windowDuration: windowDurationSeconds })})`;
   }
-
-  const parsedFilters = BAQuery.getFilterQuery(queryFilters || []);
-  whereConditions.push(SQL.AND(parsedFilters));
 
   const sql = safeSql`
     WITH
