@@ -3,12 +3,12 @@ import { generateTempId } from '@/utils/temporaryId';
 import { useCallback, useState } from 'react';
 
 export function useQueryFilters() {
-  const [queryFilters, setQueryFilters] = useState<QueryFilterWithId[]>([]);
+  const [queryFilters, setQueryFilters] = useState<QueryFilter[]>([]);
 
-  const addQueryFilter = useCallback((queryFilter: QueryFilter) => {
+  const addQueryFilter = useCallback((queryFilter: QueryFilter | Omit<QueryFilter, 'id'>) => {
     const filter = {
       ...queryFilter,
-      id: generateTempId(),
+      id: 'id' in queryFilter ? queryFilter.id : generateTempId(),
     };
     setQueryFilters((filters) => [...filters, filter]);
   }, []);
@@ -21,7 +21,7 @@ export function useQueryFilters() {
     setQueryFilters((filters) => filters.filter((filter) => filter.id !== id));
   }, []);
 
-  const updateQueryFilter = useCallback((queryFilter: QueryFilterWithId) => {
+  const updateQueryFilter = useCallback((queryFilter: QueryFilter) => {
     setQueryFilters((filters) =>
       filters.with(
         filters.findIndex((filter) => filter.id === queryFilter.id),
@@ -39,7 +39,3 @@ export function useQueryFilters() {
     setQueryFilters,
   };
 }
-
-export type QueryFilterWithId = QueryFilter & {
-  id: string;
-};

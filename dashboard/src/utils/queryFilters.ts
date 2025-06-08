@@ -1,10 +1,9 @@
-import { QueryFilterWithId } from '@/hooks/use-query-filters';
 import { type FilterColumn, type QueryFilter, type FilterOperator } from '@/entities/filter';
 
 /**
  * Equality checking between query filters
  */
-export function isQueryFiltersEqual(a: QueryFilterWithId, b: QueryFilterWithId) {
+export function isQueryFiltersEqual(a: QueryFilter, b: QueryFilter) {
   return a.id === b.id && a.column === b.column && a.operator === b.operator && a.value === b.value;
 }
 

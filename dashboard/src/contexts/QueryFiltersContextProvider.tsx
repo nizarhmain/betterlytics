@@ -1,14 +1,14 @@
 import React, { type Dispatch, type SetStateAction } from 'react';
 import { type QueryFilter } from '@/entities/filter';
-import { type QueryFilterWithId, useQueryFilters } from '@/hooks/use-query-filters';
+import { useQueryFilters } from '@/hooks/use-query-filters';
 
 type QueryFiltersContextProps = {
-  queryFilters: QueryFilterWithId[];
+  queryFilters: QueryFilter[];
   addQueryFilter: Dispatch<QueryFilter>;
   addEmptyQueryFilter: Dispatch<void>;
   removeQueryFilter: Dispatch<string>;
-  updateQueryFilter: Dispatch<QueryFilterWithId>;
-  setQueryFilters: Dispatch<SetStateAction<QueryFilterWithId[]>>;
+  updateQueryFilter: Dispatch<QueryFilter>;
+  setQueryFilters: Dispatch<SetStateAction<QueryFilter[]>>;
 };
 
 const QueryFiltersContext = React.createContext<QueryFiltersContextProps>({} as QueryFiltersContextProps);
