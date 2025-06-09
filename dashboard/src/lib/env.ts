@@ -18,6 +18,12 @@ const envSchema = z.object({
     })
     .optional()
     .default(false),
+  IS_CLOUD: z
+    .boolean({
+      coerce: true,
+    })
+    .optional()
+    .default(false),
 });
 
 export const env = envSchema.parse(process.env);
