@@ -1,6 +1,7 @@
 import { ArrowRight, Github, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { GitHubStats } from './githubStats';
 
 export function HeroSection() {
   return (
@@ -12,7 +13,6 @@ export function HeroSection() {
             Open Source • GDPR Compliant • Cookieless
           </Badge>
           <h1 className='mb-6 text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl'>
-            {/* TODO: Primary looks too dark IMO. Change to primary ? */}
             <span className='text-blue-600 dark:text-blue-400'>Privacy-First</span> <br />
             Web Analytics
           </h1>
@@ -30,13 +30,7 @@ export function HeroSection() {
               View on GitHub
             </Button>
           </div>
-          <div className='text-muted-foreground mt-8 flex items-center justify-center text-sm'>
-            <div className='flex items-center'>
-              <Star className='mr-1 h-4 w-4 text-yellow-500' />
-              <span className='font-medium'>10</span>
-              <span className='ml-1'>stars on GitHub</span>
-            </div>
-          </div>
+          <GitHubStats />
         </div>
       </div>
     </section>
