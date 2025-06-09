@@ -33,11 +33,14 @@ export function formatTimeAgo(date: Date): string {
   const diffMs = now.getTime() - date.getTime();
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffHours / 24);
-  
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
   if (diffDays > 0) {
     return `${diffDays}d ago`;
   } else if (diffHours > 0) {
     return `${diffHours}h ago`;
+  } else if (diffMinutes > 0) {
+    return `${diffMinutes}m ago`;
   } else {
     return 'Recently';
   }
