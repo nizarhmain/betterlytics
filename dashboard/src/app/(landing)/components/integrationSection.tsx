@@ -1,6 +1,7 @@
 import { Code, Zap, Shield } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function IntegrationSection() {
   const integrationMethods = [
@@ -60,8 +61,8 @@ export function IntegrationSection() {
         </div>
 
         <div className='mt-12 text-center'>
-          <Button size='lg' className='mb-4'>
-            View Integration Guide
+          <Button size='lg' className='mb-4' asChild>
+            <Link href='/docs'>View Integration Guide</Link>
           </Button>
           <p className='text-muted-foreground text-sm'>
             Detailed installation instructions for all platforms and frameworks

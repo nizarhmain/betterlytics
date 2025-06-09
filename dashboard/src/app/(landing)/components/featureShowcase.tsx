@@ -1,9 +1,9 @@
 'use client';
 
 import {
-  Link,
   Monitor,
   Flag,
+  Link as LinkIcon,
   Globe,
   Laptop,
   Zap,
@@ -26,6 +26,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import LeafletMap from '@/components/LeafletMap';
 import { GeoVisitor } from '@/entities/geography';
 import { formatPercentage } from '@/utils/formatters';
+import Link from 'next/link';
 
 export function FeatureShowcase() {
   return (
@@ -53,7 +54,7 @@ export function FeatureShowcase() {
 
         <div className='mt-8 flex justify-center'>
           <Button variant='outline' size='lg'>
-            Explore All Features
+            <Link href='/docs'>Explore All Features</Link>
             <ChevronRight className='ml-2 h-4 w-4' />
           </Button>
         </div>
@@ -65,7 +66,7 @@ export function FeatureShowcase() {
 export function AdvancedFiltersCard() {
   const filterCategories = useMemo(
     () => [
-      { name: 'URL', icon: <Link className='h-4 w-4' /> },
+      { name: 'URL', icon: <LinkIcon className='h-4 w-4' /> },
       { name: 'Device Type', icon: <Monitor className='h-4 w-4' /> },
       { name: 'Country Code', icon: <Flag className='h-4 w-4' /> },
       { name: 'Browser', icon: <Globe className='h-4 w-4' /> },

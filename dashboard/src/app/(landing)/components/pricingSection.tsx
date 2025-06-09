@@ -5,6 +5,7 @@ import { Check } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const eventRanges = [
   { value: 10000, label: '10K', price: 0 },
@@ -130,7 +131,11 @@ export function PricingSection() {
                   ))}
                 </ul>
                 <Button className='mt-auto w-full' variant={plan.popular ? 'default' : 'outline'}>
-                  {plan.cta}
+                  {plan.cta.toLowerCase().includes('get started') ? (
+                    <Link href='/register'>{plan.cta}</Link>
+                  ) : (
+                    <Link href='/contact'>{plan.cta}</Link>
+                  )}
                 </Button>
               </CardContent>
             </Card>

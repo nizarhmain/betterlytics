@@ -1,5 +1,6 @@
 import { Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function OpenSourceCallout() {
   return (
@@ -15,12 +16,14 @@ export function OpenSourceCallout() {
             platform to your unique requirements.
           </p>
           <div className='flex flex-col justify-center gap-4 sm:flex-row'>
-            <Button size='lg' variant='outline'>
-              <Github className='mr-2 h-5 w-5' />
-              Star on GitHub
+            <Button size='lg' variant='outline' asChild>
+              <a href='https://github.com/betterlytics/betterlytics' target='_blank' rel='noopener noreferrer'>
+                <Github className='mr-2 h-5 w-5' />
+                Star on GitHub
+              </a>
             </Button>
-            <Button size='lg' variant='outline'>
-              View Documentation
+            <Button size='lg' variant='outline' asChild>
+              <Link href='/docs'>View Documentation</Link>
             </Button>
           </div>
         </div>

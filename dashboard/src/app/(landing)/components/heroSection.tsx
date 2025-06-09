@@ -2,6 +2,7 @@ import { ArrowRight, Github, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { GitHubStats } from './githubStats';
+import Link from 'next/link';
 
 export function HeroSection() {
   return (
@@ -22,12 +23,14 @@ export function HeroSection() {
           </p>
           <div className='flex flex-col justify-center gap-4 sm:flex-row'>
             <Button size='lg' className='bg-primary px-8 text-lg'>
-              Get Started Free
+              <Link href='/register'>Get Started Free</Link>
               <ArrowRight className='ml-2 h-5 w-5' />
             </Button>
-            <Button variant='outline' size='lg' className='px-8 text-lg'>
-              <Github className='mr-2 h-5 w-5' />
-              View on GitHub
+            <Button size='lg' variant='outline' className='text-lg' asChild>
+              <a href='https://github.com/betterlytics/betterlytics' target='_blank' rel='noopener noreferrer'>
+                <Github className='mr-2 h-5 w-5' />
+                View on GitHub
+              </a>
             </Button>
           </div>
           <GitHubStats />
