@@ -7,6 +7,8 @@ import { PricingSection } from './components/pricingSection';
 import { OpenSourceCallout } from './components/openSourceCallout';
 import { Footer } from './components/footer';
 
+export const revalidate = 3600;
+
 export default function LandingPage() {
   return (
     <div className='bg-background text-foreground min-h-screen'>
