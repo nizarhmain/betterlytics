@@ -12,6 +12,8 @@ import {
   Tag,
   Megaphone,
   Target,
+  TrendingUp,
+  TrendingDown,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,11 +36,12 @@ export function FeatureShowcase() {
         <div className='mx-auto max-w-7xl'>
           <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
             <AdvancedFiltersCard />
+            <FunnelShowcaseCard />
 
-            {Array.from({ length: 5 }).map((_, index) => (
+            {Array.from({ length: 4 }).map((_, index) => (
               <Card key={index} className='dark:metric-card dark:shadow-card-glow'>
                 <CardHeader>
-                  <CardTitle className='text-xl'>Feature {index + 2}</CardTitle>
+                  <CardTitle className='text-xl'>Feature {index + 3}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className='text-muted-foreground flex h-32 items-center justify-center'>
@@ -98,6 +101,58 @@ export function AdvancedFiltersCard() {
               <span>{filter.name}</span>
             </div>
           ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function FunnelShowcaseCard() {
+  const funnelSteps = useMemo(
+    () => [
+      { name: 'Read Blog Post', conversion: 100, dropOff: 60.0 },
+      { name: 'Click CTA', conversion: 40, dropOff: 30.0 },
+      { name: 'View Landing Page', conversion: 28, dropOff: 16.3 },
+      { name: 'Start Form', conversion: 15, dropOff: null },
+    ],
+    [],
+  );
+
+  return (
+    <Card className='dark:metric-card dark:shadow-card-glow'>
+      <CardHeader>
+        <CardTitle className='text-xl'>Funnels</CardTitle>
+        <CardDescription className='text-base'>
+          Track the conversion rate of your website's key user journeys.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className='space-y-3'>
+        {funnelSteps.map((step, index) => (
+          <div key={index} className='space-y-1'>
+            <div className='flex items-center justify-between'>
+              <span className='text-sm font-medium'>{step.name}</span>
+              <span className='text-sm font-bold'>{step.conversion}%</span>
+            </div>
+            <div className='bg-muted h-2 w-full overflow-hidden rounded-full'>
+              <div className='bg-primary h-full' style={{ width: `${step.conversion}%` }} />
+            </div>
+            {step.dropOff && (
+              <div className='text-muted-foreground flex items-center text-xs'>
+                <TrendingDown className='mr-1 h-3 w-3' />
+                <span>{step.dropOff}% drop off</span>
+              </div>
+            )}
+          </div>
+        ))}
+
+        <div className='border-border mt-4 border-t pt-3'>
+          <div className='flex items-center justify-between text-sm'>
+            <span className='font-medium'>Total: 15%</span>
+            <div className='flex items-center text-green-500'>
+              <TrendingUp className='mr-1 h-3 w-3' />
+              <span>2.3% since last week</span>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
