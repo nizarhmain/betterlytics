@@ -88,7 +88,7 @@ export function PricingSection() {
       <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='mb-16 text-center'>
           <h2 className='mb-4 text-3xl font-bold sm:text-4xl'>
-            <span className='dark:gradient-text'>Simple, scalable</span> pricing
+            <span className='text-blue-600 dark:text-blue-400'>Simple, scalable</span> pricing
           </h2>
           <p className='text-muted-foreground text-xl'>
             Traffic-based plans that matches your growth. Start free, scale as you grow.

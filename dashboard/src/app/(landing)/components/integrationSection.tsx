@@ -29,7 +29,7 @@ export function IntegrationSection() {
       <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='mb-16 text-center'>
           <h2 className='mb-4 text-3xl font-bold sm:text-4xl'>
-            Get started in <span className='dark:gradient-text'>under 2 minutes</span>
+            Get started in <span className='text-blue-600 dark:text-blue-400'>under 2 minutes</span>
           </h2>
           <p className='text-muted-foreground mx-auto max-w-2xl text-xl'>
             Add our lightweight script and start collecting cookieless, privacy-friendly analytics immediately. No
