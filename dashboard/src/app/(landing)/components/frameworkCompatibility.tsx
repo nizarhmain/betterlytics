@@ -1,41 +1,20 @@
 import Image from 'next/image';
 
 const frameworks = [
-  { name: 'Next.js', logo: '/framework-logos/nextjs.svg' },
-  { name: 'React', logo: '/framework-logos/react.svg' },
-  { name: 'Vue.js', logo: '/framework-logos/vue.svg' },
-  { name: 'Angular', logo: '/framework-logos/angular.svg' },
-  { name: 'Svelte', icon: '💚' },
-  { name: 'Nuxt.js', icon: '💚' },
-  { name: 'Gatsby', icon: '💚' },
-  { name: 'Astro', icon: '💚' },
-  { name: 'Laravel', icon: '💚' },
-  { name: 'Django', icon: '💚' },
-  { name: 'Ruby on Rails', icon: '💚' },
-  { name: 'Spring Boot', icon: '💚' },
-  { name: 'Express.js', icon: '💚' },
-  { name: 'Flask', icon: '💚' },
-  { name: 'WordPress', icon: '💚' },
-  { name: 'Drupal', icon: '💚' },
-  { name: 'Joomla', icon: '💚' },
-  { name: 'Shopify', icon: '💚' },
-  { name: 'WooCommerce', icon: '💚' },
-  { name: 'Magento', icon: '💚' },
-  { name: 'PrestaShop', icon: '💚' },
-  { name: 'Webflow', icon: '💚' },
-  { name: 'Squarespace', icon: '💚' },
-  { name: 'Wix', icon: '💚' },
-  { name: 'Ghost', icon: '💚' },
-  { name: 'Hugo', icon: '💚' },
-  { name: 'Jekyll', icon: '💚' },
-  { name: 'Eleventy', icon: '💚' },
-  { name: 'Remix', icon: '💚' },
-  { name: 'SvelteKit', icon: '💚' },
-  { name: 'Qwik', icon: '💚' },
-  { name: 'Solid.js', icon: '💚' },
-  { name: 'Alpine.js', icon: '💚' },
-  { name: 'Ember.js', icon: '💚' },
-  { name: 'Backbone.js', icon: '💚' },
+  { name: 'Next.js', logo: '/framework-logos/nextjs-icon.svg' },
+  { name: 'React', logo: '/framework-logos/react-icon.svg' },
+  { name: 'Vue.js', logo: '/framework-logos/vue-icon.svg' },
+  { name: 'Angular', logo: '/framework-logos/angular-icon.svg' },
+  { name: 'Svelte', logo: '/framework-logos/svelte-icon.svg' },
+  { name: 'Nuxt.js', logo: '/framework-logos/nuxtjs-icon.svg' },
+  { name: 'Gatsby', logo: '/framework-logos/gatsby-icon.svg' },
+  { name: 'Laravel', logo: '/framework-logos/laravel-icon.svg' },
+  { name: 'WordPress', logo: '/framework-logos/wordpress-icon.svg' },
+  { name: 'Shopify', logo: '/framework-logos/shopify-icon.svg' },
+  { name: 'GTM', logo: '/framework-logos/gtm-icon.svg' },
+  { name: 'Webflow', logo: '/framework-logos/webflow-icon.svg' },
+  { name: 'Remix', logo: '/framework-logos/remix-icon.svg' },
+  { name: 'Solid.js', logo: '/framework-logos/solidjs-icon.svg' },
 ];
 
 export function FrameworkCompatibility() {
@@ -50,24 +29,39 @@ export function FrameworkCompatibility() {
         </div>
 
         <div className='relative overflow-hidden'>
-          <div className='flex animate-[scroll_50s_linear_infinite] space-x-8 hover:[animation-play-state:paused]'>
+          <div className='flex animate-[scroll_40s_linear_infinite] space-x-8 hover:[animation-play-state:paused]'>
             {frameworks.map((framework, index) => (
               <div
                 key={`first-${index}`}
                 className='hover:bg-card flex min-w-[120px] flex-shrink-0 flex-col items-center space-y-2 rounded-lg p-4 transition-colors'
               >
                 <div className='flex h-8 w-8 items-center justify-center'>
-                  {framework.logo ? (
-                    <Image
-                      src={framework.logo}
-                      alt={`${framework.name} logo`}
-                      width={32}
-                      height={32}
-                      className='h-8 w-8'
-                    />
-                  ) : (
-                    <div className='text-3xl'>{framework.icon}</div>
-                  )}
+                  <Image
+                    src={framework.logo}
+                    alt={`${framework.name} logo`}
+                    width={32}
+                    height={32}
+                    className='h-8 w-8'
+                  />
+                </div>
+                <span className='text-center text-sm font-medium'>{framework.name}</span>
+              </div>
+            ))}
+
+            {/* Duplicate set of frameworks to reduce the flickering when the loop reaches the end */}
+            {frameworks.map((framework, index) => (
+              <div
+                key={`second-${index}`}
+                className='hover:bg-card flex min-w-[120px] flex-shrink-0 flex-col items-center space-y-2 rounded-lg p-4 transition-colors'
+              >
+                <div className='flex h-8 w-8 items-center justify-center'>
+                  <Image
+                    src={framework.logo}
+                    alt={`${framework.name} logo`}
+                    width={32}
+                    height={32}
+                    className='h-8 w-8'
+                  />
                 </div>
                 <span className='text-center text-sm font-medium'>{framework.name}</span>
               </div>
