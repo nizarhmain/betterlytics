@@ -12,6 +12,12 @@ const envSchema = z.object({
     })
     .optional()
     .default(false),
+  ENABLE_REGISTRATION: z
+    .boolean({
+      coerce: true,
+    })
+    .optional()
+    .default(false),
 });
 
 export const env = envSchema.parse(process.env);
