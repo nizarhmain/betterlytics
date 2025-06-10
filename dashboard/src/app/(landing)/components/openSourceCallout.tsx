@@ -9,7 +9,7 @@ export function OpenSourceCallout() {
         <div className='text-center'>
           <Github className='text-primary mx-auto mb-6 h-16 w-16' />
           <h2 className='mb-4 text-3xl font-bold sm:text-4xl'>
-            <span className='text-blue-600 dark:text-blue-400'>Open Source</span> & Community Driven
+            <span className='text-blue-600 dark:text-blue-400'>Open Source</span> &amp; Community Driven
           </h2>
           <p className='text-muted-foreground mx-auto mb-8 max-w-2xl text-xl'>
             Transparent, community-driven development. Join our contributors, request features, or adapt the

@@ -1,22 +1,18 @@
-import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export function UserJourneyCard() {
-  const journeyData = useMemo(
-    () => ({
-      start: { name: 'Landing Page', users: 1000 },
-      middle: { name: 'Product Page', users: 650 },
-      pathA: [
-        { name: 'Add to Cart', users: 320 },
-        { name: 'Checkout', users: 180 },
-      ],
-      pathB: [
-        { name: 'Search', users: 330 },
-        { name: 'Compare', users: 120 },
-      ],
-    }),
-    [],
-  );
+export default async function UserJourneyCard() {
+  const journeyData = {
+    start: { name: 'Landing Page', users: 1000 },
+    middle: { name: 'Product Page', users: 650 },
+    pathA: [
+      { name: 'Add to Cart', users: 320 },
+      { name: 'Checkout', users: 180 },
+    ],
+    pathB: [
+      { name: 'Search', users: 330 },
+      { name: 'Compare', users: 120 },
+    ],
+  };
 
   const JourneyNode = ({ name, users, isStart }: { name: string; users: number; isStart?: boolean }) => (
     <div className='flex flex-col items-center'>
@@ -49,7 +45,7 @@ export function UserJourneyCard() {
   );
 
   return (
-    <Card className='dark:metric-card dark:shadow-card-glow'>
+    <Card>
       <CardHeader className='pb-0'>
         <CardTitle className='text-xl'>User Journeys</CardTitle>
         <CardDescription className='text-base'>

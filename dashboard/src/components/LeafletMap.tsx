@@ -67,8 +67,8 @@ const LeafletMap = ({
 
   // Get feature ID from GeoJSON - used to match the visitor data (like country code) to the GeoJSON data
   const getFeatureId = (feature: Feature<Geometry, any>): string | undefined => {
-    if (!feature || !feature.properties) return undefined;
-    return feature.id ? String(feature.id) : undefined;
+    if (!feature || !feature.properties || !feature.id) return undefined;
+    return String(feature.id);
   };
 
   // Style function for the GeoJSON layers/regions

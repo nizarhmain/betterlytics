@@ -8,17 +8,17 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const eventRanges = [
-  { value: 10000, label: '10K', price: 0 },
-  { value: 50000, label: '50K', price: 6 },
-  { value: 100000, label: '100K', price: 13 },
-  { value: 150000, label: '150K', price: 20 },
-  { value: 200000, label: '200K', price: 27 },
-  { value: 500000, label: '500K', price: 48 },
-  { value: 1000000, label: '1M', price: 69 },
-  { value: 2000000, label: '2M', price: 132 },
-  { value: 5000000, label: '5M', price: 209 },
-  { value: 10000000, label: '10M', price: 349 },
-  { value: 25000000, label: '10M+', price: 'Custom' },
+  { value: 10_000, label: '10K', price: 0 },
+  { value: 50_000, label: '50K', price: 6 },
+  { value: 100_000, label: '100K', price: 13 },
+  { value: 150_000, label: '150K', price: 20 },
+  { value: 200_000, label: '200K', price: 27 },
+  { value: 500_000, label: '500K', price: 48 },
+  { value: 1_000_000, label: '1M', price: 69 },
+  { value: 2_000_000, label: '2M', price: 132 },
+  { value: 5_000_000, label: '5M', price: 209 },
+  { value: 10_000_000, label: '10M', price: 349 },
+  { value: 25_000_000, label: '10M+', price: 'Custom' },
 ];
 
 export function PricingSection() {
@@ -46,7 +46,7 @@ export function PricingSection() {
         '1 year data retention',
         'Email support',
       ],
-      cta: isFree ? 'Get Started Free' : isCustom ? 'Contact Sales' : 'Get Started',
+      cta: isFree ? 'Get Started for Free' : isCustom ? 'Contact Sales' : 'Get Started',
       popular: false,
     },
     {
@@ -103,9 +103,9 @@ export function PricingSection() {
         />
 
         <div className='mx-auto grid max-w-6xl gap-8 md:grid-cols-3'>
-          {plans.map((plan, index) => (
+          {plans.map((plan) => (
             <Card
-              key={index}
+              key={plan.name}
               className={`dark:metric-card relative flex flex-col ${plan.popular ? 'dark:shadow-card-glow border-primary/50' : ''}`}
             >
               {plan.popular && (
@@ -123,8 +123,8 @@ export function PricingSection() {
               </CardHeader>
               <CardContent className='flex flex-grow flex-col'>
                 <ul className='mb-6 flex-grow space-y-3'>
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className='flex items-center'>
+                  {plan.features.map((feature) => (
+                    <li key={feature} className='flex items-center'>
                       <Check className='text-primary mr-3 h-4 w-4 flex-shrink-0' />
                       <span className='text-sm'>{feature}</span>
                     </li>
@@ -178,11 +178,11 @@ export function EventSlider({
         />
 
         <div className='mt-3 flex justify-between'>
-          {eventRanges.map((range, index) => (
+          {eventRanges.map((range) => (
             <div
-              key={index}
+              key={range.label}
               className={`text-xs transition-colors ${
-                index === selectedRangeIndex ? 'text-primary font-semibold' : 'text-muted-foreground'
+                range.label === currentRange.label ? 'text-primary font-semibold' : 'text-muted-foreground'
               }`}
             >
               {range.label}

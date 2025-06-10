@@ -1,31 +1,27 @@
-import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import LeafletMap from '@/components/LeafletMap';
 import { GeoVisitor } from '@/entities/geography';
 
-export function WorldMapCard() {
-  const mockGeographyData: GeoVisitor[] = useMemo(
-    () => [
-      { country_code: 'USA', visitors: 1247 },
-      { country_code: 'GBR', visitors: 892 },
-      { country_code: 'DNK', visitors: 743 },
-      { country_code: 'FRA', visitors: 621 },
-      { country_code: 'CAN', visitors: 534 },
-      { country_code: 'AUS', visitors: 398 },
-      { country_code: 'JPN', visitors: 287 },
-      { country_code: 'BRA', visitors: 234 },
-      { country_code: 'IND', visitors: 198 },
-      { country_code: 'ESP', visitors: 156 },
-      { country_code: 'ITA', visitors: 134 },
-      { country_code: 'NLD', visitors: 98 },
-      { country_code: 'SWE', visitors: 67 },
-      { country_code: 'NOR', visitors: 45 },
-    ],
-    [],
-  );
+export default function WorldMapCard() {
+  const mockGeographyData: GeoVisitor[] = [
+    { country_code: 'USA', visitors: 1247 },
+    { country_code: 'GBR', visitors: 892 },
+    { country_code: 'DNK', visitors: 743 },
+    { country_code: 'FRA', visitors: 621 },
+    { country_code: 'CAN', visitors: 534 },
+    { country_code: 'AUS', visitors: 398 },
+    { country_code: 'JPN', visitors: 287 },
+    { country_code: 'BRA', visitors: 234 },
+    { country_code: 'IND', visitors: 198 },
+    { country_code: 'ESP', visitors: 156 },
+    { country_code: 'ITA', visitors: 134 },
+    { country_code: 'NLD', visitors: 98 },
+    { country_code: 'SWE', visitors: 67 },
+    { country_code: 'NOR', visitors: 45 },
+  ];
 
   return (
-    <Card className='dark:metric-card dark:shadow-card-glow'>
+    <Card>
       <CardHeader className='pb-0'>
         <CardTitle className='text-xl'>Geographical Analytics</CardTitle>
         <CardDescription className='text-base'>

@@ -30,9 +30,9 @@ export function FrameworkCompatibility() {
 
         <div className='relative overflow-hidden'>
           <div className='flex animate-[scroll_40s_linear_infinite] space-x-8 hover:[animation-play-state:paused]'>
-            {frameworks.map((framework, index) => (
+            {frameworks.map((framework) => (
               <div
-                key={`first-${index}`}
+                key={`first-${framework.name}`}
                 className='hover:bg-card flex min-w-[120px] flex-shrink-0 flex-col items-center space-y-2 rounded-lg p-4 transition-colors'
               >
                 <div className='flex h-8 w-8 items-center justify-center'>
@@ -49,9 +49,9 @@ export function FrameworkCompatibility() {
             ))}
 
             {/* Duplicate set of frameworks to reduce the flickering when the loop reaches the end */}
-            {frameworks.map((framework, index) => (
+            {frameworks.map((framework) => (
               <div
-                key={`second-${index}`}
+                key={`second-${framework.name}`}
                 className='hover:bg-card flex min-w-[120px] flex-shrink-0 flex-col items-center space-y-2 rounded-lg p-4 transition-colors'
               >
                 <div className='flex h-8 w-8 items-center justify-center'>

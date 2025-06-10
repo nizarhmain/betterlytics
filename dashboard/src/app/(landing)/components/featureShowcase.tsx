@@ -1,14 +1,12 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import AdvancedFiltersCard from './featureCards/advancedFiltersCard';
-import { FunnelsCard } from './featureCards/funnelsCard';
-import { EventTrackingCard } from './featureCards/eventTrackingCard';
-import { UserJourneyCard } from './featureCards/userJourneyCard';
-import { WorldMapCard } from './featureCards/worldMapCard';
-import { TrafficSourcesCard } from './featureCards/trafficSourcesCard';
+import FunnelsCard from './featureCards/funnelsCard';
+import EventTrackingCard from './featureCards/eventTrackingCard';
+import UserJourneyCard from './featureCards/userJourneyCard';
+import WorldMapCard from './featureCards/worldMapCard';
+import TrafficSourcesCard from './featureCards/trafficSourcesCard';
 
 export function FeatureShowcase() {
   return (

@@ -1,20 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import { useMemo } from 'react';
 
-export function FunnelsCard() {
-  const funnelSteps = useMemo(
-    () => [
-      { name: 'Read Blog Post', conversion: 100, dropOff: 60.0 },
-      { name: 'Click CTA', conversion: 40, dropOff: 30.0 },
-      { name: 'View Landing Page', conversion: 28, dropOff: 16.3 },
-      { name: 'Start Form', conversion: 15, dropOff: null },
-    ],
-    [],
-  );
+export default function FunnelsCard() {
+  const funnelSteps = [
+    { name: 'Read Blog Post', conversion: 100, dropOff: 60.0 },
+    { name: 'Click CTA', conversion: 40, dropOff: 30.0 },
+    { name: 'View Landing Page', conversion: 28, dropOff: 16.3 },
+    { name: 'Start Form', conversion: 15, dropOff: null },
+  ];
 
   return (
-    <Card className='dark:metric-card dark:shadow-card-glow'>
+    <Card>
       <CardHeader>
         <CardTitle className='text-xl'>Funnels</CardTitle>
         <CardDescription className='text-base'>
@@ -22,8 +18,8 @@ export function FunnelsCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className='space-y-3'>
-        {funnelSteps.map((step, index) => (
-          <div key={index} className='space-y-1'>
+        {funnelSteps.map((step) => (
+          <div key={step.name} className='space-y-1'>
             <div className='flex items-center justify-between'>
               <span className='text-sm font-medium'>{step.name}</span>
               <span className='text-sm font-bold'>{step.conversion}%</span>
