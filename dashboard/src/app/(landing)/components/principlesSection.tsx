@@ -4,36 +4,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 const features = [
   {
     icon: <Lock className='h-6 w-6' />,
-    title: '100% GDPR Compliant',
+    title: 'EU-Based & GDPR Compliant',
     description:
-      'No cookies, no personal data collection. Fully compliant with privacy regulations out of the box.',
+      'Servers hosted in the EU with strict data protection. No cookies, no personal data collection, fully anonymous by design.',
   },
   {
     icon: <Zap className='h-6 w-6' />,
-    title: 'Lightweight & Fast',
-    description: "Under 1KB script size. Won't slow down your site or impact user experience.",
+    title: 'Lightweight & Developer-Friendly',
+    description:
+      'Under 1KB script, open-source codebase, and comprehensive APIs. Built by developers, for developers.',
   },
   {
     icon: <Database className='h-6 w-6' />,
-    title: 'Full Data Ownership',
-    description: 'Your data stays yours. Self-host or use our cloud with complete control over your analytics.',
+    title: 'Complete Data Ownership',
+    description:
+      'Your data stays yours forever. Self-host with our open-source version or use our secure cloud infrastructure.',
   },
   {
     icon: <Eye className='h-6 w-6' />,
-    title: 'Real-time Insights',
+    title: 'Real-time Business Insights',
     description:
-      'Instant data updates and live visitor tracking with sub-second performance and beautiful dashboards.',
+      'Live visitor tracking, conversion analytics, and beautiful dashboards that help you make data-driven decisions.',
   },
   {
     icon: <Code className='h-6 w-6' />,
-    title: 'Easy Integration',
+    title: 'Simple Setup, Powerful Features',
     description:
-      'Simple setup for any website. Advanced APIs and documentation available for custom implementations.',
+      'One-line integration for any website. Advanced customization options and enterprise-grade features available.',
   },
   {
     icon: <Globe className='h-6 w-6' />,
-    title: 'Global Edge Network',
-    description: 'Lightning-fast data collection from anywhere in the world with our edge infrastructure.',
+    title: 'Global Performance',
+    description: 'Lightning-fast data collection worldwide with 99.9% uptime and enterprise-level reliability.',
   },
 ];
 

@@ -1,4 +1,4 @@
-import { ArrowRight, Github, Star } from 'lucide-react';
+import { ChevronRight, Github, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { GitHubStats } from './githubStats';
@@ -24,7 +24,7 @@ export function HeroSection() {
           <div className='flex flex-col justify-center gap-4 sm:flex-row'>
             <Button size='lg' className='bg-primary px-8 text-lg'>
               <Link href='/register'>Get Started Free</Link>
-              <ArrowRight className='ml-2 h-5 w-5' />
+              <ChevronRight className='ml-1 h-5 w-5' />
             </Button>
             <Button size='lg' variant='outline' className='text-lg' asChild>
               <a href='https://github.com/betterlytics/betterlytics' target='_blank' rel='noopener noreferrer'>
