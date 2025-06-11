@@ -1,18 +1,18 @@
-import { Lock, Zap, Database, Eye, Code, Globe } from 'lucide-react';
+import { Shield, Zap, Database, Eye, Code, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const features = [
   {
-    icon: <Lock className='h-6 w-6' />,
+    icon: <Shield className='h-6 w-6' />,
     title: 'EU-Based & GDPR Compliant',
     description:
-      'Servers hosted in the EU with strict data protection. No cookies, no personal data collection, fully anonymous by design.',
+      'Servers hosted in the EU with strict data protection standards. Complete GDPR compliance with anonymous data collection and robust privacy safeguards.',
   },
   {
-    icon: <Zap className='h-6 w-6' />,
-    title: 'Lightweight & Developer-Friendly',
+    icon: <CheckCircle className='h-6 w-6' />,
+    title: 'No Consent Banner Required',
     description:
-      'Under 1KB script, open-source codebase, and comprehensive APIs. Built by developers, for developers.',
+      'Fully anonymous analytics mean no cookie banners, no GDPR consent forms, no user friction. Just install and start tracking immediately.',
   },
   {
     icon: <Database className='h-6 w-6' />,
@@ -24,18 +24,19 @@ const features = [
     icon: <Eye className='h-6 w-6' />,
     title: 'Real-time Business Insights',
     description:
-      'Live visitor tracking, conversion analytics, and beautiful dashboards that help you make data-driven decisions.',
+      'Lightning-fast visitor tracking and conversion analytics worldwide. Beautiful dashboards help you make data-driven decisions instantly.',
+  },
+  {
+    icon: <Zap className='h-6 w-6' />,
+    title: 'Lightweight & Developer-Friendly',
+    description:
+      'Under 1KB script, open-source codebase, and comprehensive APIs. Built by developers, for developers.',
   },
   {
     icon: <Code className='h-6 w-6' />,
     title: 'Simple Setup, Powerful Features',
     description:
       'One-line integration for any website. Advanced customization options and enterprise-grade features available.',
-  },
-  {
-    icon: <Globe className='h-6 w-6' />,
-    title: 'Global Performance',
-    description: 'Lightning-fast data collection worldwide with 99.9% uptime and enterprise-level reliability.',
   },
 ];
 
