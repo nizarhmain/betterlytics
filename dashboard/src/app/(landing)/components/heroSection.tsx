@@ -6,8 +6,13 @@ import Link from 'next/link';
 
 export function HeroSection() {
   return (
-    <section className='relative py-20 sm:py-32'>
-      <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
+    <section className='relative overflow-hidden py-20 sm:py-32'>
+      <div className='absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20 dark:from-blue-950/20 dark:via-transparent dark:to-purple-950/10' />
+
+      <div className='absolute -top-40 -right-32 h-80 w-80 animate-pulse rounded-full bg-gradient-to-br from-blue-400/20 to-purple-600/20 blur-3xl' />
+      <div className='absolute -bottom-40 -left-32 h-80 w-80 animate-pulse rounded-full bg-gradient-to-tr from-purple-400/20 to-blue-600/20 blur-3xl' />
+
+      <div className='relative container mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='text-center'>
           <Badge variant='secondary' className='mb-4'>
             <Star className='mr-1 h-3 w-3' />
@@ -23,7 +28,7 @@ export function HeroSection() {
           </p>
           <div className='flex flex-col justify-center gap-4 sm:flex-row'>
             <Button size='lg' className='bg-primary px-8 text-lg'>
-              <Link href='/register'>Get Started Free</Link>
+              <Link href='/register'>Get Started for Free</Link>
               <ChevronRight className='ml-1 h-5 w-5' />
             </Button>
             <Button size='lg' variant='outline' className='text-lg' asChild>

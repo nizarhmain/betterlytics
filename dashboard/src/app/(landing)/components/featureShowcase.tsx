@@ -10,8 +10,10 @@ import TrafficSourcesCard from './featureCards/trafficSourcesCard';
 
 export function FeatureShowcase() {
   return (
-    <section className='bg-card/20 py-20'>
-      <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
+    <section className='bg-card/20 relative overflow-hidden py-20'>
+      <div className='absolute inset-0 bg-gradient-to-br from-blue-50/10 via-transparent to-purple-50/10 dark:from-blue-950/10 dark:via-transparent dark:to-purple-950/10' />
+
+      <div className='relative container mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='mb-16 text-center'>
           <h2 className='mb-4 text-3xl font-bold sm:text-4xl'>
             <span className='text-blue-600 dark:text-blue-400'>Powerful features</span> at your fingertips
