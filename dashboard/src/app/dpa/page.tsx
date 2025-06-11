@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { env } from '@/lib/env';
 
 export const metadata: Metadata = {
   title: 'Data Processing Agreement - Betterlytics',
@@ -7,6 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function DPAPage() {
+  if (!env.IS_CLOUD) {
+    redirect('/');
+  }
+
   return (
     <div className='bg-background min-h-screen py-12'>
       <div className='mx-auto max-w-4xl px-4 sm:px-6 lg:px-8'>

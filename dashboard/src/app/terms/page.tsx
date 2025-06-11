@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { env } from '@/lib/env';
 
 export const metadata: Metadata = {
   title: 'Terms of Service - Betterlytics',
@@ -7,6 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function TermsPage() {
+  if (!env.IS_CLOUD) {
+    redirect('/');
+  }
+
   return (
     <div className='bg-background min-h-screen py-12'>
       <div className='mx-auto max-w-4xl px-4 sm:px-6 lg:px-8'>
