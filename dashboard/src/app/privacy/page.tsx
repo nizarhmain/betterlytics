@@ -32,6 +32,16 @@ export default function PrivacyPage() {
               </p>
             </section>
 
+            <section className='border-primary bg-accent rounded-r-lg border-l-4 p-6'>
+              <h2 className='text-accent-foreground mb-3 text-xl font-semibold'>Scope of This Policy</h2>
+              <p className='text-accent-foreground'>
+                This privacy policy applies exclusively to the <strong>Betterlytics hosted cloud service</strong>{' '}
+                available at betterlytics.io and our official domains. It does not apply to self-hosted
+                installations of our open source software. If you self-host Betterlytics, you are responsible for
+                your own privacy policy, data processing practices, and legal compliance.
+              </p>
+            </section>
+
             <section>
               <p className='text-foreground leading-relaxed'>
                 At Betterlytics, we are committed to complying with GDPR, CCPA, PECR and other privacy regulations.
