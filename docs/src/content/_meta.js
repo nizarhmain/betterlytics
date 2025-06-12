@@ -1,5 +1,5 @@
 export default {
-  introduction: "Introduction",
+  index: "Introduction",
   installation: "Installation & Setup",
   integration: "Integration",
   dashboard: "Dashboard Features",
