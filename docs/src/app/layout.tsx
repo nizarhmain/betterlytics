@@ -1,9 +1,11 @@
-import { Footer, Layout, Navbar } from "nextra-theme-docs";
+import { Layout, Navbar } from "nextra-theme-docs";
 import { Banner, Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import "nextra-theme-docs/style.css";
+import "./globals.css";
 import { Metadata } from "next";
 import Image from "next/image";
+import { Footer } from "./components/footer";
 
 export const metadata: Metadata = {
   title: "Betterlytics Docs",
@@ -48,7 +50,7 @@ const banner = (
   </Banner>
 );
 
-const footer = <Footer>MIT {new Date().getFullYear()} © Nextra.</Footer>;
+const footer = <Footer />;
 
 export default async function RootLayout({
   children,
