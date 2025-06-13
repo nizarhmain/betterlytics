@@ -81,11 +81,14 @@ export function PricingCards({ currentRange, onPlanSelect, mode = 'landing', cla
 
   const renderButton = (plan: any) => {
     if (mode === 'billing') {
+      const isFreePlanOnBilling = plan.name === 'Starter' && isFree;
+
       return (
         <Button
           className='mt-auto w-full'
           variant={plan.popular ? 'default' : 'outline'}
           onClick={() => handlePlanClick(plan)}
+          disabled={isFreePlanOnBilling}
         >
           {plan.cta}
         </Button>
