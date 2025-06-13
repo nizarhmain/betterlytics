@@ -3,9 +3,10 @@
 import { useCallback, useState } from 'react';
 import { PricingSlider, eventRanges } from './PricingSlider';
 import { PricingCards } from './PricingCards';
+import { SelectedPlan } from '@/types/pricing';
 
 interface PricingComponentProps {
-  onPlanSelect?: (planName: string, planData: any) => void;
+  onPlanSelect?: (planData: SelectedPlan) => void;
   initialRangeIndex?: number;
   className?: string;
 }
@@ -29,7 +30,9 @@ export function PricingComponent({ onPlanSelect, initialRangeIndex = 0, classNam
       />
 
       <PricingCards
-        currentRange={currentRange}
+        eventLimit={currentRange.value}
+        eventLabel={currentRange.label}
+        basePrice={currentRange.price}
         onPlanSelect={onPlanSelect}
         mode={onPlanSelect ? 'billing' : 'landing'}
       />

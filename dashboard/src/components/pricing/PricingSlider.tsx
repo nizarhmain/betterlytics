@@ -1,6 +1,6 @@
 'use client';
 
-// TODO: Get from a pricing service or config
+// TODO: Get from a pricing service or config or smth - perhaps move to pricing component as well
 const eventRanges = [
   { value: 10_000, label: '10K', price: 0 },
   { value: 50_000, label: '50K', price: 6 },
@@ -13,10 +13,12 @@ const eventRanges = [
   { value: 5_000_000, label: '5M', price: 209 },
   { value: 10_000_000, label: '10M', price: 349 },
   { value: 25_000_000, label: '10M+', price: 'Custom' },
-];
+] as const;
+
+type EventRange = (typeof eventRanges)[number];
 
 interface PricingSliderProps {
-  currentRange: any;
+  currentRange: EventRange;
   selectedRangeIndex: number;
   handleSliderChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
@@ -64,3 +66,4 @@ export function PricingSlider({
 }
 
 export { eventRanges };
+export type { EventRange };

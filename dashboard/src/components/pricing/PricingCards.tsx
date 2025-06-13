@@ -5,26 +5,46 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { SelectedPlan, Tier } from '@/types/pricing';
 
 interface PricingCardsProps {
-  currentRange: any;
-  onPlanSelect?: (planName: string, planData: any) => void;
+  eventLimit: number;
+  eventLabel: string;
+  basePrice: number | 'Custom';
+  onPlanSelect?: (planData: SelectedPlan) => void;
   mode?: 'landing' | 'billing';
   className?: string;
 }
 
-export function PricingCards({ currentRange, onPlanSelect, mode = 'landing', className = '' }: PricingCardsProps) {
-  const isFree = currentRange.price === 0;
-  const isCustom = currentRange.price === 'Custom';
+interface PlanConfig {
+  tier: Tier;
+  price: string;
+  period: string;
+  description: string;
+  features: readonly string[];
+  cta: string;
+  popular: boolean;
+}
 
-  const plans = [
+export function PricingCards({
+  eventLimit,
+  eventLabel,
+  basePrice,
+  onPlanSelect,
+  mode = 'landing',
+  className = '',
+}: PricingCardsProps) {
+  const isFree = basePrice === 0;
+  const isCustom = basePrice === 'Custom';
+
+  const plans: PlanConfig[] = [
     {
-      name: 'Starter',
-      price: isFree ? 'Free' : isCustom ? 'Custom' : `$${currentRange.price}`,
+      tier: 'starter',
+      price: isFree ? 'Free' : isCustom ? 'Custom' : `$${basePrice}`,
       period: !isFree && !isCustom ? '/month' : '',
       description: 'Perfect for small websites and personal projects',
       features: [
-        `Up to ${currentRange.label} events/month`,
+        `Up to ${eventLabel} events/month`,
         'Real-time dashboard',
         'All analytics features',
         '1 website',
@@ -35,12 +55,12 @@ export function PricingCards({ currentRange, onPlanSelect, mode = 'landing', cla
       popular: false,
     },
     {
-      name: 'Professional',
-      price: isFree ? '$6' : isCustom ? 'Custom' : `$${Math.round((currentRange.price as number) * 2)}`,
+      tier: 'professional',
+      price: isFree ? '$6' : isCustom ? 'Custom' : `$${Math.round((basePrice as number) * 2)}`,
       period: !isCustom ? '/month' : '',
       description: 'Advanced features for growing businesses',
       features: [
-        `Up to ${currentRange.label} events/month`,
+        `Up to ${eventLabel} events/month`,
         'Everything in Starter',
         '3+ years data retention',
         'Up to 50 sites',
@@ -52,7 +72,7 @@ export function PricingCards({ currentRange, onPlanSelect, mode = 'landing', cla
       popular: true,
     },
     {
-      name: 'Enterprise',
+      tier: 'enterprise',
       price: 'Custom',
       period: '',
       description: 'Complete solution for large organizations',
@@ -69,19 +89,22 @@ export function PricingCards({ currentRange, onPlanSelect, mode = 'landing', cla
     },
   ];
 
-  const handlePlanClick = (plan: any) => {
+  const handlePlanClick = (plan: PlanConfig) => {
     if (mode === 'billing' && onPlanSelect) {
-      onPlanSelect(plan.name, {
-        ...plan,
-        eventLimit: currentRange.value,
-        eventLabel: currentRange.label,
-      });
+      // Only pass essential payment data
+      const selectedPlan: SelectedPlan = {
+        tier: plan.tier,
+        eventLimit,
+        price: plan.price,
+        period: plan.period,
+      };
+      onPlanSelect(selectedPlan);
     }
   };
 
-  const renderButton = (plan: any) => {
+  const renderButton = (plan: PlanConfig) => {
     if (mode === 'billing') {
-      const isFreePlanOnBilling = plan.name === 'Starter' && isFree;
+      const isFreePlanOnBilling = plan.tier === 'starter' && isFree;
 
       return (
         <Button
@@ -111,14 +134,14 @@ export function PricingCards({ currentRange, onPlanSelect, mode = 'landing', cla
     <div className={`mx-auto grid max-w-6xl gap-8 md:grid-cols-3 ${className}`}>
       {plans.map((plan) => (
         <Card
-          key={plan.name}
+          key={plan.tier}
           className={`dark:metric-card relative flex flex-col ${plan.popular ? 'dark:shadow-card-glow border-primary/50' : ''}`}
         >
           {plan.popular && (
             <Badge className='bg-primary absolute -top-3 left-1/2 -translate-x-1/2 transform'>Most Popular</Badge>
           )}
           <CardHeader className='text-center'>
-            <CardTitle className='text-2xl'>{plan.name}</CardTitle>
+            <CardTitle className='text-2xl'>{getTierDisplayName(plan.tier)}</CardTitle>
             <div className='mt-4'>
               <span className='text-4xl font-bold'>{plan.price}</span>
               {plan.period && <span className='text-muted-foreground text-lg'>{plan.period}</span>}
@@ -140,4 +163,8 @@ export function PricingCards({ currentRange, onPlanSelect, mode = 'landing', cla
       ))}
     </div>
   );
+}
+
+function getTierDisplayName(tier: Tier): string {
+  return tier.charAt(0).toUpperCase() + tier.slice(1);
 }
