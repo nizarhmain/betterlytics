@@ -1,9 +1,10 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { PricingSlider, eventRanges } from './PricingSlider';
+import { PricingSlider } from './PricingSlider';
 import { PricingCards } from './PricingCards';
 import { SelectedPlan } from '@/types/pricing';
+import { EVENT_RANGES } from '@/lib/billing/plans';
 
 interface PricingComponentProps {
   onPlanSelect?: (planData: SelectedPlan) => void;
@@ -13,7 +14,7 @@ interface PricingComponentProps {
 
 export function PricingComponent({ onPlanSelect, initialRangeIndex = 0, className = '' }: PricingComponentProps) {
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(initialRangeIndex);
-  const currentRange = eventRanges[selectedRangeIndex];
+  const currentRange = EVENT_RANGES[selectedRangeIndex];
 
   const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const index = parseInt(e.target.value);

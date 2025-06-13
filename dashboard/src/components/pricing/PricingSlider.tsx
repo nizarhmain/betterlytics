@@ -1,21 +1,6 @@
 'use client';
 
-// TODO: Get from a pricing service or config or smth - perhaps move to pricing component as well
-const eventRanges = [
-  { value: 10_000, label: '10K', price: 0 },
-  { value: 50_000, label: '50K', price: 6 },
-  { value: 100_000, label: '100K', price: 13 },
-  { value: 150_000, label: '150K', price: 20 },
-  { value: 200_000, label: '200K', price: 27 },
-  { value: 500_000, label: '500K', price: 48 },
-  { value: 1_000_000, label: '1M', price: 69 },
-  { value: 2_000_000, label: '2M', price: 132 },
-  { value: 5_000_000, label: '5M', price: 209 },
-  { value: 10_000_000, label: '10M', price: 349 },
-  { value: 25_000_000, label: '10M+', price: 'Custom' },
-] as const;
-
-type EventRange = (typeof eventRanges)[number];
+import { EVENT_RANGES, EventRange } from '@/lib/billing/plans';
 
 interface PricingSliderProps {
   currentRange: EventRange;
@@ -42,14 +27,14 @@ export function PricingSlider({
           type='range'
           value={selectedRangeIndex}
           onChange={handleSliderChange}
-          max={eventRanges.length - 1}
+          max={EVENT_RANGES.length - 1}
           min={0}
           step={1}
           className='slider h-3 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700'
         />
 
         <div className='mt-3 flex justify-between'>
-          {eventRanges.map((range) => (
+          {EVENT_RANGES.map((range) => (
             <div
               key={range.label}
               className={`text-xs transition-colors ${
@@ -64,6 +49,3 @@ export function PricingSlider({
     </div>
   );
 }
-
-export { eventRanges };
-export type { EventRange };
