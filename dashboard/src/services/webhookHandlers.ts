@@ -6,6 +6,7 @@ import {
 } from '@/repositories/postgres/subscription';
 import { createBillingHistoryEntry } from '@/repositories/postgres/billingHistory';
 import { stripe } from '@/lib/stripe';
+import { getTierConfigFromLookupKey } from '@/lib/billing/plans';
 
 export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   try {
@@ -17,17 +18,22 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
       throw new Error('No subscription in session');
     }
 
-    const { userId, tier, eventLimit } = session.metadata;
-
+    const { userId } = session.metadata;
     const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription as string);
     const subscriptionItem = stripeSubscription.items.data[0];
     const pricePerMonth = subscriptionItem.price.unit_amount || 0;
 
+    const tierConfig = getTierConfigFromLookupKey(subscriptionItem.price.lookup_key);
+
+    if (!tierConfig) {
+      throw new Error(`Unknown price lookup key: ${subscriptionItem.price.lookup_key}`);
+    }
+
     await upsertSubscription({
       userId,
-      tier,
+      tier: tierConfig.tier,
       status: 'active',
-      eventLimit: parseInt(eventLimit),
+      eventLimit: tierConfig.eventLimit,
       pricePerMonth,
       paymentCustomerId: stripeSubscription.customer as string,
       paymentSubscriptionId: session.subscription as string,

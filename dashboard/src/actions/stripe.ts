@@ -32,9 +32,6 @@ export const createStripeCheckoutSession = withUserAuth(async (userId: string, p
       customer_email: userSession?.user?.email || undefined,
       metadata: {
         userId,
-        tier: validatedPlan.tier,
-        eventLimit: validatedPlan.eventLimit.toString(),
-        pricePerMonth: validatedPlan.price.toString(),
       },
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing?canceled=true`,

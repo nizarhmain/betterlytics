@@ -6,7 +6,7 @@ export type Tier = z.infer<typeof TierSchema>;
 export const SelectedPlanSchema = z.object({
   tier: TierSchema,
   eventLimit: z.number(),
-  price: z.union([z.string(), z.number()]), // "Free", "Custom", or "$6"
+  price: z.union([z.string(), z.number()]), // "Free", "Custom", or 600 (cents)
   period: z.string(),
 });
 
