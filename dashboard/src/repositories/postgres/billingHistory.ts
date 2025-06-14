@@ -14,3 +14,21 @@ export async function getBillingHistoryByUserId(userId: string): Promise<Billing
     return [];
   }
 }
+
+export async function createBillingHistoryEntry(data: {
+  userId: string;
+  periodStart: Date;
+  periodEnd: Date;
+  eventCount: number;
+  eventLimit: number;
+  amountPaid: number;
+  paymentInvoiceId?: string;
+  paymentPaymentIntentId?: string;
+  status: string;
+}): Promise<BillingHistory> {
+  const billingHistory = await prisma.billingHistory.create({
+    data,
+  });
+
+  return BillingHistorySchema.parse(billingHistory);
+}
