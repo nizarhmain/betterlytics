@@ -60,12 +60,12 @@ export default function BillingPageClient({ billingData }: BillingPageClientProp
     try {
       const validatedPlan = SelectedPlanSchema.parse(planData);
 
-      if (validatedPlan.price === 0 || validatedPlan.price === 'Free') {
+      if (validatedPlan.price === 0 && validatedPlan.tier === 'starter') {
         toast.info('You are already on the free starter plan!');
         return;
       }
 
-      if (validatedPlan.price === 'Custom') {
+      if (validatedPlan.tier === 'enterprise') {
         toast.info('Please contact us for custom pricing');
         return;
       }

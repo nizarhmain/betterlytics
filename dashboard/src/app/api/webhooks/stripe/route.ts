@@ -6,7 +6,6 @@ import {
   handleCheckoutCompleted,
   handleInvoicePaymentSucceeded,
   handleInvoicePaymentFailed,
-  handleSubscriptionUpdated,
   handleSubscriptionDeleted,
 } from '@/services/webhookHandlers';
 import { env } from '@/lib/env';
@@ -41,10 +40,6 @@ export async function POST(req: NextRequest) {
 
       case 'invoice.payment_failed':
         await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
-        break;
-
-      case 'customer.subscription.updated':
-        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
         break;
 
       case 'customer.subscription.deleted':

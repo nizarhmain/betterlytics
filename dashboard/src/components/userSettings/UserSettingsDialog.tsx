@@ -12,6 +12,7 @@ import UserPreferencesSettings from '@/components/userSettings/UserPreferencesSe
 import UserSecuritySettings from '@/components/userSettings/UserSecuritySettings';
 import UserDangerZoneSettings from '@/components/userSettings/UserDangerZoneSettings';
 import UserUsageSettings from '@/components/userSettings/UserUsageSettings';
+import UserBillingHistory from '@/components/userSettings/UserBillingHistory';
 import { Spinner } from '../ui/spinner';
 
 interface UserSettingsDialogProps {
@@ -41,6 +42,12 @@ const USER_SETTINGS_TABS: UserSettingsTabConfig[] = [
     label: 'Usage',
     icon: BarChart3,
     component: UserUsageSettings,
+  },
+  {
+    id: 'billing',
+    label: 'Billing',
+    icon: Receipt,
+    component: UserBillingHistory,
   },
   {
     id: 'security',

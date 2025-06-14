@@ -4,27 +4,28 @@ import { withUserAuth } from '@/auth/auth-actions';
 import { stripe } from '@/lib/stripe';
 import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
 import { getAuthSession } from '@/auth/auth-actions';
+import { getLookupKeyFromTierConfig } from '@/lib/billing/plans';
 
 export const createStripeCheckoutSession = withUserAuth(async (userId: string, planData: SelectedPlan) => {
   try {
     const validatedPlan = SelectedPlanSchema.parse(planData);
 
-    if (validatedPlan.price === 0 || validatedPlan.price === 'Free') {
+    if (validatedPlan.price === 0 && validatedPlan.tier === 'starter') {
       throw new Error('Free plans do not require checkout');
     }
 
-    if (validatedPlan.price === 'Custom') {
+    if (validatedPlan.tier === 'enterprise') {
       throw new Error('Custom plans require manual setup');
     }
 
-    const userSession = await getAuthSession();
+    const userSession = await getAuthSession(); // TODO: Should withUserAuth return entire User object to avoid this?
 
-    const priceId = await getStripePriceId(validatedPlan.eventLimit);
+    const lookupKey = getLookupKeyFromTierConfig(validatedPlan.tier, validatedPlan.eventLimit);
 
     const checkoutSession = await stripe.checkout.sessions.create({
       line_items: [
         {
-          price: priceId,
+          price: lookupKey,
           quantity: 1,
         },
       ],
@@ -57,21 +58,3 @@ export const createStripeCheckoutSession = withUserAuth(async (userId: string, p
     throw new Error('Failed to create checkout session');
   }
 });
-
-/*
- * The lookup key is a custom key that is used to identify the price for the product created in the Stripe dashboard.
- */
-const getStripePriceId = async (eventLimit: number) => {
-  const lookupKey = `analytics_${eventLimit}_events`;
-
-  const prices = await stripe.prices.list({
-    lookup_keys: [lookupKey],
-    expand: ['data.product'],
-  });
-
-  if (!prices.data || prices.data.length === 0) {
-    throw new Error(`No Stripe price found for lookup key: ${lookupKey}`);
-  }
-
-  return prices.data[0].id;
-};

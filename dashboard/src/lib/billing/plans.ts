@@ -109,3 +109,15 @@ export function getTierConfigFromLookupKey(lookupKey: string | null): TierConfig
   }
   return TIER_CONFIG[lookupKey as TierLookupKey];
 }
+
+export function getLookupKeyFromTierConfig(tier: string, eventLimit: number): TierLookupKey {
+  const tierConfig = Object.values(TIER_CONFIG).find(
+    (config) => config.tier === tier && config.eventLimit === eventLimit,
+  ) as TierConfig | undefined;
+
+  if (!tierConfig) {
+    throw new Error(`No lookup key found for tier: ${tier} and event limit: ${eventLimit}`);
+  }
+
+  return Object.keys(TIER_CONFIG).find((key) => TIER_CONFIG[key as TierLookupKey] === tierConfig) as TierLookupKey;
+}
