@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Calendar, TrendingUp } from 'lucide-react';
 import { formatNumber } from '@/utils/formatters';
+import { formatPrice } from '@/utils/pricing';
 import type { getUserBillingData } from '@/actions/billing';
 
 interface CurrentPlanCardProps extends Awaited<ReturnType<typeof getUserBillingData>> {}
@@ -30,7 +31,7 @@ export function CurrentPlanCard({ subscription, usage, usagePercentage, daysUnti
           <div>
             <div className='text-muted-foreground text-sm'>Monthly Price</div>
             <div className='font-semibold'>
-              {subscription.pricePerMonth === 0 ? 'Free' : `$${subscription.pricePerMonth}`}
+              {subscription.pricePerMonth === 0 ? 'Free' : formatPrice(subscription.pricePerMonth)}
             </div>
           </div>
           <div className='text-muted-foreground flex items-center gap-2 text-sm'>

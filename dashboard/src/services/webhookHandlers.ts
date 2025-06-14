@@ -18,22 +18,21 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
     }
 
     const { userId, tier, eventLimit } = session.metadata;
-    const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-    const pricePerMonth = subscription.items.data[0].price.unit_amount || 0;
-    const paymentPriceId = subscription.items.data[0].price.id;
+
+    const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription as string);
+    const subscriptionItem = stripeSubscription.items.data[0];
+    const pricePerMonth = subscriptionItem.price.unit_amount || 0;
 
     await upsertSubscription({
       userId,
       tier,
-      status: 'processing',
+      status: 'active',
       eventLimit: parseInt(eventLimit),
       pricePerMonth,
-      paymentCustomerId: session.customer as string,
+      paymentCustomerId: stripeSubscription.customer as string,
       paymentSubscriptionId: session.subscription as string,
-      paymentPriceId,
+      paymentPriceId: subscriptionItem.price.id,
     });
-
-    await updateSubscriptionStatus(userId, 'processing');
   } catch (error) {
     console.error('Error handling checkout completed:', error);
     throw error;
@@ -51,12 +50,11 @@ export async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 
     const subscriptionId = subscriptionDetails.subscription as string;
     const subscription = await getSubscriptionByPaymentId(subscriptionId);
+
     if (!subscription) {
       console.log('No local subscription found for Stripe subscription:', subscriptionId);
       return;
     }
-
-    await updateSubscriptionStatus(subscription.userId, 'active');
 
     await createBillingHistoryEntry({
       userId: subscription.userId,
@@ -75,6 +73,30 @@ export async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   }
 }
 
+export async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+  try {
+    const subscriptionDetails = invoice.parent?.subscription_details;
+
+    if (!subscriptionDetails || !subscriptionDetails.subscription) {
+      console.log('Invoice payment failed but has no subscription details, skipping');
+      return;
+    }
+
+    const subscriptionId = subscriptionDetails.subscription as string;
+    const subscription = await getSubscriptionByPaymentId(subscriptionId);
+
+    if (!subscription) {
+      console.log('No local subscription found for failed payment:', subscriptionId);
+      return;
+    }
+
+    await updateSubscriptionStatus(subscription.userId, 'past_due');
+  } catch (error) {
+    console.error('Error handling invoice payment failed:', error);
+    throw error;
+  }
+}
+
 export async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   try {
     const localSubscription = await getSubscriptionByPaymentId(subscription.id);
@@ -83,17 +105,9 @@ export async function handleSubscriptionDeleted(subscription: Stripe.Subscriptio
       return;
     }
 
-    await updateSubscriptionStatus(localSubscription.userId, 'canceled');
+    await updateSubscriptionStatus(localSubscription.userId, 'canceled', true);
   } catch (error) {
     console.error('Error handling subscription deleted:', error);
     throw error;
   }
-}
-
-export async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
-  console.log('Processing invoice.payment_failed:', invoice.id);
-}
-
-export async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
-  console.log('Processing subscription.updated:', subscription.id);
 }
