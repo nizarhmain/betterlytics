@@ -398,10 +398,10 @@ export default function TermsPage() {
               </p>
               <div className='text-foreground space-y-2'>
                 <p>
-                  <strong>Email:</strong> legal@betterlytics.eu
+                  <strong>Email:</strong> legal@betterlytics.io
                 </p>
                 <p>
-                  <strong>Support:</strong> support@betterlytics.eu
+                  <strong>Support:</strong> support@betterlytics.io
                 </p>
                 <p>
                   <strong>Address:</strong> Betterlytics, EU
