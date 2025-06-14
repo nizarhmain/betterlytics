@@ -11,7 +11,7 @@ export default async function BillingPage() {
     redirect('/signin');
   }
 
-  const billingData = await getUserBillingData(session.user.id);
+  const billingData = await getUserBillingData();
 
-  return <BillingPageClient user={session.user} billingData={billingData} />;
+  return <BillingPageClient billingData={billingData} />;
 }

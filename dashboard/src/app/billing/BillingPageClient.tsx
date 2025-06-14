@@ -4,8 +4,12 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { PricingComponent } from '@/components/pricing/PricingComponent';
 import { CurrentPlanCard } from '@/components/billing/CurrentPlanCard';
-import { SelectedPlan, SelectedPlanSchema, SubscriptionData } from '@/types/pricing';
+import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
 import type { getUserBillingData } from '@/actions/billing';
+import { createStripeCheckoutSession } from '@/actions/stripe';
+import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 const FAQ_ITEMS = [
   {
@@ -40,34 +44,42 @@ const FAQ_ITEMS = [
 ];
 
 interface BillingPageClientProps {
-  user: {
-    id: string;
-    email?: string | null;
-    name?: string | null;
-  };
   billingData: Awaited<ReturnType<typeof getUserBillingData>>;
 }
 
-export default function BillingPageClient({ user, billingData }: BillingPageClientProps) {
-  const handlePlanSelect = (planData: SelectedPlan) => {
+export default function BillingPageClient({ billingData }: BillingPageClientProps) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams?.get('canceled') === 'true') {
+      toast.info('Checkout was canceled. You can try again anytime.');
+    }
+  }, [searchParams]);
+
+  const handlePlanSelect = async (planData: SelectedPlan) => {
     try {
       const validatedPlan = SelectedPlanSchema.parse(planData);
 
-      const subscriptionData: SubscriptionData = {
-        userId: user.id,
-        userEmail: user.email ?? null,
-        userName: user.name ?? null,
-        tier: validatedPlan.tier,
-        eventLimit: validatedPlan.eventLimit,
-        price: validatedPlan.price,
-        period: validatedPlan.period,
-      };
+      if (validatedPlan.price === 0 || validatedPlan.price === 'Free') {
+        toast.info('You are already on the free starter plan!');
+        return;
+      }
 
-      // TODO: Integrate with payment service (Stripe/Mollie) - perhaps external?
-      console.log('Proceeding to checkout with:', subscriptionData);
+      if (validatedPlan.price === 'Custom') {
+        toast.info('Please contact us for custom pricing');
+        return;
+      }
+
+      const result = await createStripeCheckoutSession(validatedPlan);
+
+      if (result) {
+        window.location.href = result;
+      } else {
+        throw new Error('No checkout URL received');
+      }
     } catch (error) {
-      console.error('Invalid plan data:', error);
-      // TODO: Handle validation error - show toast or error message?
+      console.error('Checkout failed:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to start checkout');
     }
   };
 
