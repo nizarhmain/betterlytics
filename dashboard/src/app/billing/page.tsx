@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
+import { getUserBillingData } from '@/actions/billing';
 import BillingPageClient from '@/app/billing/BillingPageClient';
 
 export default async function BillingPage() {
@@ -10,5 +11,7 @@ export default async function BillingPage() {
     redirect('/signin');
   }
 
-  return <BillingPageClient user={session.user} />;
+  const billingData = await getUserBillingData(session.user.id);
+
+  return <BillingPageClient user={session.user} billingData={billingData} />;
 }

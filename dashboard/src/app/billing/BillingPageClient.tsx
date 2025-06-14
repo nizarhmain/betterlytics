@@ -3,7 +3,9 @@
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { PricingComponent } from '@/components/pricing/PricingComponent';
+import { CurrentPlanCard } from '@/components/billing/CurrentPlanCard';
 import { SelectedPlan, SelectedPlanSchema, SubscriptionData } from '@/types/pricing';
+import type { getUserBillingData } from '@/actions/billing';
 
 const FAQ_ITEMS = [
   {
@@ -43,9 +45,10 @@ interface BillingPageClientProps {
     email?: string | null;
     name?: string | null;
   };
+  billingData: Awaited<ReturnType<typeof getUserBillingData>>;
 }
 
-export default function BillingPageClient({ user }: BillingPageClientProps) {
+export default function BillingPageClient({ user, billingData }: BillingPageClientProps) {
   const handlePlanSelect = (planData: SelectedPlan) => {
     try {
       const validatedPlan = SelectedPlanSchema.parse(planData);
@@ -92,6 +95,10 @@ export default function BillingPageClient({ user }: BillingPageClientProps) {
         <div className='mb-16 space-y-4 text-center'>
           <h2 className='text-3xl font-bold sm:text-4xl'>Upgrade your plan</h2>
           <p className='text-muted-foreground text-xl'>Choose the perfect plan for your analytics needs.</p>
+        </div>
+
+        <div className='mb-8'>
+          <CurrentPlanCard {...billingData} />
         </div>
 
         <PricingComponent onPlanSelect={handlePlanSelect} />
