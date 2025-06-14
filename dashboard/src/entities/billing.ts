@@ -40,7 +40,23 @@ export const EventCountResultSchema = z.object({
   total: z.number(),
 });
 
+export const BillingHistorySchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  periodStart: z.date(),
+  periodEnd: z.date(),
+  eventCount: z.number(),
+  eventLimit: z.number(),
+  amountPaid: z.number(),
+  paymentInvoiceId: z.string().nullable(),
+  paymentPaymentIntentId: z.string().nullable(),
+  status: z.enum(['paid', 'pending', 'failed', 'refunded']),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
 export type Subscription = z.infer<typeof SubscriptionSchema>;
 export type UsageData = z.infer<typeof UsageDataSchema>;
 export type BillingStats = z.infer<typeof BillingStatsSchema>;
 export type EventCountResult = z.infer<typeof EventCountResultSchema>;
+export type BillingHistory = z.infer<typeof BillingHistorySchema>;

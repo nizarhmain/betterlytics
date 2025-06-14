@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Shield, AlertTriangle, Loader2, Save } from 'lucide-react';
+import { Settings, Shield, AlertTriangle, Loader2, Save, BarChart3, Receipt } from 'lucide-react';
 import { useUserSettings } from '@/hooks/useUserSettings';
 import { UserSettingsUpdate } from '@/entities/userSettings';
 import { toast } from 'sonner';
 import UserPreferencesSettings from '@/components/userSettings/UserPreferencesSettings';
 import UserSecuritySettings from '@/components/userSettings/UserSecuritySettings';
 import UserDangerZoneSettings from '@/components/userSettings/UserDangerZoneSettings';
+import UserUsageSettings from '@/components/userSettings/UserUsageSettings';
 import { Spinner } from '../ui/spinner';
 
 interface UserSettingsDialogProps {
@@ -34,6 +35,12 @@ const USER_SETTINGS_TABS: UserSettingsTabConfig[] = [
     label: 'Preferences',
     icon: Settings,
     component: UserPreferencesSettings,
+  },
+  {
+    id: 'usage',
+    label: 'Usage',
+    icon: BarChart3,
+    component: UserUsageSettings,
   },
   {
     id: 'security',

@@ -1,8 +1,9 @@
-'server-only';
+'use server';
 
-import { getUserBillingStats } from '@/services/billing';
+import { withUserAuth } from '@/auth/auth-actions';
+import { getUserBillingStats, getUserBillingHistory } from '@/services/billing';
 
-export async function getUserBillingData(userId: string) {
+export const getUserBillingData = withUserAuth(async (userId: string) => {
   try {
     const stats = await getUserBillingStats(userId);
 
@@ -26,7 +27,16 @@ export async function getUserBillingData(userId: string) {
     console.error('Failed to fetch user billing data:', error);
     return getDefaultBillingData();
   }
-}
+});
+
+export const getUserBillingHistoryData = withUserAuth(async (userId: string) => {
+  try {
+    return await getUserBillingHistory(userId);
+  } catch (error) {
+    console.error('Failed to fetch billing history:', error);
+    return [];
+  }
+});
 
 function getDefaultBillingData() {
   return {

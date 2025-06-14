@@ -1,8 +1,9 @@
 import { getUserSubscription } from '@/repositories/postgres/subscription';
 import { getUserSiteIds } from '@/repositories/postgres/dashboard';
 import { getUserEventCountForPeriod } from '@/repositories/clickhouse/usage';
+import { getBillingHistoryByUserId } from '@/repositories/postgres/billingHistory';
 import { toDateString } from '@/utils/dateFormatters';
-import type { UsageData, BillingStats } from '@/entities/billing';
+import type { UsageData, BillingStats, BillingHistory } from '@/entities/billing';
 
 export async function getUserBillingStats(userId: string): Promise<BillingStats | null> {
   try {
@@ -38,6 +39,15 @@ export async function getUserBillingStats(userId: string): Promise<BillingStats 
   } catch (error) {
     console.error('Failed to get billing stats:', error);
     return null;
+  }
+}
+
+export async function getUserBillingHistory(userId: string): Promise<BillingHistory[]> {
+  try {
+    return await getBillingHistoryByUserId(userId);
+  } catch (error) {
+    console.error('Failed to get billing history:', error);
+    return [];
   }
 }
 
