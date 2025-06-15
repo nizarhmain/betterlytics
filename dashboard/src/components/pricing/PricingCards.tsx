@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { SelectedPlan, Tier } from '@/types/pricing';
 import type { UserBillingData } from '@/entities/billing';
+import { formatPrice } from '@/utils/pricing';
 
 interface PricingCardsProps {
   eventLimit: number;
   eventLabel: string;
-  basePrice: number | 'Custom';
+  basePrice: number;
   onPlanSelect?: (planData: SelectedPlan) => void;
   mode?: 'landing' | 'billing';
   className?: string;
@@ -38,12 +39,12 @@ export function PricingCards({
   billingData,
 }: PricingCardsProps) {
   const isFree = basePrice === 0;
-  const isCustom = basePrice === 'Custom';
+  const isCustom = basePrice < 0;
 
   const plans: PlanConfig[] = [
     {
       tier: 'growth',
-      price: isFree ? 0 : isCustom ? -1 : (basePrice as number),
+      price: basePrice,
       period: !isFree && !isCustom ? '/month' : '',
       description: 'Perfect for small websites and personal projects',
       features: [
@@ -59,7 +60,7 @@ export function PricingCards({
     },
     {
       tier: 'professional',
-      price: isFree ? 6 : isCustom ? -1 : Math.round((basePrice as number) * 2),
+      price: isFree ? 700 : basePrice * 2,
       period: !isCustom ? '/month' : '',
       description: 'Advanced features for growing businesses',
       features: [
@@ -97,7 +98,7 @@ export function PricingCards({
       const selectedPlan: SelectedPlan = {
         tier: plan.tier,
         eventLimit,
-        price: plan.price === -1 ? -1 : plan.price * 100,
+        price: plan.price,
         period: plan.period,
       };
       onPlanSelect(selectedPlan);
@@ -106,8 +107,8 @@ export function PricingCards({
 
   const formatDisplayPrice = (price: number): string => {
     if (price === 0) return 'Free';
-    if (price === -1) return 'Custom';
-    return `$${price}`;
+    if (price < 0) return 'Custom';
+    return formatPrice(price);
   };
 
   const renderButton = (plan: PlanConfig) => {
@@ -168,7 +169,6 @@ export function PricingCards({
           {plan.popular && (
             <Badge className='bg-primary absolute -top-3 left-1/2 -translate-x-1/2 transform'>Most Popular</Badge>
           )}
-          {/* Add current plan badge */}
           {billingData &&
             billingData.subscription.tier === plan.tier &&
             billingData.subscription.eventLimit === eventLimit && (
