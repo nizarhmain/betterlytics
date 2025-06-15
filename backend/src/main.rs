@@ -1,5 +1,5 @@
 use axum::{
-    extract::State, http::{HeaderMap, StatusCode}, response::IntoResponse, routing::{get, post}, Json, Router
+    extract::{ConnectInfo, State}, http::{HeaderMap, StatusCode}, response::IntoResponse, routing::{get, post}, Json, Router
 };
 use std::sync::Arc;
 use std::{net::SocketAddr, net::IpAddr, str::FromStr};
@@ -94,6 +94,7 @@ async fn health_check(
 
 async fn track_event(
     State((_db, processor)): State<(SharedDatabase, Arc<EventProcessor>)>,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
     headers: HeaderMap,
     Json(raw_event): Json<RawTrackingEvent>,
 ) -> Result<StatusCode, (StatusCode, String)> {
@@ -107,7 +108,7 @@ async fn track_event(
         return Err((StatusCode::BAD_REQUEST, "event name is required".to_string()));
     }
 
-    let event = AnalyticsEvent::new(raw_event, parse_ip(headers).to_string());
+    let event = AnalyticsEvent::new(raw_event, parse_ip(headers).unwrap_or(addr.ip()).to_string());
 
     if let Err(e) = processor.process_event(event).await {
         error!("Failed to process event: {}", e);
@@ -117,20 +118,19 @@ async fn track_event(
     Ok(StatusCode::OK)
 }
 
-pub fn parse_ip(headers: HeaderMap) -> IpAddr {
+pub fn parse_ip(headers: HeaderMap) -> Result<IpAddr, ()> {
     // Get IP from X-Forwarded-For header
     if let Some(forwarded_for) = headers.get("x-forwarded-for") {
         if let Ok(forwarded_str) = forwarded_for.to_str() {
             if let Some(first_ip) = forwarded_str.split(',').next() {
                 if let Ok(ip) = IpAddr::from_str(first_ip.trim()) {
-                    return ip;
+                    return Ok(ip);
                 }
             }
         }
     }
 
-    // Fallback to localhost IP
-    "127.0.0.1".parse().unwrap()
+    Err(())
 }
 
 /// Temporary endpoint to generate a site ID
