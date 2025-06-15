@@ -51,7 +51,7 @@ export function IntegrationSheet({ open, onOpenChange }: IntegrationSheetProps) 
   }, [isVerified]);
 
   const trackingScript = siteId
-    ? `<script async src="https://analytics.example.com/tracker.js" data-site-id="${siteId}"></script>`
+    ? `<script async src="https://betterlytics.io/analytics.js" data-site-id="${siteId}" data-server-url="https://betterlytics.io/track"></script>`
     : '';
 
   const handleVerifyInstallation = async () => {
@@ -93,6 +93,7 @@ export default function RootLayout({
           async
           src="https://analytics.example.com/tracker.js"
           data-site-id="${siteId}"
+          data-server-url="https://betterlytics.io/track"
         />
       </head>
       <body>{children}</body>
@@ -108,6 +109,7 @@ function App() {
     script.async = true;
     script.src = "https://analytics.example.com/tracker.js";
     script.setAttribute('data-site-id', "${siteId}");
+    script.setAttribute('data-server-url', "https://betterlytics.io/track")
     document.head.appendChild(script);
 
     return () => {
