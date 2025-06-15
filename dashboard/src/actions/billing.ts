@@ -2,16 +2,17 @@
 
 import { withUserAuth } from '@/auth/auth-actions';
 import { getUserBillingStats, getUserBillingHistory } from '@/services/billing';
+import { UserBillingDataSchema, type UserBillingData } from '@/entities/billing';
 
-export const getUserBillingData = withUserAuth(async (userId: string) => {
+export const getUserBillingData = withUserAuth(async (userId: string): Promise<UserBillingData> => {
   try {
     const stats = await getUserBillingStats(userId);
 
     if (!stats) {
-      return getDefaultBillingData();
+      return UserBillingDataSchema.parse(getDefaultBillingData());
     }
 
-    return {
+    const billingData = {
       subscription: {
         tier: stats.subscription.tier,
         eventLimit: stats.subscription.eventLimit,
@@ -23,9 +24,11 @@ export const getUserBillingData = withUserAuth(async (userId: string) => {
       usagePercentage: stats.usagePercentage,
       daysUntilReset: stats.daysUntilReset,
     };
+
+    return UserBillingDataSchema.parse(billingData);
   } catch (error) {
     console.error('Failed to fetch user billing data:', error);
-    return getDefaultBillingData();
+    return UserBillingDataSchema.parse(getDefaultBillingData());
   }
 });
 

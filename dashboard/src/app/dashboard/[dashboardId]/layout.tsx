@@ -9,6 +9,8 @@ import { TrackingScript } from './TrackingScript';
 import { fetchSiteId } from '@/app/actions';
 import { isFeatureEnabled } from '@/lib/feature-flags';
 import { IntegrationManager } from './IntegrationManager';
+import UsageUpgradeBanner from '@/components/billing/UsageUpgradeBanner';
+import { getUserBillingData } from '@/actions/billing';
 import { Suspense } from 'react';
 
 type DashboardLayoutProps = {
@@ -41,7 +43,12 @@ export default async function DashboardLayout({ children, params }: DashboardLay
       <SidebarProvider>
         <BASidebar dashboardId={dashboardId} />
         <BAMobileSidebarTrigger />
-        <main className='bg-background w-full max-w-svw overflow-x-hidden'>{children}</main>
+        <main className='bg-background w-full max-w-svw overflow-x-hidden'>
+          <Suspense fallback={null}>
+            <UsageUpgradeBanner billingDataPromise={getUserBillingData()} />
+          </Suspense>
+          <div className='container mx-auto px-4 pt-4'>{children}</div>
+        </main>
         {/* Conditionally render tracking script based on server-side feature flag */}
         {shouldEnableTracking && siteId && <TrackingScript siteId={siteId} />}
 

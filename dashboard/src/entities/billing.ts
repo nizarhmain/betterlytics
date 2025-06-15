@@ -55,8 +55,22 @@ export const BillingHistorySchema = z.object({
   updatedAt: z.date(),
 });
 
+export const UserBillingDataSchema = z.object({
+  subscription: z.object({
+    tier: z.string(),
+    eventLimit: z.number(),
+    pricePerMonth: z.number(),
+    currentPeriodEnd: z.date(),
+    status: z.string(),
+  }),
+  usage: UsageDataSchema,
+  usagePercentage: z.number(),
+  daysUntilReset: z.number(),
+});
+
 export type Subscription = z.infer<typeof SubscriptionSchema>;
 export type UsageData = z.infer<typeof UsageDataSchema>;
 export type BillingStats = z.infer<typeof BillingStatsSchema>;
 export type EventCountResult = z.infer<typeof EventCountResultSchema>;
 export type BillingHistory = z.infer<typeof BillingHistorySchema>;
+export type UserBillingData = z.infer<typeof UserBillingDataSchema>;
