@@ -29,7 +29,7 @@ export default function UsageUpgradeBanner({ billingDataPromise }: UsageUpgradeB
             <div className='flex flex-col text-sm sm:flex-row sm:items-center sm:gap-2'>
               <span className='font-medium'>Usage Limit Exceeded:</span>
               <span>
-                You've used <strong>{billingData.usage.current.toLocaleString()}</strong> events out of your{' '}
+                You&apos;ve used <strong>{billingData.usage.current.toLocaleString()}</strong> events out of your{' '}
                 <strong>{billingData.usage.limit.toLocaleString()}</strong> event limit ({overagePercentage}% over
                 your {billingData.subscription.tier} plan).
               </span>

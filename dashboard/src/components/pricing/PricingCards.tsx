@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { SelectedPlan, Tier } from '@/types/pricing';
-import type { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import type { UserBillingData } from '@/entities/billing';
 
 interface PricingCardsProps {
   eventLimit: number;
@@ -15,7 +15,7 @@ interface PricingCardsProps {
   onPlanSelect?: (planData: SelectedPlan) => void;
   mode?: 'landing' | 'billing';
   className?: string;
-  subscriptionStatus?: ReturnType<typeof useSubscriptionStatus>;
+  billingData?: UserBillingData;
 }
 
 interface PlanConfig {
@@ -35,14 +35,14 @@ export function PricingCards({
   onPlanSelect,
   mode = 'landing',
   className = '',
-  subscriptionStatus,
+  billingData,
 }: PricingCardsProps) {
   const isFree = basePrice === 0;
   const isCustom = basePrice === 'Custom';
 
   const plans: PlanConfig[] = [
     {
-      tier: 'starter',
+      tier: 'growth',
       price: isFree ? 0 : isCustom ? -1 : (basePrice as number),
       period: !isFree && !isCustom ? '/month' : '',
       description: 'Perfect for small websites and personal projects',
@@ -111,10 +111,9 @@ export function PricingCards({
   };
 
   const renderButton = (plan: PlanConfig) => {
-    if (mode === 'billing' && subscriptionStatus) {
+    if (mode === 'billing' && billingData) {
       const isCurrentPlan =
-        subscriptionStatus.subscription.tier === plan.tier &&
-        subscriptionStatus.subscription.eventLimit === eventLimit;
+        billingData.subscription.tier === plan.tier && billingData.subscription.eventLimit === eventLimit;
 
       let buttonText = plan.cta;
       let buttonVariant: 'default' | 'outline' | 'secondary' = plan.popular ? 'default' : 'outline';
@@ -126,10 +125,10 @@ export function PricingCards({
         isDisabled = true;
       } else if (plan.tier === 'enterprise') {
         buttonText = 'Contact Sales';
-      } else if (plan.tier === 'starter' && plan.price === 0) {
+      } else if (plan.tier === 'growth' && plan.price === 0) {
         buttonText = 'Get Started for Free';
         isDisabled = true;
-      } else if (subscriptionStatus.isExistingPaidSubscriber) {
+      } else if (billingData.isExistingPaidSubscriber) {
         buttonText = 'Change to This Plan';
       } else {
         buttonText = plan.cta;
@@ -170,9 +169,9 @@ export function PricingCards({
             <Badge className='bg-primary absolute -top-3 left-1/2 -translate-x-1/2 transform'>Most Popular</Badge>
           )}
           {/* Add current plan badge */}
-          {subscriptionStatus &&
-            subscriptionStatus.subscription.tier === plan.tier &&
-            subscriptionStatus.subscription.eventLimit === eventLimit && (
+          {billingData &&
+            billingData.subscription.tier === plan.tier &&
+            billingData.subscription.eventLimit === eventLimit && (
               <Badge variant='secondary' className='absolute -bottom-3 left-1/2 -translate-x-1/2 transform'>
                 Current
               </Badge>
@@ -201,7 +200,6 @@ export function PricingCards({
     </div>
   );
 }
-
 function getTierDisplayName(tier: Tier): string {
   return tier.charAt(0).toUpperCase() + tier.slice(1);
 }

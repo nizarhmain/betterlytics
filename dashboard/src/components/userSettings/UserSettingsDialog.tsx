@@ -27,6 +27,7 @@ interface UserSettingsTabConfig {
   component: React.ComponentType<{
     formData: UserSettingsUpdate;
     onUpdate: (updates: Partial<UserSettingsUpdate>) => void;
+    onCloseDialog?: () => void;
   }>;
 }
 
@@ -88,6 +89,10 @@ export default function UserSettingsDialog({ open, onOpenChange }: UserSettingsD
     }
   };
 
+  const handleCloseDialog = () => {
+    onOpenChange(false);
+  };
+
   if (isLoading) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -138,7 +143,7 @@ export default function UserSettingsDialog({ open, onOpenChange }: UserSettingsD
             const Component = tab.component;
             return (
               <TabsContent key={tab.id} value={tab.id} className='mt-6'>
-                <Component formData={formData} onUpdate={handleUpdate} />
+                <Component formData={formData} onUpdate={handleUpdate} onCloseDialog={handleCloseDialog} />
               </TabsContent>
             );
           })}

@@ -5,7 +5,7 @@ import {
   getSubscriptionByPaymentId,
 } from '@/repositories/postgres/subscription';
 import { createBillingHistoryEntry } from '@/repositories/postgres/billingHistory';
-import { stripe } from '@/lib/stripe';
+import { stripe } from '@/lib/billing/stripe';
 import { getTierConfigFromLookupKey } from '@/lib/billing/plans';
 
 export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {

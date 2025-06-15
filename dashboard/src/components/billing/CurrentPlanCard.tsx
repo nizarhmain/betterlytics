@@ -1,15 +1,17 @@
-'use client';
-
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Calendar, TrendingUp } from 'lucide-react';
-import { formatNumber } from '@/utils/formatters';
+import { formatNumber, formatPercentage } from '@/utils/formatters';
 import { formatPrice } from '@/utils/pricing';
-import type { getUserBillingData } from '@/actions/billing';
+import type { UserBillingData } from '@/entities/billing';
 
-interface CurrentPlanCardProps extends Awaited<ReturnType<typeof getUserBillingData>> {}
+interface CurrentPlanCardProps {
+  billingData: UserBillingData;
+}
 
-export function CurrentPlanCard({ subscription, usage, usagePercentage, daysUntilReset }: CurrentPlanCardProps) {
+export function CurrentPlanCard({ billingData }: CurrentPlanCardProps) {
+  const { subscription, usage } = billingData;
+
   return (
     <div className='bg-card space-y-4 rounded-lg border p-6'>
       <div className='flex items-center justify-between'>
@@ -36,7 +38,7 @@ export function CurrentPlanCard({ subscription, usage, usagePercentage, daysUnti
           </div>
           <div className='text-muted-foreground flex items-center gap-2 text-sm'>
             <Calendar size={14} />
-            <span>Resets in {daysUntilReset} days</span>
+            <span>Resets in {usage.daysUntilReset} days</span>
           </div>
         </div>
 
@@ -52,11 +54,11 @@ export function CurrentPlanCard({ subscription, usage, usagePercentage, daysUnti
                 {formatNumber(usage.current)} of {formatNumber(usage.limit)} events
               </span>
               <span className={`font-medium ${usage.isOverLimit ? 'text-red-500' : 'text-foreground'}`}>
-                {usagePercentage.toFixed(1)}%
+                {formatPercentage(usage.usagePercentage)}
               </span>
             </div>
 
-            <Progress value={Math.min(usagePercentage, 100)} className='h-2' />
+            <Progress value={Math.min(usage.usagePercentage, 100)} className='h-2' />
           </div>
         </div>
       </div>

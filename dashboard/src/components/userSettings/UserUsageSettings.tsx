@@ -1,31 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CurrentPlanCard } from '@/components/billing/CurrentPlanCard';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Zap } from 'lucide-react';
-import { getUserBillingData } from '@/actions/billing';
 import { Spinner } from '@/components/ui/spinner';
-import Link from 'next/link';
+import { useBillingData } from '@/hooks/useBillingData';
 
-export default function UserUsageSettings() {
-  const [billingData, setBillingData] = useState<Awaited<ReturnType<typeof getUserBillingData>> | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+interface UserUsageSettingsProps {
+  onCloseDialog?: () => void;
+}
 
-  useEffect(() => {
-    const fetchBillingData = async () => {
-      try {
-        const data = await getUserBillingData();
-        setBillingData(data);
-      } catch (error) {
-        console.error('Failed to fetch billing data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+export default function UserUsageSettings({ onCloseDialog }: UserUsageSettingsProps) {
+  const router = useRouter();
+  const { billingData, isLoading, error } = useBillingData();
 
-    fetchBillingData();
-  }, []);
+  const handleViewPlans = () => {
+    onCloseDialog?.();
+    router.push('/billing');
+  };
 
   if (isLoading) {
     return (
@@ -35,7 +28,7 @@ export default function UserUsageSettings() {
     );
   }
 
-  if (!billingData) {
+  if (error || !billingData) {
     return (
       <div className='py-8 text-center'>
         <p className='text-muted-foreground'>Unable to load usage data</p>
@@ -64,11 +57,9 @@ export default function UserUsageSettings() {
             Upgrade your plan to get more events and unlock additional features.
           </p>
         </div>
-        <Button asChild size='sm'>
-          <Link href='/billing'>
-            <ExternalLink className='mr-2 h-4 w-4' />
-            View Plans
-          </Link>
+        <Button onClick={handleViewPlans} size='sm'>
+          <ExternalLink className='mr-2 h-4 w-4' />
+          View Plans
         </Button>
       </div>
 
@@ -81,8 +72,8 @@ export default function UserUsageSettings() {
             <div className='space-y-1'>
               <h4 className='text-destructive text-sm font-medium'>Usage limit exceeded</h4>
               <p className='text-destructive/80 text-sm'>
-                You've exceeded your monthly event limit. Upgrade your plan to continue tracking all your analytics
-                data.
+                You&apos;ve exceeded your monthly event limit. Upgrade your plan to continue tracking all your
+                analytics data.
               </p>
             </div>
           </div>

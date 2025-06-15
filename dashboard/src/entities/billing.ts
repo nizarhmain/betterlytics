@@ -23,17 +23,12 @@ export const UsageDataSchema = z.object({
   limit: z.number(),
   remaining: z.number(),
   isOverLimit: z.boolean(),
+  usagePercentage: z.number(),
+  daysUntilReset: z.number(),
   billingPeriod: z.object({
     start: z.date(),
     end: z.date(),
   }),
-});
-
-export const BillingStatsSchema = z.object({
-  subscription: SubscriptionSchema,
-  usage: UsageDataSchema,
-  usagePercentage: z.number(),
-  daysUntilReset: z.number(),
 });
 
 export const EventCountResultSchema = z.object({
@@ -64,13 +59,12 @@ export const UserBillingDataSchema = z.object({
     status: z.string(),
   }),
   usage: UsageDataSchema,
-  usagePercentage: z.number(),
-  daysUntilReset: z.number(),
+  isExistingPaidSubscriber: z.boolean(),
+  isFreePlanUser: z.boolean(),
 });
 
 export type Subscription = z.infer<typeof SubscriptionSchema>;
 export type UsageData = z.infer<typeof UsageDataSchema>;
-export type BillingStats = z.infer<typeof BillingStatsSchema>;
 export type EventCountResult = z.infer<typeof EventCountResultSchema>;
 export type BillingHistory = z.infer<typeof BillingHistorySchema>;
 export type UserBillingData = z.infer<typeof UserBillingDataSchema>;

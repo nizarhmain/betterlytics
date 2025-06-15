@@ -1,7 +1,7 @@
 'use server';
 
 import { withUserAuth } from '@/auth/auth-actions';
-import { stripe } from '@/lib/stripe';
+import { stripe } from '@/lib/billing/stripe';
 import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
 import { getAuthSession } from '@/auth/auth-actions';
 import { getLookupKeyFromTierConfig } from '@/lib/billing/plans';
@@ -10,7 +10,7 @@ export const createStripeCheckoutSession = withUserAuth(async (userId: string, p
   try {
     const validatedPlan = SelectedPlanSchema.parse(planData);
 
-    if (validatedPlan.price === 0 && validatedPlan.tier === 'starter') {
+    if (validatedPlan.price === 0 && validatedPlan.tier === 'growth') {
       throw new Error('Free plans do not require checkout');
     }
 
@@ -50,11 +50,6 @@ export const createStripeCheckoutSession = withUserAuth(async (userId: string, p
     return checkoutSession.url;
   } catch (error) {
     console.error('Failed to create Stripe checkout session:', error);
-
-    if (error instanceof Error) {
-      throw new Error(`Checkout failed: ${error.message}`);
-    }
-
     throw new Error('Failed to create checkout session');
   }
 });

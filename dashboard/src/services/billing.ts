@@ -3,13 +3,18 @@ import { getUserSiteIds } from '@/repositories/postgres/dashboard';
 import { getUserEventCountForPeriod } from '@/repositories/clickhouse/usage';
 import { getBillingHistoryByUserId } from '@/repositories/postgres/billingHistory';
 import { toDateString } from '@/utils/dateFormatters';
-import type { UsageData, BillingStats, BillingHistory } from '@/entities/billing';
+import {
+  UserBillingDataSchema,
+  type UsageData,
+  type UserBillingData,
+  type BillingHistory,
+} from '@/entities/billing';
 
-export async function getUserBillingStats(userId: string): Promise<BillingStats | null> {
+export async function getUserBillingStats(userId: string): Promise<UserBillingData> {
   try {
     const subscription = await getUserSubscription(userId);
     if (!subscription) {
-      return null;
+      throw new Error('No subscription found for user');
     }
 
     const siteIds = await getUserSiteIds(userId);
@@ -21,24 +26,26 @@ export async function getUserBillingStats(userId: string): Promise<BillingStats 
       limit: subscription.eventLimit,
       remaining: Math.max(0, subscription.eventLimit - currentUsage),
       isOverLimit: currentUsage >= subscription.eventLimit,
+      usagePercentage: (currentUsage / subscription.eventLimit) * 100,
+      daysUntilReset: getDaysUntilReset(subscription.currentPeriodEnd),
       billingPeriod: {
         start: subscription.currentPeriodStart,
         end: subscription.currentPeriodEnd,
       },
     };
 
-    const usagePercentage = (currentUsage / subscription.eventLimit) * 100;
-    const daysUntilReset = getDaysUntilReset(subscription.currentPeriodEnd);
+    const isExistingPaidSubscriber = subscription.pricePerMonth > 0 && subscription.status === 'active';
+    const isFreePlanUser = subscription.pricePerMonth === 0;
 
-    return {
-      subscription,
+    return UserBillingDataSchema.parse({
+      subscription: { ...subscription },
       usage,
-      usagePercentage,
-      daysUntilReset,
-    };
+      isExistingPaidSubscriber,
+      isFreePlanUser,
+    });
   } catch (error) {
     console.error('Failed to get billing stats:', error);
-    return null;
+    throw new Error('Failed to get billing stats');
   }
 }
 

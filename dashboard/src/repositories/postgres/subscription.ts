@@ -25,7 +25,7 @@ async function createDefaultStarterSubscription(userId: string): Promise<Subscri
   const subscription = await prisma.subscription.create({
     data: {
       user: { connect: { id: userId } },
-      tier: 'starter',
+      tier: 'growth',
       eventLimit: 10000,
       pricePerMonth: 0,
       currentPeriodStart: now,

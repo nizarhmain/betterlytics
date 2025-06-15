@@ -1,33 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { CreditCard } from 'lucide-react';
 import { formatPrice } from '@/utils/pricing';
 import { format } from 'date-fns';
-import type { BillingHistory } from '@/entities/billing';
-import { getUserBillingHistoryData } from '@/actions/billing';
+import { useBillingHistory } from '@/hooks/useBillingData';
 
 export default function UserBillingHistory() {
-  const [billingHistory, setBillingHistory] = useState<BillingHistory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchBillingHistory = async () => {
-      try {
-        const data = await getUserBillingHistoryData();
-        setBillingHistory(data);
-      } catch (error) {
-        console.error('Failed to fetch billing history:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchBillingHistory();
-  }, []);
+  const { billingHistory, isLoading, error } = useBillingHistory();
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -67,6 +49,14 @@ export default function UserBillingHistory() {
     return (
       <div className='flex items-center justify-center py-8'>
         <Spinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='py-8 text-center'>
+        <p className='text-muted-foreground'>Unable to load usage data</p>
       </div>
     );
   }

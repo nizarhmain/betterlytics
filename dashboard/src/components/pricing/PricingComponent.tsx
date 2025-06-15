@@ -5,20 +5,20 @@ import { PricingSlider } from './PricingSlider';
 import { PricingCards } from './PricingCards';
 import { SelectedPlan } from '@/types/pricing';
 import { EVENT_RANGES } from '@/lib/billing/plans';
-import type { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import type { UserBillingData } from '@/entities/billing';
 
 interface PricingComponentProps {
   onPlanSelect?: (planData: SelectedPlan) => void;
   initialRangeIndex?: number;
   className?: string;
-  subscriptionStatus?: ReturnType<typeof useSubscriptionStatus>;
+  billingData?: UserBillingData;
 }
 
 export function PricingComponent({
   onPlanSelect,
   initialRangeIndex = 0,
   className = '',
-  subscriptionStatus,
+  billingData,
 }: PricingComponentProps) {
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(initialRangeIndex);
   const currentRange = EVENT_RANGES[selectedRangeIndex];
@@ -43,7 +43,7 @@ export function PricingComponent({
         basePrice={currentRange.price}
         onPlanSelect={onPlanSelect}
         mode={onPlanSelect ? 'billing' : 'landing'}
-        subscriptionStatus={subscriptionStatus}
+        billingData={billingData}
       />
     </div>
   );

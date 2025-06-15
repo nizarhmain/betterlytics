@@ -17,12 +17,6 @@ export type EventRange = (typeof EVENT_RANGES)[number];
  * Maps Stripe price lookup keys to tier and event limit
  */
 export const TIER_CONFIG = {
-  // Starter (free)
-  starter_10000_events: {
-    tier: 'starter',
-    eventLimit: 10_000,
-  },
-
   // Growth tier - all event limits
   growth_10000_events: {
     tier: 'growth',
