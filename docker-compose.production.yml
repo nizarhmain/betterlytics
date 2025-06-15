@@ -16,7 +16,7 @@ services:
     networks:
       - proxy_network
       - clickhouse_network
-      - bridge: {}
+      - bridge
 
   dashboard:
     build:
@@ -154,5 +154,3 @@ networks:
   proxy_network:
   postgres_network:
   clickhouse_network:
-  bridge:
-    external: true
