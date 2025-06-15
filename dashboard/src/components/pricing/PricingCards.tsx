@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { SelectedPlan, Tier } from '@/types/pricing';
+import type { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 
 interface PricingCardsProps {
   eventLimit: number;
@@ -14,11 +15,7 @@ interface PricingCardsProps {
   onPlanSelect?: (planData: SelectedPlan) => void;
   mode?: 'landing' | 'billing';
   className?: string;
-  currentSubscription?: {
-    tier: string;
-    eventLimit: number;
-    isExistingPaidSubscriber: boolean;
-  };
+  subscriptionStatus?: ReturnType<typeof useSubscriptionStatus>;
 }
 
 interface PlanConfig {
@@ -38,7 +35,7 @@ export function PricingCards({
   onPlanSelect,
   mode = 'landing',
   className = '',
-  currentSubscription,
+  subscriptionStatus,
 }: PricingCardsProps) {
   const isFree = basePrice === 0;
   const isCustom = basePrice === 'Custom';
@@ -114,11 +111,10 @@ export function PricingCards({
   };
 
   const renderButton = (plan: PlanConfig) => {
-    if (mode === 'billing') {
+    if (mode === 'billing' && subscriptionStatus) {
       const isCurrentPlan =
-        currentSubscription &&
-        currentSubscription.tier === plan.tier &&
-        currentSubscription.eventLimit === eventLimit;
+        subscriptionStatus.subscription.tier === plan.tier &&
+        subscriptionStatus.subscription.eventLimit === eventLimit;
 
       let buttonText = plan.cta;
       let buttonVariant: 'default' | 'outline' | 'secondary' = plan.popular ? 'default' : 'outline';
@@ -131,8 +127,9 @@ export function PricingCards({
       } else if (plan.tier === 'enterprise') {
         buttonText = 'Contact Sales';
       } else if (plan.tier === 'starter' && plan.price === 0) {
+        buttonText = 'Get Started for Free';
         isDisabled = true;
-      } else if (currentSubscription?.isExistingPaidSubscriber) {
+      } else if (subscriptionStatus.isExistingPaidSubscriber) {
         buttonText = 'Change to This Plan';
       } else {
         buttonText = plan.cta;
@@ -173,9 +170,9 @@ export function PricingCards({
             <Badge className='bg-primary absolute -top-3 left-1/2 -translate-x-1/2 transform'>Most Popular</Badge>
           )}
           {/* Add current plan badge */}
-          {currentSubscription &&
-            currentSubscription.tier === plan.tier &&
-            currentSubscription.eventLimit === eventLimit && (
+          {subscriptionStatus &&
+            subscriptionStatus.subscription.tier === plan.tier &&
+            subscriptionStatus.subscription.eventLimit === eventLimit && (
               <Badge variant='secondary' className='absolute -bottom-3 left-1/2 -translate-x-1/2 transform'>
                 Current
               </Badge>

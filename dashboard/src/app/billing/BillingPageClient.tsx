@@ -8,8 +8,9 @@ import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
 import type { getUserBillingData } from '@/actions/billing';
 import { createStripeCheckoutSession } from '@/actions/stripe';
 import { toast } from 'sonner';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 
 const FAQ_ITEMS = [
   {
@@ -49,9 +50,7 @@ interface BillingPageClientProps {
 
 export default function BillingPageClient({ billingData }: BillingPageClientProps) {
   const searchParams = useSearchParams();
-
-  const isExistingPaidSubscriber =
-    billingData.subscription.pricePerMonth > 0 && billingData.subscription.status === 'active';
+  const subscriptionStatus = useSubscriptionStatus(billingData);
 
   useEffect(() => {
     if (searchParams?.get('canceled') === 'true') {
@@ -64,8 +63,8 @@ export default function BillingPageClient({ billingData }: BillingPageClientProp
       const validatedPlan = SelectedPlanSchema.parse(planData);
 
       if (validatedPlan.price === 0 && validatedPlan.tier === 'starter') {
-        if (isExistingPaidSubscriber) {
-          // TODO: Handle downgrade to free plan (implement later)
+        if (subscriptionStatus.isExistingPaidSubscriber) {
+          // TODO: Handle downgrade to free plan (implement later?)
           return;
         } else {
           toast.info('You are already on the free starter plan!');
@@ -78,7 +77,7 @@ export default function BillingPageClient({ billingData }: BillingPageClientProp
         return;
       }
 
-      if (isExistingPaidSubscriber) {
+      if (subscriptionStatus.isExistingPaidSubscriber) {
         // TODO: Handle plan change for existing subscribers (implement later)
         return;
       } else {
@@ -126,14 +125,7 @@ export default function BillingPageClient({ billingData }: BillingPageClientProp
           <CurrentPlanCard {...billingData} />
         </div>
 
-        <PricingComponent
-          onPlanSelect={handlePlanSelect}
-          currentSubscription={{
-            tier: billingData.subscription.tier,
-            eventLimit: billingData.subscription.eventLimit,
-            isExistingPaidSubscriber,
-          }}
-        />
+        <PricingComponent onPlanSelect={handlePlanSelect} subscriptionStatus={subscriptionStatus} />
 
         <div className='mt-6 text-center'>
           <p className='text-muted-foreground text-sm'>Start with our free plan - no credit card required.</p>
