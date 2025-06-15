@@ -154,3 +154,5 @@ networks:
   proxy_network:
   postgres_network:
   clickhouse_network:
+  bridge:
+    external: true
