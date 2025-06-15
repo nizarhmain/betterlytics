@@ -14,9 +14,9 @@ services:
       init:
         condition: service_completed_successfully
     networks:
-      - proxy_network
-      - clickhouse_network
-      - bridge: {}
+      proxy_network:
+      clickhouse_network:
+      bridge: {}
 
   dashboard:
     build:
@@ -40,9 +40,9 @@ services:
       init:
         condition: service_completed_successfully
     networks:
-      - proxy_network
-      - postgres_network
-      - clickhouse_network
+      proxy_network:
+      postgres_network:
+      clickhouse_network:
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
@@ -69,7 +69,7 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - clickhouse_network
+      clickhouse_network:
 
   postgres:
     image: postgres:latest
@@ -86,7 +86,7 @@ services:
       timeout: 10s
       retries: 5
     networks:
-      - postgres_network
+      postgres_network:
 
   init:
     image: node:20-slim
@@ -118,8 +118,8 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - postgres_network
-      - clickhouse_network
+      postgres_network:
+      clickhouse_network:
 
   proxy:
     build:
@@ -143,7 +143,7 @@ services:
       - 80:80
       - 443:443
     networks:
-      - proxy_network
+      proxy_network:
 
 volumes:
   clickhouse_prod_data:
