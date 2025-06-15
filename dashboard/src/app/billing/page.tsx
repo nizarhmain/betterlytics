@@ -1,13 +1,18 @@
 import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { getUserBillingData } from '@/actions/billing';
 import { BillingNavigationBanner } from './BillingNavigationBanner';
 import { BillingFAQGrid } from './BillingFAQGrid';
 import { BillingInteractive } from './BillingInteractive';
 import { CurrentPlanCard } from '@/components/billing/CurrentPlanCard';
+import { isClientFeatureEnabled } from '@/lib/client-feature-flags';
 
 export default async function BillingPage() {
+  if (!isClientFeatureEnabled('enableBilling')) {
+    return notFound();
+  }
+
   const session = await getServerSession(authOptions);
 
   if (!session) {

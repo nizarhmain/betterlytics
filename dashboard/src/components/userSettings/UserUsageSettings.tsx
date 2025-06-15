@@ -45,7 +45,7 @@ export default function UserUsageSettings({ onCloseDialog }: UserUsageSettingsPr
         </p>
       </div>
 
-      <CurrentPlanCard {...billingData} />
+      <CurrentPlanCard billingData={billingData} />
 
       <div className='bg-card flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='space-y-1'>

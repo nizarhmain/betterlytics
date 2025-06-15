@@ -2,6 +2,10 @@ import Link from 'next/link';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getServerSession } from 'next-auth';
+import { notFound, redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
+import { isClientFeatureEnabled } from '@/lib/client-feature-flags';
 
 interface SuccessPageProps {
   searchParams: Promise<{
@@ -10,6 +14,16 @@ interface SuccessPageProps {
 }
 
 export default async function SuccessPage({ searchParams }: SuccessPageProps) {
+  if (!isClientFeatureEnabled('enableBilling')) {
+    return notFound();
+  }
+
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect('/signin');
+  }
+
   const resolvedSearchParams = await searchParams;
   const sessionId = resolvedSearchParams.session_id;
 

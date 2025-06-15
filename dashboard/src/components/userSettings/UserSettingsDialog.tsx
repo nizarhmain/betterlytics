@@ -14,6 +14,7 @@ import UserDangerZoneSettings from '@/components/userSettings/UserDangerZoneSett
 import UserUsageSettings from '@/components/userSettings/UserUsageSettings';
 import UserBillingHistory from '@/components/userSettings/UserBillingHistory';
 import { Spinner } from '../ui/spinner';
+import { isClientFeatureEnabled } from '@/lib/client-feature-flags';
 
 interface UserSettingsDialogProps {
   open: boolean;
@@ -29,6 +30,7 @@ interface UserSettingsTabConfig {
     onUpdate: (updates: Partial<UserSettingsUpdate>) => void;
     onCloseDialog?: () => void;
   }>;
+  disabled?: boolean;
 }
 
 const USER_SETTINGS_TABS: UserSettingsTabConfig[] = [
@@ -43,12 +45,14 @@ const USER_SETTINGS_TABS: UserSettingsTabConfig[] = [
     label: 'Usage',
     icon: BarChart3,
     component: UserUsageSettings,
+    disabled: !isClientFeatureEnabled('enableBilling'),
   },
   {
     id: 'billing',
     label: 'Billing',
     icon: Receipt,
     component: UserBillingHistory,
+    disabled: !isClientFeatureEnabled('enableBilling'),
   },
   {
     id: 'security',
@@ -66,7 +70,8 @@ const USER_SETTINGS_TABS: UserSettingsTabConfig[] = [
 
 export default function UserSettingsDialog({ open, onOpenChange }: UserSettingsDialogProps) {
   const { settings, isLoading, isSaving, saveSettings } = useUserSettings();
-  const [activeTab, setActiveTab] = useState(USER_SETTINGS_TABS[0].id);
+  const availableTabs = USER_SETTINGS_TABS.filter((tab) => !tab.disabled);
+  const [activeTab, setActiveTab] = useState(availableTabs[0].id);
   const [formData, setFormData] = useState<UserSettingsUpdate>({});
 
   useEffect(() => {
@@ -127,8 +132,8 @@ export default function UserSettingsDialog({ open, onOpenChange }: UserSettingsD
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          <TabsList className={`grid w-full grid-cols-5`}>
-            {USER_SETTINGS_TABS.map((tab) => {
+          <TabsList className={`grid w-full grid-cols-${availableTabs.length}`}>
+            {availableTabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <TabsTrigger key={tab.id} value={tab.id} className='flex items-center gap-2'>
@@ -139,7 +144,7 @@ export default function UserSettingsDialog({ open, onOpenChange }: UserSettingsD
             })}
           </TabsList>
 
-          {USER_SETTINGS_TABS.map((tab) => {
+          {availableTabs.map((tab) => {
             const Component = tab.component;
             return (
               <TabsContent key={tab.id} value={tab.id} className='mt-6'>

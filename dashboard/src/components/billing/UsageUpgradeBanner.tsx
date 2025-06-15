@@ -5,12 +5,17 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { use } from 'react';
 import type { UserBillingData } from '@/entities/billing';
+import { isClientFeatureEnabled } from '@/lib/client-feature-flags';
 
 interface UsageUpgradeBannerProps {
   billingDataPromise: Promise<UserBillingData>;
 }
 
 export default function UsageUpgradeBanner({ billingDataPromise }: UsageUpgradeBannerProps) {
+  if (!isClientFeatureEnabled('enableBilling')) {
+    return null;
+  }
+
   const billingData = use(billingDataPromise);
 
   if (!billingData.usage.isOverLimit) {

@@ -8,6 +8,7 @@ import BAMobileSidebarTrigger from '@/components/sidebar/BAMobileSidebarTrigger'
 import { TrackingScript } from './TrackingScript';
 import { fetchSiteId } from '@/app/actions';
 import { isFeatureEnabled } from '@/lib/feature-flags';
+import { isClientFeatureEnabled } from '@/lib/client-feature-flags';
 import { IntegrationManager } from './IntegrationManager';
 import UsageUpgradeBanner from '@/components/billing/UsageUpgradeBanner';
 import { getUserBillingData } from '@/actions/billing';
@@ -28,6 +29,7 @@ export default async function DashboardLayout({ children, params }: DashboardLay
   const { dashboardId } = await params;
 
   const shouldEnableTracking = isFeatureEnabled('enableDashboardTracking');
+  const billingEnabled = isClientFeatureEnabled('enableBilling');
   let siteId: string | null = null;
 
   if (shouldEnableTracking) {
@@ -44,9 +46,11 @@ export default async function DashboardLayout({ children, params }: DashboardLay
         <BASidebar dashboardId={dashboardId} />
         <BAMobileSidebarTrigger />
         <main className='bg-background w-full max-w-svw overflow-x-hidden'>
-          <Suspense fallback={null}>
-            <UsageUpgradeBanner billingDataPromise={getUserBillingData()} />
-          </Suspense>
+          {billingEnabled && (
+            <Suspense fallback={null}>
+              <UsageUpgradeBanner billingDataPromise={getUserBillingData()} />
+            </Suspense>
+          )}
           <div className='container mx-auto px-4 pt-4'>{children}</div>
         </main>
         {/* Conditionally render tracking script based on server-side feature flag */}
