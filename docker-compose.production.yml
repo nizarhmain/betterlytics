@@ -16,6 +16,7 @@ services:
     networks:
       - proxy_network
       - clickhouse_network
+      - bridge
 
   dashboard:
     build:
