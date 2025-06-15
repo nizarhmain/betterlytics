@@ -24,6 +24,7 @@ FROM debian:bookworm-slim as runner
 # Install OpenSSL runtime libs
 RUN apt-get update && apt-get install -y \
     libssl3 \
+    curl ca-certificates iputils-ping dnsutils \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
