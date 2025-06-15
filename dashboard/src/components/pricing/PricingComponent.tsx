@@ -10,9 +10,19 @@ interface PricingComponentProps {
   onPlanSelect?: (planData: SelectedPlan) => void;
   initialRangeIndex?: number;
   className?: string;
+  currentSubscription?: {
+    tier: string;
+    eventLimit: number;
+    isExistingPaidSubscriber: boolean;
+  };
 }
 
-export function PricingComponent({ onPlanSelect, initialRangeIndex = 0, className = '' }: PricingComponentProps) {
+export function PricingComponent({
+  onPlanSelect,
+  initialRangeIndex = 0,
+  className = '',
+  currentSubscription,
+}: PricingComponentProps) {
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(initialRangeIndex);
   const currentRange = EVENT_RANGES[selectedRangeIndex];
 
@@ -36,6 +46,7 @@ export function PricingComponent({ onPlanSelect, initialRangeIndex = 0, classNam
         basePrice={currentRange.price}
         onPlanSelect={onPlanSelect}
         mode={onPlanSelect ? 'billing' : 'landing'}
+        currentSubscription={currentSubscription}
       />
     </div>
   );

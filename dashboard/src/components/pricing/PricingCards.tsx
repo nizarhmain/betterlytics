@@ -14,11 +14,16 @@ interface PricingCardsProps {
   onPlanSelect?: (planData: SelectedPlan) => void;
   mode?: 'landing' | 'billing';
   className?: string;
+  currentSubscription?: {
+    tier: string;
+    eventLimit: number;
+    isExistingPaidSubscriber: boolean;
+  };
 }
 
 interface PlanConfig {
   tier: Tier;
-  price: string;
+  price: number;
   period: string;
   description: string;
   features: readonly string[];
@@ -33,6 +38,7 @@ export function PricingCards({
   onPlanSelect,
   mode = 'landing',
   className = '',
+  currentSubscription,
 }: PricingCardsProps) {
   const isFree = basePrice === 0;
   const isCustom = basePrice === 'Custom';
@@ -40,7 +46,7 @@ export function PricingCards({
   const plans: PlanConfig[] = [
     {
       tier: 'starter',
-      price: isFree ? 'Free' : isCustom ? 'Custom' : `$${basePrice}`,
+      price: isFree ? 0 : isCustom ? -1 : (basePrice as number),
       period: !isFree && !isCustom ? '/month' : '',
       description: 'Perfect for small websites and personal projects',
       features: [
@@ -56,7 +62,7 @@ export function PricingCards({
     },
     {
       tier: 'professional',
-      price: isFree ? '$6' : isCustom ? 'Custom' : `$${Math.round((basePrice as number) * 2)}`,
+      price: isFree ? 6 : isCustom ? -1 : Math.round((basePrice as number) * 2),
       period: !isCustom ? '/month' : '',
       description: 'Advanced features for growing businesses',
       features: [
@@ -73,7 +79,7 @@ export function PricingCards({
     },
     {
       tier: 'enterprise',
-      price: 'Custom',
+      price: -1,
       period: '',
       description: 'Complete solution for large organizations',
       features: [
@@ -91,29 +97,55 @@ export function PricingCards({
 
   const handlePlanClick = (plan: PlanConfig) => {
     if (mode === 'billing' && onPlanSelect) {
-      // Only pass essential payment data
       const selectedPlan: SelectedPlan = {
         tier: plan.tier,
         eventLimit,
-        price: plan.price,
+        price: plan.price === -1 ? -1 : plan.price * 100,
         period: plan.period,
       };
       onPlanSelect(selectedPlan);
     }
   };
 
+  const formatDisplayPrice = (price: number): string => {
+    if (price === 0) return 'Free';
+    if (price === -1) return 'Custom';
+    return `$${price}`;
+  };
+
   const renderButton = (plan: PlanConfig) => {
     if (mode === 'billing') {
-      const isFreePlanOnBilling = plan.tier === 'starter' && isFree;
+      const isCurrentPlan =
+        currentSubscription &&
+        currentSubscription.tier === plan.tier &&
+        currentSubscription.eventLimit === eventLimit;
+
+      let buttonText = plan.cta;
+      let buttonVariant: 'default' | 'outline' | 'secondary' = plan.popular ? 'default' : 'outline';
+      let isDisabled = false;
+
+      if (isCurrentPlan) {
+        buttonText = 'Current Plan';
+        buttonVariant = 'secondary';
+        isDisabled = true;
+      } else if (plan.tier === 'enterprise') {
+        buttonText = 'Contact Sales';
+      } else if (plan.tier === 'starter' && plan.price === 0) {
+        isDisabled = true;
+      } else if (currentSubscription?.isExistingPaidSubscriber) {
+        buttonText = 'Change to This Plan';
+      } else {
+        buttonText = plan.cta;
+      }
 
       return (
         <Button
           className='mt-auto w-full'
-          variant={plan.popular ? 'default' : 'outline'}
+          variant={buttonVariant}
           onClick={() => handlePlanClick(plan)}
-          disabled={isFreePlanOnBilling}
+          disabled={isDisabled}
         >
-          {plan.cta}
+          {buttonText}
         </Button>
       );
     }
@@ -140,10 +172,18 @@ export function PricingCards({
           {plan.popular && (
             <Badge className='bg-primary absolute -top-3 left-1/2 -translate-x-1/2 transform'>Most Popular</Badge>
           )}
+          {/* Add current plan badge */}
+          {currentSubscription &&
+            currentSubscription.tier === plan.tier &&
+            currentSubscription.eventLimit === eventLimit && (
+              <Badge variant='secondary' className='absolute -bottom-3 left-1/2 -translate-x-1/2 transform'>
+                Current
+              </Badge>
+            )}
           <CardHeader className='text-center'>
             <CardTitle className='text-2xl'>{getTierDisplayName(plan.tier)}</CardTitle>
             <div className='mt-4'>
-              <span className='text-4xl font-bold'>{plan.price}</span>
+              <span className='text-4xl font-bold'>{formatDisplayPrice(plan.price)}</span>
               {plan.period && <span className='text-muted-foreground text-lg'>{plan.period}</span>}
             </div>
             <CardDescription className='mt-2'>{plan.description}</CardDescription>

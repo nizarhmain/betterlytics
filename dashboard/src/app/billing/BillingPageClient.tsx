@@ -50,6 +50,9 @@ interface BillingPageClientProps {
 export default function BillingPageClient({ billingData }: BillingPageClientProps) {
   const searchParams = useSearchParams();
 
+  const isExistingPaidSubscriber =
+    billingData.subscription.pricePerMonth > 0 && billingData.subscription.status === 'active';
+
   useEffect(() => {
     if (searchParams?.get('canceled') === 'true') {
       toast.info('Checkout was canceled. You can try again anytime.');
@@ -61,8 +64,13 @@ export default function BillingPageClient({ billingData }: BillingPageClientProp
       const validatedPlan = SelectedPlanSchema.parse(planData);
 
       if (validatedPlan.price === 0 && validatedPlan.tier === 'starter') {
-        toast.info('You are already on the free starter plan!');
-        return;
+        if (isExistingPaidSubscriber) {
+          // TODO: Handle downgrade to free plan (implement later)
+          return;
+        } else {
+          toast.info('You are already on the free starter plan!');
+          return;
+        }
       }
 
       if (validatedPlan.tier === 'enterprise') {
@@ -70,16 +78,21 @@ export default function BillingPageClient({ billingData }: BillingPageClientProp
         return;
       }
 
-      const result = await createStripeCheckoutSession(validatedPlan);
-
-      if (result) {
-        window.location.href = result;
+      if (isExistingPaidSubscriber) {
+        // TODO: Handle plan change for existing subscribers (implement later)
+        return;
       } else {
-        throw new Error('No checkout URL received');
+        const result = await createStripeCheckoutSession(validatedPlan);
+
+        if (result) {
+          window.location.href = result;
+        } else {
+          throw new Error('No checkout URL received');
+        }
       }
     } catch (error) {
-      console.error('Checkout failed:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to start checkout');
+      console.error('Plan selection failed:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to process plan selection');
     }
   };
 
@@ -113,7 +126,14 @@ export default function BillingPageClient({ billingData }: BillingPageClientProp
           <CurrentPlanCard {...billingData} />
         </div>
 
-        <PricingComponent onPlanSelect={handlePlanSelect} />
+        <PricingComponent
+          onPlanSelect={handlePlanSelect}
+          currentSubscription={{
+            tier: billingData.subscription.tier,
+            eventLimit: billingData.subscription.eventLimit,
+            isExistingPaidSubscriber,
+          }}
+        />
 
         <div className='mt-6 text-center'>
           <p className='text-muted-foreground text-sm'>Start with our free plan - no credit card required.</p>
