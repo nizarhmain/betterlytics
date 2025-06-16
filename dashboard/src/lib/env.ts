@@ -7,23 +7,20 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().min(1),
   ADMIN_PASSWORD: z.string().min(1),
   ENABLE_DASHBOARD_TRACKING: z
-    .boolean({
-      coerce: true,
-    })
+    .enum(['true', 'false'])
     .optional()
-    .default(false),
+    .default('false')
+    .transform((val) => val === 'true'),
   ENABLE_REGISTRATION: z
-    .boolean({
-      coerce: true,
-    })
+    .enum(['true', 'false'])
     .optional()
-    .default(false),
+    .default('false')
+    .transform((val) => val === 'true'),
   IS_CLOUD: z
-    .boolean({
-      coerce: true,
-    })
+    .enum(['true', 'false'])
     .optional()
-    .default(false),
+    .default('false')
+    .transform((val) => val === 'true'),
 });
 
 export const env = envSchema.parse(process.env);
