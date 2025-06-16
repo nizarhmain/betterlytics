@@ -1,10 +1,8 @@
 import { LucideFunnel, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useOpenContext } from '@/contexts/OpenContextProvider';
+import { CreateFunnelDialog } from './CreateFunnelDialog';
 
 export function FunnelsEmptyState() {
-  const { open } = useOpenContext();
-
   return (
     <div className='mx-auto flex min-h-[600px] max-w-md flex-col items-center justify-center px-4 text-center'>
       <div className='mb-6'>
@@ -25,12 +23,9 @@ export function FunnelsEmptyState() {
         start analyzing conversion paths and optimize your user experience.
       </p>
 
-      <Button size='lg' className='mb-8' onClick={open}>
-        <Plus className='mr-2 h-5 w-5' />
-        Create Your First Funnel
-      </Button>
+      <CreateFunnelDialog triggerText='Create your first Funnel' />
 
-      <div className='space-y-4 text-left'>
+      <div className='mt-8 space-y-4 text-left'>
         <div className='flex items-start gap-3'>
           <div className='mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20'>
             <div className='h-2 w-2 rounded-full bg-blue-500'></div>

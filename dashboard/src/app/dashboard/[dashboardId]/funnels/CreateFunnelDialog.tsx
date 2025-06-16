@@ -23,7 +23,6 @@ import { FunnelPreviewDisplay } from './FunnelPreviewDisplay';
 import { fetchFunnelPreviewAction } from '@/app/actions/funnels';
 import { type FunnelPreview } from '@/entities/funnels';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useOpenContext } from '@/contexts/OpenContextProvider';
 import { useQueryFilters } from '@/hooks/use-query-filters';
 import { QueryFilterInputRow } from '@/components/filters/QueryFilterInputRow';
 
@@ -37,15 +36,13 @@ type FunnelMetadata = {
   isStrict: boolean;
 };
 
-type Funnel = {
-  name: string;
-  pages: Page[];
-  isStrict: boolean;
+type CreateFunnelDialogProps = {
+  triggerText?: string;
 };
 
-export function CreateFunnelDialog() {
+export function CreateFunnelDialog({ triggerText }: CreateFunnelDialogProps) {
   const dashboardId = useDashboardId();
-  const { isOpen, setIsOpen } = useOpenContext();
+  const [isOpen, setIsOpen] = useState(false);
 
   const [metadata, setMetadata] = useState<FunnelMetadata>({
     name: 'My new funnel',
@@ -87,7 +84,7 @@ export function CreateFunnelDialog() {
       <DialogTrigger asChild>
         <Button variant='outline'>
           <Plus className='size-5' />
-          Create Funnel
+          {triggerText || 'Create Funnel'}
         </Button>
       </DialogTrigger>
       <DialogContent className='bg-background flex h-[70dvh] min-w-[80dvw] flex-col'>
