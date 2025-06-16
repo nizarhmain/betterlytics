@@ -1,5 +1,4 @@
 import { LucideFunnel, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { CreateFunnelDialog } from './CreateFunnelDialog';
 
 export function FunnelsEmptyState() {
@@ -23,7 +22,7 @@ export function FunnelsEmptyState() {
         start analyzing conversion paths and optimize your user experience.
       </p>
 
-      <CreateFunnelDialog triggerText='Create your first Funnel' />
+      <CreateFunnelDialog triggerText='Create your first Funnel' triggerVariant='default' />
 
       <div className='mt-8 space-y-4 text-left'>
         <div className='flex items-start gap-3'>

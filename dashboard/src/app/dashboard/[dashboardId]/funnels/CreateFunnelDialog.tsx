@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo, ComponentProps } from 'react';
 import { Plus, PlusIcon } from 'lucide-react';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 import { FunnelPreviewDisplay } from './FunnelPreviewDisplay';
@@ -38,9 +38,10 @@ type FunnelMetadata = {
 
 type CreateFunnelDialogProps = {
   triggerText?: string;
+  triggerVariant?: ComponentProps<typeof Button>['variant'];
 };
 
-export function CreateFunnelDialog({ triggerText }: CreateFunnelDialogProps) {
+export function CreateFunnelDialog({ triggerText, triggerVariant }: CreateFunnelDialogProps) {
   const dashboardId = useDashboardId();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -82,7 +83,7 @@ export function CreateFunnelDialog({ triggerText }: CreateFunnelDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant='outline'>
+        <Button variant={triggerVariant || 'outline'}>
           <Plus className='size-5' />
           {triggerText || 'Create Funnel'}
         </Button>
