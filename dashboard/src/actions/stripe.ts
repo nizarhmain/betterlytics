@@ -10,7 +10,7 @@ export const createStripeCheckoutSession = withUserAuth(async (userId: string, p
   try {
     const validatedPlan = SelectedPlanSchema.parse(planData);
 
-    if (validatedPlan.price === 0 && validatedPlan.tier === 'growth') {
+    if (validatedPlan.price_cents === 0 && validatedPlan.tier === 'growth') {
       throw new Error('Free plans do not require checkout');
     }
 

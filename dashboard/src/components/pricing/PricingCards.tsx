@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { SelectedPlan, Tier } from '@/types/pricing';
 import type { UserBillingData } from '@/entities/billing';
 import { formatPrice } from '@/utils/pricing';
+import { capitalizeFirstLetter } from '@/utils/formatters';
 
 interface PricingCardsProps {
   eventLimit: number;
@@ -21,7 +22,7 @@ interface PricingCardsProps {
 
 interface PlanConfig {
   tier: Tier;
-  price: number;
+  price_cents: number;
   period: string;
   description: string;
   features: readonly string[];
@@ -44,7 +45,7 @@ export function PricingCards({
   const plans: PlanConfig[] = [
     {
       tier: 'growth',
-      price: basePrice,
+      price_cents: basePrice,
       period: !isFree && !isCustom ? '/month' : '',
       description: 'Perfect for small websites and personal projects',
       features: [
@@ -60,7 +61,7 @@ export function PricingCards({
     },
     {
       tier: 'professional',
-      price: isFree ? 700 : basePrice * 2,
+      price_cents: isFree ? 700 : basePrice * 2,
       period: !isCustom ? '/month' : '',
       description: 'Advanced features for growing businesses',
       features: [
@@ -77,7 +78,7 @@ export function PricingCards({
     },
     {
       tier: 'enterprise',
-      price: -1,
+      price_cents: -1,
       period: '',
       description: 'Complete solution for large organizations',
       features: [
@@ -98,7 +99,7 @@ export function PricingCards({
       const selectedPlan: SelectedPlan = {
         tier: plan.tier,
         eventLimit,
-        price: plan.price,
+        price_cents: plan.price_cents,
         period: plan.period,
       };
       onPlanSelect(selectedPlan);
@@ -126,7 +127,7 @@ export function PricingCards({
         isDisabled = true;
       } else if (plan.tier === 'enterprise') {
         buttonText = 'Contact Sales';
-      } else if (plan.tier === 'growth' && plan.price === 0) {
+      } else if (plan.tier === 'growth' && plan.price_cents === 0) {
         buttonText = 'Get Started for Free';
         isDisabled = true;
       } else if (billingData.isExistingPaidSubscriber) {
@@ -137,7 +138,7 @@ export function PricingCards({
 
       return (
         <Button
-          className='mt-auto w-full'
+          className='mt-auto w-full cursor-pointer'
           variant={buttonVariant}
           onClick={() => handlePlanClick(plan)}
           disabled={isDisabled}
@@ -147,15 +148,14 @@ export function PricingCards({
       );
     }
 
-    // Landing page mode - use Links for SEO
+    const href = plan.cta.toLowerCase().includes('get started') ? '/register' : '/contact';
+
     return (
-      <Button className='mt-auto w-full' variant={plan.popular ? 'default' : 'outline'}>
-        {plan.cta.toLowerCase().includes('get started') ? (
-          <Link href='/register'>{plan.cta}</Link>
-        ) : (
-          <Link href='/contact'>{plan.cta}</Link>
-        )}
-      </Button>
+      <Link href={href} className='w-full'>
+        <Button className='mt-auto w-full cursor-pointer' variant={plan.popular ? 'default' : 'outline'}>
+          {plan.cta}
+        </Button>
+      </Link>
     );
   };
 
@@ -177,9 +177,9 @@ export function PricingCards({
               </Badge>
             )}
           <CardHeader className='text-center'>
-            <CardTitle className='text-2xl'>{getTierDisplayName(plan.tier)}</CardTitle>
+            <CardTitle className='text-2xl'>{capitalizeFirstLetter(plan.tier)}</CardTitle>
             <div className='mt-4'>
-              <span className='text-4xl font-bold'>{formatDisplayPrice(plan.price)}</span>
+              <span className='text-4xl font-bold'>{formatDisplayPrice(plan.price_cents)}</span>
               {plan.period && <span className='text-muted-foreground text-lg'>{plan.period}</span>}
             </div>
             <CardDescription className='mt-2'>{plan.description}</CardDescription>
@@ -199,7 +199,4 @@ export function PricingCards({
       ))}
     </div>
   );
-}
-function getTierDisplayName(tier: Tier): string {
-  return tier.charAt(0).toUpperCase() + tier.slice(1);
 }

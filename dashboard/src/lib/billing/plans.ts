@@ -1,14 +1,16 @@
+import { formatNumber } from '@/utils/formatters';
+
 export const EVENT_RANGES = [
-  { value: 10_000, label: '10K', price: 0 },
-  { value: 50_000, label: '50K', price: 700 },
-  { value: 100_000, label: '100K', price: 1400 },
-  { value: 200_000, label: '200K', price: 2500 },
-  { value: 500_000, label: '500K', price: 3900 },
-  { value: 1_000_000, label: '1M', price: 5900 },
-  { value: 2_000_000, label: '2M', price: 8900 },
-  { value: 5_000_000, label: '5M', price: 12900 },
-  { value: 10_000_000, label: '10M', price: 16900 },
-  { value: 25_000_000, label: '10M+', price: -1 },
+  { value: 10_000, label: formatNumber(10_000, 0), price_cents: 0 },
+  { value: 50_000, label: formatNumber(50_000, 0), price_cents: 700 },
+  { value: 100_000, label: formatNumber(100_000, 0), price_cents: 1400 },
+  { value: 200_000, label: formatNumber(200_000, 0), price_cents: 2500 },
+  { value: 500_000, label: formatNumber(500_000, 0), price_cents: 3900 },
+  { value: 1_000_000, label: formatNumber(1_000_000, 0), price_cents: 5900 },
+  { value: 2_000_000, label: formatNumber(2_000_000, 0), price_cents: 8900 },
+  { value: 5_000_000, label: formatNumber(5_000_000, 0), price_cents: 12900 },
+  { value: 10_000_000, label: formatNumber(10_000_000, 0), price_cents: 16900 },
+  { value: 10_000_001, label: '10M+', price_cents: -1 },
 ] as const;
 
 export type EventRange = (typeof EVENT_RANGES)[number];

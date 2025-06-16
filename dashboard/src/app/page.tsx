@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { env } from '@/lib/env';
 import LandingPage from './(landing)/page';
+import { clientFeatureFlags } from '@/lib/client-feature-flags';
 
 export default async function HomePage() {
-  if (!env.IS_CLOUD) {
+  if (!clientFeatureFlags.isCloud) {
     const session = await getServerSession(authOptions);
 
     if (session) {

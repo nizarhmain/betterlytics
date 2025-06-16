@@ -25,7 +25,7 @@ export function BillingInteractive({ billingData }: BillingInteractiveProps) {
     try {
       const validatedPlan = SelectedPlanSchema.parse(planData);
 
-      if (validatedPlan.price === 0 && validatedPlan.tier === 'growth') {
+      if (validatedPlan.price_cents === 0 && validatedPlan.tier === 'growth') {
         if (billingData.isExistingPaidSubscriber) {
           // TODO: Handle downgrade to free plan (implement later?)
           return;

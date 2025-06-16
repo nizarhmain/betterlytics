@@ -40,7 +40,7 @@ export function PricingComponent({
       <PricingCards
         eventLimit={currentRange.value}
         eventLabel={currentRange.label}
-        basePrice={currentRange.price}
+        basePrice={currentRange.price_cents}
         onPlanSelect={onPlanSelect}
         mode={onPlanSelect ? 'billing' : 'landing'}
         billingData={billingData}

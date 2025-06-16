@@ -18,12 +18,6 @@ const envSchema = z.object({
     })
     .optional()
     .default(false),
-  IS_CLOUD: z
-    .boolean({
-      coerce: true,
-    })
-    .optional()
-    .default(false),
   NEXT_PUBLIC_BASE_URL: z.string().optional().default('http://localhost:3000'),
   NEXT_PUBLIC_IS_CLOUD: z
     .boolean({
