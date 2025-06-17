@@ -83,14 +83,6 @@ Thank you for joining Betterlytics! We're excited to help you gain powerful insi
 
 Your Analytics Journey Starts Here
 
-With Betterlytics, you can:
-• Track real-time visitor analytics
-• Monitor geographic distribution of your audience
-• Analyze device and browser usage patterns
-• Set up conversion funnels and track user journeys
-• Create custom events for deeper insights
-• Maintain user privacy with cookieless tracking
-
 Next Steps:
 1. Log in to your dashboard: https://betterlytics.io/dashboards
 2. Add your website and get your tracking script
@@ -99,7 +91,6 @@ Next Steps:
 
 Resources to Get You Started:
 • Installation Guide: https://betterlytics.io/docs/installation
-• Integration Examples: https://betterlytics.io/docs/integration
 • Dashboard Features: https://betterlytics.io/docs/dashboard-features
 • Contact Support: support@betterlytics.io
 
