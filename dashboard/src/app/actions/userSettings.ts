@@ -1,42 +1,33 @@
-"use server";
+'use server';
 
-import { UserSettings, UserSettingsUpdate } from "@/entities/userSettings";
-import { ChangePasswordRequest, ChangePasswordRequestSchema } from "@/entities/password";
-import { withUserAuth } from "@/auth/auth-actions";
-import * as UserSettingsService from "@/services/userSettings";
+import { UserSettings, UserSettingsUpdate } from '@/entities/userSettings';
+import { ChangePasswordRequest, ChangePasswordRequestSchema } from '@/entities/password';
+import { withUserAuth } from '@/auth/auth-actions';
+import * as UserSettingsService from '@/services/userSettings';
+import { User } from 'next-auth';
 
-export const getUserSettingsAction = withUserAuth(
-  async (userId: string): Promise<UserSettings> => {
-    return await UserSettingsService.getUserSettings(userId);
-  }
-);
+export const getUserSettingsAction = withUserAuth(async (user: User): Promise<UserSettings> => {
+  return await UserSettingsService.getUserSettings(user.id);
+});
 
 export const updateUserSettingsAction = withUserAuth(
-  async (
-    userId: string,
-    updates: UserSettingsUpdate
-  ): Promise<UserSettings> => {
-    return await UserSettingsService.updateUserSettings(userId, updates);
-  }
+  async (user: User, updates: UserSettingsUpdate): Promise<UserSettings> => {
+    return await UserSettingsService.updateUserSettings(user.id, updates);
+  },
 );
 
-export const deleteUserAccountAction = withUserAuth(
-  async (userId: string): Promise<void> => {
-    return await UserSettingsService.deleteUser(userId);
-  }
-);
+export const deleteUserAccountAction = withUserAuth(async (user: User): Promise<void> => {
+  return await UserSettingsService.deleteUser(user.id);
+});
 
 export const changePasswordAction = withUserAuth(
-  async (
-    userId: string,
-    data: ChangePasswordRequest
-  ): Promise<void> => {
+  async (user: User, data: ChangePasswordRequest): Promise<void> => {
     const validatedData = ChangePasswordRequestSchema.parse(data);
-    
+
     return await UserSettingsService.changeUserPassword(
-      userId, 
-      validatedData.currentPassword, 
-      validatedData.newPassword
+      user.id,
+      validatedData.currentPassword,
+      validatedData.newPassword,
     );
-  }
+  },
 );

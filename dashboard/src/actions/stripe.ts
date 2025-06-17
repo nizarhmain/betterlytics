@@ -3,10 +3,10 @@
 import { withUserAuth } from '@/auth/auth-actions';
 import { stripe } from '@/lib/billing/stripe';
 import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
-import { getAuthSession } from '@/auth/auth-actions';
 import { getLookupKeyFromTierConfig } from '@/lib/billing/plans';
+import { User } from 'next-auth';
 
-export const createStripeCheckoutSession = withUserAuth(async (userId: string, planData: SelectedPlan) => {
+export const createStripeCheckoutSession = withUserAuth(async (user: User, planData: SelectedPlan) => {
   try {
     const validatedPlan = SelectedPlanSchema.parse(planData);
 
@@ -18,8 +18,6 @@ export const createStripeCheckoutSession = withUserAuth(async (userId: string, p
       throw new Error('Custom plans require manual setup');
     }
 
-    const userSession = await getAuthSession(); // TODO: Should withUserAuth return entire User object to avoid this?
-
     const lookupKey = getLookupKeyFromTierConfig(validatedPlan.tier, validatedPlan.eventLimit);
 
     const checkoutSession = await stripe.checkout.sessions.create({
@@ -30,9 +28,9 @@ export const createStripeCheckoutSession = withUserAuth(async (userId: string, p
         },
       ],
       mode: 'subscription',
-      customer_email: userSession?.user?.email || undefined,
+      customer_email: user.email,
       metadata: {
-        userId,
+        userId: user.id,
       },
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing?canceled=true`,
