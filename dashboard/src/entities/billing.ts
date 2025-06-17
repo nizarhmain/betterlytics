@@ -1,9 +1,11 @@
 import { z } from 'zod';
 
+export const TierSchema = z.enum(['growth', 'professional', 'enterprise']);
+
 export const SubscriptionSchema = z.object({
   id: z.string(),
   userId: z.string(),
-  tier: z.string(),
+  tier: TierSchema,
   eventLimit: z.number(),
   pricePerMonth: z.number(),
   currentPeriodStart: z.date(),
@@ -35,6 +37,8 @@ export const EventCountResultSchema = z.object({
   total: z.number(),
 });
 
+export const PaymentStatusSchema = z.enum(['paid', 'pending', 'failed', 'refunded', 'past-due']);
+
 export const BillingHistorySchema = z.object({
   id: z.string(),
   userId: z.string(),
@@ -45,14 +49,14 @@ export const BillingHistorySchema = z.object({
   amountPaid: z.number(),
   paymentInvoiceId: z.string().nullable(),
   paymentPaymentIntentId: z.string().nullable(),
-  status: z.enum(['paid', 'pending', 'failed', 'refunded']),
+  status: PaymentStatusSchema,
   createdAt: z.date(),
   updatedAt: z.date(),
 });
 
 export const UserBillingDataSchema = z.object({
   subscription: z.object({
-    tier: z.string(),
+    tier: TierSchema,
     eventLimit: z.number(),
     pricePerMonth: z.number(),
     currentPeriodEnd: z.date(),
@@ -63,8 +67,10 @@ export const UserBillingDataSchema = z.object({
   isFreePlanUser: z.boolean(),
 });
 
+export type Tier = z.infer<typeof TierSchema>;
 export type Subscription = z.infer<typeof SubscriptionSchema>;
 export type UsageData = z.infer<typeof UsageDataSchema>;
 export type EventCountResult = z.infer<typeof EventCountResultSchema>;
+export type PaymentStatus = z.infer<typeof PaymentStatusSchema>;
 export type BillingHistory = z.infer<typeof BillingHistorySchema>;
 export type UserBillingData = z.infer<typeof UserBillingDataSchema>;

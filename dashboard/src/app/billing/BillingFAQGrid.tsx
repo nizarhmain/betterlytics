@@ -39,8 +39,8 @@ export function BillingFAQGrid() {
       </div>
 
       <div className='grid gap-8 md:grid-cols-2 lg:grid-cols-3'>
-        {FAQ_ITEMS.map((item, index) => (
-          <div key={index} className='space-y-3'>
+        {FAQ_ITEMS.map((item) => (
+          <div key={item.question} className='space-y-3'>
             <h4 className='text-base font-semibold'>{item.question}</h4>
             <p className='text-muted-foreground text-sm leading-relaxed'>{item.answer}</p>
           </div>

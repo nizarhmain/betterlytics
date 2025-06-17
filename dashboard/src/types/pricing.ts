@@ -1,7 +1,5 @@
 import { z } from 'zod';
-
-export const TierSchema = z.enum(['growth', 'professional', 'enterprise']);
-export type Tier = z.infer<typeof TierSchema>;
+import { TierSchema } from '@/entities/billing';
 
 export const SelectedPlanSchema = z.object({
   tier: TierSchema,

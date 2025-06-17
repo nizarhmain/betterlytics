@@ -20,11 +20,10 @@ const envSchema = z.object({
     .default(false),
   NEXT_PUBLIC_BASE_URL: z.string().optional().default('http://localhost:3000'),
   NEXT_PUBLIC_IS_CLOUD: z
-    .boolean({
-      coerce: true,
-    })
+    .enum(['true', 'false'])
     .optional()
-    .default(false),
+    .default('false')
+    .transform((val) => val === 'true'),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional().default(''),
   STRIPE_SECRET_KEY: z.string().optional().default(''),
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(''),

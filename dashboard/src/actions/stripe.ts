@@ -5,6 +5,7 @@ import { stripe } from '@/lib/billing/stripe';
 import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
 import { getLookupKeyFromTierConfig } from '@/lib/billing/plans';
 import { User } from 'next-auth';
+import { env } from '@/lib/env';
 
 export const createStripeCheckoutSession = withUserAuth(async (user: User, planData: SelectedPlan) => {
   try {
@@ -32,8 +33,8 @@ export const createStripeCheckoutSession = withUserAuth(async (user: User, planD
       metadata: {
         userId: user.id,
       },
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing?canceled=true`,
+      success_url: `${env.NEXT_PUBLIC_BASE_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${env.NEXT_PUBLIC_BASE_URL}/billing?canceled=true`,
       allow_promotion_codes: true,
       billing_address_collection: 'required',
       /*automatic_tax: {

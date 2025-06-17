@@ -7,11 +7,13 @@ import { CreditCard } from 'lucide-react';
 import { formatPrice } from '@/utils/pricing';
 import { format } from 'date-fns';
 import { useBillingHistory } from '@/hooks/useBillingData';
+import { PaymentStatus } from '@/entities/billing';
+import { capitalizeFirstLetter, formatNumber } from '@/utils/formatters';
 
 export default function UserBillingHistory() {
   const { billingHistory, isLoading, error } = useBillingHistory();
 
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: PaymentStatus) => {
     switch (status) {
       case 'paid':
         return 'default';
@@ -28,7 +30,7 @@ export default function UserBillingHistory() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: PaymentStatus) => {
     switch (status) {
       case 'paid':
         return 'text-green-600';
@@ -107,12 +109,12 @@ export default function UserBillingHistory() {
                       {format(record.periodStart, 'MMM d')} - {format(record.periodEnd, 'MMM d, yyyy')}
                     </p>
                     <Badge variant={getStatusBadgeVariant(record.status)} className='text-xs'>
-                      {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                      {capitalizeFirstLetter(record.status)}
                     </Badge>
                   </div>
 
                   <div className='text-muted-foreground flex items-center gap-1 text-sm'>
-                    <span>{record.eventLimit.toLocaleString()} events</span>
+                    <span>{formatNumber(record.eventLimit)} events</span>
                   </div>
 
                   {record.paymentInvoiceId && (

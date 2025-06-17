@@ -1,5 +1,6 @@
 import prisma from '@/lib/postgres';
 import { Subscription, SubscriptionSchema } from '@/entities/billing';
+import { addMonths, startOfDay } from 'date-fns';
 
 export async function getUserSubscription(userId: string): Promise<Subscription | null> {
   try {
@@ -19,8 +20,8 @@ export async function getUserSubscription(userId: string): Promise<Subscription 
 }
 
 async function createDefaultStarterSubscription(userId: string): Promise<Subscription> {
-  const now = new Date();
-  const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const now = startOfDay(new Date());
+  const periodEnd = addMonths(now, 1);
 
   const subscription = await prisma.subscription.create({
     data: {

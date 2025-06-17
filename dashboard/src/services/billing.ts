@@ -25,7 +25,7 @@ export async function getUserBillingStats(userId: string): Promise<UserBillingDa
       current: currentUsage,
       limit: subscription.eventLimit,
       remaining: Math.max(0, subscription.eventLimit - currentUsage),
-      isOverLimit: currentUsage >= subscription.eventLimit,
+      isOverLimit: currentUsage > subscription.eventLimit,
       usagePercentage: (currentUsage / subscription.eventLimit) * 100,
       daysUntilReset: getDaysUntilReset(subscription.currentPeriodEnd),
       billingPeriod: {
@@ -34,8 +34,9 @@ export async function getUserBillingStats(userId: string): Promise<UserBillingDa
       },
     };
 
-    const isExistingPaidSubscriber = subscription.pricePerMonth > 0 && subscription.status === 'active';
-    const isFreePlanUser = subscription.pricePerMonth === 0;
+    const isExistingPaidSubscriber =
+      (subscription.tier !== 'growth' || subscription.pricePerMonth > 0) && subscription.status === 'active';
+    const isFreePlanUser = subscription.tier === 'growth' && subscription.pricePerMonth === 0;
 
     return UserBillingDataSchema.parse({
       subscription: { ...subscription },

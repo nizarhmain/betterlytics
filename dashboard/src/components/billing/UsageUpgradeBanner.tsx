@@ -5,17 +5,13 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { use } from 'react';
 import type { UserBillingData } from '@/entities/billing';
-import { isClientFeatureEnabled } from '@/lib/client-feature-flags';
+import { formatPercentage } from '@/utils/formatters';
 
 interface UsageUpgradeBannerProps {
   billingDataPromise: Promise<UserBillingData>;
 }
 
 export default function UsageUpgradeBanner({ billingDataPromise }: UsageUpgradeBannerProps) {
-  if (!isClientFeatureEnabled('enableBilling')) {
-    return null;
-  }
-
   const billingData = use(billingDataPromise);
 
   if (!billingData.usage.isOverLimit) {
@@ -23,7 +19,7 @@ export default function UsageUpgradeBanner({ billingDataPromise }: UsageUpgradeB
   }
 
   const overageEvents = billingData.usage.current - billingData.usage.limit;
-  const overagePercentage = ((overageEvents / billingData.usage.limit) * 100).toFixed(1);
+  const overagePercentage = (overageEvents / billingData.usage.limit) * 100;
 
   return (
     <div className='w-full border-b border-red-600 bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-sm'>
@@ -35,8 +31,8 @@ export default function UsageUpgradeBanner({ billingDataPromise }: UsageUpgradeB
               <span className='font-medium'>Usage Limit Exceeded:</span>
               <span>
                 You&apos;ve used <strong>{billingData.usage.current.toLocaleString()}</strong> events out of your{' '}
-                <strong>{billingData.usage.limit.toLocaleString()}</strong> event limit ({overagePercentage}% over
-                your {billingData.subscription.tier} plan).
+                <strong>{billingData.usage.limit.toLocaleString()}</strong> event limit (
+                {formatPercentage(overagePercentage)} over your {billingData.subscription.tier} plan).
               </span>
               <span className='flex items-center gap-1 font-medium text-yellow-200'>
                 <AlertCircle className='h-3 w-3' />
