@@ -10,6 +10,8 @@ type Filters = {
     numberOfSteps: number;
     numberOfJourneys: number;
   };
+  compareStartDate?: Date;
+  compareEndDate?: Date;
 };
 
 function getDefaultFilters(): Filters {
@@ -22,6 +24,8 @@ function getDefaultFilters(): Filters {
       numberOfSteps: 3,
       numberOfJourneys: 5,
     },
+    compareStartDate: undefined,
+    compareEndDate: undefined,
   };
 }
 
@@ -41,6 +45,8 @@ function decode(base64: string): Filters {
     ...withDefaults,
     startDate: new Date(withDefaults.startDate),
     endDate: new Date(withDefaults.endDate),
+    compareStartDate: withDefaults.compareStartDate ? new Date(withDefaults.compareStartDate) : undefined,
+    compareEndDate: withDefaults.compareEndDate ? new Date(withDefaults.compareEndDate) : undefined,
   };
 }
 
