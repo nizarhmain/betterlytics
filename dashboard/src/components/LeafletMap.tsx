@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, useMemo, use } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { scaleLinear } from 'd3-scale';
 import 'leaflet/dist/leaflet.css';
 import dynamic from 'next/dynamic';
+import { MapContainer, GeoJSON } from 'react-leaflet';
+import L from 'leaflet';
 import { Feature, Geometry } from 'geojson';
 import { GeoVisitor } from '@/entities/geography';
 
@@ -22,7 +24,17 @@ const geoJsonOptions = {
 
 const WORLD_GEOJSON_URL = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
 
-// To limit how far users can pan
+const MAP_COLORS = {
+  NO_VISITORS: '#6b7280', // Gray for 0 visitors
+  HIGH_VISITORS: '#60a5fa', // Light blue for high visitor counts
+  LOW_VISITORS: '#1e40af', // Dark blue for low visitor counts
+} as const;
+
+const BORDER_COLORS = {
+  NO_VISITORS: '#9ca3af', // Lighter gray for 0 visitors border
+  HIGH_VISITORS: '#93c5fd', // Lighter version of light blue
+  LOW_VISITORS: '#3b82f6', // Lighter version of dark blue
+} as const;
 
 const LeafletMap = ({
   visitorData,
@@ -31,9 +43,6 @@ const LeafletMap = ({
   showLegend = true,
   initialZoom,
 }: LeafletMapProps) => {
-  const { MapContainer, GeoJSON } = use(import('react-leaflet'));
-  const L = use(import('leaflet'));
-
   const [worldGeoJson, setWorldGeoJson] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -41,14 +50,18 @@ const LeafletMap = ({
 
   const MAX_WORLD_BOUNDS = useMemo(() => L.latLngBounds(L.latLng(-100, -220), L.latLng(100, 220)), []);
 
-  // Create a simple placeholder color scale - from dark to blue
   const colorScale = useMemo(() => {
     return scaleLinear<string>()
-      .domain([0, calculatedMaxVisitors])
-      .range(['var(--color-secondary)', 'var(--color-primary)']);
+      .domain([0, 1, calculatedMaxVisitors])
+      .range([MAP_COLORS.NO_VISITORS, MAP_COLORS.LOW_VISITORS, MAP_COLORS.HIGH_VISITORS]);
   }, [calculatedMaxVisitors]);
 
-  // Load GeoJSON data
+  const borderColorScale = useMemo(() => {
+    return scaleLinear<string>()
+      .domain([0, 1, calculatedMaxVisitors])
+      .range([BORDER_COLORS.NO_VISITORS, BORDER_COLORS.LOW_VISITORS, BORDER_COLORS.HIGH_VISITORS]);
+  }, [calculatedMaxVisitors]);
+
   useEffect(() => {
     setIsLoading(true);
 
@@ -73,7 +86,6 @@ const LeafletMap = ({
     return String(feature.id);
   };
 
-  // Style function for the GeoJSON layers/regions
   const styleGeoJson = (feature: Feature<Geometry, any> | undefined) => {
     if (!feature) return {};
 
@@ -81,12 +93,15 @@ const LeafletMap = ({
     const visitorEntry = visitorData.find((d) => d.country_code === featureId);
     const visitors = visitorEntry ? visitorEntry.visitors : 0;
 
+    const fillColor = colorScale(visitors);
+    const borderColor = borderColorScale(visitors);
+
     return {
-      fillColor: colorScale(visitors),
-      weight: 0.5,
+      fillColor,
+      weight: 1.3,
       opacity: 1,
-      color: 'var(--color-border)',
-      fillOpacity: visitors > 0 ? 0.8 : 0.6,
+      color: borderColor,
+      fillOpacity: 0.8,
     };
   };
 
@@ -154,7 +169,7 @@ const LeafletMap = ({
             <div
               className='h-2 w-24 rounded'
               style={{
-                background: `linear-gradient(to right, var(--color-secondary), var(--color-primary))`,
+                background: `linear-gradient(to right, ${MAP_COLORS.NO_VISITORS} 0%, ${MAP_COLORS.NO_VISITORS} 2%, ${MAP_COLORS.LOW_VISITORS} 3%, ${MAP_COLORS.HIGH_VISITORS} 100%)`,
               }}
             ></div>
             <span className='text-muted-foreground ml-1 text-xs'>{calculatedMaxVisitors.toLocaleString()}</span>
