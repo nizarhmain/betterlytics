@@ -22,7 +22,7 @@ import { withDashboardAuthContext } from '@/auth/auth-actions';
 import { AuthContext } from '@/entities/authContext';
 import { getSessionMetrics } from '@/repositories/clickhouse';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { toAreaChart } from '@/utils/toAreaChart';
+import { toAreaChart } from '@/presenters/toAreaChart';
 
 export const fetchTotalPageViewsAction = withDashboardAuthContext(
   async (
@@ -31,10 +31,19 @@ export const fetchTotalPageViewsAction = withDashboardAuthContext(
     endDate: Date,
     granularity: GranularityRangeValues,
     queryFilters: QueryFilter[],
+    compareStartDate?: Date,
+    compareEndDate?: Date,
   ) => {
     const data = await getTotalPageViewsForSite(ctx.siteId, startDate, endDate, granularity, queryFilters);
+    const compare =
+      compareStartDate && compareEndDate
+        ? await getTotalPageViewsForSite(ctx.siteId, startDate, endDate, granularity, queryFilters)
+        : undefined;
+
+    console.log(data, compare);
     return toAreaChart({
       data,
+      compare,
       granularity,
       dataKey: 'views',
     });

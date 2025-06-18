@@ -1,10 +1,11 @@
 import React from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { timeFormat } from 'd3-time-format';
 
 interface ChartDataPoint {
   date: string | number;
-  value: string | number;
+  value: number | number[];
 }
 
 interface InteractiveChartProps {
@@ -33,11 +34,12 @@ const InteractiveChart: React.FC<InteractiveChartProps> = React.memo(({ title, d
               </defs>
               <CartesianGrid strokeDasharray='3 3' className='opacity-10' />
               <XAxis
-                dataKey='formattedDate'
+                dataKey='date'
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
                 className='text-muted-foreground'
+                tickFormatter={timeFormat('%b %d')}
               />
               <YAxis
                 fontSize={12}

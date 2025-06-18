@@ -1,4 +1,4 @@
-import { type GranularityRangeValues } from './granularityRanges';
+import { type GranularityRangeValues } from '@/utils/granularityRanges';
 import { utcDay, utcHour, utcMinute } from 'd3-time';
 
 const IntervalFunctions = {
@@ -7,17 +7,17 @@ const IntervalFunctions = {
   minute: utcMinute,
 } as const;
 
-type FragmentedGranularityTimeSeriesAreaChartProps<K extends string> = {
+type DataToAreaChartProps<K extends string> = {
   dataKey: K;
   data: Array<{ date: string } & Record<K, number>>;
   granularity: GranularityRangeValues;
 };
 
-export function toAreaChart<K extends string>({
-  dataKey,
-  data,
-  granularity,
-}: FragmentedGranularityTimeSeriesAreaChartProps<K>) {
+type ToAreaChartProps<K extends string> = DataToAreaChartProps<K> & {
+  compare?: Array<{ date: string } & Record<K, number>>;
+};
+
+function dataToAreaChart<K extends string>({ dataKey, data, granularity }: ToAreaChartProps<K>) {
   // Map date to value
   const groupedData = data.reduce(
     (group, row) => {
@@ -56,4 +56,31 @@ export function toAreaChart<K extends string>({
   }
 
   return chartData;
+}
+
+export function toAreaChart<K extends string>({ dataKey, data, compare, granularity }: ToAreaChartProps<K>) {
+  const chart = dataToAreaChart({
+    dataKey,
+    data,
+    granularity,
+  });
+
+  if (compare === undefined) {
+    return chart;
+  }
+
+  const compareChart = dataToAreaChart({
+    dataKey,
+    data: compare,
+    granularity,
+  });
+
+  if (chart.length !== compareChart.length) {
+    return chart;
+  }
+
+  return chart.map((point, index) => ({
+    date: point.date,
+    value: [point.value, compareChart[index].value],
+  }));
 }
