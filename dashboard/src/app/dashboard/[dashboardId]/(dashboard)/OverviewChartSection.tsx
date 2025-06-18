@@ -59,13 +59,13 @@ export default function OverviewChartSection({
   const chartData = useMemo(() => {
     switch (activeMetric) {
       case 'visitors':
-        return visitorsData || [];
+        return visitorsData;
       case 'pageviews':
-        return pageviewsData || [];
+        return pageviewsData;
       case 'bounceRate':
-        return sessionMetricsData || [];
+        return sessionMetricsData.bounceRate;
       case 'avgDuration':
-        return sessionMetricsData || [];
+        return sessionMetricsData.avgVisitDuration;
       default:
         return [];
     }
@@ -77,7 +77,6 @@ export default function OverviewChartSection({
     <InteractiveChart
       title={currentMetricConfig.title}
       data={chartData}
-      valueField={currentMetricConfig.valueField}
       color={currentMetricConfig.color}
       formatValue={currentMetricConfig.formatValue}
     />

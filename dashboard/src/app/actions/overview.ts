@@ -22,7 +22,7 @@ import { withDashboardAuthContext } from '@/auth/auth-actions';
 import { AuthContext } from '@/entities/authContext';
 import { getSessionMetrics } from '@/repositories/clickhouse';
 import { toDateTimeString } from '@/utils/dateFormatters';
-import { fromFragmentedGranularityTimeSeriesToLineChartAreaChart } from '@/utils/fragmentedGranulatiryTimeSeriesAreaChart';
+import { toAreaChart } from '@/utils/toAreaChart';
 
 export const fetchTotalPageViewsAction = withDashboardAuthContext(
   async (
@@ -33,7 +33,7 @@ export const fetchTotalPageViewsAction = withDashboardAuthContext(
     queryFilters: QueryFilter[],
   ) => {
     const data = await getTotalPageViewsForSite(ctx.siteId, startDate, endDate, granularity, queryFilters);
-    return fromFragmentedGranularityTimeSeriesToLineChartAreaChart({
+    return toAreaChart({
       data,
       granularity,
       dataKey: 'views',
@@ -50,7 +50,7 @@ export const fetchUniqueVisitorsAction = withDashboardAuthContext(
     queryFilters: QueryFilter[],
   ) => {
     const data = await getUniqueVisitorsForSite(ctx.siteId, startDate, endDate, granularity, queryFilters);
-    return fromFragmentedGranularityTimeSeriesToLineChartAreaChart({
+    return toAreaChart({
       data,
       granularity,
       dataKey: 'unique_visitors',
@@ -65,18 +65,6 @@ export const fetchSummaryStatsAction = withDashboardAuthContext(
   },
 );
 
-export const fetchTopPagesAction = withDashboardAuthContext(
-  async (
-    ctx: AuthContext,
-    startDate: Date,
-    endDate: Date,
-    limit: number,
-    queryFilters: QueryFilter[],
-  ): Promise<TopPageRow[]> => {
-    return getTopPagesForSite(ctx.siteId, startDate, endDate, limit, queryFilters);
-  },
-);
-
 export const fetchSessionMetricsAction = withDashboardAuthContext(
   async (
     ctx: AuthContext,
@@ -84,14 +72,19 @@ export const fetchSessionMetricsAction = withDashboardAuthContext(
     endDate: Date,
     granularity: GranularityRangeValues,
     queryFilters: QueryFilter[],
-  ): Promise<DailySessionMetricsRow[]> => {
-    return getSessionMetrics(
+  ) => {
+    const data = await getSessionMetrics(
       ctx.siteId,
       toDateTimeString(startDate),
       toDateTimeString(endDate),
       granularity,
       queryFilters,
     );
+
+    return {
+      avgVisitDuration: toAreaChart({ data, granularity, dataKey: 'avg_visit_duration' }),
+      bounceRate: toAreaChart({ data, granularity, dataKey: 'bounce_rate' }),
+    };
   },
 );
 

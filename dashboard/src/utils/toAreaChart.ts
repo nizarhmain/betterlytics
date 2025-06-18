@@ -7,19 +7,13 @@ const IntervalFunctions = {
   minute: utcMinute,
 } as const;
 
-type StringLiteral<T> = T extends string ? (string extends T ? never : T) : never;
-
-type LiteralObject<K> = {
-  [P in StringLiteral<K>]: number;
-};
-
 type FragmentedGranularityTimeSeriesAreaChartProps<K extends string> = {
-  dataKey: StringLiteral<K>;
+  dataKey: K;
   data: Array<{ date: string } & Record<K, number>>;
   granularity: GranularityRangeValues;
 };
 
-export function fromFragmentedGranularityTimeSeriesToLineChartAreaChart<K extends string>({
+export function toAreaChart<K extends string>({
   dataKey,
   data,
   granularity,
@@ -57,9 +51,9 @@ export function fromFragmentedGranularityTimeSeriesToLineChartAreaChart<K extend
     // Add entry - either with data from group or default value of 0
     chartData.push({
       date: +key,
-      [dataKey]: groupedData[key] ?? 0,
+      value: groupedData[key] ?? 0,
     });
   }
 
-  return chartData as ({ date: number } & LiteralObject<K>)[];
+  return chartData;
 }
