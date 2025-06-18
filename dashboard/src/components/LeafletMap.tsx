@@ -3,11 +3,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { scaleLinear } from 'd3-scale';
 import 'leaflet/dist/leaflet.css';
-import dynamic from 'next/dynamic';
-import { MapContainer, GeoJSON } from 'react-leaflet';
-import L from 'leaflet';
 import { Feature, Geometry } from 'geojson';
 import { GeoVisitor } from '@/entities/geography';
+import { LatLngBoundsExpression } from 'leaflet';
 
 interface LeafletMapProps {
   visitorData: GeoVisitor[];
@@ -43,12 +41,49 @@ const LeafletMap = ({
   showLegend = true,
   initialZoom,
 }: LeafletMapProps) => {
-  const [worldGeoJson, setWorldGeoJson] = useState<any>(null);
+  const [worldGeoJson, setWorldGeoJson] = useState<GeoJSON.FeatureCollection | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [mapComponents, setMapComponents] = useState<{
+    L: typeof import('leaflet');
+    MapContainer: typeof import('react-leaflet').MapContainer;
+    GeoJSON: typeof import('react-leaflet').GeoJSON;
+  } | null>(null);
 
   const calculatedMaxVisitors = maxVisitors || Math.max(...visitorData.map((d) => d.visitors), 1);
 
-  const MAX_WORLD_BOUNDS = useMemo(() => L.latLngBounds(L.latLng(-100, -220), L.latLng(100, 220)), []);
+  useEffect(() => {
+    setIsLoading(true);
+
+    const loadMapDependencies = async () => {
+      try {
+        const [leafletModule, reactLeafletModule, worldRes] = await Promise.all([
+          import('leaflet'),
+          import('react-leaflet'),
+          fetch(WORLD_GEOJSON_URL),
+        ]);
+
+        const world = await worldRes.json();
+
+        setMapComponents({
+          L: leafletModule.default,
+          MapContainer: reactLeafletModule.MapContainer,
+          GeoJSON: reactLeafletModule.GeoJSON,
+        });
+        setWorldGeoJson(world);
+      } catch (err) {
+        console.error('Error loading map dependencies:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMapDependencies();
+  }, []);
+
+  const MAX_WORLD_BOUNDS = useMemo(() => {
+    if (!mapComponents?.L) return null;
+    return mapComponents.L.latLngBounds(mapComponents.L.latLng(-100, -220), mapComponents.L.latLng(100, 220));
+  }, [mapComponents]);
 
   const colorScale = useMemo(() => {
     return scaleLinear<string>()
@@ -62,31 +97,12 @@ const LeafletMap = ({
       .range([BORDER_COLORS.NO_VISITORS, BORDER_COLORS.LOW_VISITORS, BORDER_COLORS.HIGH_VISITORS]);
   }, [calculatedMaxVisitors]);
 
-  useEffect(() => {
-    setIsLoading(true);
-
-    const fetchGeoJson = async () => {
-      try {
-        const worldRes = await fetch(WORLD_GEOJSON_URL);
-        const world = await worldRes.json();
-        setWorldGeoJson(world);
-      } catch (err) {
-        console.error('Error loading GeoJSON data:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchGeoJson();
-  }, []);
-
-  // Get feature ID from GeoJSON - used to match the visitor data (like country code) to the GeoJSON data
-  const getFeatureId = (feature: Feature<Geometry, any>): string | undefined => {
+  const getFeatureId = (feature: Feature<Geometry, GeoJSON.GeoJsonProperties>): string | undefined => {
     if (!feature || !feature.properties || !feature.id) return undefined;
     return String(feature.id);
   };
 
-  const styleGeoJson = (feature: Feature<Geometry, any> | undefined) => {
+  const styleGeoJson = (feature: Feature<Geometry, GeoJSON.GeoJsonProperties> | undefined) => {
     if (!feature) return {};
 
     const featureId = getFeatureId(feature);
@@ -106,7 +122,7 @@ const LeafletMap = ({
   };
 
   // Attached the popup shown when clicking on a country to the GeoJSON data
-  const onEachFeature = (feature: Feature<Geometry, any>, layer: L.Layer) => {
+  const onEachFeature = (feature: Feature<Geometry, GeoJSON.GeoJsonProperties>, layer: L.Layer) => {
     if (!feature.properties) return;
 
     const featureId = getFeatureId(feature);
@@ -122,17 +138,21 @@ const LeafletMap = ({
     `);
   };
 
+  if (isLoading || !mapComponents || !worldGeoJson) {
+    return (
+      <div className='bg-background/70 flex h-full w-full items-center justify-center'>
+        <div className='flex flex-col items-center'>
+          <div className='border-accent border-t-primary mb-2 h-8 w-8 animate-spin rounded-full border-4'></div>
+          <p className='text-foreground'>Loading map...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { MapContainer, GeoJSON } = mapComponents;
+
   return (
     <div style={{ height: '100%', width: '100%', position: 'relative' }}>
-      {isLoading && (
-        <div className='bg-background/70 absolute inset-0 z-10 flex items-center justify-center'>
-          <div className='flex flex-col items-center'>
-            <div className='border-accent border-t-primary mb-2 h-8 w-8 animate-spin rounded-full border-4'></div>
-            <p className='text-foreground'>Loading map data...</p>
-          </div>
-        </div>
-      )}
-
       <style jsx global>{`
         .leaflet-container {
           background-color: var(--color-card);
@@ -144,21 +164,19 @@ const LeafletMap = ({
         style={{ height: '100%', width: '100%' }}
         zoom={initialZoom || 2}
         zoomControl={showZoomControls}
-        maxBounds={MAX_WORLD_BOUNDS}
+        maxBounds={MAX_WORLD_BOUNDS as LatLngBoundsExpression}
         maxBoundsViscosity={0.5}
         minZoom={1}
         maxZoom={7}
         attributionControl={false}
       >
-        {worldGeoJson && (
-          <GeoJSON
-            key={JSON.stringify(visitorData.length)} // Force re-render when data changes
-            data={worldGeoJson}
-            style={styleGeoJson}
-            onEachFeature={onEachFeature}
-            {...geoJsonOptions}
-          />
-        )}
+        <GeoJSON
+          key={JSON.stringify(visitorData.length)}
+          data={worldGeoJson}
+          style={styleGeoJson}
+          onEachFeature={onEachFeature}
+          {...geoJsonOptions}
+        />
       </MapContainer>
 
       {showLegend && (
@@ -180,8 +198,4 @@ const LeafletMap = ({
   );
 };
 
-// Export with dynamic import to prevent SSR issues.
-// Required because Leaflet requires window and document objects which doesn't exist during server-side rendering
-export default dynamic(() => Promise.resolve(LeafletMap), {
-  ssr: false,
-});
+export default LeafletMap;
