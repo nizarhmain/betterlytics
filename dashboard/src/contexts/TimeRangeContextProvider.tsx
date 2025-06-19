@@ -1,6 +1,10 @@
-import React, { Dispatch, SetStateAction, useCallback } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect } from 'react';
 import { getDateRangeForTimePresets } from '@/utils/timeRanges';
-import { GranularityRangeValues } from '@/utils/granularityRanges';
+import {
+  GranularityRangeValues,
+  getAllowedGranularities,
+  getValidGranularityFallback,
+} from '@/utils/granularityRanges';
 import { startOfDay, endOfDay } from 'date-fns';
 
 type TimeRangeContextProps = {
@@ -41,6 +45,14 @@ export function TimeRangeContextProvider({ children }: TimeRangeContextProviderP
     setCompareStartDate(startOfDay(csDate));
     setCompareEndDate(endOfDay(ceDate));
   }, []);
+
+  useEffect(() => {
+    const allowedGranularities = getAllowedGranularities(startDate, endDate);
+    if (!allowedGranularities.includes(granularity)) {
+      const validGranularity = getValidGranularityFallback(granularity, allowedGranularities);
+      setGranularity(validGranularity);
+    }
+  }, [startDate, endDate, granularity, setGranularity]);
 
   return (
     <TimeRangeContext.Provider
