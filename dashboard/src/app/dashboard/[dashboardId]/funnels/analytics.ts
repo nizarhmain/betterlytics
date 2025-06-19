@@ -23,23 +23,13 @@ export function analyzeFunnel(funnel: FunnelDetails | FunnelPreview) {
       visitorsRatio: visitors / visitorCount.max,
       dropoffCount: previousStep.visitors - visitors,
       dropoffRatio: dropoffRatio,
-      stepStep: [previousStep.filter, filter],
+      step: [previousStep.filter, filter],
     };
   });
 
-  const biggestDropOff = steps.reduce(
-    (max, current) => {
-      return current.dropoffRatio > max.dropoffRatio ? current : max;
-    },
-    steps[0] ?? {
-      step: '/',
-      visitors: visitorCount.max,
-      visitorsRatio: 0,
-      dropoffCount: 0,
-      dropoffRatio: 0,
-      stepStep: ['/', '/'],
-    },
-  );
+  const biggestDropOff = steps.reduce((max, current) => {
+    return current.dropoffRatio > max.dropoffRatio ? current : max;
+  }, steps[0]);
 
   const conversionRate = visitorCount.min / (visitorCount.max || 1);
 

@@ -30,8 +30,8 @@ export default function FunnelSummarySection({ funnelPromise }: FunnelSummarySec
       title: 'Biggest drop-off',
       value: (
         <span className='flex overflow-hidden overflow-x-auto text-sm text-ellipsis'>
-          {funnelData.biggestDropOff.stepStep[0]} <ArrowRight className='mx-1 max-w-[1rem] min-w-[1rem]' />{' '}
-          {funnelData.biggestDropOff.stepStep[1]}
+          {funnelData.biggestDropOff.step[0]} <ArrowRight className='mx-1 max-w-[1rem] min-w-[1rem]' />{' '}
+          {funnelData.biggestDropOff.step[1]}
         </span>
       ),
     },
