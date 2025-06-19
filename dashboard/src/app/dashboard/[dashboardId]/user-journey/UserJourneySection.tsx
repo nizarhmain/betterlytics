@@ -1,11 +1,8 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use } from 'react';
 import { fetchUserJourneyAction } from '@/app/actions/userJourney';
 import UserJourneyChart from '@/app/dashboard/[dashboardId]/user-journey/UserJourneyChart';
-import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
-import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
-import { useDashboardId } from '@/hooks/use-dashboard-id';
 import { useUserJourneyFilter } from '@/contexts/UserJourneyFilterContextProvider';
 
 const STEP_OPTIONS = [1, 2, 3, 4, 5];
@@ -16,42 +13,18 @@ type UserJourneySectionProps = {
 };
 
 export default function UserJourneySection({ userJourneyPromise }: UserJourneySectionProps) {
-  const dashboardId = useDashboardId();
   const { numberOfSteps, setNumberOfSteps, numberOfJourneys, setNumberOfJourneys } = useUserJourneyFilter();
-  const [currentPromise, setCurrentPromise] = useState(userJourneyPromise);
 
-  const { startDate, endDate } = useTimeRangeContext();
-  const { queryFilters } = useQueryFiltersContext();
-
-  const journeyData = use(currentPromise);
-
-  const handleParameterChange = (newSteps?: number, newJourneys?: number) => {
-    const steps = newSteps ?? numberOfSteps;
-    const journeys = newJourneys ?? numberOfJourneys;
-
-    const newPromise = fetchUserJourneyAction(dashboardId, startDate, endDate, steps, journeys, queryFilters);
-
-    setCurrentPromise(newPromise);
-  };
-
-  const handleStepsChange = (steps: number) => {
-    setNumberOfSteps(steps);
-    handleParameterChange(steps, undefined);
-  };
-
-  const handleJourneysChange = (journeys: number) => {
-    setNumberOfJourneys(journeys);
-    handleParameterChange(undefined, journeys);
-  };
+  const journeyData = use(userJourneyPromise);
 
   return (
     <div className='space-y-6'>
       <div className='flex grow-1 flex-col justify-end gap-x-4 gap-y-1 md:flex-row'>
         <select
           id='steps-select'
-          className='text-foreground bg-background focus:ring-ring h-9 grow-1 rounded border px-3 focus:ring-2 md:grow-0 focus:outline-none md:w-[200px]'
+          className='text-foreground bg-background focus:ring-ring h-9 grow-1 rounded border px-3 focus:ring-2 focus:outline-none md:w-[200px] md:grow-0'
           value={numberOfSteps}
-          onChange={(e) => handleStepsChange(Number(e.target.value))}
+          onChange={(e) => setNumberOfSteps(Number(e.target.value))}
         >
           {STEP_OPTIONS.map((steps) => (
             <option key={steps} value={steps}>
@@ -61,9 +34,9 @@ export default function UserJourneySection({ userJourneyPromise }: UserJourneySe
         </select>
         <select
           id='journeys-select'
-          className='text-foreground bg-background focus:ring-ring h-9 grow-1 rounded border px-3 focus:ring-2 md:grow-0 focus:outline-none md:w-[200px]'
+          className='text-foreground bg-background focus:ring-ring h-9 grow-1 rounded border px-3 focus:ring-2 focus:outline-none md:w-[200px] md:grow-0'
           value={numberOfJourneys}
-          onChange={(e) => handleJourneysChange(Number(e.target.value))}
+          onChange={(e) => setNumberOfJourneys(Number(e.target.value))}
         >
           {JOURNEY_OPTIONS.map((journeys) => (
             <option key={journeys} value={journeys}>

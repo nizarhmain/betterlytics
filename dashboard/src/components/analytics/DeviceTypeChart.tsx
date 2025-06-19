@@ -44,7 +44,7 @@ export default function DeviceTypeChart({ data }: DeviceTypeChartProps) {
           <Tooltip formatter={(value: any) => value.toLocaleString()} />
         </PieChart>
       </ResponsiveContainer>
-      <div className='mt-4 flex justify-center gap-4'>
+      <div className='mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2'>
         {chartData.map((entry) => (
           <div key={entry.label} className='flex items-center gap-1 text-sm'>
             <span className='inline-block h-3 w-3 rounded-full' style={{ backgroundColor: entry.color }}></span>
