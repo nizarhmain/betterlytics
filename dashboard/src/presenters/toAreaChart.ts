@@ -88,6 +88,6 @@ export function toAreaChart<K extends string>({
 
   return chart.map((point, index) => ({
     date: point.date,
-    value: [...point.value, compareChart[index].value],
+    value: [...point.value, ...compareChart[index].value],
   }));
 }
