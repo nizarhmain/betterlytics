@@ -20,8 +20,8 @@ type DataToAreaChartProps<K extends string> = {
 type ToAreaChartProps<K extends string> = DataToAreaChartProps<K> & {
   compare?: Array<{ date: string } & Record<K, number>>;
   compareDateRange?: {
-    start: Date;
-    end: Date;
+    start?: Date;
+    end?: Date;
   };
 };
 
@@ -71,7 +71,11 @@ export function toAreaChart<K extends string>({
     return chart;
   }
 
-  if (compareDateRange === undefined) {
+  if (
+    compareDateRange === undefined ||
+    compareDateRange.start === undefined ||
+    compareDateRange.end === undefined
+  ) {
     throw 'Compare date range must be specified if compare data is received';
   }
 
@@ -79,7 +83,10 @@ export function toAreaChart<K extends string>({
     dataKey,
     data: compare,
     granularity,
-    dateRange: compareDateRange,
+    dateRange: compareDateRange as {
+      start: Date;
+      end: Date;
+    },
   });
 
   if (chart.length !== compareChart.length) {
