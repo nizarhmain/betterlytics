@@ -1,8 +1,6 @@
 'use server';
 
-import { DailySessionMetricsRow } from '@/entities/sessionMetrics';
 import {
-  TopPageRow,
   TopEntryPageRow,
   TopExitPageRow,
   PageAnalyticsCombined,
@@ -37,15 +35,25 @@ export const fetchTotalPageViewsAction = withDashboardAuthContext(
     const data = await getTotalPageViewsForSite(ctx.siteId, startDate, endDate, granularity, queryFilters);
     const compare =
       compareStartDate && compareEndDate
-        ? await getTotalPageViewsForSite(ctx.siteId, startDate, endDate, granularity, queryFilters)
+        ? await getTotalPageViewsForSite(ctx.siteId, compareStartDate, compareEndDate, granularity, queryFilters)
         : undefined;
 
-    console.log(data, compare);
     return toAreaChart({
       data,
       compare,
       granularity,
       dataKey: 'views',
+      dateRange: {
+        start: startDate,
+        end: endDate,
+      },
+      compareDateRange:
+        compareStartDate && compareEndDate
+          ? {
+              start: compareStartDate,
+              end: compareEndDate,
+            }
+          : undefined,
     });
   },
 );
@@ -63,6 +71,10 @@ export const fetchUniqueVisitorsAction = withDashboardAuthContext(
       data,
       granularity,
       dataKey: 'unique_visitors',
+      dateRange: {
+        start: startDate,
+        end: endDate,
+      },
     });
   },
 );
@@ -91,8 +103,24 @@ export const fetchSessionMetricsAction = withDashboardAuthContext(
     );
 
     return {
-      avgVisitDuration: toAreaChart({ data, granularity, dataKey: 'avg_visit_duration' }),
-      bounceRate: toAreaChart({ data, granularity, dataKey: 'bounce_rate' }),
+      avgVisitDuration: toAreaChart({
+        data,
+        granularity,
+        dataKey: 'avg_visit_duration',
+        dateRange: {
+          start: startDate,
+          end: endDate,
+        },
+      }),
+      bounceRate: toAreaChart({
+        data,
+        granularity,
+        dataKey: 'bounce_rate',
+        dateRange: {
+          start: startDate,
+          end: endDate,
+        },
+      }),
     };
   },
 );

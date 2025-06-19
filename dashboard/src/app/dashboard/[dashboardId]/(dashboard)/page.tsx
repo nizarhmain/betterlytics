@@ -51,7 +51,15 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
   const summaryAndChartPromise = Promise.all([
     fetchSummaryStatsAction(dashboardId, startDate, endDate, queryFilters),
     fetchUniqueVisitorsAction(dashboardId, startDate, endDate, granularity, queryFilters),
-    fetchTotalPageViewsAction(dashboardId, startDate, endDate, granularity, queryFilters),
+    fetchTotalPageViewsAction(
+      dashboardId,
+      startDate,
+      endDate,
+      granularity,
+      queryFilters,
+      compareStartDate,
+      compareEndDate,
+    ),
     fetchSessionMetricsAction(dashboardId, startDate, endDate, granularity, queryFilters),
   ]);
 
