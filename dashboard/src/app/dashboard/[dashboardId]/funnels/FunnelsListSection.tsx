@@ -3,7 +3,7 @@
 import { use, useMemo, ReactNode } from 'react';
 import { fetchFunnelsAction } from '@/app/actions';
 import { Badge } from '@/components/ui/badge';
-import { analyzeFunnel } from './analytics';
+import { analyzeFunnel } from '@/lib/analytics';
 import { ArrowRightCircleIcon } from 'lucide-react';
 import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
 import { FunnelsEmptyState } from './FunnelsEmptyState';

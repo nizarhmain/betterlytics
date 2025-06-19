@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useCallback, useState, useMemo, ComponentProps } from 'react';
+import { useCallback, useState, useMemo, ComponentProps, useEffect } from 'react';
 import { Plus, PlusIcon } from 'lucide-react';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 import { FunnelPreviewDisplay } from './FunnelPreviewDisplay';
@@ -51,6 +51,12 @@ export function CreateFunnelDialog({ triggerText, triggerVariant }: CreateFunnel
   });
 
   const { queryFilters, addEmptyQueryFilter, updateQueryFilter, removeQueryFilter } = useQueryFilters();
+
+  useEffect(() => {
+    if (queryFilters.length === 0) {
+      addEmptyQueryFilter();
+    }
+  }, [queryFilters]);
 
   const queryClient = useQueryClient();
 
@@ -88,7 +94,7 @@ export function CreateFunnelDialog({ triggerText, triggerVariant }: CreateFunnel
           {triggerText || 'Create Funnel'}
         </Button>
       </DialogTrigger>
-      <DialogContent className='bg-background flex h-[70dvh] min-w-[80dvw] flex-col'>
+      <DialogContent className='bg-background flex h-[70dvh] w-[80dvw] !max-w-[1250px] flex-col'>
         <DialogHeader>
           <DialogTitle>Create funnel</DialogTitle>
           <DialogDescription>Create a new funnel for your website.</DialogDescription>
@@ -154,7 +160,7 @@ export function CreateFunnelDialog({ triggerText, triggerVariant }: CreateFunnel
           </div>
         </div>
         <DialogFooter className='mt-auto pt-2'>
-          <Button type='submit' onClick={submit}>
+          <Button type='submit' onClick={submit} disabled={queryFilters.length < 2}>
             Create
           </Button>
         </DialogFooter>

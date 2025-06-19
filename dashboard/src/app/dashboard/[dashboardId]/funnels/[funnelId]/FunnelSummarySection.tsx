@@ -1,7 +1,7 @@
 import { use, useMemo } from 'react';
 import SummaryCardsSection, { SummaryCardData } from '@/components/dashboard/SummaryCardsSection';
 import { ArrowRight } from 'lucide-react';
-import { analyzeFunnel } from '../analytics';
+import { analyzeFunnel } from '@/lib/analytics';
 import { fetchFunnelDetailsAction } from '@/app/actions';
 import { formatPercentage } from '@/utils/formatters';
 

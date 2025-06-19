@@ -13,17 +13,17 @@ export function analyzeFunnel(funnel: FunnelDetails | FunnelPreview) {
   };
 
   const steps = stepVisitors.map(({ filter, visitors }, index) => {
-    const previousStep = stepVisitors[index - 1]
-      ? stepVisitors[index - 1]
+    const nextStep = stepVisitors[index + 1]
+      ? stepVisitors[index + 1]
       : { visitors: visitorCount.max, filter: '' };
-    const dropoffRatio = previousStep.visitors ? 1 - visitors / previousStep.visitors : 0;
+    const dropoffRatio = visitors ? 1 - nextStep.visitors / visitors : 0;
     return {
       filter,
       visitors,
       visitorsRatio: visitors / visitorCount.max,
-      dropoffCount: previousStep.visitors - visitors,
+      dropoffCount: visitors - nextStep.visitors,
       dropoffRatio: dropoffRatio,
-      step: [previousStep.filter, filter],
+      step: [filter, nextStep.filter],
     };
   });
 
