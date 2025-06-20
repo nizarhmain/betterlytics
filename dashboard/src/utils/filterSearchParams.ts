@@ -1,6 +1,6 @@
-import { subDays, subMonths, startOfDay, endOfDay } from 'date-fns';
+import { subDays } from 'date-fns';
 import { QueryFilter } from '@/entities/filter';
-import { GranularityRangeValues } from './granularityRanges';
+import { GranularityRangeValues, getAllowedGranularities, getValidGranularityFallback } from './granularityRanges';
 
 type Filters = {
   queryFilters: (QueryFilter & { id: string })[];
@@ -48,18 +48,24 @@ function decode(base64: string): Filters {
     ...decoded,
   };
 
+  const startDate = new Date(withDefaults.startDate);
+  const endDate = new Date(withDefaults.endDate);
+
   if (!withDefaults.compareEnabled) {
     withDefaults.compareStartDate = undefined;
     withDefaults.compareEndDate = undefined;
   }
-  console.log(withDefaults);
+
+  const allowedGranularities = getAllowedGranularities(startDate, endDate);
+  const validGranularity = getValidGranularityFallback(withDefaults.granularity, allowedGranularities);
 
   return {
     ...withDefaults,
-    startDate: new Date(withDefaults.startDate),
-    endDate: new Date(withDefaults.endDate),
+    startDate,
+    endDate,
     compareStartDate: withDefaults.compareStartDate ? new Date(withDefaults.compareStartDate) : undefined,
     compareEndDate: withDefaults.compareEndDate ? new Date(withDefaults.compareEndDate) : undefined,
+    granularity: validGranularity,
   };
 }
 

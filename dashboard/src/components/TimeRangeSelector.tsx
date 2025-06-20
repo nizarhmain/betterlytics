@@ -1,9 +1,14 @@
 'use client';
 
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
 import { TIME_RANGE_PRESETS, TimeRangeValue, getDateRangeForTimePresets } from '@/utils/timeRanges';
-import { GRANULARITY_RANGE_PRESETS, GranularityRangeValues } from '@/utils/granularityRanges';
-import React, { useState, useMemo, useEffect } from 'react';
+import {
+  getValidGranularityFallback,
+  getAllowedGranularities,
+  GRANULARITY_RANGE_PRESETS,
+  GranularityRangeValues,
+} from '@/utils/granularityRanges';
 import { format, addDays, differenceInCalendarDays } from 'date-fns';
 import { CalendarIcon, ChevronDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -89,11 +94,38 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
     return null;
   }, [tempRange, tempCustomStart, tempCustomEnd]);
 
+  const allowedGranularities = useMemo((): GranularityRangeValues[] => {
+    if (tempRange !== 'custom') {
+      const { startDate, endDate } = getDateRangeForTimePresets(tempRange);
+      return getAllowedGranularities(startDate, endDate);
+    }
+
+    if (tempCustomStart && tempCustomEnd) {
+      return getAllowedGranularities(tempCustomStart, tempCustomEnd);
+    }
+
+    return ['day']; // Should never happen
+  }, [tempRange, tempCustomStart, tempCustomEnd]);
+
+  const isGranularityAllowed = useCallback(
+    (granularity: GranularityRangeValues) => {
+      return allowedGranularities.includes(granularity);
+    },
+    [allowedGranularities],
+  );
+
   useEffect(() => {
     if (tempCompareStartDate && tempMainPeriodDurationDays !== null) {
       setTempCompareEndDate(addDays(tempCompareStartDate, tempMainPeriodDurationDays - 1));
     }
   }, [tempMainPeriodDurationDays, tempCompareStartDate]);
+
+  useEffect(() => {
+    if (!allowedGranularities.includes(tempGranularity)) {
+      const validGranularity = getValidGranularityFallback(tempGranularity, allowedGranularities);
+      setTempGranularity(validGranularity);
+    }
+  }, [allowedGranularities, tempGranularity]);
 
   const handlePopoverOpenChange = (open: boolean) => {
     setIsPopoverOpen(open);
@@ -209,16 +241,20 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
         <div>
           <h3 className='mb-2 text-sm font-medium text-gray-500'>Granularity</h3>
           <div className='flex flex-wrap gap-2'>
-            {GRANULARITY_RANGE_PRESETS.map((gran) => (
-              <Button
-                key={gran.value}
-                variant={tempGranularity === gran.value ? 'default' : 'outline'}
-                onClick={() => setTempGranularity(gran.value)}
-                className='flex-1'
-              >
-                {gran.label}
-              </Button>
-            )).reverse()}
+            {GRANULARITY_RANGE_PRESETS.map((gran) => {
+              const isAllowed = isGranularityAllowed(gran.value);
+              return (
+                <Button
+                  key={gran.value}
+                  variant={tempGranularity === gran.value ? 'default' : 'outline'}
+                  onClick={() => isAllowed && setTempGranularity(gran.value)}
+                  disabled={!isAllowed}
+                  className={cn('flex-1', !isAllowed && 'cursor-not-allowed opacity-50')}
+                >
+                  {gran.label}
+                </Button>
+              );
+            }).reverse()}
           </div>
         </div>
 
@@ -245,6 +281,12 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
                     mode='single'
                     selected={tempCustomStart}
                     onSelect={handleStartDateSelect}
+                    disabled={(date) => {
+                      if (tempCustomEnd && date > tempCustomEnd) {
+                        return true;
+                      }
+                      return date > new Date();
+                    }}
                     initialFocus
                   />
                 </PopoverContent>
@@ -266,7 +308,18 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className='z-[1003] w-auto p-0' align='start'>
-                  <Calendar mode='single' selected={tempCustomEnd} onSelect={handleEndDateSelect} initialFocus />
+                  <Calendar
+                    mode='single'
+                    selected={tempCustomEnd}
+                    onSelect={handleEndDateSelect}
+                    disabled={(date) => {
+                      if (tempCustomStart && date < tempCustomStart) {
+                        return true;
+                      }
+                      return date > new Date();
+                    }}
+                    initialFocus
+                  />
                 </PopoverContent>
               </Popover>
             </div>
@@ -310,6 +363,12 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
                         mode='single'
                         selected={tempCompareStartDate}
                         onSelect={handleCompareStartDateSelect}
+                        disabled={(date) => {
+                          if (tempCompareEndDate && date > tempCompareEndDate) {
+                            return true;
+                          }
+                          return date > new Date();
+                        }}
                         initialFocus
                       />
                     </PopoverContent>
@@ -335,6 +394,12 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
                         mode='single'
                         selected={tempCompareEndDate}
                         onSelect={handleCompareEndDateSelect}
+                        disabled={(date) => {
+                          if (tempCompareStartDate && date < tempCompareStartDate) {
+                            return true;
+                          }
+                          return date > new Date();
+                        }}
                         initialFocus
                       />
                     </PopoverContent>

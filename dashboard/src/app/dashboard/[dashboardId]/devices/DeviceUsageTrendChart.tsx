@@ -21,7 +21,7 @@ interface DeviceUsageTrendChartProps {
 }
 
 const CustomLegend = React.memo(({ deviceTypes }: { deviceTypes: string[] }) => (
-  <div className='mt-4 flex justify-center gap-4'>
+  <div className='mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2'>
     {deviceTypes.map((deviceType) => (
       <div key={deviceType} className='flex items-center gap-1 text-sm'>
         <span
