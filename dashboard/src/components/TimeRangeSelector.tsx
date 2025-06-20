@@ -240,7 +240,7 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
                     {tempCustomStart ? format(tempCustomStart, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className='w-auto p-0' align='start'>
+                <PopoverContent className='z-[1003] w-auto p-0' align='start'>
                   <Calendar
                     mode='single'
                     selected={tempCustomStart}
@@ -265,7 +265,7 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
                     {tempCustomEnd ? format(tempCustomEnd, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className='w-auto p-0' align='start'>
+                <PopoverContent className='z-[1003] w-auto p-0' align='start'>
                   <Calendar mode='single' selected={tempCustomEnd} onSelect={handleEndDateSelect} initialFocus />
                 </PopoverContent>
               </Popover>
@@ -305,7 +305,7 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
                         {tempCompareStartDate ? format(tempCompareStartDate, 'PPP') : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className='w-auto p-0' align='start'>
+                    <PopoverContent className='z-[1003] w-auto p-0' align='start'>
                       <Calendar
                         mode='single'
                         selected={tempCompareStartDate}
@@ -330,7 +330,7 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
                         {tempCompareEndDate ? format(tempCompareEndDate, 'PPP') : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className='w-auto p-0' align='start'>
+                    <PopoverContent className='z-[1003] w-auto p-0' align='start'>
                       <Calendar
                         mode='single'
                         selected={tempCompareEndDate}
