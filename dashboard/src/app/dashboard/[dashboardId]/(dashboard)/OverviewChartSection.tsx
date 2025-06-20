@@ -8,6 +8,7 @@ import {
   type fetchTotalPageViewsAction,
   type fetchUniqueVisitorsAction,
 } from '@/app/actions';
+import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
 
 type ActiveMetric = 'visitors' | 'pageviews' | 'bounceRate' | 'avgDuration';
 
@@ -72,6 +73,7 @@ export default function OverviewChartSection({
   }, [activeMetric, visitorsData, pageviewsData, sessionMetricsData]);
 
   const currentMetricConfig = useMemo(() => metricConfigs[activeMetric], [activeMetric]);
+  const { granularity } = useTimeRangeContext();
 
   return (
     <InteractiveChart
@@ -79,6 +81,7 @@ export default function OverviewChartSection({
       data={chartData}
       color={currentMetricConfig.color}
       formatValue={currentMetricConfig.formatValue}
+      granularity={granularity}
     />
   );
 }
