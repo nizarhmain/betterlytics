@@ -17,6 +17,7 @@ mod geoip_updater;
 mod bot_detection;
 mod referrer;
 mod campaign;
+mod ua_parser;
 
 use analytics::{AnalyticsEvent, RawTrackingEvent, generate_site_id};
 use db::{Database, SharedDatabase};
@@ -32,6 +33,8 @@ async fn main() {
         .with(tracing_subscriber::EnvFilter::new(&config.log_level))
         .with(tracing_subscriber::fmt::layer())
         .init();
+
+    ua_parser::initialize();
 
     let ip_addr = config.server_host.parse::<std::net::IpAddr>()
         .map_err(|e| format!("Invalid server host IP address '{}': {}", config.server_host, e))

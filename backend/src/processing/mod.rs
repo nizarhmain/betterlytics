@@ -7,12 +7,9 @@ use crate::geoip::GeoIpService;
 use crate::session;
 use crate::bot_detection;
 use crate::referrer::{ReferrerInfo, parse_referrer};
-use woothee::parser::Parser;
-use once_cell::sync::Lazy;
 use url::Url;
 use crate::campaign::{CampaignInfo, parse_campaign_params};
-
-static USER_AGENT_PARSER: Lazy<Parser> = Lazy::new(|| Parser::new());
+use crate::ua_parser;
 
 #[derive(Debug, Clone)]
 pub struct ProcessedEvent {
@@ -203,31 +200,22 @@ impl EventProcessor {
         Ok(())
     }
 
-    /// Detect if the request is from a bot
     async fn detect_bot(&self, processed: &mut ProcessedEvent) -> Result<()> {
         processed.is_bot = bot_detection::is_bot(&processed.user_agent);
         Ok(())
     }
 
-    /// Parse user agent to extract browser and OS information
     async fn parse_user_agent(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        debug!("Parsing user agent: {:?}", processed.user_agent);
+        let parsed = ua_parser::parse_user_agent(&processed.user_agent);
         
-        if let Some(result) = USER_AGENT_PARSER.parse(&processed.user_agent) {
-            // Extract browser information
-            processed.browser = Some(result.name.to_string());
-            processed.browser_version = Some(result.version.to_string());
-            
-            // Extract OS information
-            processed.os = Some(result.os.to_string());
-            
-            debug!(
-                "User agent parsed: browser={:?}, version={:?}, os={:?}, device_type={:?}",
-                processed.browser, processed.browser_version, processed.os, processed.device_type
-            );
-        } else {
-            debug!("Failed to parse user agent: {}", processed.user_agent);
-        }
+        processed.browser = Some(parsed.browser);
+        processed.browser_version = parsed.browser_version;
+        processed.os = Some(parsed.os);
+        
+        debug!(
+            "User agent parsed: browser={:?}, version={:?}, os={:?}, device_type={:?}",
+            processed.browser, processed.browser_version, processed.os, processed.device_type
+        );
         
         Ok(())
     }
