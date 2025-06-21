@@ -20,8 +20,6 @@ export default function DeviceTypeChart({ data }: DeviceTypeChartProps) {
     }));
   }, [data]);
 
-  console.log(chartData);
-
   return (
     <div className='flex h-64 flex-col items-center'>
       <ResponsiveContainer width='100%' height={200}>

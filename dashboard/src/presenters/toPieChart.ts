@@ -15,7 +15,7 @@ function dataToPieChart<K extends string, D extends string>({ key, dataKey, data
     value: [point[dataKey]],
   }));
 
-  const total = baseChart.reduce((sum, d) => sum + d.value[0], 0);
+  const total = baseChart.reduce((sum, d) => sum + d.value[0], 0) || 1;
 
   return baseChart.map((point) => ({
     ...point,
@@ -47,7 +47,7 @@ export function toPieChart<K extends string, D extends string>({
 
   return chart.map((point, index) => ({
     name: point.name,
-    value: [...point.value, ...compareChart[index].value],
+    value: [...point.value, ...(compareChart.find((comp) => comp.name === point.name)?.value ?? [0])],
     percentage: point.percentage,
   }));
 }
