@@ -76,9 +76,10 @@ export const createStripeCheckoutSession = withUserAuth(async (user: User, planD
       cancel_url: `${env.NEXT_PUBLIC_BASE_URL}/billing?canceled=true`,
       allow_promotion_codes: true,
       billing_address_collection: 'required',
-      automatic_tax: {
+      /*automatic_tax: {
         enabled: true,
       },
+      */
     });
 
     if (!checkoutSession.url) {

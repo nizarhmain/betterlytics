@@ -13,8 +13,8 @@ export const EVENT_RANGES = [
     },
     professional: {
       price: {
-        usd_cents: 1400,
-        eur_cents: 1200,
+        usd_cents: 700,
+        eur_cents: 600,
       },
       lookup_key: 'professional_10000_events',
     },
@@ -31,8 +31,8 @@ export const EVENT_RANGES = [
     },
     professional: {
       price: {
-        usd_cents: 1400,
-        eur_cents: 1200,
+        usd_cents: 1100,
+        eur_cents: 1000,
       },
       lookup_key: 'professional_50000_events',
     },
@@ -49,8 +49,8 @@ export const EVENT_RANGES = [
     },
     professional: {
       price: {
-        usd_cents: 2800,
-        eur_cents: 2500,
+        usd_cents: 2100,
+        eur_cents: 1800,
       },
       lookup_key: 'professional_100000_events',
     },
@@ -67,8 +67,8 @@ export const EVENT_RANGES = [
     },
     professional: {
       price: {
-        usd_cents: 5000,
-        eur_cents: 4400,
+        usd_cents: 3800,
+        eur_cents: 3300,
       },
       lookup_key: 'professional_200000_events',
     },
@@ -79,14 +79,14 @@ export const EVENT_RANGES = [
     growth: {
       price: {
         usd_cents: 3900,
-        eur_cents: 3500,
+        eur_cents: 3400,
       },
       lookup_key: 'growth_500000_events',
     },
     professional: {
       price: {
-        usd_cents: 7800,
-        eur_cents: 6900,
+        usd_cents: 5900,
+        eur_cents: 5200,
       },
       lookup_key: 'professional_500000_events',
     },
@@ -97,14 +97,14 @@ export const EVENT_RANGES = [
     growth: {
       price: {
         usd_cents: 5900,
-        eur_cents: 5200,
+        eur_cents: 5100,
       },
       lookup_key: 'growth_1000000_events',
     },
     professional: {
       price: {
-        usd_cents: 11800,
-        eur_cents: 10500,
+        usd_cents: 8900,
+        eur_cents: 7700,
       },
       lookup_key: 'professional_1000000_events',
     },
@@ -115,14 +115,14 @@ export const EVENT_RANGES = [
     growth: {
       price: {
         usd_cents: 8900,
-        eur_cents: 7900,
+        eur_cents: 7700,
       },
       lookup_key: 'growth_2000000_events',
     },
     professional: {
       price: {
-        usd_cents: 17800,
-        eur_cents: 15800,
+        usd_cents: 13400,
+        eur_cents: 11600,
       },
       lookup_key: 'professional_2000000_events',
     },
@@ -133,14 +133,14 @@ export const EVENT_RANGES = [
     growth: {
       price: {
         usd_cents: 12900,
-        eur_cents: 11500,
+        eur_cents: 12000,
       },
       lookup_key: 'growth_5000000_events',
     },
     professional: {
       price: {
-        usd_cents: 25800,
-        eur_cents: 22900,
+        usd_cents: 19400,
+        eur_cents: 16900,
       },
       lookup_key: 'professional_5000000_events',
     },
@@ -151,14 +151,14 @@ export const EVENT_RANGES = [
     growth: {
       price: {
         usd_cents: 16900,
-        eur_cents: 14900,
+        eur_cents: 14700,
       },
       lookup_key: 'growth_10000000_events',
     },
     professional: {
       price: {
-        usd_cents: 33800,
-        eur_cents: 29900,
+        usd_cents: 25400,
+        eur_cents: 22100,
       },
       lookup_key: 'professional_10000000_events',
     },

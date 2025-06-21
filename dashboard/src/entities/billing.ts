@@ -63,6 +63,7 @@ export const UserBillingDataSchema = z.object({
     currency: CurrencySchema,
     currentPeriodEnd: z.date(),
     status: z.string(),
+    cancelAtPeriodEnd: z.boolean(),
   }),
   usage: UsageDataSchema,
   isExistingPaidSubscriber: z.boolean(),
