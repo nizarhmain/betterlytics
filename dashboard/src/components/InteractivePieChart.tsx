@@ -28,7 +28,7 @@ interface InteractivePieChartProps {
   data: ChartDataPoint[];
   getLabel: (name: string) => string;
   getColor: (name: string) => string;
-  getIcon: (name: string) => React.ReactNode;
+  getIcon?: (name: string) => React.ReactNode;
   formatValue?: (value: number) => string;
 }
 
@@ -64,7 +64,7 @@ const InteractivePieChart: React.FC<InteractivePieChartProps> = React.memo(
                 className='inline-block h-3 w-3 rounded-full'
                 style={{ backgroundColor: getColor(entry.name) }}
               ></span>
-              {getIcon(entry.name)}
+              {getIcon && getIcon(entry.name)}
               <span className='text-foreground font-medium'>{capitalizeFirstLetter(entry.name)}</span>
               <span className='text-muted-foreground'>{formatPercentage(entry.percentage)}</span>
             </div>
