@@ -6,7 +6,7 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 interface ChartTooltipProps {
   payload?: {
     value: number;
-    payload: { date: string | number; label?: string; color?: string; value: number[] };
+    payload: { date: string | number; name?: string; label?: string; color?: string; value: number[] };
   }[];
   formatter?: (value: any) => string;
   labelFormatter: (date: any) => string;
@@ -19,8 +19,7 @@ export function ChartTooltip({ active, payload, label, formatter, labelFormatter
   if (!active || !payload || !payload.length) {
     return null;
   }
-
-  const name = label || payload[0].payload.label;
+  const name = label || payload[0].payload.name || payload[0].payload.label;
 
   const labelColor = payload[0].payload.color;
 

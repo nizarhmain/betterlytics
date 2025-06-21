@@ -52,7 +52,15 @@ export default async function ReferrersPage({ params, searchParams }: ReferrersP
     granularity,
     queryFilters,
   );
-  const tablePromise = fetchReferrerTableDataForSite(dashboardId, startDate, endDate, queryFilters, 100);
+  const tablePromise = fetchReferrerTableDataForSite(
+    dashboardId,
+    startDate,
+    endDate,
+    queryFilters,
+    100,
+    compareStartDate,
+    compareEndDate,
+  );
 
   return (
     <div className='min-h-screen'>

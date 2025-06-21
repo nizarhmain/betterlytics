@@ -106,9 +106,21 @@ export const fetchReferrerSummaryWithChartsDataForSite = withDashboardAuthContex
  * Fetches detailed referrer data for table display
  */
 export const fetchReferrerTableDataForSite = withDashboardAuthContext(
-  async (ctx: AuthContext, startDate: Date, endDate: Date, queryFilters: QueryFilter[], limit: number = 100) => {
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    queryFilters: QueryFilter[],
+    limit: number = 100,
+    compareStartDate?: Date,
+    compareEndDate?: Date,
+  ) => {
     try {
       const data = await getReferrerTableDataForSite(ctx.siteId, startDate, endDate, queryFilters, limit);
+      const compare =
+        compareStartDate &&
+        compareEndDate &&
+        (await getReferrerTableDataForSite(ctx.siteId, startDate, endDate, queryFilters, limit));
       return { data };
     } catch (error) {
       console.error('Error fetching referrer table data:', error);

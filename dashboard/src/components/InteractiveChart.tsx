@@ -20,7 +20,8 @@ interface InteractiveChartProps {
 
 const InteractiveChart: React.FC<InteractiveChartProps> = React.memo(
   ({ title, data, color, formatValue, granularity }) => {
-    const timeFormatter = granularity === 'day' ? timeFormat('%b %d') : timeFormat('%b %d - %H:%M');
+    const timeFormatter =
+      granularity === undefined || granularity === 'day' ? timeFormat('%b %d') : timeFormat('%b %d - %H:%M');
     return (
       <Card>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
