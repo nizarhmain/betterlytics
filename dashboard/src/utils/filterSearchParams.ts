@@ -1,5 +1,5 @@
 import { QueryFilter } from '@/entities/filter';
-import { GranularityRangeValues } from './granularityRanges';
+import { GranularityRangeValues, getAllowedGranularities, getValidGranularityFallback } from './granularityRanges';
 
 type Filters = {
   queryFilters: (QueryFilter & { id: string })[];
@@ -37,10 +37,18 @@ function decode(base64: string): Filters {
     ...getDefaultFilters(),
     ...decoded,
   };
+
+  const startDate = new Date(withDefaults.startDate);
+  const endDate = new Date(withDefaults.endDate);
+
+  const allowedGranularities = getAllowedGranularities(startDate, endDate);
+  const validGranularity = getValidGranularityFallback(withDefaults.granularity, allowedGranularities);
+
   return {
     ...withDefaults,
-    startDate: new Date(withDefaults.startDate),
-    endDate: new Date(withDefaults.endDate),
+    startDate,
+    endDate,
+    granularity: validGranularity,
   };
 }
 
