@@ -5,6 +5,7 @@ import {
   getSubscriptionByPaymentId,
 } from '@/repositories/postgres/subscription';
 import { createBillingHistoryEntry } from '@/repositories/postgres/billingHistory';
+import type { Currency, PaymentStatus } from '@/entities/billing';
 import { stripe } from '@/lib/billing/stripe';
 import { getTierConfigFromLookupKey } from '@/lib/billing/plans';
 
@@ -23,11 +24,7 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
     const subscriptionItem = stripeSubscription.items.data[0];
     const pricePerMonth = subscriptionItem.price.unit_amount || 0;
 
-    const tierConfig = getTierConfigFromLookupKey(subscriptionItem.price.lookup_key);
-
-    if (!tierConfig) {
-      throw new Error(`Unknown price lookup key: ${subscriptionItem.price.lookup_key}`);
-    }
+    const tierConfig = getTierConfigFromLookupKey(subscriptionItem.price.lookup_key as string);
 
     await upsertSubscription({
       userId,
@@ -35,6 +32,10 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
       status: 'active',
       eventLimit: tierConfig.eventLimit,
       pricePerMonth,
+      currency: subscriptionItem.price.currency.toUpperCase() as Currency,
+      cancelAtPeriodEnd: false,
+      currentPeriodStart: new Date(subscriptionItem.current_period_start * 1000),
+      currentPeriodEnd: new Date(subscriptionItem.current_period_end * 1000),
       paymentCustomerId: stripeSubscription.customer as string,
       paymentSubscriptionId: session.subscription as string,
       paymentPriceId: subscriptionItem.price.id,
@@ -66,12 +67,12 @@ export async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       userId: subscription.userId,
       periodStart: subscription.currentPeriodStart,
       periodEnd: subscription.currentPeriodEnd,
-      eventCount: 0,
       eventLimit: subscription.eventLimit,
       amountPaid: invoice.amount_paid,
+      currency: invoice.currency.toUpperCase() as Currency,
       paymentInvoiceId: invoice.id,
       paymentPaymentIntentId: undefined,
-      status: 'paid',
+      status: 'paid' as PaymentStatus,
     });
   } catch (error) {
     console.error('Error handling invoice payment succeeded:', error);
@@ -111,9 +112,57 @@ export async function handleSubscriptionDeleted(subscription: Stripe.Subscriptio
       return;
     }
 
-    await updateSubscriptionStatus(localSubscription.userId, 'canceled', true);
+    const now = new Date();
+
+    // Downgrade to free Growth plan
+    await upsertSubscription({
+      userId: localSubscription.userId,
+      tier: 'growth',
+      status: 'active',
+      eventLimit: 10000,
+      pricePerMonth: 0,
+      currency: localSubscription.currency,
+      currentPeriodStart: now,
+      currentPeriodEnd: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+      cancelAtPeriodEnd: false,
+      paymentCustomerId: undefined,
+      paymentSubscriptionId: undefined,
+      paymentPriceId: undefined,
+    });
   } catch (error) {
     console.error('Error handling subscription deleted:', error);
+    throw error;
+  }
+}
+
+export async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+  try {
+    const localSubscription = await getSubscriptionByPaymentId(subscription.id);
+    if (!localSubscription) {
+      throw new Error(`No local subscription found for Stripe subscription: ${subscription.id}`);
+    }
+
+    const subscriptionItem = subscription.items.data[0];
+    const pricePerMonth = subscriptionItem.price.unit_amount || 0;
+
+    const tierConfig = getTierConfigFromLookupKey(subscriptionItem.price.lookup_key as string);
+
+    await upsertSubscription({
+      userId: localSubscription.userId,
+      tier: tierConfig.tier,
+      status: subscription.status,
+      eventLimit: tierConfig.eventLimit,
+      pricePerMonth,
+      currency: subscriptionItem.price.currency.toUpperCase() as Currency,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      currentPeriodStart: new Date(subscriptionItem.current_period_start * 1000),
+      currentPeriodEnd: new Date(subscriptionItem.current_period_end * 1000),
+      paymentCustomerId: subscription.customer as string,
+      paymentSubscriptionId: subscription.id,
+      paymentPriceId: subscriptionItem.price.id,
+    });
+  } catch (error) {
+    console.error('Error handling subscription updated:', error);
     throw error;
   }
 }

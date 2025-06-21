@@ -32,7 +32,7 @@ export default async function BillingPage() {
         </div>
 
         <div className='mb-8'>
-          <CurrentPlanCard billingData={billingData} />
+          <CurrentPlanCard billingData={billingData} showManagementButtons={true} />
         </div>
 
         <BillingInteractive billingData={billingData} />

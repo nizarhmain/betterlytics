@@ -1,5 +1,10 @@
 import prisma from '@/lib/postgres';
-import { BillingHistory, BillingHistorySchema } from '@/entities/billing';
+import {
+  BillingHistory,
+  BillingHistorySchema,
+  CreateBillingHistoryData,
+  CreateBillingHistorySchema,
+} from '@/entities/billing';
 
 export async function getBillingHistoryByUserId(userId: string): Promise<BillingHistory[]> {
   try {
@@ -15,19 +20,11 @@ export async function getBillingHistoryByUserId(userId: string): Promise<Billing
   }
 }
 
-export async function createBillingHistoryEntry(data: {
-  userId: string;
-  periodStart: Date;
-  periodEnd: Date;
-  eventCount: number;
-  eventLimit: number;
-  amountPaid: number;
-  paymentInvoiceId?: string;
-  paymentPaymentIntentId?: string;
-  status: string;
-}): Promise<BillingHistory> {
+export async function createBillingHistoryEntry(data: CreateBillingHistoryData): Promise<BillingHistory> {
+  const validatedData = CreateBillingHistorySchema.parse(data);
+
   const billingHistory = await prisma.billingHistory.create({
-    data,
+    data: validatedData,
   });
 
   return BillingHistorySchema.parse(billingHistory);

@@ -5,12 +5,13 @@ import { stripe } from '@/lib/billing/stripe';
 import { SelectedPlan, SelectedPlanSchema, Currency } from '@/types/pricing';
 import { User } from 'next-auth';
 import { env } from '@/lib/env';
+import { getUserSubscription } from '@/repositories/postgres/subscription';
+import { Stripe } from 'stripe';
 
-async function getPriceWithCurrencyOptions(lookupKey: string, requestedCurrency: Currency): Promise<string> {
+async function getPriceWithCurrencyOptions(lookupKey: string, requestedCurrency: Currency): Promise<Stripe.Price> {
   try {
     const prices = await stripe.prices.list({
       lookup_keys: [lookupKey],
-      limit: 1,
       expand: ['data.currency_options'],
     });
 
@@ -18,14 +19,18 @@ async function getPriceWithCurrencyOptions(lookupKey: string, requestedCurrency:
       throw new Error(`No price found for lookup key: ${lookupKey}`);
     }
 
-    const price = prices.data[0];
-
     const currencyLower = requestedCurrency.toLowerCase();
-    if (price.currency !== currencyLower) {
-      console.warn(`Requested currency ${requestedCurrency} not supported for price ${lookupKey}`);
+
+    const targetPrice = prices.data.find((price) => price.currency === currencyLower);
+
+    if (!targetPrice) {
+      console.warn(
+        `Requested currency ${requestedCurrency} not found for lookup key ${lookupKey}, using first available price`,
+      );
+      return prices.data[0];
     }
 
-    return price.id;
+    return targetPrice;
   } catch (error) {
     console.error('Error retrieving price from lookup key:', error);
     throw new Error(`Failed to retrieve price for lookup key: ${lookupKey}`);
@@ -48,12 +53,12 @@ export const createStripeCheckoutSession = withUserAuth(async (user: User, planD
       throw new Error('No lookup key provided for plan');
     }
 
-    const priceId = await getPriceWithCurrencyOptions(validatedPlan.lookup_key, validatedPlan.currency);
+    const price = await getPriceWithCurrencyOptions(validatedPlan.lookup_key, validatedPlan.currency);
 
     const checkoutSession = await stripe.checkout.sessions.create({
       line_items: [
         {
-          price: priceId,
+          price: price.id,
           quantity: 1,
         },
       ],
@@ -69,9 +74,9 @@ export const createStripeCheckoutSession = withUserAuth(async (user: User, planD
       cancel_url: `${env.NEXT_PUBLIC_BASE_URL}/billing?canceled=true`,
       allow_promotion_codes: true,
       billing_address_collection: 'required',
-      /*automatic_tax: {
+      automatic_tax: {
         enabled: true,
-      },*/
+      },
     });
 
     if (!checkoutSession.url) {
@@ -81,16 +86,130 @@ export const createStripeCheckoutSession = withUserAuth(async (user: User, planD
     return checkoutSession.url;
   } catch (error) {
     console.error('Failed to create Stripe checkout session:', error);
+    throw new Error('Failed to create checkout session. Please try again.');
+  }
+});
 
-    if (error instanceof Error) {
-      if (error.message.includes('currency')) {
-        throw new Error('The selected currency is not supported for this plan. Please try a different currency.');
-      }
-      if (error.message.includes('lookup key')) {
-        throw new Error('The selected plan configuration is not available. Please try a different plan.');
+export const createStripeCustomerPortalSessionForCancellation = withUserAuth(async (user: User) => {
+  try {
+    const subscription = await getUserSubscription(user.id);
+
+    if (!subscription?.paymentCustomerId) {
+      throw new Error('No Stripe customer found for this user');
+    }
+
+    const configuration = await stripe.billingPortal.configurations.create({
+      business_profile: {
+        headline: 'Cancel your subscription',
+      },
+      features: {
+        subscription_cancel: {
+          enabled: true,
+          mode: 'at_period_end',
+          cancellation_reason: {
+            enabled: true,
+            options: ['too_expensive', 'missing_features', 'switched_service', 'unused', 'other'],
+          },
+        },
+        payment_method_update: { enabled: true },
+        invoice_history: { enabled: true },
+        subscription_update: { enabled: false },
+      },
+    });
+
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: subscription.paymentCustomerId,
+      return_url: `${env.NEXT_PUBLIC_BASE_URL}/billing`,
+      configuration: configuration.id,
+      flow_data: {
+        type: 'subscription_cancel',
+        subscription_cancel: {
+          subscription: subscription.paymentSubscriptionId!,
+        },
+      },
+    });
+
+    if (!portalSession.url) {
+      throw new Error('Failed to create customer portal session URL');
+    }
+
+    return portalSession.url;
+  } catch (error) {
+    console.error('Failed to create Stripe customer portal session for cancellation:', error);
+    throw new Error('Failed to access billing portal. Please try again.');
+  }
+});
+
+export const createStripeCustomerPortalSession = withUserAuth(async (user: User, targetPlan?: SelectedPlan) => {
+  try {
+    const subscription = await getUserSubscription(user.id);
+
+    if (!subscription?.paymentCustomerId) {
+      throw new Error('No Stripe customer found for this user');
+    }
+
+    let configurationId: string | undefined;
+
+    if (targetPlan?.lookup_key) {
+      try {
+        const targetPrice = await getPriceWithCurrencyOptions(targetPlan.lookup_key, targetPlan.currency);
+
+        const configuration = await stripe.billingPortal.configurations.create({
+          business_profile: {
+            headline: `Switching to ${targetPlan.tier} plan with ${targetPlan.eventLimit.toLocaleString()} events`,
+          },
+          features: {
+            subscription_update: {
+              enabled: true,
+              default_allowed_updates: ['price', 'promotion_code'],
+              proration_behavior: 'always_invoice',
+              products: [
+                {
+                  product: targetPrice.product as string,
+                  prices: [targetPrice.id],
+                },
+              ],
+            },
+            payment_method_update: { enabled: true },
+            invoice_history: { enabled: true },
+            subscription_cancel: { enabled: true },
+          },
+        });
+
+        configurationId = configuration.id;
+      } catch (configError) {
+        console.warn('Failed to create custom configuration, using default:', configError);
+        // Fallback to default configuration
       }
     }
 
-    throw new Error('Failed to create checkout session. Please try again.');
+    const sessionParams: Stripe.BillingPortal.SessionCreateParams = {
+      customer: subscription.paymentCustomerId,
+      return_url: `${env.NEXT_PUBLIC_BASE_URL}/billing`,
+    };
+
+    if (configurationId) {
+      sessionParams.configuration = configurationId;
+    }
+
+    if (targetPlan && subscription.paymentSubscriptionId) {
+      sessionParams.flow_data = {
+        type: 'subscription_update',
+        subscription_update: {
+          subscription: subscription.paymentSubscriptionId,
+        },
+      };
+    }
+
+    const portalSession = await stripe.billingPortal.sessions.create(sessionParams);
+
+    if (!portalSession.url) {
+      throw new Error('Failed to create customer portal session URL');
+    }
+
+    return portalSession.url;
+  } catch (error) {
+    console.error('Failed to create Stripe customer portal session:', error);
+    throw new Error('Failed to access billing portal. Please try again.');
   }
 });

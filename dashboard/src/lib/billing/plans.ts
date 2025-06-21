@@ -186,11 +186,7 @@ export const EVENT_RANGES = [
 export type EventRange = (typeof EVENT_RANGES)[number];
 export type TierName = 'growth' | 'professional';
 
-export function getTierConfigFromLookupKey(
-  lookupKey: string | null,
-): { tier: TierName; eventLimit: number } | null {
-  if (!lookupKey) return null;
-
+export function getTierConfigFromLookupKey(lookupKey: string): { tier: TierName; eventLimit: number } {
   for (const range of EVENT_RANGES) {
     if (range.growth.lookup_key === lookupKey) {
       return { tier: 'growth', eventLimit: range.value };
@@ -200,5 +196,5 @@ export function getTierConfigFromLookupKey(
     }
   }
 
-  return null;
+  throw new Error(`Unknown price lookup key: ${lookupKey}`);
 }

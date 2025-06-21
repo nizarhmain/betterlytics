@@ -1,6 +1,7 @@
 import prisma from '@/lib/postgres';
 import { Subscription, SubscriptionSchema } from '@/entities/billing';
 import { addMonths, startOfDay } from 'date-fns';
+import { UpsertSubscriptionData, UpsertSubscriptionSchema } from '@/entities/billing';
 
 export async function getUserSubscription(userId: string): Promise<Subscription | null> {
   try {
@@ -39,45 +40,19 @@ async function createDefaultStarterSubscription(userId: string): Promise<Subscri
   return SubscriptionSchema.parse(subscription);
 }
 
-export async function upsertSubscription(data: {
-  userId: string;
-  tier: string;
-  status: string;
-  eventLimit: number;
-  pricePerMonth: number;
-  paymentCustomerId?: string;
-  paymentSubscriptionId?: string;
-  paymentPriceId?: string;
-}): Promise<Subscription> {
-  const now = new Date();
-  const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+export async function upsertSubscription(data: UpsertSubscriptionData): Promise<Subscription> {
+  const validatedData = UpsertSubscriptionSchema.parse(data);
+
+  const { userId, ...subscriptionData } = validatedData;
 
   const subscription = await prisma.subscription.upsert({
-    where: { userId: data.userId },
+    where: { userId },
     create: {
-      user: { connect: { id: data.userId } },
-      tier: data.tier,
-      status: data.status,
-      eventLimit: data.eventLimit,
-      pricePerMonth: data.pricePerMonth,
-      currentPeriodStart: now,
-      currentPeriodEnd: periodEnd,
-      cancelAtPeriodEnd: false,
-      paymentCustomerId: data.paymentCustomerId,
-      paymentSubscriptionId: data.paymentSubscriptionId,
-      paymentPriceId: data.paymentPriceId,
+      user: { connect: { id: userId } },
+      ...subscriptionData,
     },
     update: {
-      tier: data.tier,
-      eventLimit: data.eventLimit,
-      pricePerMonth: data.pricePerMonth,
-      currentPeriodStart: now,
-      currentPeriodEnd: periodEnd,
-      status: 'active',
-      cancelAtPeriodEnd: false,
-      paymentCustomerId: data.paymentCustomerId,
-      paymentSubscriptionId: data.paymentSubscriptionId,
-      paymentPriceId: data.paymentPriceId,
+      ...subscriptionData,
     },
   });
 

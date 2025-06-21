@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { PricingComponent } from '@/components/pricing/PricingComponent';
 import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
-import { createStripeCheckoutSession } from '@/actions/stripe';
+import { createStripeCheckoutSession, createStripeCustomerPortalSession } from '@/actions/stripe';
 import type { UserBillingData } from '@/entities/billing';
 
 interface BillingInteractiveProps {
@@ -25,32 +25,26 @@ export function BillingInteractive({ billingData }: BillingInteractiveProps) {
     try {
       const validatedPlan = SelectedPlanSchema.parse(planData);
 
-      if (validatedPlan.price_cents === 0 && validatedPlan.tier === 'growth') {
-        if (billingData.isExistingPaidSubscriber) {
-          // TODO: Handle downgrade to free plan (implement later?)
-          return;
-        } else {
-          toast.info('You are already on the free starter plan!');
-          return;
-        }
-      }
-
       if (validatedPlan.tier === 'enterprise') {
         toast.info('Please contact us for custom pricing');
         return;
       }
 
       if (billingData.isExistingPaidSubscriber) {
-        // TODO: Handle plan change for existing subscribers (implement later)
-        return;
-      } else {
-        const result = await createStripeCheckoutSession(validatedPlan);
-
-        if (result) {
-          window.location.href = result;
+        const portalUrl = await createStripeCustomerPortalSession(validatedPlan);
+        if (portalUrl) {
+          window.location.href = portalUrl;
         } else {
-          throw new Error('No checkout URL received');
+          throw new Error('No customer portal URL received');
         }
+        return;
+      }
+
+      const result = await createStripeCheckoutSession(validatedPlan);
+      if (result) {
+        window.location.href = result;
+      } else {
+        throw new Error('No checkout URL received');
       }
     } catch {
       toast.error('Failed to process plan selection, please try again.');
@@ -60,8 +54,15 @@ export function BillingInteractive({ billingData }: BillingInteractiveProps) {
   return (
     <>
       <PricingComponent onPlanSelect={handlePlanSelect} billingData={billingData} />
+
       <div className='mt-6 text-center'>
-        <p className='text-muted-foreground text-sm'>Start with our free plan - no credit card required.</p>
+        {billingData.isExistingPaidSubscriber ? (
+          <p className='text-muted-foreground text-sm'>
+            Changes to your subscription will be processed immediately through Stripe's secure billing portal.
+          </p>
+        ) : (
+          <p className='text-muted-foreground text-sm'>Start with our free plan - no credit card required.</p>
+        )}
       </div>
     </>
   );

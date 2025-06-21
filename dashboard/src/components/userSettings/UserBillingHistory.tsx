@@ -125,7 +125,7 @@ export default function UserBillingHistory() {
 
               <div className='text-right'>
                 <p className={`text-lg font-semibold ${getStatusColor(record.status)}`}>
-                  {formatPrice(record.amountPaid)}
+                  {formatPrice(record.amountPaid, record.currency)}
                 </p>
               </div>
             </div>

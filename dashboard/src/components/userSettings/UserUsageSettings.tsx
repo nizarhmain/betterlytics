@@ -45,7 +45,7 @@ export default function UserUsageSettings({ onCloseDialog }: UserUsageSettingsPr
         </p>
       </div>
 
-      <CurrentPlanCard billingData={billingData} />
+      <CurrentPlanCard billingData={billingData} showManagementButtons={true} />
 
       <div className='bg-card flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='space-y-1'>
@@ -58,7 +58,6 @@ export default function UserUsageSettings({ onCloseDialog }: UserUsageSettingsPr
           </p>
         </div>
         <Button onClick={handleViewPlans} size='sm'>
-          <ExternalLink className='mr-2 h-4 w-4' />
           View Plans
         </Button>
       </div>
