@@ -1,6 +1,7 @@
 /**
  * Parameters
  */
+const SITE_ID = "";
 const TARGET_URL = "http://localhost:3001/track";
 const NUMBER_OF_EVENTS = 20_000;
 const NUMBER_OF_USERS = 5000;
@@ -17,11 +18,12 @@ const CUSTOM_EVENTS = [
   },
 ];
 const CUSTOM_EVENT_FREQUENCY = 0.2;
+const SCREEN_SIZES = ["1920x1080", "900x400", "500x300"];
 
 const BASE_PAYLOAD = {
   referrer: null,
   screen_resolution: "1920x1080",
-  site_id: "site-id",
+  site_id: SITE_ID,
   event_name: "pageview",
   is_custom_event: false,
   properties: JSON.stringify({}),
@@ -79,6 +81,8 @@ const events = new Array(NUMBER_OF_EVENTS)
   .map((timestamp) => ({
     timestamp,
     visitor_id: userIds[Math.floor(userIds.length * Math.random())],
+    screen_resolution:
+      SCREEN_SIZES[Math.floor(SCREEN_SIZES.length * Math.random())],
   }))
   .map((payload) => getExtraPayload(payload))
   .map((payload) => ({ ...BASE_PAYLOAD, ...payload }));
