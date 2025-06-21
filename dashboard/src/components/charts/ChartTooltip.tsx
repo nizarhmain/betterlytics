@@ -4,9 +4,12 @@ import { cn } from '@/lib/utils';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface ChartTooltipProps {
-  payload?: { value: number; payload: { date: string | number } }[];
+  payload?: {
+    value: number;
+    payload: { date: string | number; label?: string; color?: string; value: number[] };
+  }[];
   formatter?: (value: any) => string;
-  labelFormatter: (date: Date) => string;
+  labelFormatter: (date: any) => string;
   active?: boolean;
   label?: Date;
   className?: string;
@@ -17,15 +20,19 @@ export function ChartTooltip({ active, payload, label, formatter, labelFormatter
     return null;
   }
 
+  const name = label || payload[0].payload.label;
+
+  const labelColor = payload[0].payload.color;
+
   const value = payload[0].value;
-  const previousValue = payload[1]?.value as number;
+  const previousValue = (payload[1]?.value || payload[0].payload.value[1]) as number;
   const difference = value - previousValue;
 
-  const formattedLabel = label ? labelFormatter(label) : label;
+  const formattedLabel = name ? labelFormatter(name) : name;
 
   const getTrendInfo = () => {
     if (previousValue === undefined || difference === 0) {
-      return { icon: Minus, color: 'text-gray-400', bgColor: 'bg-gray-500/10' };
+      return { icon: Minus, color: 'text-muted', bgColor: 'text-background/10' };
     }
     if (difference > 0) {
       return { icon: TrendingUp, color: 'text-green-400', bgColor: 'bg-green-500/10' };
@@ -56,7 +63,7 @@ export function ChartTooltip({ active, payload, label, formatter, labelFormatter
       )}
     >
       <div className='mb-3 flex items-center gap-2 border-b border-gray-700/50 pb-2'>
-        <div className='h-2 w-2 rounded-full bg-blue-500'></div>
+        <div className='h-2 w-2 rounded-full bg-blue-500' style={{ background: labelColor }}></div>
         <span className='text-xs font-medium tracking-wide text-gray-300 uppercase'>{formattedLabel}</span>
       </div>
 
