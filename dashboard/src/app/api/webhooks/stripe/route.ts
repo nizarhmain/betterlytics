@@ -4,7 +4,6 @@ import { stripe } from '@/lib/billing/stripe';
 import Stripe from 'stripe';
 import {
   handleCheckoutCompleted,
-  handleInvoicePaymentSucceeded,
   handleInvoicePaymentFailed,
   handleSubscriptionDeleted,
   handleSubscriptionUpdated,
@@ -33,10 +32,6 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed':
         await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
-        break;
-
-      case 'invoice.payment_succeeded':
-        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
         break;
 
       case 'invoice.payment_failed':

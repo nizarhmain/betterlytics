@@ -1,4 +1,4 @@
-import { Currency } from '@/types/pricing';
+import { Currency } from '@/entities/billing';
 
 export function formatPrice(cents: number, currency: Currency = 'USD'): string {
   const amount = cents / 100;

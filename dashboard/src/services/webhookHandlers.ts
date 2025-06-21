@@ -4,8 +4,8 @@ import {
   updateSubscriptionStatus,
   getSubscriptionByPaymentId,
 } from '@/repositories/postgres/subscription';
-import { createBillingHistoryEntry } from '@/repositories/postgres/billingHistory';
-import type { Currency, PaymentStatus } from '@/entities/billing';
+
+import type { Currency } from '@/entities/billing';
 import { stripe } from '@/lib/billing/stripe';
 import { getTierConfigFromLookupKey } from '@/lib/billing/plans';
 
@@ -42,40 +42,6 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
     });
   } catch (error) {
     console.error('Error handling checkout completed:', error);
-    throw error;
-  }
-}
-
-export async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  try {
-    const subscriptionDetails = invoice.parent?.subscription_details;
-
-    if (!subscriptionDetails || !subscriptionDetails.subscription) {
-      console.log('Invoice has no subscription details, skipping');
-      return;
-    }
-
-    const subscriptionId = subscriptionDetails.subscription as string;
-    const subscription = await getSubscriptionByPaymentId(subscriptionId);
-
-    if (!subscription) {
-      console.log('No local subscription found for Stripe subscription:', subscriptionId);
-      return;
-    }
-
-    await createBillingHistoryEntry({
-      userId: subscription.userId,
-      periodStart: subscription.currentPeriodStart,
-      periodEnd: subscription.currentPeriodEnd,
-      eventLimit: subscription.eventLimit,
-      amountPaid: invoice.amount_paid,
-      currency: invoice.currency.toUpperCase() as Currency,
-      paymentInvoiceId: invoice.id,
-      paymentPaymentIntentId: undefined,
-      status: 'paid' as PaymentStatus,
-    });
-  } catch (error) {
-    console.error('Error handling invoice payment succeeded:', error);
     throw error;
   }
 }

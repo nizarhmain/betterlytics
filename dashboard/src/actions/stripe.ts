@@ -2,7 +2,8 @@
 
 import { withUserAuth } from '@/auth/auth-actions';
 import { stripe } from '@/lib/billing/stripe';
-import { SelectedPlan, SelectedPlanSchema, Currency } from '@/types/pricing';
+import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
+import { Currency } from '@/entities/billing';
 import { User } from 'next-auth';
 import { env } from '@/lib/env';
 import { getUserSubscription } from '@/repositories/postgres/subscription';
@@ -69,6 +70,7 @@ export const createStripeCheckoutSession = withUserAuth(async (user: User, planD
         userId: user.id,
         lookupKey: validatedPlan.lookup_key,
         requestedCurrency: validatedPlan.currency,
+        isInitialSubscription: 'true',
       },
       success_url: `${env.NEXT_PUBLIC_BASE_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${env.NEXT_PUBLIC_BASE_URL}/billing?canceled=true`,
