@@ -16,7 +16,7 @@ export function PricingSlider({
   className = '',
 }: PricingSliderProps) {
   return (
-    <div className={`mx-auto max-w-lg ${className}`}>
+    <div className={className}>
       <div className='mb-4 text-center'>
         <div className='text-muted-foreground mb-2 text-sm'>Monthly Events</div>
         <div className='text-3xl font-bold'>{currentRange.label}</div>

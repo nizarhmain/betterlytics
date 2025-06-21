@@ -1,7 +1,12 @@
-export function formatPrice(cents: number): string {
-  const usd = cents / 100;
-  return new Intl.NumberFormat('en-US', {
+import { Currency } from '@/types/pricing';
+
+export function formatPrice(cents: number, currency: Currency = 'USD'): string {
+  const amount = cents / 100;
+
+  const locale = currency === 'EUR' ? 'de-DE' : 'en-US';
+
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'USD',
-  }).format(usd);
+    currency: currency,
+  }).format(amount);
 }

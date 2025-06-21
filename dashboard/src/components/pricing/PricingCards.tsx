@@ -5,15 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { SelectedPlan, Tier } from '@/types/pricing';
-import type { UserBillingData } from '@/entities/billing';
+import { SelectedPlan, Currency } from '@/types/pricing';
+import type { UserBillingData, Tier } from '@/entities/billing';
 import { formatPrice } from '@/utils/pricing';
 import { capitalizeFirstLetter } from '@/utils/formatters';
+import { EventRange } from '@/lib/billing/plans';
 
 interface PricingCardsProps {
-  eventLimit: number;
-  eventLabel: string;
-  basePrice: number;
+  eventRange: EventRange;
+  currency: Currency;
   onPlanSelect?: (planData: SelectedPlan) => void;
   mode?: 'landing' | 'billing';
   className?: string;
@@ -28,28 +28,32 @@ interface PlanConfig {
   features: readonly string[];
   cta: string;
   popular: boolean;
+  lookup_key: string | null;
 }
 
 export function PricingCards({
-  eventLimit,
-  eventLabel,
-  basePrice,
+  eventRange,
+  currency,
   onPlanSelect,
   mode = 'landing',
   className = '',
   billingData,
 }: PricingCardsProps) {
-  const isFree = basePrice === 0;
-  const isCustom = basePrice < 0;
+  const growthPrice = currency === 'EUR' ? eventRange.growth.price.eur_cents : eventRange.growth.price.usd_cents;
+  const professionalPrice =
+    currency === 'EUR' ? eventRange.professional.price.eur_cents : eventRange.professional.price.usd_cents;
+
+  const isFree = growthPrice === 0;
+  const isCustom = growthPrice < 0;
 
   const plans: PlanConfig[] = [
     {
       tier: 'growth',
-      price_cents: basePrice,
+      price_cents: growthPrice,
       period: !isFree && !isCustom ? '/month' : '',
       description: 'Perfect for small websites and personal projects',
       features: [
-        `Up to ${eventLabel} events/month`,
+        `Up to ${eventRange.label} events/month`,
         'Real-time dashboard',
         'All analytics features',
         '1 website',
@@ -58,14 +62,15 @@ export function PricingCards({
       ],
       cta: isFree ? 'Get Started for Free' : isCustom ? 'Contact Sales' : 'Get Started',
       popular: false,
+      lookup_key: eventRange.growth.lookup_key,
     },
     {
       tier: 'professional',
-      price_cents: isFree ? 700 : basePrice * 2,
+      price_cents: professionalPrice,
       period: !isCustom ? '/month' : '',
       description: 'Advanced features for growing businesses',
       features: [
-        `Up to ${eventLabel} events/month`,
+        `Up to ${eventRange.label} events/month`,
         'Everything in Starter',
         '3+ years data retention',
         'Up to 50 sites',
@@ -75,6 +80,7 @@ export function PricingCards({
       ],
       cta: isCustom ? 'Contact Sales' : 'Get Started',
       popular: true,
+      lookup_key: eventRange.professional.lookup_key,
     },
     {
       tier: 'enterprise',
@@ -91,6 +97,7 @@ export function PricingCards({
       ],
       cta: 'Contact Us',
       popular: false,
+      lookup_key: null,
     },
   ];
 
@@ -98,9 +105,11 @@ export function PricingCards({
     if (mode === 'billing' && onPlanSelect) {
       const selectedPlan: SelectedPlan = {
         tier: plan.tier,
-        eventLimit,
+        eventLimit: eventRange.value,
         price_cents: plan.price_cents,
         period: plan.period,
+        currency,
+        lookup_key: plan.lookup_key,
       };
       onPlanSelect(selectedPlan);
     }
@@ -109,13 +118,13 @@ export function PricingCards({
   const formatDisplayPrice = (price: number): string => {
     if (price === 0) return 'Free';
     if (price < 0) return 'Custom';
-    return formatPrice(price);
+    return formatPrice(price, currency);
   };
 
   const renderButton = (plan: PlanConfig) => {
     if (mode === 'billing' && billingData) {
       const isCurrentPlan =
-        billingData.subscription.tier === plan.tier && billingData.subscription.eventLimit === eventLimit;
+        billingData.subscription.tier === plan.tier && billingData.subscription.eventLimit === eventRange.value;
 
       let buttonText = plan.cta;
       let buttonVariant: 'default' | 'outline' | 'secondary' = plan.popular ? 'default' : 'outline';
@@ -171,7 +180,7 @@ export function PricingCards({
           )}
           {billingData &&
             billingData.subscription.tier === plan.tier &&
-            billingData.subscription.eventLimit === eventLimit && (
+            billingData.subscription.eventLimit === eventRange.value && (
               <Badge variant='secondary' className='absolute -bottom-3 left-1/2 -translate-x-1/2 transform'>
                 Current
               </Badge>

@@ -1,119 +1,204 @@
 import { formatNumber } from '@/utils/formatters';
 
 export const EVENT_RANGES = [
-  { value: 10_000, label: formatNumber(10_000, 0), price_cents: 0 },
-  { value: 50_000, label: formatNumber(50_000, 0), price_cents: 700 },
-  { value: 100_000, label: formatNumber(100_000, 0), price_cents: 1400 },
-  { value: 200_000, label: formatNumber(200_000, 0), price_cents: 2500 },
-  { value: 500_000, label: formatNumber(500_000, 0), price_cents: 3900 },
-  { value: 1_000_000, label: formatNumber(1_000_000, 0), price_cents: 5900 },
-  { value: 2_000_000, label: formatNumber(2_000_000, 0), price_cents: 8900 },
-  { value: 5_000_000, label: formatNumber(5_000_000, 0), price_cents: 12900 },
-  { value: 10_000_000, label: formatNumber(10_000_000, 0), price_cents: 16900 },
-  { value: 10_000_001, label: '10M+', price_cents: -1 },
+  {
+    value: 10_000,
+    label: formatNumber(10_000, 0),
+    growth: {
+      price: {
+        usd_cents: 0,
+        eur_cents: 0,
+      },
+      lookup_key: 'growth_10000_events',
+    },
+    professional: {
+      price: {
+        usd_cents: 1400,
+        eur_cents: 1200,
+      },
+      lookup_key: 'professional_10000_events',
+    },
+  },
+  {
+    value: 50_000,
+    label: formatNumber(50_000, 0),
+    growth: {
+      price: {
+        usd_cents: 700,
+        eur_cents: 600,
+      },
+      lookup_key: 'growth_50000_events',
+    },
+    professional: {
+      price: {
+        usd_cents: 1400,
+        eur_cents: 1200,
+      },
+      lookup_key: 'professional_50000_events',
+    },
+  },
+  {
+    value: 100_000,
+    label: formatNumber(100_000, 0),
+    growth: {
+      price: {
+        usd_cents: 1400,
+        eur_cents: 1200,
+      },
+      lookup_key: 'growth_100000_events',
+    },
+    professional: {
+      price: {
+        usd_cents: 2800,
+        eur_cents: 2500,
+      },
+      lookup_key: 'professional_100000_events',
+    },
+  },
+  {
+    value: 200_000,
+    label: formatNumber(200_000, 0),
+    growth: {
+      price: {
+        usd_cents: 2500,
+        eur_cents: 2200,
+      },
+      lookup_key: 'growth_200000_events',
+    },
+    professional: {
+      price: {
+        usd_cents: 5000,
+        eur_cents: 4400,
+      },
+      lookup_key: 'professional_200000_events',
+    },
+  },
+  {
+    value: 500_000,
+    label: formatNumber(500_000, 0),
+    growth: {
+      price: {
+        usd_cents: 3900,
+        eur_cents: 3500,
+      },
+      lookup_key: 'growth_500000_events',
+    },
+    professional: {
+      price: {
+        usd_cents: 7800,
+        eur_cents: 6900,
+      },
+      lookup_key: 'professional_500000_events',
+    },
+  },
+  {
+    value: 1_000_000,
+    label: formatNumber(1_000_000, 0),
+    growth: {
+      price: {
+        usd_cents: 5900,
+        eur_cents: 5200,
+      },
+      lookup_key: 'growth_1000000_events',
+    },
+    professional: {
+      price: {
+        usd_cents: 11800,
+        eur_cents: 10500,
+      },
+      lookup_key: 'professional_1000000_events',
+    },
+  },
+  {
+    value: 2_000_000,
+    label: formatNumber(2_000_000, 0),
+    growth: {
+      price: {
+        usd_cents: 8900,
+        eur_cents: 7900,
+      },
+      lookup_key: 'growth_2000000_events',
+    },
+    professional: {
+      price: {
+        usd_cents: 17800,
+        eur_cents: 15800,
+      },
+      lookup_key: 'professional_2000000_events',
+    },
+  },
+  {
+    value: 5_000_000,
+    label: formatNumber(5_000_000, 0),
+    growth: {
+      price: {
+        usd_cents: 12900,
+        eur_cents: 11500,
+      },
+      lookup_key: 'growth_5000000_events',
+    },
+    professional: {
+      price: {
+        usd_cents: 25800,
+        eur_cents: 22900,
+      },
+      lookup_key: 'professional_5000000_events',
+    },
+  },
+  {
+    value: 10_000_000,
+    label: formatNumber(10_000_000, 0),
+    growth: {
+      price: {
+        usd_cents: 16900,
+        eur_cents: 14900,
+      },
+      lookup_key: 'growth_10000000_events',
+    },
+    professional: {
+      price: {
+        usd_cents: 33800,
+        eur_cents: 29900,
+      },
+      lookup_key: 'professional_10000000_events',
+    },
+  },
+  {
+    value: 10_000_001,
+    label: '10M+',
+    growth: {
+      price: {
+        usd_cents: -1,
+        eur_cents: -1,
+      },
+      lookup_key: null,
+    },
+    professional: {
+      price: {
+        usd_cents: -1,
+        eur_cents: -1,
+      },
+      lookup_key: null,
+    },
+  },
 ] as const;
 
 export type EventRange = (typeof EVENT_RANGES)[number];
+export type TierName = 'growth' | 'professional';
 
-/**
- * Maps Stripe price lookup keys to tier and event limit
- */
-export const TIER_CONFIG = {
-  // Growth tier - all event limits
-  growth_10000_events: {
-    tier: 'growth',
-    eventLimit: 10_000,
-  },
-  growth_50000_events: {
-    tier: 'growth',
-    eventLimit: 50_000,
-  },
-  growth_100000_events: {
-    tier: 'growth',
-    eventLimit: 100_000,
-  },
-  growth_200000_events: {
-    tier: 'growth',
-    eventLimit: 200_000,
-  },
-  growth_500000_events: {
-    tier: 'growth',
-    eventLimit: 500_000,
-  },
-  growth_1000000_events: {
-    tier: 'growth',
-    eventLimit: 1_000_000,
-  },
-  growth_2000000_events: {
-    tier: 'growth',
-    eventLimit: 2_000_000,
-  },
-  growth_5000000_events: {
-    tier: 'growth',
-    eventLimit: 5_000_000,
-  },
-  growth_10000000_events: {
-    tier: 'growth',
-    eventLimit: 10_000_000,
-  },
+export function getTierConfigFromLookupKey(
+  lookupKey: string | null,
+): { tier: TierName; eventLimit: number } | null {
+  if (!lookupKey) return null;
 
-  // Professional tier - all event limits
-  professional_10000_events: {
-    tier: 'professional',
-    eventLimit: 10_000,
-  },
-  professional_50000_events: {
-    tier: 'professional',
-    eventLimit: 50_000,
-  },
-  professional_100000_events: {
-    tier: 'professional',
-    eventLimit: 100_000,
-  },
-  professional_200000_events: {
-    tier: 'professional',
-    eventLimit: 200_000,
-  },
-  professional_500000_events: {
-    tier: 'professional',
-    eventLimit: 500_000,
-  },
-  professional_1000000_events: {
-    tier: 'professional',
-    eventLimit: 1_000_000,
-  },
-  professional_2000000_events: {
-    tier: 'professional',
-    eventLimit: 2_000_000,
-  },
-  professional_5000000_events: {
-    tier: 'professional',
-    eventLimit: 5_000_000,
-  },
-  professional_10000000_events: {
-    tier: 'professional',
-    eventLimit: 10_000_000,
-  },
-} as const;
-
-export type TierLookupKey = keyof typeof TIER_CONFIG;
-export type TierConfig = (typeof TIER_CONFIG)[TierLookupKey];
-
-export function getTierConfigFromLookupKey(lookupKey: string | null): TierConfig | null {
-  if (!lookupKey || !(lookupKey in TIER_CONFIG)) {
-    return null;
-  }
-  return TIER_CONFIG[lookupKey as TierLookupKey];
-}
-
-export function getLookupKeyFromTierConfig(tier: string, eventLimit: number): TierLookupKey {
-  const tierConfig = Object.values(TIER_CONFIG).find(
-    (config) => config.tier === tier && config.eventLimit === eventLimit,
-  ) as TierConfig | undefined;
-
-  if (!tierConfig) {
-    throw new Error(`No lookup key found for tier: ${tier} and event limit: ${eventLimit}`);
+  for (const range of EVENT_RANGES) {
+    if (range.growth.lookup_key === lookupKey) {
+      return { tier: 'growth', eventLimit: range.value };
+    }
+    if (range.professional.lookup_key === lookupKey) {
+      return { tier: 'professional', eventLimit: range.value };
+    }
   }
 
-  return Object.keys(TIER_CONFIG).find((key) => TIER_CONFIG[key as TierLookupKey] === tierConfig) as TierLookupKey;
+  return null;
 }
