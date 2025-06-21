@@ -5,8 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { SelectedPlan, Currency } from '@/types/pricing';
-import type { UserBillingData, Tier } from '@/entities/billing';
+import { SelectedPlan } from '@/types/pricing';
+import type { UserBillingData, Tier, Currency } from '@/entities/billing';
 import { formatPrice } from '@/utils/pricing';
 import { capitalizeFirstLetter } from '@/utils/formatters';
 import { EventRange } from '@/lib/billing/plans';

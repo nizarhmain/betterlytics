@@ -3,9 +3,9 @@
 import { useCallback, useState } from 'react';
 import { PricingSlider } from './PricingSlider';
 import { PricingCards } from './PricingCards';
-import { SelectedPlan, Currency } from '@/types/pricing';
+import { SelectedPlan } from '@/types/pricing';
 import { EVENT_RANGES } from '@/lib/billing/plans';
-import type { UserBillingData } from '@/entities/billing';
+import type { Currency, UserBillingData } from '@/entities/billing';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PricingComponentProps {

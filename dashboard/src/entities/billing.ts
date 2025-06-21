@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const TierSchema = z.enum(['growth', 'professional', 'enterprise']);
-export const CurrencySchema = z.enum(['USD', 'EUR']);
+export const CurrencySchema = z.enum(['USD', 'EUR']).default('USD');
 
 export const SubscriptionSchema = z.object({
   id: z.string(),
