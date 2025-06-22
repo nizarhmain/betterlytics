@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Dashboard } from '@/entities/dashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExternalLink, Globe, Calendar, Settings } from 'lucide-react';
@@ -10,6 +11,8 @@ interface DashboardCardProps {
 }
 
 export default function DashboardCard({ dashboard }: DashboardCardProps) {
+  const router = useRouter();
+
   const formattedDate = dashboard.createdAt
     ? new Date(dashboard.createdAt).toLocaleDateString(undefined, {
         month: 'short',
@@ -18,9 +21,13 @@ export default function DashboardCard({ dashboard }: DashboardCardProps) {
       })
     : 'Unknown';
 
+  const handleCardClick = () => {
+    router.push(`/dashboard/${dashboard.id}`);
+  };
+
   return (
     <Card className='group hover:border-primary/30 border-border/50 h-full cursor-pointer transition-all duration-200 hover:shadow-lg'>
-      <Link href={`/dashboard/${dashboard.id}`} className='block h-full'>
+      <div className='block h-full' onClick={handleCardClick}>
         <CardHeader className='pb-4'>
           <div className='flex items-start justify-between'>
             <div className='flex items-center gap-3'>
@@ -59,7 +66,7 @@ export default function DashboardCard({ dashboard }: DashboardCardProps) {
             </div>
           </div>
         </CardContent>
-      </Link>
+      </div>
     </Card>
   );
 }
