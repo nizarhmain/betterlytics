@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { Dispatch, useCallback, useState } from 'react';
 import { PricingSlider } from './PricingSlider';
 import { PricingCards } from './PricingCards';
 import { SelectedPlan } from '@/types/pricing';
@@ -9,7 +9,7 @@ import type { Currency, UserBillingData } from '@/entities/billing';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PricingComponentProps {
-  onPlanSelect?: (planData: SelectedPlan) => void;
+  onPlanSelect?: Dispatch<SelectedPlan>;
   initialRangeIndex?: number;
   className?: string;
   billingData?: UserBillingData;

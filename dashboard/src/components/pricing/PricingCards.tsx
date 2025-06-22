@@ -10,11 +10,12 @@ import type { UserBillingData, Tier, Currency } from '@/entities/billing';
 import { formatPrice } from '@/utils/pricing';
 import { capitalizeFirstLetter } from '@/utils/formatters';
 import { EventRange } from '@/lib/billing/plans';
+import { Dispatch } from 'react';
 
 interface PricingCardsProps {
   eventRange: EventRange;
   currency: Currency;
-  onPlanSelect?: (planData: SelectedPlan) => void;
+  onPlanSelect?: Dispatch<SelectedPlan>;
   mode?: 'landing' | 'billing';
   className?: string;
   billingData?: UserBillingData;

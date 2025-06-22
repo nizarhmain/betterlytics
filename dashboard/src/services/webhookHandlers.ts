@@ -91,7 +91,6 @@ export async function handleSubscriptionDeleted(subscription: Stripe.Subscriptio
       currentPeriodStart: now,
       currentPeriodEnd: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
       cancelAtPeriodEnd: false,
-      paymentCustomerId: undefined,
       paymentSubscriptionId: undefined,
       paymentPriceId: undefined,
     });

@@ -26,7 +26,7 @@ export function BillingInteractive({ billingData }: BillingInteractiveProps) {
       const validatedPlan = SelectedPlanSchema.parse(planData);
 
       if (validatedPlan.tier === 'enterprise') {
-        toast.info('Please contact us for custom pricing');
+        toast.info('Please contact us for a custom plan');
         return;
       }
 
