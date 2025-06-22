@@ -1,7 +1,32 @@
 import { FunnelDetails, FunnelPreview } from '@/entities/funnels';
 import { formatQueryFilter } from '@/utils/queryFilterFormatters';
 
-export function analyzeFunnel(funnel: FunnelDetails | FunnelPreview) {
+export type PresentedFunnel = {
+  visitorCount: {
+    min: number;
+    max: number;
+  };
+  steps: {
+    filter: string;
+    visitors: number;
+    visitorsRatio: number;
+    dropoffCount: number;
+    dropoffRatio: number;
+    step: string[];
+  }[];
+  biggestDropOff: {
+    filter: string;
+    visitors: number;
+    visitorsRatio: number;
+    dropoffCount: number;
+    dropoffRatio: number;
+    step: string[];
+  };
+  conversionRate: number;
+  name: string;
+};
+
+export function toFunnel(funnel: FunnelDetails | FunnelPreview): PresentedFunnel {
   const stepVisitors = funnel.queryFilters.map((filter, index) => ({
     filter: formatQueryFilter(filter),
     visitors: funnel.visitors[index],
@@ -13,15 +38,20 @@ export function analyzeFunnel(funnel: FunnelDetails | FunnelPreview) {
   };
 
   const steps = stepVisitors.map(({ filter, visitors }, index) => {
+    const actualVisitors = visitors || 0;
+
     const nextStep = stepVisitors[index + 1]
       ? stepVisitors[index + 1]
       : { visitors: visitorCount.max, filter: '' };
-    const dropoffRatio = visitors ? 1 - nextStep.visitors / visitors : 0;
+
+    nextStep.visitors = nextStep.visitors || 0;
+    const dropoffRatio = actualVisitors ? 1 - nextStep.visitors / (actualVisitors || 1) : 0;
+
     return {
       filter,
       visitors,
-      visitorsRatio: visitors / visitorCount.max,
-      dropoffCount: visitors - nextStep.visitors,
+      visitorsRatio: actualVisitors / (visitorCount.max || 1),
+      dropoffCount: actualVisitors - nextStep.visitors,
       dropoffRatio: dropoffRatio,
       step: [filter, nextStep.filter],
     };
@@ -33,10 +63,13 @@ export function analyzeFunnel(funnel: FunnelDetails | FunnelPreview) {
 
   const conversionRate = visitorCount.min / (visitorCount.max || 1);
 
+  const name = 'name' in funnel ? funnel.name : 'Funnel';
+
   return {
     visitorCount,
     steps,
     biggestDropOff,
     conversionRate,
+    name,
   };
 }

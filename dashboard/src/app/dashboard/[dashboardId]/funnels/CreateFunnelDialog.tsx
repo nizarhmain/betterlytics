@@ -21,7 +21,6 @@ import { Plus, PlusIcon } from 'lucide-react';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
 import { FunnelPreviewDisplay } from './FunnelPreviewDisplay';
 import { fetchFunnelPreviewAction } from '@/app/actions/funnels';
-import { type FunnelPreview } from '@/entities/funnels';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useQueryFilters } from '@/hooks/use-query-filters';
 import { QueryFilterInputRow } from '@/components/filters/QueryFilterInputRow';
@@ -63,7 +62,7 @@ export function CreateFunnelDialog({ triggerText, triggerVariant }: CreateFunnel
 
   const isPreviewEnabled = debouncedFunnelPages.length >= 2;
 
-  const { data: funnelPreviewData, isLoading: isPreviewLoading } = useQuery<FunnelPreview>({
+  const { data: funnelPreviewData, isLoading: isPreviewLoading } = useQuery({
     queryKey: ['funnelPreview', dashboardId, queryFilters, metadata.isStrict],
     queryFn: async () => {
       return fetchFunnelPreviewAction(dashboardId, queryFilters, metadata.isStrict);

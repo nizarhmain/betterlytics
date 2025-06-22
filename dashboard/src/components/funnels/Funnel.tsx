@@ -1,28 +1,22 @@
-import { analyzeFunnel } from '@/lib/analytics';
-import type { FunnelDetails, FunnelPreview } from '@/entities/funnels';
-import { useMemo } from 'react';
 import { formatPercentage } from '@/utils/formatters';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { PresentedFunnel } from '@/presenters/toFunnel';
 
 type BAFunnelProps = {
-  funnel: FunnelDetails | FunnelPreview;
+  funnel: PresentedFunnel;
 };
 
 export function BAFunnel({ funnel }: BAFunnelProps) {
-  const funnelData = useMemo(() => {
-    return analyzeFunnel(funnel);
-  }, [funnel]);
-
   return (
     <div className='text-sm font-semibold'>
       <div className='mb-3 flex items-center gap-3'>
-        <h1 className='text-xl font-semibold'>{'name' in funnel ? funnel.name : 'Funnel'}</h1>
+        <h1 className='text-xl font-semibold'>{funnel.name}</h1>
         <Badge className='text-muted-foreground mt-0.5 h-[1.5rem] rounded-full' variant='outline'>
-          {funnelData.steps.length} steps
+          {funnel.steps.length} steps
         </Badge>
       </div>
-      {funnelData.steps.map((step, index) => (
+      {funnel.steps.map((step, index) => (
         <div key={step.filter + index} className='mb-2 last:mb-0'>
           <div className='flex items-end justify-between'>
             <div className='flex items-center gap-3'>
@@ -39,7 +33,7 @@ export function BAFunnel({ funnel }: BAFunnelProps) {
           </div>
           <div className='text-muted-foreground pr-1 pl-9 text-xs'>
             <Progress className='h-3' value={100 * step.visitorsRatio} color='var(--primary)' />
-            {index < funnelData.steps.length - 1 && (
+            {index < funnel.steps.length - 1 && (
               <>
                 <Progress className='mt-1 h-2' value={100 * step.dropoffRatio} color='var(--destructive)' />
                 <div className='mt-0.5 flex w-full items-end justify-end'>
@@ -50,7 +44,7 @@ export function BAFunnel({ funnel }: BAFunnelProps) {
               </>
             )}
           </div>
-          {index < funnelData.steps.length - 1 && <hr className='mt-2 mb-2 ml-9' />}
+          {index < funnel.steps.length - 1 && <hr className='mt-2 mb-2 ml-9' />}
         </div>
       ))}
     </div>

@@ -1,6 +1,6 @@
 'use server';
 
-import { type Funnel, CreateFunnelSchema, type FunnelDetails, type FunnelPreview } from '@/entities/funnels';
+import { type Funnel, CreateFunnelSchema } from '@/entities/funnels';
 import {
   createFunnelForDashboard,
   getFunnelDetailsById,
@@ -11,6 +11,7 @@ import { withDashboardAuthContext } from '@/auth/auth-actions';
 import { type AuthContext } from '@/entities/authContext';
 import { type QueryFilter } from '@/entities/filter';
 import { revalidatePath } from 'next/cache';
+import { toFunnel } from '@/presenters/toFunnel';
 
 export const postFunnelAction = withDashboardAuthContext(
   async (ctx: AuthContext, name: string, queryFilters: QueryFilter[], isStrict: boolean): Promise<Funnel> => {
@@ -25,23 +26,29 @@ export const postFunnelAction = withDashboardAuthContext(
   },
 );
 
-export const fetchFunnelDetailsAction = withDashboardAuthContext(
-  async (ctx: AuthContext, funnelId: string): Promise<FunnelDetails> => {
-    const funnel = await getFunnelDetailsById(ctx.siteId, funnelId);
-    if (funnel === null) {
-      throw new Error('Funnel not found');
-    }
+export const fetchFunnelDetailsAction = withDashboardAuthContext(async (ctx: AuthContext, funnelId: string) => {
+  const funnel = await getFunnelDetailsById(ctx.siteId, funnelId);
+  if (funnel === null) {
+    throw new Error('Funnel not found');
+  }
 
-    return funnel;
-  },
-);
+  return toFunnel(funnel);
+});
 
-export const fetchFunnelsAction = withDashboardAuthContext(async (ctx: AuthContext): Promise<FunnelDetails[]> => {
-  return getFunnelsByDashboardId(ctx.dashboardId, ctx.siteId);
+export const fetchFunnelsAction = withDashboardAuthContext(async (ctx: AuthContext) => {
+  const funnels = await getFunnelsByDashboardId(ctx.dashboardId, ctx.siteId);
+
+  return funnels.map((funnel) => ({
+    id: funnel.id,
+    stepCount: funnel.queryFilters.length,
+    ...toFunnel(funnel),
+  }));
 });
 
 export const fetchFunnelPreviewAction = withDashboardAuthContext(
-  async (ctx: AuthContext, queryFilters: QueryFilter[], isStrict: boolean): Promise<FunnelPreview> => {
-    return getFunnelPreviewData(ctx.siteId, queryFilters, isStrict);
+  async (ctx: AuthContext, queryFilters: QueryFilter[], isStrict: boolean) => {
+    const funnelPreview = await getFunnelPreviewData(ctx.siteId, queryFilters, isStrict);
+
+    return toFunnel(funnelPreview);
   },
 );

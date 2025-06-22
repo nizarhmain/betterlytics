@@ -1,10 +1,10 @@
 'use client';
 
-import { type FunnelPreview } from '@/entities/funnels';
 import { BAFunnel } from '@/components/funnels/Funnel';
+import { PresentedFunnel } from '@/presenters/toFunnel';
 
 type FunnelPreviewDisplayProps = {
-  funnelDetails?: FunnelPreview;
+  funnelDetails?: PresentedFunnel;
   funnelName: string;
   isLoading: boolean;
 };
@@ -19,7 +19,7 @@ export function FunnelPreviewDisplay({ funnelDetails, funnelName, isLoading }: F
     );
   }
 
-  if (!funnelDetails || funnelDetails.queryFilters.length < 2 || funnelName.length === 0) {
+  if (!funnelDetails || funnelDetails.steps.length < 2 || funnelName.length === 0) {
     return (
       <div className='text-muted-foreground flex h-full items-center justify-center'>
         <p>Define at least 2 steps to see the preview.</p>

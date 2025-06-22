@@ -1,9 +1,8 @@
 'use client';
 
-import { use, useMemo, ReactNode } from 'react';
+import { use, ReactNode } from 'react';
 import { fetchFunnelsAction } from '@/app/actions';
 import { Badge } from '@/components/ui/badge';
-import { analyzeFunnel } from '@/lib/analytics';
 import { ArrowRightCircleIcon } from 'lucide-react';
 import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
 import { FunnelsEmptyState } from './FunnelsEmptyState';
@@ -16,24 +15,14 @@ type FunnelsListSectionProps = {
 
 export default function FunnelsListSection({ funnelsPromise, dashboardId }: FunnelsListSectionProps) {
   const funnels = use(funnelsPromise);
-  const funnelsData = useMemo(
-    () =>
-      funnels.map((funnel) => ({
-        id: funnel.id,
-        name: funnel.name,
-        stepCount: funnel.queryFilters.length,
-        ...analyzeFunnel(funnel),
-      })),
-    [funnels],
-  );
 
-  if (funnelsData.length === 0) {
+  if (funnels.length === 0) {
     return <FunnelsEmptyState />;
   }
 
   return (
     <div className='space-y-5'>
-      {funnelsData.map((funnel) => (
+      {funnels.map((funnel) => (
         <div
           key={funnel.id}
           className='bg-card grid grid-cols-4 grid-rows-5 gap-2 rounded-md border p-3 shadow md:grid-rows-2'
