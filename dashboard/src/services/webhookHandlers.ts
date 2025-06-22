@@ -26,13 +26,15 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
 
     const tierConfig = getTierConfigFromLookupKey(subscriptionItem.price.lookup_key as string);
 
+    const paymentCurrency = session.currency || subscriptionItem.price.currency;
+
     await upsertSubscription({
       userId,
       tier: tierConfig.tier,
       status: 'active',
       eventLimit: tierConfig.eventLimit,
       pricePerMonth,
-      currency: subscriptionItem.price.currency.toUpperCase() as Currency,
+      currency: paymentCurrency.toUpperCase() as Currency,
       cancelAtPeriodEnd: false,
       currentPeriodStart: new Date(subscriptionItem.current_period_start * 1000),
       currentPeriodEnd: new Date(subscriptionItem.current_period_end * 1000),
@@ -118,7 +120,7 @@ export async function handleSubscriptionUpdated(subscription: Stripe.Subscriptio
       status: subscription.status,
       eventLimit: tierConfig.eventLimit,
       pricePerMonth,
-      currency: subscriptionItem.price.currency.toUpperCase() as Currency,
+      currency: subscription.currency.toUpperCase() as Currency,
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       currentPeriodStart: new Date(subscriptionItem.current_period_start * 1000),
       currentPeriodEnd: new Date(subscriptionItem.current_period_end * 1000),

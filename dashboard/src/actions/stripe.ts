@@ -3,13 +3,12 @@
 import { withUserAuth } from '@/auth/auth-actions';
 import { stripe } from '@/lib/billing/stripe';
 import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
-import { Currency } from '@/entities/billing';
 import { User } from 'next-auth';
 import { env } from '@/lib/env';
 import { getUserSubscription } from '@/repositories/postgres/subscription';
 import { Stripe } from 'stripe';
 
-async function getPriceWithCurrencyOptions(lookupKey: string, requestedCurrency: Currency): Promise<Stripe.Price> {
+async function getPriceByLookupKey(lookupKey: string): Promise<Stripe.Price> {
   try {
     const prices = await stripe.prices.list({
       lookup_keys: [lookupKey],
@@ -20,18 +19,7 @@ async function getPriceWithCurrencyOptions(lookupKey: string, requestedCurrency:
       throw new Error(`No price found for lookup key: ${lookupKey}`);
     }
 
-    const currencyLower = requestedCurrency.toLowerCase();
-
-    const targetPrice = prices.data.find((price) => price.currency === currencyLower);
-
-    if (!targetPrice) {
-      console.warn(
-        `Requested currency ${requestedCurrency} not found for lookup key ${lookupKey}, using first available price`,
-      );
-      return prices.data[0];
-    }
-
-    return targetPrice;
+    return prices.data[0];
   } catch (error) {
     console.error('Error retrieving price from lookup key:', error);
     throw new Error(`Failed to retrieve price for lookup key: ${lookupKey}`);
@@ -54,7 +42,7 @@ export const createStripeCheckoutSession = withUserAuth(async (user: User, planD
       throw new Error('No lookup key provided for plan');
     }
 
-    const price = await getPriceWithCurrencyOptions(validatedPlan.lookup_key, validatedPlan.currency);
+    const price = await getPriceByLookupKey(validatedPlan.lookup_key);
 
     const checkoutSession = await stripe.checkout.sessions.create({
       line_items: [
@@ -155,7 +143,7 @@ export const createStripeCustomerPortalSession = withUserAuth(async (user: User,
 
     if (targetPlan?.lookup_key) {
       try {
-        const targetPrice = await getPriceWithCurrencyOptions(targetPlan.lookup_key, targetPlan.currency);
+        const targetPrice = await getPriceByLookupKey(targetPlan.lookup_key);
 
         const configuration = await stripe.billingPortal.configurations.create({
           business_profile: {
