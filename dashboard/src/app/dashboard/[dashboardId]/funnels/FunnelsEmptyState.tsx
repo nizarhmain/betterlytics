@@ -1,6 +1,27 @@
 import { LucideFunnel, Plus } from 'lucide-react';
 import { CreateFunnelDialog } from './CreateFunnelDialog';
 
+type FunnelExplanationProps = {
+  title: string;
+  description: string;
+  color: string;
+};
+function FunnelExplanation({ title, description, color }: FunnelExplanationProps) {
+  return (
+    <div className='flex items-start gap-3'>
+      <div
+        className={`mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-${color}-500/20`}
+      >
+        <div className={`h-2 w-2 rounded-full bg-${color}-500`}></div>
+      </div>
+      <div>
+        <h3 className='text-sm font-medium'>{title}</h3>
+        <p className='text-muted-foreground text-xs'>{description}</p>
+      </div>
+    </div>
+  );
+}
+
 export function FunnelsEmptyState() {
   return (
     <div className='mx-auto flex min-h-[600px] max-w-md flex-col items-center justify-center px-4 text-center'>
@@ -25,35 +46,21 @@ export function FunnelsEmptyState() {
       <CreateFunnelDialog triggerText='Create your first Funnel' triggerVariant='default' />
 
       <div className='mt-8 space-y-4 text-left'>
-        <div className='flex items-start gap-3'>
-          <div className='mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20'>
-            <div className='h-2 w-2 rounded-full bg-blue-500'></div>
-          </div>
-          <div>
-            <h3 className='text-sm font-medium'>Track conversion steps</h3>
-            <p className='text-muted-foreground text-xs'>Monitor user progress through custom filters</p>
-          </div>
-        </div>
-
-        <div className='flex items-start gap-3'>
-          <div className='mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-green-500/20'>
-            <div className='h-2 w-2 rounded-full bg-green-500'></div>
-          </div>
-          <div>
-            <h3 className='text-sm font-medium'>Identify drop-off points</h3>
-            <p className='text-muted-foreground text-xs'>Find where users abandon their journey</p>
-          </div>
-        </div>
-
-        <div className='flex items-start gap-3'>
-          <div className='mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-purple-500/20'>
-            <div className='h-2 w-2 rounded-full bg-purple-500'></div>
-          </div>
-          <div>
-            <h3 className='text-sm font-medium'>Optimize conversions</h3>
-            <p className='text-muted-foreground text-xs'>Improve your product based on data insights</p>
-          </div>
-        </div>
+        <FunnelExplanation
+          title='Track conversion steps'
+          description='Monitor user progress through custom filters'
+          color='blue'
+        />
+        <FunnelExplanation
+          title='Identify drop-off points'
+          description='Find where users abandon their journey'
+          color='green'
+        />
+        <FunnelExplanation
+          title='Optimize conversions'
+          description='Improve your product based on data insights'
+          color='purple'
+        />
       </div>
     </div>
   );
