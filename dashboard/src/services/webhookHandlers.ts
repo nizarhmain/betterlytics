@@ -22,11 +22,10 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
     const { userId } = session.metadata;
     const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription as string);
     const subscriptionItem = stripeSubscription.items.data[0];
-    const pricePerMonth = subscriptionItem.price.unit_amount || 0;
 
     const tierConfig = getTierConfigFromLookupKey(subscriptionItem.price.lookup_key as string);
-
     const paymentCurrency = session.currency || subscriptionItem.price.currency;
+    const pricePerMonth = await getPriceAmountByCurrency(subscriptionItem.price.id, paymentCurrency);
 
     await upsertSubscription({
       userId,
@@ -110,9 +109,8 @@ export async function handleSubscriptionUpdated(subscription: Stripe.Subscriptio
     }
 
     const subscriptionItem = subscription.items.data[0];
-    const pricePerMonth = subscriptionItem.price.unit_amount || 0;
-
     const tierConfig = getTierConfigFromLookupKey(subscriptionItem.price.lookup_key as string);
+    const pricePerMonth = await getPriceAmountByCurrency(subscriptionItem.price.id, localSubscription.currency);
 
     await upsertSubscription({
       userId: localSubscription.userId,
@@ -132,4 +130,23 @@ export async function handleSubscriptionUpdated(subscription: Stripe.Subscriptio
     console.error('Error handling subscription updated:', error);
     throw error;
   }
+}
+
+async function getPriceAmountByCurrency(priceId: string, currency: string): Promise<number> {
+  const priceWithOptions = await stripe.prices.retrieve(priceId, {
+    expand: ['currency_options'],
+  });
+
+  const currencyLower = currency.toLowerCase();
+
+  if (!priceWithOptions.unit_amount) {
+    throw new Error('Price has no unit_amount, price: ' + JSON.stringify(priceWithOptions));
+  }
+
+  if (priceWithOptions.currency_options && currencyLower in priceWithOptions.currency_options) {
+    const currencyOption = priceWithOptions.currency_options[currencyLower];
+    return currencyOption.unit_amount ?? 0;
+  }
+
+  return priceWithOptions.unit_amount;
 }
