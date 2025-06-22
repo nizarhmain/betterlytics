@@ -155,7 +155,7 @@ export default function DeviceUsageTrendChart({ data }: DeviceUsageTrendChartPro
               tickMargin={10}
               tickFormatter={(val) => val.toLocaleString()}
             />
-            <RechartsTooltip content={<ChartTooltip labelFormatter={capitalizeFirstLetter} />} />
+            <RechartsTooltip content={<CustomTooltip />} />
 
             {sortedDeviceTypes.map((deviceType) => (
               <Area
