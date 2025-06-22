@@ -7,12 +7,9 @@ use crate::geoip::GeoIpService;
 use crate::session;
 use crate::bot_detection;
 use crate::referrer::{ReferrerInfo, parse_referrer};
-use woothee::parser::Parser;
-use once_cell::sync::Lazy;
 use url::Url;
 use crate::campaign::{CampaignInfo, parse_campaign_params};
-
-static USER_AGENT_PARSER: Lazy<Parser> = Lazy::new(|| Parser::new());
+use crate::ua_parser;
 
 #[derive(Debug, Clone)]
 pub struct ProcessedEvent {
@@ -24,8 +21,6 @@ pub struct ProcessedEvent {
     pub domain: Option<String>,
     /// Contains only the path of the URL (e.g. "/path/to/page" or "/")
     pub url: String,
-    /// Detected bot status
-    pub is_bot: bool,
     /// Geolocation data - Planning to use ip-api.com or maxmind to get this data
     pub country_code: Option<String>,
     /// Browser information - Parsed from user_agent string
@@ -69,6 +64,12 @@ impl EventProcessor {
         let referrer = event.raw.referrer.clone();
         let user_agent = event.raw.user_agent.clone();
 
+        // Bot Detection early to avoid processing bot traffic
+        if bot_detection::is_bot(&user_agent) {
+            debug!("Bot detected, discarding event: {}", user_agent);
+            return Ok(());
+        }
+
         let (domain, path) = self.extract_domain_and_path_from_url(&raw_url);
         debug!("Extracted domain '{:?}' and path '{}' from URL '{}'", domain, path, raw_url);
 
@@ -76,7 +77,6 @@ impl EventProcessor {
             event: event.clone(),
             event_type: String::new(),
             session_id: String::new(),
-            is_bot: false,
             country_code: None,
             browser: None,
             browser_version: None,
@@ -116,10 +116,6 @@ impl EventProcessor {
             &processed.event.raw.screen_resolution,
             &processed.event.raw.user_agent,
         );
-
-        if let Err(e) = self.detect_bot(&mut processed).await {
-            error!("Failed to detect bot: {}", e);
-        }
 
         let session_id_result = session::get_or_create_session_id(
             &site_id, 
@@ -203,31 +199,17 @@ impl EventProcessor {
         Ok(())
     }
 
-    /// Detect if the request is from a bot
-    async fn detect_bot(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        processed.is_bot = bot_detection::is_bot(&processed.user_agent);
-        Ok(())
-    }
-
-    /// Parse user agent to extract browser and OS information
     async fn parse_user_agent(&self, processed: &mut ProcessedEvent) -> Result<()> {
-        debug!("Parsing user agent: {:?}", processed.user_agent);
+        let parsed = ua_parser::parse_user_agent(&processed.user_agent);
         
-        if let Some(result) = USER_AGENT_PARSER.parse(&processed.user_agent) {
-            // Extract browser information
-            processed.browser = Some(result.name.to_string());
-            processed.browser_version = Some(result.version.to_string());
-            
-            // Extract OS information
-            processed.os = Some(result.os.to_string());
-            
-            debug!(
-                "User agent parsed: browser={:?}, version={:?}, os={:?}, device_type={:?}",
-                processed.browser, processed.browser_version, processed.os, processed.device_type
-            );
-        } else {
-            debug!("Failed to parse user agent: {}", processed.user_agent);
-        }
+        processed.browser = Some(parsed.browser);
+        processed.browser_version = parsed.browser_version;
+        processed.os = Some(parsed.os);
+        
+        debug!(
+            "User agent parsed: browser={:?}, version={:?}, os={:?}, device_type={:?}",
+            processed.browser, processed.browser_version, processed.os, processed.device_type
+        );
         
         Ok(())
     }
