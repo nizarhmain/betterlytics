@@ -6,7 +6,7 @@ import {
   fetchReferrerSourceAggregationDataForSite,
   fetchReferrerTrafficTrendBySourceDataForSite,
 } from '@/app/actions';
-import InteractivePieChart from '@/components/InteractivePieChart';
+import BAPieChart from '@/components/BAPieChart';
 import { getReferrerColor } from '@/utils/referrerColors';
 import { capitalizeFirstLetter } from '@/utils/formatters';
 
@@ -30,11 +30,7 @@ export default function ReferrersChartsSection({
       <div className='bg-card border-border rounded-lg border p-4 shadow'>
         <div className='text-foreground mb-2 font-medium'>Referrer Distribution</div>
         <p className='text-muted-foreground mb-4 text-xs'>Traffic sources by category</p>
-        <InteractivePieChart
-          data={distributionData}
-          getColor={getReferrerColor}
-          getLabel={capitalizeFirstLetter}
-        />
+        <BAPieChart data={distributionData} getColor={getReferrerColor} getLabel={capitalizeFirstLetter} />
       </div>
       <div className='bg-card border-border rounded-lg border p-4 shadow'>
         <div className='text-foreground mb-2 font-medium'>Referral Traffic Trends</div>
