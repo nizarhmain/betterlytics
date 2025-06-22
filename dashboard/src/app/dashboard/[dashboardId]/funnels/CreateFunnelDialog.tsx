@@ -26,11 +26,6 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useQueryFilters } from '@/hooks/use-query-filters';
 import { QueryFilterInputRow } from '@/components/filters/QueryFilterInputRow';
 
-type Page = {
-  value: string;
-  key: string;
-};
-
 type FunnelMetadata = {
   name: string;
   isStrict: boolean;
