@@ -32,8 +32,8 @@ export function PricingComponent({
 
   return (
     <div className={className}>
-      <div className='mb-12 flex items-center justify-between gap-8'>
-        <div className='flex-1'>
+      <div className='mb-12 flex items-center justify-center gap-8'>
+        <div className='mx-1 w-full lg:w-1/2'>
           <PricingSlider
             currentRange={currentRange}
             selectedRangeIndex={selectedRangeIndex}
