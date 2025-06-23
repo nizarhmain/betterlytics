@@ -74,7 +74,6 @@ export function CreateFunnelDialog({ triggerText, triggerVariant }: CreateFunnel
     postFunnelAction(dashboardId, metadata.name, queryFilters, metadata.isStrict)
       .then(() => {
         toast.success('Funnel created!');
-        queryClient.invalidateQueries({ queryKey: ['funnels', dashboardId] });
         setIsOpen(false);
       })
       .catch(() => toast.error('Funnel creation failed!'));
