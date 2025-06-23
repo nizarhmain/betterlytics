@@ -6,7 +6,6 @@ import { PricingCards } from './PricingCards';
 import { SelectedPlan } from '@/types/pricing';
 import { EVENT_RANGES } from '@/lib/billing/plans';
 import type { Currency, UserBillingData } from '@/entities/billing';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PricingComponentProps {
   onPlanSelect?: Dispatch<SelectedPlan>;
@@ -24,16 +23,11 @@ export function PricingComponent({
   defaultCurrency = 'USD',
 }: PricingComponentProps) {
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(initialRangeIndex);
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(defaultCurrency);
   const currentRange = EVENT_RANGES[selectedRangeIndex];
 
   const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const index = parseInt(e.target.value);
     setSelectedRangeIndex(index);
-  }, []);
-
-  const handleCurrencyChange = useCallback((currency: string) => {
-    setSelectedCurrency(currency as Currency);
   }, []);
 
   return (
@@ -46,15 +40,6 @@ export function PricingComponent({
             handleSliderChange={handleSliderChange}
           />
         </div>
-
-        <div className='flex-shrink-0'>
-          <Tabs value={selectedCurrency} onValueChange={handleCurrencyChange} className='w-fit'>
-            <TabsList className='grid w-full grid-cols-2'>
-              <TabsTrigger value='USD'>USD ($)</TabsTrigger>
-              <TabsTrigger value='EUR'>EUR (€)</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
       </div>
 
       <PricingCards
@@ -62,7 +47,7 @@ export function PricingComponent({
         onPlanSelect={onPlanSelect}
         mode={onPlanSelect ? 'billing' : 'landing'}
         billingData={billingData}
-        currency={selectedCurrency}
+        currency={defaultCurrency}
       />
     </div>
   );
