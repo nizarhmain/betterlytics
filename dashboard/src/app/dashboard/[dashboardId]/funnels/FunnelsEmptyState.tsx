@@ -1,18 +1,32 @@
 import { LucideFunnel, Plus } from 'lucide-react';
 import { CreateFunnelDialog } from './CreateFunnelDialog';
+import { cn } from '@/lib/utils';
 
 type FunnelExplanationProps = {
   title: string;
   description: string;
-  color: string;
+  color: 'blue' | 'green' | 'purple';
 };
 function FunnelExplanation({ title, description, color }: FunnelExplanationProps) {
+  console.log(color && `bg-${color}-500/20`);
   return (
     <div className='flex items-start gap-3'>
       <div
-        className={`mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-${color}-500/20`}
+        className={cn(
+          'mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full',
+          color === 'blue' && 'bg-blue-500/20',
+          color === 'green' && 'bg-green-500/20',
+          color === 'purple' && 'bg-purple-500/20',
+        )}
       >
-        <div className={`h-2 w-2 rounded-full bg-${color}-500`}></div>
+        <div
+          className={cn(
+            'h-2 w-2 rounded-full',
+            color === 'blue' && 'bg-blue-500',
+            color === 'green' && 'bg-green-500',
+            color === 'purple' && 'bg-purple-500',
+          )}
+        ></div>
       </div>
       <div>
         <h3 className='text-sm font-medium'>{title}</h3>
