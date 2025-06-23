@@ -7,6 +7,7 @@ import {
   createPrimaryLink,
 } from './email-components';
 import { EmailData, wrapEmailContent, wrapTextEmailContent } from '@/services/email/mail.service';
+import escapeHtml from 'escape-html';
 
 export interface ResetPasswordEmailData extends EmailData {
   userName: string;
@@ -18,7 +19,7 @@ export function generateResetPasswordEmailContent(data: ResetPasswordEmailData):
   const content = `
     <h1>Reset Your Password</h1>
     
-    <p>Hi <strong>${data.userName}</strong>,</p>
+    <p>Hi <strong>${escapeHtml(data.userName)}</strong>,</p>
     
     <p>We received a request to reset your password for your Betterlytics account. If you made this request, click the button below to reset your password.</p>
 
@@ -32,7 +33,7 @@ export function generateResetPasswordEmailContent(data: ResetPasswordEmailData):
         Security Notice
       </h3>
       <p style="margin: 10px 0 0 0; ${emailStyles.mutedText}">
-        This password reset link will expire in <strong>${data.expirationTime}</strong> for security reasons.
+        This password reset link will expire in <strong>${escapeHtml(data.expirationTime)}</strong> for security reasons.
       </p>
       <p style="margin: 10px 0 0 0; ${emailStyles.mutedText}">
         If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.
@@ -45,8 +46,8 @@ export function generateResetPasswordEmailContent(data: ResetPasswordEmailData):
       <h2>Having Trouble?</h2>
       
       <p>If the button above doesn't work, you can copy and paste this link into your browser:</p>
-        <a href="${data.resetUrl}" style="${emailStyles.mutedLink} word-break: break-all; font-family: monospace; font-size: 14px;">
-          ${data.resetUrl}
+        <a href="${escapeHtml(data.resetUrl)}" style="${emailStyles.mutedLink} word-break: break-all; font-family: monospace; font-size: 14px;">
+          ${escapeHtml(data.resetUrl)}
         </a>
       
       <p>If you continue to have problems, contact our support team:</p>

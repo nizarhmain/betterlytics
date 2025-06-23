@@ -7,6 +7,7 @@ import {
   createPrimaryLink,
 } from './email-components';
 import { EmailData, wrapEmailContent, wrapTextEmailContent } from '@/services/email/mail.service';
+import escapeHtml from 'escape-html';
 
 export interface WelcomeEmailData extends EmailData {
   userName: string;
@@ -16,7 +17,7 @@ export function generateWelcomeEmailContent(data: WelcomeEmailData): string {
   const content = `
     <h1>Welcome to Betterlytics!</h1>
     
-    <p>Hi <strong>${data.userName}</strong>,</p>
+    <p>Hi <strong>${escapeHtml(data.userName)}</strong>,</p>
     
     <p>Thank you for joining Betterlytics! We're excited to help you gain powerful insights into your website's performance with our privacy-focused analytics platform.</p>
 
@@ -107,7 +108,7 @@ function createStepsOrdered(steps: string[]): string {
   const listItems = steps
     .map(
       (step) => `
-    <li style="${emailStyles.listItem}">${step}</li>
+    <li style="${emailStyles.listItem}">${escapeHtml(step)}</li>
   `,
     )
     .join('');
@@ -120,8 +121,8 @@ export function createResourceList(resources: Array<{ text: string; url: string;
     .map(
       (resource) => `
     <li style="${emailStyles.resourceListItem}">
-      ${createPrimaryLink(resource.text, resource.url)}
-      ${resource.description ? `<span style="${emailStyles.mutedText}"> - ${resource.description}</span>` : ''}
+      ${createPrimaryLink(escapeHtml(resource.text), resource.url)}
+      ${resource.description ? `<span style="${emailStyles.mutedText}"> - ${escapeHtml(resource.description)}</span>` : ''}
     </li>
   `,
     )
@@ -132,7 +133,7 @@ export function createResourceList(resources: Array<{ text: string; url: string;
 
 export function createWelcomeEmailTemplate(data: WelcomeEmailData) {
   return {
-    subject: `Welcome to Betterlytics, ${data.userName}!`,
+    subject: `Welcome to Betterlytics, ${escapeHtml(data.userName)}!`,
     html: wrapEmailContent(generateWelcomeEmailContent(data)),
     text: wrapTextEmailContent(generateWelcomeEmailText(data)),
   };

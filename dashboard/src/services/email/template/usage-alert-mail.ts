@@ -8,6 +8,7 @@ import {
   emailIcons,
 } from './email-components';
 import { EmailData, wrapEmailContent, wrapTextEmailContent } from '@/services/email/mail.service';
+import escapeHtml from 'escape-html';
 
 export interface UsageAlertEmailData extends EmailData {
   userName: string;
@@ -66,11 +67,11 @@ function getAlertMessage(percentage: number, currentUsage: number, usageLimit: n
 
 function getSubjectLine(percentage: number, planName: string): string {
   if (percentage >= 100) {
-    return `${emailIcons.warning} Data Protection Alert: Usage limit exceeded on your ${planName} plan`;
+    return `${emailIcons.warning} Data Protection Alert: Usage limit exceeded on your ${escapeHtml(planName)} plan`;
   } else if (percentage >= 90) {
-    return `${emailIcons.alert} Data Protection Warning: ${percentage}% usage reached on your ${planName} plan`;
+    return `${emailIcons.alert} Data Protection Warning: ${percentage}% usage reached on your ${escapeHtml(planName)} plan`;
   } else {
-    return `${emailIcons.stats} Usage Notification: ${percentage}% of your ${planName} plan used`;
+    return `${emailIcons.stats} Usage Notification: ${percentage}% of your ${escapeHtml(planName)} plan used`;
   }
 }
 
@@ -108,9 +109,9 @@ export function generateUsageAlertEmailContent(data: UsageAlertEmailData): strin
   const content = `
     <h1>Usage Alert for Your Betterlytics Account</h1>
     
-    <p>Hi <strong>${data.userName}</strong>,</p>
+    <p>Hi <strong>${escapeHtml(data.userName)}</strong>,</p>
     
-    <p>We're writing to inform you about your current usage on the <strong>${data.planName}</strong> plan.</p>
+    <p>We're writing to inform you about your current usage on the <strong>${escapeHtml(data.planName)}</strong> plan.</p>
 
     ${createInfoBox(alertMessage, alertLevel)}
 

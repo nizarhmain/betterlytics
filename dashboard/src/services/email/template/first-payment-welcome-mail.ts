@@ -7,6 +7,7 @@ import {
   createPrimaryLink,
 } from './email-components';
 import { EmailData, wrapEmailContent, wrapTextEmailContent } from '@/services/email/mail.service';
+import escapeHtml from 'escape-html';
 
 export interface FirstPaymentWelcomeEmailData extends EmailData {
   userName: string;
@@ -22,11 +23,11 @@ export interface FirstPaymentWelcomeEmailData extends EmailData {
 
 export function generateFirstPaymentWelcomeEmailContent(data: FirstPaymentWelcomeEmailData): string {
   const content = `
-    <h1>Welcome to the ${data.planName} plan!</h1>
+    <h1>Welcome to the ${escapeHtml(data.planName)} plan!</h1>
     
-    <p>Hi <strong>${data.userName}</strong>,</p>
+    <p>Hi <strong>${escapeHtml(data.userName)}</strong>,</p>
     
-    <p>Thank you for upgrading to Betterlytics ${data.planName}! Your payment has been processed successfully, and all premium features are now active on your account.</p>
+    <p>Thank you for upgrading to Betterlytics ${escapeHtml(data.planName)}! Your payment has been processed successfully, and all premium features are now active on your account.</p>
 
     ${createInfoBox(
       `
@@ -36,15 +37,15 @@ export function generateFirstPaymentWelcomeEmailContent(data: FirstPaymentWelcom
       <div style="${emailStyles.mutedText}">
         <div style="display: flex; justify-content: space-between; margin: 8px 0; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
           <span><strong>Plan:</strong></span>
-          <span>${data.planName}</span>
+          <span>${escapeHtml(data.planName)}</span>
         </div>
         <div style="display: flex; justify-content: space-between; margin: 8px 0; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
           <span><strong>Monthly Events:</strong></span>
-          <span>${data.monthlyEventLimit}</span>
+          <span>${escapeHtml(data.monthlyEventLimit)}</span>
         </div>
         <div style="display: flex; justify-content: space-between; margin: 8px 0; padding: 8px 0;">
           <span><strong>Billing:</strong></span>
-          <span>${data.billingAmount}</span>
+          <span>${escapeHtml(data.billingAmount)}</span>
         </div>
       </div>
     `,
@@ -77,7 +78,7 @@ export function generateFirstPaymentWelcomeEmailContent(data: FirstPaymentWelcom
       </div>
     </div>
 
-    <p>We're excited to see how the ${data.planName} plan helps you gain better insights into your website performance!</p>
+    <p>We're excited to see how the ${escapeHtml(data.planName)} plan helps you gain better insights into your website performance!</p>
 
     <p>Welcome to the team!</p>
 
@@ -135,8 +136,8 @@ function createNumberedFeaturesList(features: { title: string; description: stri
         <div style="display: flex; align-items: flex-start; margin: 15px 0;">
           <div style="background-color: #2563eb; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-weight: bold; font-size: 12px; flex-shrink: 0;">${index + 1}</div>
           <div>
-            <h4 style="margin: 0 0 5px 0; ${emailStyles.primaryText} font-size: 16px;">${feature.title}</h4>
-            <p style="margin: 0; ${emailStyles.secondaryText} font-size: 14px;">${feature.description}</p>
+            <h4 style="margin: 0 0 5px 0; ${emailStyles.primaryText} font-size: 16px;">${escapeHtml(feature.title)}</h4>
+            <p style="margin: 0; ${emailStyles.secondaryText} font-size: 14px;">${escapeHtml(feature.description)}</p>
           </div>
         </div>
       `,
@@ -146,7 +147,7 @@ function createNumberedFeaturesList(features: { title: string; description: stri
 
 export function createFirstPaymentWelcomeEmailTemplate(data: FirstPaymentWelcomeEmailData) {
   return {
-    subject: `Welcome to the ${data.planName} plan! Your premium features are now active`,
+    subject: `Welcome to the ${escapeHtml(data.planName)} plan! Your premium features are now active`,
     html: wrapEmailContent(generateFirstPaymentWelcomeEmailContent(data)),
     text: wrapTextEmailContent(generateFirstPaymentWelcomeEmailText(data)),
   };
