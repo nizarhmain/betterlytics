@@ -1,7 +1,6 @@
-import { use, useMemo } from 'react';
+import { use } from 'react';
 import SummaryCardsSection, { SummaryCardData } from '@/components/dashboard/SummaryCardsSection';
 import { ArrowRight } from 'lucide-react';
-import { analyzeFunnel } from '../analytics';
 import { fetchFunnelDetailsAction } from '@/app/actions';
 import { formatPercentage } from '@/utils/formatters';
 
@@ -11,27 +10,26 @@ type FunnelSummarySectionProps = {
 
 export default function FunnelSummarySection({ funnelPromise }: FunnelSummarySectionProps) {
   const funnel = use(funnelPromise);
-  const funnelData = useMemo(() => analyzeFunnel(funnel), [funnel]);
 
   const cards: SummaryCardData[] = [
     {
       title: 'Overall conversion',
-      value: `${formatPercentage(Math.floor(100 * funnelData.conversionRate))}`,
+      value: `${formatPercentage(Math.floor(100 * funnel.conversionRate))}`,
     },
     {
       title: 'Total visitors',
-      value: `${funnelData.visitorCount.max}`,
+      value: `${funnel.visitorCount.max}`,
     },
     {
       title: 'Total completed',
-      value: `${funnelData.visitorCount.min}`,
+      value: `${funnel.visitorCount.min}`,
     },
     {
       title: 'Biggest drop-off',
       value: (
         <span className='flex overflow-hidden overflow-x-auto text-sm text-ellipsis'>
-          {funnelData.biggestDropOff.pageStep[0]} <ArrowRight className='mx-1 max-w-[1rem] min-w-[1rem]' />{' '}
-          {funnelData.biggestDropOff.pageStep[1]}
+          {funnel.biggestDropOff.step[0]} <ArrowRight className='mx-1 max-w-[1rem] min-w-[1rem]' />{' '}
+          {funnel.biggestDropOff.step[1]}
         </span>
       ),
     },
