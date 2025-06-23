@@ -1,20 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { PricingComponent } from '@/components/pricing/PricingComponent';
 import { SelectedPlan, SelectedPlanSchema } from '@/types/pricing';
 import { createStripeCheckoutSession, createStripeCustomerPortalSession } from '@/actions/stripe';
-import type { Currency, UserBillingData } from '@/entities/billing';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import type { UserBillingData } from '@/entities/billing';
 
 interface BillingInteractiveProps {
   billingData: UserBillingData;
@@ -22,7 +14,6 @@ interface BillingInteractiveProps {
 
 export function BillingInteractive({ billingData }: BillingInteractiveProps) {
   const searchParams = useSearchParams();
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>('USD');
 
   useEffect(() => {
     if (searchParams?.get('canceled') === 'true') {
@@ -60,17 +51,9 @@ export function BillingInteractive({ billingData }: BillingInteractiveProps) {
     }
   };
 
-  const handleCurrencyChange = useCallback((currency: string) => {
-    setSelectedCurrency(currency as Currency);
-  }, []);
-
   return (
-    <div className='relative'>
-      <PricingComponent
-        onPlanSelect={handlePlanSelect}
-        billingData={billingData}
-        defaultCurrency={selectedCurrency}
-      />
+    <>
+      <PricingComponent onPlanSelect={handlePlanSelect} billingData={billingData} defaultCurrency={'USD'} />
 
       <div className='mt-6 text-center'>
         {billingData.isExistingPaidSubscriber ? (
@@ -81,20 +64,6 @@ export function BillingInteractive({ billingData }: BillingInteractiveProps) {
           <p className='text-muted-foreground text-sm'>Start with our free plan - no credit card required.</p>
         )}
       </div>
-
-      <div className='text-muted-foreground absolute top-0 mt-2 flex flex-shrink-0 justify-end text-xs'>
-        <Select value={selectedCurrency} onValueChange={handleCurrencyChange}>
-          <SelectTrigger size='sm'>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value='USD'>USD ($)</SelectItem>
-              <SelectItem value='EUR'>EUR (€)</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
+    </>
   );
 }
