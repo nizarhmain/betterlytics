@@ -1,7 +1,7 @@
 'use client';
 
 import { toast } from 'sonner';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { postFunnelAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -52,8 +52,6 @@ export function CreateFunnelDialog({ triggerText, triggerVariant }: CreateFunnel
     }
   }, [queryFilters]);
 
-  const queryClient = useQueryClient();
-
   const processedQueryFilters = useMemo(() => {
     return queryFilters.map((p) => p.value).filter((p) => p.trim() !== '');
   }, [queryFilters]);
@@ -77,7 +75,7 @@ export function CreateFunnelDialog({ triggerText, triggerVariant }: CreateFunnel
         setIsOpen(false);
       })
       .catch(() => toast.error('Funnel creation failed!'));
-  }, [metadata, queryFilters, queryClient, dashboardId]);
+  }, [metadata, queryFilters, dashboardId]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
