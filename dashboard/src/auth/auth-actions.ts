@@ -1,6 +1,6 @@
 'server only';
 
-import { getServerSession } from 'next-auth';
+import { getServerSession, User } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { Session } from 'next-auth';
@@ -46,7 +46,7 @@ export function withDashboardAuthContext<Args extends Array<unknown> = unknown[]
   };
 }
 
-type ActionRequiringUserId<Args extends Array<unknown>, Ret> = (userId: string, ...args: Args) => Ret;
+type ActionRequiringUserId<Args extends Array<unknown>, Ret> = (user: User, ...args: Args) => Ret;
 
 export function withUserAuth<Args extends Array<unknown> = unknown[], Ret = unknown>(
   action: ActionRequiringUserId<Args, Ret>,
@@ -55,7 +55,7 @@ export function withUserAuth<Args extends Array<unknown> = unknown[], Ret = unkn
     const session = await requireAuth();
 
     try {
-      return await action(session.user.id, ...args);
+      return await action(session.user, ...args);
     } catch (e) {
       console.error('Error occurred in user action:', e);
       throw new Error('An error occurred');
