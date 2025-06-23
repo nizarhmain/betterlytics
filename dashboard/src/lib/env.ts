@@ -6,20 +6,23 @@ const envSchema = z.object({
   CLICKHOUSE_DASHBOARD_PASSWORD: z.string().min(1),
   ADMIN_EMAIL: z.string().min(1),
   ADMIN_PASSWORD: z.string().min(1),
+  NEXT_PUBLIC_TRACKING_SERVER_ENDPOINT: z.string().min(1),
   ENABLE_DASHBOARD_TRACKING: z
-    .boolean({
-      coerce: true,
-    })
+    .enum(['true', 'false'])
     .optional()
-    .default(false),
+    .default('false')
+    .transform((val) => val === 'true'),
   ENABLE_REGISTRATION: z
-    .boolean({
-      coerce: true,
-    })
+    .enum(['true', 'false'])
     .optional()
-    .default(false),
+    .default('false')
+    .transform((val) => val === 'true'),
   NEXT_PUBLIC_BASE_URL: z.string().optional().default('http://localhost:3000'),
   NEXT_PUBLIC_IS_CLOUD: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((val) => val === 'true'),
+  IS_CLOUD: z
     .enum(['true', 'false'])
     .optional()
     .default('false')

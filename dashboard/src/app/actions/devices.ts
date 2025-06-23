@@ -20,10 +20,30 @@ import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { QueryFilter } from '@/entities/filter';
 import { withDashboardAuthContext } from '@/auth/auth-actions';
 import { AuthContext } from '@/entities/authContext';
+import { toPieChart } from '@/presenters/toPieChart';
 
 export const fetchDeviceTypeBreakdownAction = withDashboardAuthContext(
-  async (ctx: AuthContext, startDate: Date, endDate: Date, queryFilters: QueryFilter[]): Promise<DeviceType[]> => {
-    return getDeviceTypeBreakdownForSite(ctx.siteId, startDate, endDate, queryFilters);
+  async (
+    ctx: AuthContext,
+    startDate: Date,
+    endDate: Date,
+    queryFilters: QueryFilter[],
+    compareStartDate?: Date,
+    compareEndDate?: Date,
+  ) => {
+    const data = await getDeviceTypeBreakdownForSite(ctx.siteId, startDate, endDate, queryFilters);
+
+    const compare =
+      compareStartDate &&
+      compareEndDate &&
+      (await getDeviceTypeBreakdownForSite(ctx.siteId, compareStartDate, compareEndDate, queryFilters));
+
+    return toPieChart({
+      key: 'device_type',
+      dataKey: 'visitors',
+      data,
+      compare,
+    });
   },
 );
 

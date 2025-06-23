@@ -1,8 +1,8 @@
 use axum::{
-    extract::{ConnectInfo, Request, State}, http::{HeaderMap, StatusCode}, response::{Html, IntoResponse}, routing::{get, post}, Json, Router
+    extract::{ConnectInfo, State}, http::{HeaderMap, StatusCode}, response::IntoResponse, routing::{get, post}, Json, Router
 };
 use std::sync::Arc;
-use std::net::SocketAddr;
+use std::{net::SocketAddr, net::IpAddr, str::FromStr};
 use tower_http::cors::CorsLayer;
 use tracing::{info, error};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -17,6 +17,7 @@ mod geoip_updater;
 mod bot_detection;
 mod referrer;
 mod campaign;
+mod ua_parser;
 
 use analytics::{AnalyticsEvent, RawTrackingEvent, generate_site_id};
 use db::{Database, SharedDatabase};
@@ -32,6 +33,8 @@ async fn main() {
         .with(tracing_subscriber::EnvFilter::new(&config.log_level))
         .with(tracing_subscriber::fmt::layer())
         .init();
+
+    ua_parser::initialize();
 
     let ip_addr = config.server_host.parse::<std::net::IpAddr>()
         .map_err(|e| format!("Invalid server host IP address '{}': {}", config.server_host, e))
@@ -95,6 +98,7 @@ async fn health_check(
 async fn track_event(
     State((_db, processor)): State<(SharedDatabase, Arc<EventProcessor>)>,
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    headers: HeaderMap,
     Json(raw_event): Json<RawTrackingEvent>,
 ) -> Result<StatusCode, (StatusCode, String)> {
     if raw_event.site_id.is_empty() {
@@ -107,7 +111,7 @@ async fn track_event(
         return Err((StatusCode::BAD_REQUEST, "event name is required".to_string()));
     }
 
-    let event = AnalyticsEvent::new(raw_event, addr.ip().to_string());
+    let event = AnalyticsEvent::new(raw_event, parse_ip(headers).unwrap_or(addr.ip()).to_string());
 
     if let Err(e) = processor.process_event(event).await {
         error!("Failed to process event: {}", e);
@@ -115,6 +119,21 @@ async fn track_event(
     }
 
     Ok(StatusCode::OK)
+}
+
+pub fn parse_ip(headers: HeaderMap) -> Result<IpAddr, ()> {
+    // Get IP from X-Forwarded-For header
+    if let Some(forwarded_for) = headers.get("x-forwarded-for") {
+        if let Ok(forwarded_str) = forwarded_for.to_str() {
+            if let Some(first_ip) = forwarded_str.split(',').next() {
+                if let Ok(ip) = IpAddr::from_str(first_ip.trim()) {
+                    return Ok(ip);
+                }
+            }
+        }
+    }
+
+    Err(())
 }
 
 /// Temporary endpoint to generate a site ID
