@@ -717,7 +717,15 @@ export async function getDailyAverageTimeOnPage(
     })
     .toPromise()) as unknown[];
 
-  return result.map((row) => DailyAverageTimeRowSchema.parse(row));
+  const parsedResult = result.map((row) => {
+    const parsedRow = DailyAverageTimeRowSchema.parse(row);
+    return {
+      ...parsedRow,
+      avgTime: Number(parsedRow.avgTime ?? 0),
+    };
+  });
+
+  return parsedResult;
 }
 
 export async function getDailyBounceRate(
