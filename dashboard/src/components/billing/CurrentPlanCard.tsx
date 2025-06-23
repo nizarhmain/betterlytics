@@ -105,7 +105,7 @@ export function CurrentPlanCard({ billingData, showManagementButtons = false }: 
               </span>
             </div>
 
-            <Progress value={Math.min(usage.usagePercentage, 100)} className='h-2' />
+            <Progress value={Math.min(usage.usagePercentage, 100)} className='h-2' color='var(--primary)' />
           </div>
         </div>
       </div>
