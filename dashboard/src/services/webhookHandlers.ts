@@ -8,6 +8,7 @@ import {
 import type { Currency } from '@/entities/billing';
 import { stripe } from '@/lib/billing/stripe';
 import { getTierConfigFromLookupKey } from '@/lib/billing/plans';
+import { addMonths } from 'date-fns';
 
 export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   try {
@@ -90,7 +91,7 @@ export async function handleSubscriptionDeleted(subscription: Stripe.Subscriptio
       pricePerMonth: 0,
       currency: localSubscription.currency,
       currentPeriodStart: now,
-      currentPeriodEnd: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+      currentPeriodEnd: addMonths(now, 1),
       cancelAtPeriodEnd: false,
       paymentSubscriptionId: undefined,
       paymentPriceId: undefined,
