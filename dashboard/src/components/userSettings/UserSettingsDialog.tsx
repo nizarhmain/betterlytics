@@ -132,7 +132,7 @@ export default function UserSettingsDialog({ open, onOpenChange }: UserSettingsD
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          <TabsList className={`grid w-full grid-cols-${availableTabs.length}`}>
+          <TabsList className='flex w-full'>
             {availableTabs.map((tab) => {
               const Icon = tab.icon;
               return (
