@@ -1,6 +1,6 @@
 'use client';
 
-import { BAFunnel } from '@/components/funnels/Funnel';
+import { BAFunnel } from '@/components/funnels/BAFunnel';
 import { PresentedFunnel } from '@/presenters/toFunnel';
 
 type FunnelPreviewDisplayProps = {

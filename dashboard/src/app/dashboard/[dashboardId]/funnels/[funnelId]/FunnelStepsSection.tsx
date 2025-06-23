@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 import { fetchFunnelDetailsAction } from '@/app/actions';
-import { BAFunnel } from '@/components/funnels/Funnel';
+import { BAFunnel } from '@/components/funnels/BAFunnel';
 
 type FunnelStepsSectionProps = {
   funnelPromise: ReturnType<typeof fetchFunnelDetailsAction>;
