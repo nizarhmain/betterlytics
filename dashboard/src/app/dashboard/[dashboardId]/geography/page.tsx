@@ -39,7 +39,7 @@ export default async function GeographyPage({ params, searchParams }: GeographyP
         <GeographySection worldMapPromise={worldMapPromise} />
       </Suspense>
 
-      <div className='absolute top-4 right-4 z-[1001]'>
+      <div className='absolute top-4 right-4 z-20'>
         <div className='bg-card flex gap-4 rounded-md p-2 shadow-md'>
           <DashboardFilters />
         </div>
