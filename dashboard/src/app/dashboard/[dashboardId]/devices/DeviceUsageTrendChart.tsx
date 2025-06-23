@@ -15,6 +15,7 @@ import { getDeviceColor } from '@/utils/deviceColors';
 import { DeviceIcon } from '@/components/icons';
 import { format } from 'date-fns';
 import { capitalizeFirstLetter } from '@/utils/formatters';
+import { ChartTooltip } from '@/components/charts/ChartTooltip';
 
 interface DeviceUsageTrendChartProps {
   data?: DeviceUsageTrendRow[];
