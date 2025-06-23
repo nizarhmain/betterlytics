@@ -214,6 +214,16 @@ Have an idea for Betterlytics? We'd love to hear it!
 
 ---
 
+## 📄 License & Attribution
+
+This project is licensed under the [AGPL-3.0 License](LICENSE).
+
+### Third-Party Components
+
+Betterlytics includes components from other open source projects. See [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) for detailed attribution and license information.
+
+---
+
 ## 👥 Community
 
 Join our small community of developers and privacy advocates:
