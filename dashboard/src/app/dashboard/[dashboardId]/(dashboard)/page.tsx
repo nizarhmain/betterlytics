@@ -90,53 +90,51 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
   const customEventsPromise = fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, queryFilters);
 
   return (
-    <div className='min-h-screen'>
-      <div className='space-y-6 p-6'>
-        <DashboardFilters />
+    <div className='space-y-6 p-6'>
+      <DashboardFilters />
 
-        <Suspense>
-          <NoDataBanner />
-        </Suspense>
+      <Suspense>
+        <NoDataBanner />
+      </Suspense>
 
-        <Suspense
-          fallback={
-            <div className='space-y-6'>
-              <SummaryCardsSkeleton />
-              <ChartSkeleton />
-            </div>
-          }
-        >
-          <SummaryAndChartSection data={summaryAndChartPromise} />
-        </Suspense>
-
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-          <Suspense fallback={<TableSkeleton />}>
-            <PagesAnalyticsSection analyticsCombinedPromise={analyticsCombinedPromise} />
-          </Suspense>
-          <Suspense fallback={<TableSkeleton />}>
-            <GeographySection worldMapPromise={worldMapPromise} />
-          </Suspense>
-        </div>
-
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
-          <div className='flex-1 lg:flex-[2]'>
-            <Suspense fallback={<TableSkeleton />}>
-              <DevicesSection deviceBreakdownCombinedPromise={devicePromise} />
-            </Suspense>
+      <Suspense
+        fallback={
+          <div className='space-y-6'>
+            <SummaryCardsSkeleton />
+            <ChartSkeleton />
           </div>
-          <div className='flex-1'>
-            <Suspense fallback={<TableSkeleton />}>
-              <TrafficSourcesSection trafficSourcesCombinedPromise={trafficSourcesPromise} />
-            </Suspense>
-          </div>
-        </div>
+        }
+      >
+        <SummaryAndChartSection data={summaryAndChartPromise} />
+      </Suspense>
 
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <Suspense fallback={<TableSkeleton />}>
+          <PagesAnalyticsSection analyticsCombinedPromise={analyticsCombinedPromise} />
+        </Suspense>
+        <Suspense fallback={<TableSkeleton />}>
+          <GeographySection worldMapPromise={worldMapPromise} />
+        </Suspense>
+      </div>
+
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <div className='flex-1 lg:flex-[2]'>
           <Suspense fallback={<TableSkeleton />}>
-            <CustomEventsSection customEventsPromise={customEventsPromise} />
+            <DevicesSection deviceBreakdownCombinedPromise={devicePromise} />
           </Suspense>
-          <div>{/* Placeholder for future content */}</div>
         </div>
+        <div className='flex-1'>
+          <Suspense fallback={<TableSkeleton />}>
+            <TrafficSourcesSection trafficSourcesCombinedPromise={trafficSourcesPromise} />
+          </Suspense>
+        </div>
+      </div>
+
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <Suspense fallback={<TableSkeleton />}>
+          <CustomEventsSection customEventsPromise={customEventsPromise} />
+        </Suspense>
+        <div>{/* Placeholder for future content */}</div>
       </div>
     </div>
   );

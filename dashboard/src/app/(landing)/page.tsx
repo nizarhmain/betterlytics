@@ -11,7 +11,7 @@ export const revalidate = 3600;
 
 export default function LandingPage() {
   return (
-    <div className='bg-background text-foreground min-h-screen'>
+    <div className='bg-background text-foreground'>
       <HeroSection />
       <FrameworkCompatibility />
       <PrinciplesSection />

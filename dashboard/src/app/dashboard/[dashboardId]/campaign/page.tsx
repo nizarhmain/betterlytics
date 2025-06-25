@@ -38,26 +38,24 @@ export default async function CampaignPage({ params, searchParams }: CampaignPag
   const landingPagePerformancePromise = fetchCampaignLandingPagePerformanceAction(dashboardId, startDate, endDate);
 
   return (
-    <div className='min-h-screen'>
-      <div className='space-y-6 p-6'>
-        <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
-          <div>
-            <h1 className='text-foreground mb-1 text-2xl font-bold'>Campaigns</h1>
-            <p className='text-muted-foreground text-sm'>Campaign performance analytics and insights</p>
-          </div>
-          <DashboardFilters />
+    <div className='space-y-6 p-6'>
+      <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
+        <div>
+          <h1 className='text-foreground mb-1 text-2xl font-bold'>Campaigns</h1>
+          <p className='text-muted-foreground text-sm'>Campaign performance analytics and insights</p>
         </div>
-
-        <CampaignTabs
-          campaignPerformancePromise={campaignPerformancePromise}
-          visitorTrendPromise={visitorTrendPromise}
-          sourceBreakdownPromise={sourceBreakdownPromise}
-          mediumBreakdownPromise={mediumBreakdownPromise}
-          contentBreakdownPromise={contentBreakdownPromise}
-          termBreakdownPromise={termBreakdownPromise}
-          landingPagePerformancePromise={landingPagePerformancePromise}
-        />
+        <DashboardFilters />
       </div>
+
+      <CampaignTabs
+        campaignPerformancePromise={campaignPerformancePromise}
+        visitorTrendPromise={visitorTrendPromise}
+        sourceBreakdownPromise={sourceBreakdownPromise}
+        mediumBreakdownPromise={mediumBreakdownPromise}
+        contentBreakdownPromise={contentBreakdownPromise}
+        termBreakdownPromise={termBreakdownPromise}
+        landingPagePerformancePromise={landingPagePerformancePromise}
+      />
     </div>
   );
 }

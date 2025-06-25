@@ -52,45 +52,43 @@ export default async function DevicesPage({ params, searchParams }: DevicesPageP
   );
 
   return (
-    <div className='min-h-screen'>
-      <div className='space-y-6 p-6'>
-        <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
-          <div>
-            <h1 className='text-foreground mb-1 text-2xl font-bold'>Devices</h1>
-            <p className='text-muted-foreground text-sm'>Visitor device breakdown and usage analytics</p>
-          </div>
-          <DashboardFilters />
+    <div className='space-y-6 p-6'>
+      <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
+        <div>
+          <h1 className='text-foreground mb-1 text-2xl font-bold'>Devices</h1>
+          <p className='text-muted-foreground text-sm'>Visitor device breakdown and usage analytics</p>
         </div>
-
-        <Suspense fallback={<SummaryCardsSkeleton count={4} />}>
-          <DevicesSummarySection deviceSummaryPromise={deviceSummaryPromise} />
-        </Suspense>
-
-        <Suspense
-          fallback={
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-              <ChartSkeleton />
-              <ChartSkeleton />
-            </div>
-          }
-        >
-          <DevicesChartsSection
-            deviceBreakdownPromise={deviceBreakdownPromise}
-            deviceUsageTrendPromise={deviceUsageTrendPromise}
-          />
-        </Suspense>
-
-        <Suspense
-          fallback={
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-              <TableSkeleton />
-              <TableSkeleton />
-            </div>
-          }
-        >
-          <DevicesTablesSection browserStatsPromise={browserStatsPromise} osStatsPromise={osStatsPromise} />
-        </Suspense>
+        <DashboardFilters />
       </div>
+
+      <Suspense fallback={<SummaryCardsSkeleton count={4} />}>
+        <DevicesSummarySection deviceSummaryPromise={deviceSummaryPromise} />
+      </Suspense>
+
+      <Suspense
+        fallback={
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+            <ChartSkeleton />
+            <ChartSkeleton />
+          </div>
+        }
+      >
+        <DevicesChartsSection
+          deviceBreakdownPromise={deviceBreakdownPromise}
+          deviceUsageTrendPromise={deviceUsageTrendPromise}
+        />
+      </Suspense>
+
+      <Suspense
+        fallback={
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+            <TableSkeleton />
+            <TableSkeleton />
+          </div>
+        }
+      >
+        <DevicesTablesSection browserStatsPromise={browserStatsPromise} osStatsPromise={osStatsPromise} />
+      </Suspense>
     </div>
   );
 }
