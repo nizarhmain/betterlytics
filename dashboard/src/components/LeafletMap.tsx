@@ -152,7 +152,7 @@ const LeafletMap = ({
   const { MapContainer, GeoJSON } = mapComponents;
 
   return (
-    <div style={{ height: '100%', width: '100%', position: 'relative', zIndex: 10 }}>
+    <div style={{ height: '100%', width: '100%' }}>
       <style jsx global>{`
         .leaflet-container {
           background-color: var(--color-card);
