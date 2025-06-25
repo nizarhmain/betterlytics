@@ -41,7 +41,7 @@ export default async function PagesPage({ params, searchParams }: PagesPageParam
   const exitPageAnalyticsPromise = fetchExitPageAnalyticsAction(dashboardId, startDate, endDate, queryFilters);
 
   return (
-    <div className='space-y-6 p-6'>
+    <div className='container space-y-6 p-6'>
       <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
         <div>
           <h1 className='text-foreground mb-1 text-2xl font-bold'>Pages</h1>

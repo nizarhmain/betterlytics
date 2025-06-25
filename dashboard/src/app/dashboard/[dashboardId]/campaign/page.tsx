@@ -38,7 +38,7 @@ export default async function CampaignPage({ params, searchParams }: CampaignPag
   const landingPagePerformancePromise = fetchCampaignLandingPagePerformanceAction(dashboardId, startDate, endDate);
 
   return (
-    <div className='space-y-6 p-6'>
+    <div className='container space-y-6 p-6'>
       <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
         <div>
           <h1 className='text-foreground mb-1 text-2xl font-bold'>Campaigns</h1>

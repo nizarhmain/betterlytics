@@ -90,7 +90,7 @@ export default async function DashboardPage({ params, searchParams }: DashboardP
   const customEventsPromise = fetchCustomEventsOverviewAction(dashboardId, startDate, endDate, queryFilters);
 
   return (
-    <div className='space-y-6 p-6'>
+    <div className='container space-y-6 p-6'>
       <DashboardFilters />
 
       <Suspense>

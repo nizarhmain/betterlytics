@@ -44,12 +44,12 @@ type BASidebarProps = {
 
 export default async function BASidebar({ dashboardId }: BASidebarProps) {
   return (
-    <Sidebar variant='floating' collapsible='icon' className='top-14 h-[calc(100vh-3.5rem)]'>
+    <Sidebar variant='floating' collapsible='icon' className='top-14 !z-1100 h-[calc(100vh-3.5rem)]'>
       <SidebarHeader>
         <BASidebarHeader />
       </SidebarHeader>
-      <SidebarContent className='bg-background pl-1'>
-        <SidebarGroup>
+      <SidebarContent className='bg-background !z-1100 pl-1'>
+        <SidebarGroup className='!z-1100'>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

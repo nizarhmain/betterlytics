@@ -54,7 +54,7 @@ export default async function DashboardLayout({ children, params }: DashboardLay
                 <UsageUpgradeBanner billingDataPromise={getUserBillingData()} />
               </Suspense>
             )}
-            <div className='container'>{children}</div>
+            <div className='flex w-full justify-center'>{children}</div>
           </main>
           {/* Conditionally render tracking script based on server-side feature flag */}
           {shouldEnableTracking && siteId && <TrackingScript siteId={siteId} />}
