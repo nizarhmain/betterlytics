@@ -10,7 +10,7 @@ export function IntegrationManager() {
   const router = useRouter();
 
   useEffect(() => {
-    const showIntegration = searchParams.get('showIntegration');
+    const showIntegration = searchParams?.get('showIntegration');
     if (showIntegration === 'true') {
       setIsSheetOpen(true);
       const newUrl = window.location.pathname;
