@@ -24,7 +24,7 @@ export default async function FunnelsPage({ params }: FunnelsPageParams) {
   const funnelsPromise = fetchFunnelsAction(dashboardId);
 
   return (
-    <div className='min-h-screen space-y-6 p-6'>
+    <div className='space-y-6 p-6'>
       <div className='flex flex-col justify-between gap-y-4 xl:flex-row xl:items-center'>
         <div>
           <h1 className='text-foreground mb-1 text-2xl font-bold'>Funnels</h1>

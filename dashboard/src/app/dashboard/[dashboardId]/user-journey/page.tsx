@@ -34,31 +34,29 @@ export default async function UserJourneyPage({ params, searchParams }: UserJour
   );
 
   return (
-    <div className='min-h-screen'>
-      <div className='space-y-6 p-6'>
-        <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
-          <div>
-            <h1 className='text-foreground mb-1 text-2xl font-bold'>User Journey</h1>
-            <p className='text-muted-foreground text-sm'>Analytics and insights for your website</p>
-          </div>
-          <DashboardFilters />
+    <div className='space-y-6 p-6'>
+      <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
+        <div>
+          <h1 className='text-foreground mb-1 text-2xl font-bold'>User Journey</h1>
+          <p className='text-muted-foreground text-sm'>Analytics and insights for your website</p>
         </div>
+        <DashboardFilters />
+      </div>
 
-        <Suspense
-          fallback={
-            <div className='relative min-h-[400px]'>
-              <div className='bg-background/70 absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm'>
-                <div className='flex flex-col items-center'>
-                  <Spinner size='lg' className='mb-2' />
-                  <p className='text-muted-foreground'>Loading journey data...</p>
-                </div>
+      <Suspense
+        fallback={
+          <div className='relative min-h-[400px]'>
+            <div className='bg-background/70 absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm'>
+              <div className='flex flex-col items-center'>
+                <Spinner size='lg' className='mb-2' />
+                <p className='text-muted-foreground'>Loading journey data...</p>
               </div>
             </div>
-          }
-        >
-          <UserJourneySection userJourneyPromise={userJourneyPromise} />
-        </Suspense>
-      </div>
+          </div>
+        }
+      >
+        <UserJourneySection userJourneyPromise={userJourneyPromise} />
+      </Suspense>
     </div>
   );
 }

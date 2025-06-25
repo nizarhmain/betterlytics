@@ -13,6 +13,7 @@ import { IntegrationManager } from './IntegrationManager';
 import UsageUpgradeBanner from '@/components/billing/UsageUpgradeBanner';
 import { getUserBillingData } from '@/actions/billing';
 import { Suspense } from 'react';
+import BATopbar from '@/components/topbar/BATopbar';
 
 type DashboardLayoutProps = {
   params: Promise<{ dashboardId: string }>;
@@ -42,24 +43,27 @@ export default async function DashboardLayout({ children, params }: DashboardLay
 
   return (
     <DashboardProvider>
-      <SidebarProvider>
-        <BASidebar dashboardId={dashboardId} />
-        <BAMobileSidebarTrigger />
-        <main className='bg-background w-full max-w-svw overflow-x-hidden'>
-          {billingEnabled && (
-            <Suspense fallback={null}>
-              <UsageUpgradeBanner billingDataPromise={getUserBillingData()} />
-            </Suspense>
-          )}
-          <div className='container mx-auto px-4 pt-4'>{children}</div>
-        </main>
-        {/* Conditionally render tracking script based on server-side feature flag */}
-        {shouldEnableTracking && siteId && <TrackingScript siteId={siteId} />}
+      <section>
+        <BATopbar />
+        <SidebarProvider>
+          <BASidebar dashboardId={dashboardId} />
+          <BAMobileSidebarTrigger />
+          <main className='bg-background w-full overflow-x-hidden'>
+            {billingEnabled && (
+              <Suspense fallback={null}>
+                <UsageUpgradeBanner billingDataPromise={getUserBillingData()} />
+              </Suspense>
+            )}
+            <div className='container'>{children}</div>
+          </main>
+          {/* Conditionally render tracking script based on server-side feature flag */}
+          {shouldEnableTracking && siteId && <TrackingScript siteId={siteId} />}
 
-        <Suspense>
-          <IntegrationManager />
-        </Suspense>
-      </SidebarProvider>
+          <Suspense>
+            <IntegrationManager />
+          </Suspense>
+        </SidebarProvider>
+      </section>
     </DashboardProvider>
   );
 }
