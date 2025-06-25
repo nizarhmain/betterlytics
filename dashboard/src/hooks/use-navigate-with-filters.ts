@@ -16,7 +16,7 @@ export function useNavigateWithFilters() {
       const url = new URL(href, window.location.origin);
 
       // Preserve current search params if the new URL doesn't have any
-      if (!url.search && searchParams.toString()) {
+      if (!url.search && searchParams?.toString()) {
         url.search = searchParams.toString();
       }
 
@@ -37,7 +37,7 @@ export function useNavigateWithFilters() {
       const url = new URL(href, window.location.origin);
 
       // Preserve current search params if the new URL doesn't have any
-      if (!url.search && searchParams.toString()) {
+      if (!url.search && searchParams?.toString()) {
         url.search = searchParams.toString();
       }
 
