@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
+import { useParams } from 'next/navigation';
 
 export function useDashboardId() {
   const params = useParams();
-  return params.dashboardId as string;
+  return params?.dashboardId as string;
 }

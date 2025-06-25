@@ -28,7 +28,7 @@ export function useSyncURLFilters() {
 
   useEffect(() => {
     try {
-      const encodedFilters = searchParams.get(URL_PARAM_NAME);
+      const encodedFilters = searchParams?.get(URL_PARAM_NAME);
       const filters = encodedFilters
         ? BAFilterSearchParams.decode(encodedFilters)
         : BAFilterSearchParams.getDefaultFilters();
@@ -60,7 +60,7 @@ export function useSyncURLFilters() {
 
   useEffect(() => {
     try {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams?.toString() ?? '');
 
       const encodedFilters = BAFilterSearchParams.encode({
         queryFilters,
