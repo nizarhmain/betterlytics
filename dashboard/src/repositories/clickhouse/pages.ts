@@ -226,8 +226,8 @@ export async function getPageMetrics(
     title: row.path,
     visitors: Number(row.visitors),
     pageviews: Number(row.pageviews),
-    bounceRate: Number(row.bounceRate ?? 0),
-    avgTime: Number(row.avgTime ?? 0),
+    bounceRate: row.bounceRate,
+    avgTime: row.avgTime,
   }));
 
   return PageAnalyticsSchema.array().parse(mappedResults);
@@ -303,8 +303,8 @@ export async function getPageDetailMetrics(
     title: row.path,
     visitors: Number(row.visitors),
     pageviews: Number(row.pageviews),
-    bounceRate: Number(row.bounceRate ?? 0),
-    avgTime: Number(row.avgTime ?? 0),
+    bounceRate: row.bounceRate,
+    avgTime: row.avgTime,
   };
 
   return PageAnalyticsSchema.parse(mappedResult);
@@ -545,8 +545,8 @@ export async function getEntryPageAnalytics(
     title: row.path,
     visitors: Number(row.visitors),
     pageviews: Number(row.pageviews),
-    bounceRate: Number(row.bounceRate ?? 0),
-    avgTime: Number(row.avgTime ?? 0),
+    bounceRate: row.bounceRate,
+    avgTime: row.avgTime,
     entryRate: Number(row.entryRate ?? 0),
   }));
 
@@ -655,8 +655,8 @@ export async function getExitPageAnalytics(
     title: row.path,
     visitors: Number(row.visitors),
     pageviews: Number(row.pageviews),
-    bounceRate: Number(row.bounceRate ?? 0),
-    avgTime: Number(row.avgTime ?? 0),
+    bounceRate: row.bounceRate,
+    avgTime: row.avgTime,
     exitRate: Number(row.exitRate ?? 0),
   }));
 

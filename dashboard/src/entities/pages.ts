@@ -5,8 +5,14 @@ export const PageAnalyticsSchema = z.object({
   title: z.string(),
   visitors: z.number(),
   pageviews: z.number(),
-  bounceRate: z.number(),
-  avgTime: z.number(),
+  bounceRate: z.preprocess((val) => {
+    if (val === null || val === undefined) return 0;
+    return Number(val);
+  }, z.number()),
+  avgTime: z.preprocess((val) => {
+    if (val === null || val === undefined) return 0;
+    return Number(val);
+  }, z.number()),
   entryRate: z.number().optional(),
   exitRate: z.number().optional(),
 });
@@ -34,12 +40,18 @@ export const PageAnalyticsCombinedSchema = z.object({
 
 export const DailyAverageTimeRowSchema = z.object({
   date: z.string(),
-  avgTime: z.number(),
+  avgTime: z.preprocess((val) => {
+    if (val === null || val === undefined) return 0;
+    return Number(val);
+  }, z.number()),
 });
 
 export const DailyBounceRateRowSchema = z.object({
   date: z.string(),
-  bounceRate: z.number(),
+  bounceRate: z.preprocess((val) => {
+    if (val === null || val === undefined) return 0;
+    return Number(val);
+  }, z.number()),
 });
 
 export const PageviewsChartDataPointSchema = z.object({
