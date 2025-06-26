@@ -31,5 +31,6 @@ WORKDIR /app
 
 # Copy just the compiled binary
 COPY --from=builder /app/target/release/betterlytics /app/app
+COPY --from=builder /app/assets /app/assets
 
 CMD ./app

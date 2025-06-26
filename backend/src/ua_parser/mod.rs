@@ -1,8 +1,9 @@
+use std::path::Path;
+
 use uaparser::{UserAgentParser, Parser};
 use once_cell::sync::Lazy;
 use moka::sync::Cache;
 use tracing::{info, debug};
-use std::path::Path;
 use std::sync::OnceLock;
 
 static USER_AGENT_PARSER: OnceLock<UserAgentParser> = OnceLock::new();
