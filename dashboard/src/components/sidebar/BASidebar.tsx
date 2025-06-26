@@ -9,7 +9,6 @@ import {
   DollarSign,
   Route,
 } from 'lucide-react';
-import { BASidebarHeader } from './BASidebarHeader';
 import {
   Sidebar,
   SidebarContent,
@@ -45,9 +44,7 @@ type BASidebarProps = {
 export default async function BASidebar({ dashboardId }: BASidebarProps) {
   return (
     <Sidebar variant='floating' collapsible='icon' className='top-14 !z-1100 h-[calc(100vh-3.5rem)]'>
-      <SidebarHeader>
-        <BASidebarHeader />
-      </SidebarHeader>
+      <SidebarHeader className='bg-background rounded-t-xl pt-2'></SidebarHeader>
       <SidebarContent className='bg-background !z-1100 pl-1'>
         <SidebarGroup className='!z-1100'>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
