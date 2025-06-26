@@ -9,7 +9,7 @@ export default function BAMobileSidebarTrigger() {
   const { toggleSidebar, isMobile } = useSidebar();
 
   return (
-    <div className='bg-background fixed bottom-10 left-6 z-20 h-fit w-fit rounded-md'>
+    <div className='bg-background fixed bottom-10 left-6 z-600 h-fit w-fit rounded-md'>
       <Button variant='outline' className={cn(!isMobile && 'hidden')} onClick={toggleSidebar}>
         <MenuIcon />
       </Button>

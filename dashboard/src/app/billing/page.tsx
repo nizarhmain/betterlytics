@@ -22,7 +22,7 @@ export default async function BillingPage() {
   const billingData = await getUserBillingData();
 
   return (
-    <div className='bg-background min-h-screen'>
+    <div className='bg-background'>
       <BillingNavigationBanner />
 
       <div className='container mx-auto max-w-6xl px-4 py-8'>

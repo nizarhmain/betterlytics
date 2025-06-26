@@ -30,7 +30,7 @@ export default function GeographySection({ worldMapPromise }: GeographySectionPr
 
   return (
     <>
-      <div className='absolute inset-0 h-full w-full'>
+      <div className='h-full w-full'>
         <LeafletMap visitorData={processedVisitorData} maxVisitors={mapData.maxVisitors} showZoomControls={true} />
       </div>
 
