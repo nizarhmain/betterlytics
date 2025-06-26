@@ -22,10 +22,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import BASidebarCollapsibleSignOutButton from './BASidebarCollapsibleSignOutButton';
 import SettingsButton from '../SettingsButton';
 import { IntegrationButton } from '@/components/integration/IntegrationButton';
 import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
+import { ActiveUsersLabel } from './ActiveUsersLabel';
+import { Suspense } from 'react';
 
 const navItems = [
   { name: 'Overview', href: '', icon: <LayoutDashboard size={18} /> },
@@ -51,8 +52,12 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
       </SidebarHeader>
       <SidebarContent className='bg-background z-600 pl-1'>
         <SidebarGroup className='z-600'>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
+          <SidebarGroupLabel>
+            <Suspense fallback={null}>
+              <ActiveUsersLabel />
+            </Suspense>
+          </SidebarGroupLabel>
+          <SidebarGroupContent className='pt-2'>
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.name}>
@@ -69,10 +74,9 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
-          <SettingsButton />
+        <SidebarMenu className='gap-2'>
           <IntegrationButton />
-          <BASidebarCollapsibleSignOutButton />
+          <SettingsButton />
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

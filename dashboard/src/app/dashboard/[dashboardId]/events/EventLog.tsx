@@ -11,6 +11,7 @@ import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { formatNumber } from '@/utils/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
+import { LiveIndicator } from '@/components/ui/live-indicator';
 import { EventLogItem } from './EventLogItem';
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -20,12 +21,6 @@ const COUNT_REFRESH_INTERVAL_MS = 60 * 1000; // 1 minute
 interface EventLogProps {
   pageSize?: number;
 }
-
-const LiveIndicator = () => (
-  <div className='absolute -top-1 -right-1 h-3 w-3 animate-pulse rounded-full bg-green-500 shadow-lg shadow-green-500/50'>
-    <div className='absolute inset-0 h-3 w-3 animate-ping rounded-full bg-green-400' />
-  </div>
-);
 
 const EmptyState = () => (
   <div className='flex flex-col items-center justify-center space-y-3 py-16'>
