@@ -6,7 +6,7 @@ use tracing::{info, debug};
 static USER_AGENT_PARSER: Lazy<UserAgentParser> = Lazy::new(|| {
     info!("Initializing user agent parser...");
     
-    let regexes_path = "./assets/user_agent_headers/regexes.yaml";
+    let regexes_path = concat!(env!("CARGO_MANIFEST_DIR"), "./assets/user_agent_headers/regexes.yaml");
     
     UserAgentParser::builder()
         .with_unicode_support(false)  // Disable unicode since we don't expect any unicode in the user agent
