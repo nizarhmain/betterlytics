@@ -13,7 +13,7 @@ FROM base as builder
 WORKDIR /app
 
 COPY package*.json .
-RUN pnpm fetch --prod
+RUN pnpm install
 
 COPY . .
 
@@ -38,4 +38,4 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-CMD node server.js 
+CMD node server.js

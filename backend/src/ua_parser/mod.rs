@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use uaparser::{UserAgentParser, Parser};
 use once_cell::sync::Lazy;
 use moka::sync::Cache;
@@ -6,14 +8,14 @@ use tracing::{info, debug};
 static USER_AGENT_PARSER: Lazy<UserAgentParser> = Lazy::new(|| {
     info!("Initializing user agent parser...");
     
-    let regexes_path = concat!(env!("CARGO_MANIFEST_DIR"), "./assets/user_agent_headers/regexes.yaml");
+    let regexes_path = Path::new("assets/user_agent_headers/regexes.yaml");
     
     UserAgentParser::builder()
         .with_unicode_support(false)  // Disable unicode since we don't expect any unicode in the user agent
         .with_device(false)          // Disable device parsing since we detect device from screen resolution
-        .build_from_yaml(regexes_path)
+        .build_from_yaml(regexes_path.to_str().unwrap())
         .unwrap_or_else(|e| {
-            panic!("Failed to initialize user agent parser from {}: {}. Please ensure regexes.yaml is available.", regexes_path, e);
+            panic!("Failed to initialize user agent parser from {}: {}. Please ensure regexes.yaml is available.", regexes_path.to_str().unwrap(), e);
         })
 });
 
