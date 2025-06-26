@@ -52,6 +52,7 @@ export function CurrentPlanCard({ billingData, showManagementButtons = false }: 
       <div className='flex items-start justify-between'>
         <div className='flex-1'>
           <div className='flex items-center gap-2'>
+            <TrendingUp size={16} className='text-muted-foreground' />
             <h3 className='text-lg font-semibold'>Current Plan</h3>
             {isCanceled ? (
               <Badge variant='destructive' className='capitalize'>

@@ -3,27 +3,13 @@
 import { useState, useEffect, useTransition } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Loader2, Save, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSettings } from '@/contexts/SettingsProvider';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
-import { resetDashboardSettingsAction, updateDashboardSettingsAction } from '@/app/actions/dashboardSettings';
+import { updateDashboardSettingsAction } from '@/app/actions/dashboardSettings';
 import { DashboardSettingsUpdate } from '@/entities/dashboardSettings';
-import DisplayDashboardSettings from '@/components/dashboardSettings/DashboardDisplaySettings';
 import DataDashboardSettings from '@/components/dashboardSettings/DashboardDataSettings';
-import ReportDashboardSettings from '@/components/dashboardSettings/DashboardReportSettings';
-import AlertDashboardSettings from '@/components/dashboardSettings/DashboardAlertSettings';
 
 interface SettingsTabConfig {
   id: string;
@@ -35,26 +21,27 @@ interface SettingsTabConfig {
 }
 
 const SETTINGS_TABS: SettingsTabConfig[] = [
-  {
+  /*{
     id: 'display',
     label: 'Display',
     component: DisplayDashboardSettings,
-  },
+  },*/
   {
     id: 'data',
     label: 'Data',
     component: DataDashboardSettings,
   },
-  {
+  /*{
     id: 'reports',
     label: 'Reports',
     component: ReportDashboardSettings,
-  },
-  {
+  },*/
+  /*{
     id: 'alerts',
     label: 'Alerts',
     component: AlertDashboardSettings,
   },
+  */
 ];
 
 export default function SettingsSection() {
@@ -63,7 +50,6 @@ export default function SettingsSection() {
   const [formData, setFormData] = useState<DashboardSettingsUpdate>({});
   const [activeTab, setActiveTab] = useState(SETTINGS_TABS[0].id);
   const [isPendingSave, startTransitionSave] = useTransition();
-  const [isPendingReset, startTransitionReset] = useTransition();
 
   useEffect(() => {
     if (settings) {
@@ -83,18 +69,6 @@ export default function SettingsSection() {
         toast.success('Settings saved successfully');
       } catch {
         toast.error('Failed to save settings');
-      }
-    });
-  };
-
-  const handleReset = () => {
-    startTransitionReset(async () => {
-      try {
-        await resetDashboardSettingsAction(dashboardId);
-        await refreshSettings();
-        toast.success('Settings reset to defaults');
-      } catch {
-        toast.error('Failed to reset settings');
       }
     });
   };
@@ -129,58 +103,8 @@ export default function SettingsSection() {
         );
       })}
 
-      <div className='flex justify-between border-t pt-6'>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant='outline' disabled={isPendingReset || isPendingSave}>
-              {isPendingReset ? (
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              ) : (
-                <RotateCcw className='mr-2 h-4 w-4' />
-              )}
-              Reset to Defaults
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle className='flex items-center gap-2'>
-                <AlertTriangle className='text-destructive h-5 w-5' />
-                Reset Settings to Defaults
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to reset all settings to their default values? This action cannot be undone
-                and will:
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-
-            <div className='text-muted-foreground space-y-2 text-sm'>
-              <ul className='list-inside list-disc space-y-1'>
-                <li>Reset all display preferences</li>
-                <li>Clear all report recipients</li>
-                <li>Reset data retention and alert settings</li>
-                <li>Lose any custom configurations</li>
-              </ul>
-            </div>
-
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPendingReset}>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleReset}
-                disabled={isPendingReset}
-                className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
-              >
-                {isPendingReset ? (
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                ) : (
-                  <RotateCcw className='mr-2 h-4 w-4' />
-                )}
-                Reset Settings
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        <Button onClick={handleSave} disabled={isPendingSave || isPendingReset}>
+      <div className='flex justify-end border-t pt-6'>
+        <Button onClick={handleSave} disabled={isPendingSave}>
           {isPendingSave ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <Save className='mr-2 h-4 w-4' />}
           Save Changes
         </Button>

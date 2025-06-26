@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Settings, LogOut, User, ExternalLink, LayoutDashboard } from 'lucide-react';
+import { Settings, LogOut, User, ExternalLink, LayoutDashboard, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import Logo from '@/components/logo';
 import UserSettingsDialog from '@/components/userSettings/UserSettingsDialog';
@@ -74,12 +74,19 @@ export default function BATopbar() {
                         <span>Dashboards</span>
                       </Link>
                     </DropdownMenuItem>
-
+                    <DropdownMenuItem asChild className='cursor-pointer'>
+                      <Link href='/billing'>
+                        <CreditCard className='mr-2 h-4 w-4' />
+                        <span>Upgrade Plan</span>
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSettingsClick} className='cursor-pointer'>
                       <Settings className='mr-2 h-4 w-4' />
                       <span>Settings</span>
                     </DropdownMenuItem>
+
                     <DropdownMenuSeparator />
+
                     <DropdownMenuItem asChild className='cursor-pointer'>
                       <Link href='/docs'>
                         <ExternalLink className='mr-2 h-4 w-4' />
