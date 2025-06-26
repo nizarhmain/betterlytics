@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useTransition, useMemo } from "react";
-import { DashboardSettings, DashboardSettingsUpdate } from "@/entities/dashboardSettings";
-import { getDashboardSettingsAction, updateDashboardSettingsAction, resetDashboardSettingsAction } from "@/app/actions/dashboardSettings";
-import { useDashboardId } from "@/hooks/use-dashboard-id";
+import { useState, useEffect, useTransition, useMemo } from 'react';
+import { DashboardSettings, DashboardSettingsUpdate } from '@/entities/dashboardSettings';
+import { getDashboardSettingsAction, updateDashboardSettingsAction } from '@/app/actions/dashboardSettings';
+import { useDashboardId } from '@/hooks/use-dashboard-id';
 
 interface UseDashboardSettingsReturn {
   settings: DashboardSettings | null;
@@ -11,7 +11,6 @@ interface UseDashboardSettingsReturn {
   isSaving: boolean;
   updateSetting: <K extends keyof DashboardSettingsUpdate>(key: K, value: DashboardSettingsUpdate[K]) => void;
   saveSettings: (newSettings?: Partial<DashboardSettingsUpdate>) => Promise<{ success: boolean }>;
-  resetSettings: () => Promise<{ success: boolean }>;
   refreshSettings: () => Promise<void>;
 }
 
@@ -29,7 +28,7 @@ export function useDashboardSettings(): UseDashboardSettingsReturn {
       setSettings(dashboardSettings);
       setPendingUpdates({});
     } catch (error) {
-      console.error("Failed to load dashboard settings:", error);
+      console.error('Failed to load dashboard settings:', error);
     } finally {
       setIsLoading(false);
     }
@@ -41,11 +40,8 @@ export function useDashboardSettings(): UseDashboardSettingsReturn {
     }
   }, [dashboardId]);
 
-  const updateSetting = <K extends keyof DashboardSettingsUpdate>(
-    key: K, 
-    value: DashboardSettingsUpdate[K]
-  ) => {
-    setPendingUpdates(prev => ({ ...prev, [key]: value }));
+  const updateSetting = <K extends keyof DashboardSettingsUpdate>(key: K, value: DashboardSettingsUpdate[K]) => {
+    setPendingUpdates((prev) => ({ ...prev, [key]: value }));
   };
 
   const saveSettings = async (newSettings?: Partial<DashboardSettingsUpdate>): Promise<{ success: boolean }> => {
@@ -58,23 +54,7 @@ export function useDashboardSettings(): UseDashboardSettingsReturn {
           setPendingUpdates({});
           resolve({ success: true });
         } catch (error) {
-          console.error("Failed to save dashboard settings:", error);
-          resolve({ success: false });
-        }
-      });
-    });
-  };
-
-  const resetSettings = async (): Promise<{ success: boolean }> => {
-    return new Promise((resolve) => {
-      startTransition(async () => {
-        try {
-          const resetSettings = await resetDashboardSettingsAction(dashboardId);
-          setSettings(resetSettings);
-          setPendingUpdates({});
-          resolve({ success: true });
-        } catch (error) {
-          console.error("Failed to reset dashboard settings:", error);
+          console.error('Failed to save dashboard settings:', error);
           resolve({ success: false });
         }
       });
@@ -95,7 +75,6 @@ export function useDashboardSettings(): UseDashboardSettingsReturn {
     isSaving,
     updateSetting,
     saveSettings,
-    resetSettings,
     refreshSettings,
   };
-} 
+}

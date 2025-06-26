@@ -1,6 +1,6 @@
 'server-only';
 
-import { getUniqueVisitors, getSessionMetrics } from '@/repositories/clickhouse';
+import { getUniqueVisitors, getSessionMetrics, getActiveUsersCount } from '@/repositories/clickhouse';
 import { toDateTimeString } from '@/utils/dateFormatters';
 import { SummaryStatsWithChartsSchema } from '@/entities/stats';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
@@ -74,4 +74,8 @@ export async function getSummaryStatsWithChartsForSite(
   };
 
   return SummaryStatsWithChartsSchema.parse(statsWithCharts);
+}
+
+export async function getActiveUsersForSite(siteId: string): Promise<number> {
+  return getActiveUsersCount(siteId, 5);
 }

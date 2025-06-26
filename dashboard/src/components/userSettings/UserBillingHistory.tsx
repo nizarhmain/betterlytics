@@ -35,13 +35,13 @@ export default function UserBillingHistory() {
     <SettingsCard
       icon={CreditCard}
       title='Billing History'
-      description='View your complete billing history and download invoices'
+      description='Manage your billing details and access your full billing history'
     >
       <div className='flex flex-col items-center justify-center py-4 text-center'>
-        <h3 className='mb-2 text-lg font-medium'>View Complete Billing History</h3>
+        <h3 className='mb-2 text-lg font-medium'>Access Billing History</h3>
         <p className='text-muted-foreground mb-6 text-sm'>
-          Access your complete billing history, download invoices, and manage payment methods through Stripe's
-          secure customer portal.
+          View all past invoices, update payment methods, and manage your billing through Stripe&apos;s secure
+          customer portal.
         </p>
 
         {billingData?.isExistingPaidSubscriber ? (
@@ -51,7 +51,7 @@ export default function UserBillingHistory() {
           </Button>
         ) : (
           <p className='text-muted-foreground text-sm'>
-            No billing history available. Upgrade to a paid plan to see your billing records.
+            Billing history will be available once you upgrade to a paid plan.
           </p>
         )}
       </div>

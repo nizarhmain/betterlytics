@@ -15,15 +15,19 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import SettingsButton from '../SettingsButton';
 import { IntegrationButton } from '@/components/integration/IntegrationButton';
 import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
+import { ActiveUsersLabel } from './ActiveUsersLabel';
+import { Suspense } from 'react';
+import { getAllUserDashboardsAction, getCurrentDashboardAction } from '@/app/actions/dashboard';
+import { DashboardDropdown } from './DashboardDropdown';
 
 const navItems = [
   { name: 'Overview', href: '', icon: <LayoutDashboard size={18} /> },
@@ -42,14 +46,33 @@ type BASidebarProps = {
 };
 
 export default async function BASidebar({ dashboardId }: BASidebarProps) {
+  const currentDashboardPromise = getCurrentDashboardAction(dashboardId);
+  const allDashboardsPromise = getAllUserDashboardsAction();
+
   return (
     <Sidebar variant='floating' collapsible='icon' className='top-14 !z-1100 h-[calc(100vh-3.5rem)]'>
       <SidebarHeader className='bg-background rounded-t-xl pt-2'></SidebarHeader>
-      <SidebarContent className='bg-background !z-1100 pl-1'>
+      <SidebarContent className='bg-background !z-1100 overflow-x-hidden pl-1'>
+        <SidebarGroup className='z-600'>
+          <SidebarGroupContent className='space-y-2 overflow-hidden px-2'>
+            <Suspense fallback={<div className='bg-muted h-6 animate-pulse rounded' />}>
+              <DashboardDropdown
+                currentDashboardPromise={currentDashboardPromise}
+                allDashboardsPromise={allDashboardsPromise}
+              />
+            </Suspense>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
         <SidebarGroup className='!z-1100'>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <Suspense fallback={null}>
+              <ActiveUsersLabel />
+            </Suspense>
+
+            <SidebarMenu className='mt-3'>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
@@ -65,9 +88,9 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
-          <SettingsButton />
+        <SidebarMenu className='gap-2'>
           <IntegrationButton />
+          <SettingsButton />
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>

@@ -1,11 +1,13 @@
-"server-only";
+'server-only';
 
-import { DashboardSettings, DashboardSettingsUpdate, DEFAULT_DASHBOARD_SETTINGS } from "@/entities/dashboardSettings";
-import * as SettingsRepository from "@/repositories/postgres/settings";
+import {
+  DashboardSettings,
+  DashboardSettingsUpdate,
+  DEFAULT_DASHBOARD_SETTINGS,
+} from '@/entities/dashboardSettings';
+import * as SettingsRepository from '@/repositories/postgres/settings';
 
-export async function getDashboardSettings(
-  dashboardId: string,
-): Promise<DashboardSettings> {
+export async function getDashboardSettings(dashboardId: string): Promise<DashboardSettings> {
   try {
     const settings = await SettingsRepository.findSettingsByDashboardId(dashboardId);
 
@@ -15,8 +17,8 @@ export async function getDashboardSettings(
 
     return settings;
   } catch (error) {
-    console.error("Error getting dashboard settings:", error);
-    throw new Error("Failed to get dashboard settings");
+    console.error('Error getting dashboard settings:', error);
+    throw new Error('Failed to get dashboard settings');
   }
 }
 
@@ -27,18 +29,7 @@ export async function updateDashboardSettings(
   try {
     return await SettingsRepository.updateSettings(dashboardId, updates);
   } catch (error) {
-    console.error("Error updating dashboard settings:", error);
-    throw new Error("Failed to update dashboard settings");
-  }
-}
-
-export async function resetDashboardSettings(
-  dashboardId: string,
-): Promise<DashboardSettings> {
-  try {
-    return await SettingsRepository.updateSettings(dashboardId, DEFAULT_DASHBOARD_SETTINGS);
-  } catch (error) {
-    console.error("Error resetting dashboard settings:", error);
-    throw new Error("Failed to reset dashboard settings");
+    console.error('Error updating dashboard settings:', error);
+    throw new Error('Failed to update dashboard settings');
   }
 }

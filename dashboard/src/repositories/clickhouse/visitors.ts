@@ -131,3 +131,24 @@ export async function getSessionMetrics(
 
   return result.map((row) => DailySessionMetricsRowSchema.parse(row));
 }
+
+export async function getActiveUsersCount(siteId: string, minutesWindow: number = 5): Promise<number> {
+  const query = safeSql`
+    SELECT uniq(visitor_id) as active_users
+    FROM analytics.events
+    WHERE site_id = {site_id:String}
+      AND timestamp >= now() - INTERVAL {minutes_window:UInt32} MINUTE
+  `;
+
+  const result = (await clickhouse
+    .query(query.taggedSql, {
+      params: {
+        ...query.taggedParams,
+        site_id: siteId,
+        minutes_window: minutesWindow,
+      },
+    })
+    .toPromise()) as Array<{ active_users: number }>;
+
+  return result[0]?.active_users || 0;
+}

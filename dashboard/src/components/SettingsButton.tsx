@@ -17,7 +17,7 @@ export default function SettingsButton() {
           className='hover:bg-accent hover:text-accent-foreground text-foreground flex w-full items-center gap-2 rounded px-2 py-2 text-sm font-medium'
         >
           <Settings size={18} />
-          Settings
+          Dashboard Settings
         </Button>
       </PopoverTrigger>
       <PopoverContent className='!z-1200 w-auto border-none p-0 shadow-lg' side='top' align='start'>
