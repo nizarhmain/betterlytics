@@ -11,7 +11,7 @@ import { useQueryFiltersContext } from '@/contexts/QueryFiltersContextProvider';
 import { formatNumber } from '@/utils/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import { LiveIndicator } from '@/components/ui/live-indicator';
+import { LiveIndicator } from '@/components/live-indicator';
 import { EventLogItem } from './EventLogItem';
 
 const DEFAULT_PAGE_SIZE = 25;

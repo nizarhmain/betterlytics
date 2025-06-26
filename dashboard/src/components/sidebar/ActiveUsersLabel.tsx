@@ -3,8 +3,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchActiveUsersAction } from '@/app/actions/visitors';
 import { useDashboardId } from '@/hooks/use-dashboard-id';
-import { LiveIndicator } from '@/components/ui/live-indicator';
-import { AnimatedCounter } from '@/components/ui/animated-counter';
+import { LiveIndicator } from '@/components/live-indicator';
+import { AnimatedCounter } from '@/components/animated-counter';
 
 const ACTIVE_USERS_REFRESH_INTERVAL_MS = 30 * 1000;
 
