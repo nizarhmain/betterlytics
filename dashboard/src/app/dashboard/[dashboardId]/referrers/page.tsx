@@ -63,35 +63,33 @@ export default async function ReferrersPage({ params, searchParams }: ReferrersP
   );
 
   return (
-    <div className='min-h-screen'>
-      <div className='space-y-6 p-6'>
-        <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
-          <div>
-            <h1 className='text-foreground mb-1 text-2xl font-bold'>Referrers</h1>
-            <p className='text-muted-foreground text-sm'>Analytics and insights for your website</p>
-          </div>
-          <DashboardFilters />
+    <div className='container space-y-6 p-6'>
+      <div className='flex flex-col justify-between gap-y-4 lg:flex-row lg:items-center'>
+        <div>
+          <h1 className='text-foreground mb-1 text-2xl font-bold'>Referrers</h1>
+          <p className='text-muted-foreground text-sm'>Analytics and insights for your website</p>
         </div>
-
-        <Suspense fallback={<SummaryCardsSkeleton count={4} />}>
-          <ReferrersSummarySection referrerSummaryWithChartsPromise={referrerSummaryWithChartsPromise} />
-        </Suspense>
-
-        <Suspense
-          fallback={
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-              <ChartSkeleton />
-              <ChartSkeleton />
-            </div>
-          }
-        >
-          <ReferrersChartsSection distributionPromise={distributionPromise} trendPromise={trendPromise} />
-        </Suspense>
-
-        <Suspense fallback={<TableSkeleton />}>
-          <ReferrersTableSection referrerTablePromise={tablePromise} />
-        </Suspense>
+        <DashboardFilters />
       </div>
+
+      <Suspense fallback={<SummaryCardsSkeleton count={4} />}>
+        <ReferrersSummarySection referrerSummaryWithChartsPromise={referrerSummaryWithChartsPromise} />
+      </Suspense>
+
+      <Suspense
+        fallback={
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+            <ChartSkeleton />
+            <ChartSkeleton />
+          </div>
+        }
+      >
+        <ReferrersChartsSection distributionPromise={distributionPromise} trendPromise={trendPromise} />
+      </Suspense>
+
+      <Suspense fallback={<TableSkeleton />}>
+        <ReferrersTableSection referrerTablePromise={tablePromise} />
+      </Suspense>
     </div>
   );
 }

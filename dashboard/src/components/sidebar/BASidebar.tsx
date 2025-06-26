@@ -9,7 +9,6 @@ import {
   DollarSign,
   Route,
 } from 'lucide-react';
-import { BASidebarHeader } from './BASidebarHeader';
 import {
   Sidebar,
   SidebarContent,
@@ -51,11 +50,9 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
   const allDashboardsPromise = getAllUserDashboardsAction();
 
   return (
-    <Sidebar className='top-14 z-600 h-[calc(100vh-3.5rem)] border-t'>
-      <SidebarHeader>
-        <BASidebarHeader />
-      </SidebarHeader>
-      <SidebarContent className='bg-background z-600 overflow-x-hidden pl-1'>
+    <Sidebar variant='floating' collapsible='icon' className='top-14 !z-1100 h-[calc(100vh-3.5rem)]'>
+      <SidebarHeader className='bg-background rounded-t-xl pt-2'></SidebarHeader>
+      <SidebarContent className='bg-background !z-1100 overflow-x-hidden pl-1'>
         <SidebarGroup className='z-600'>
           <SidebarGroupContent className='space-y-2 overflow-hidden px-2'>
             <Suspense fallback={<div className='bg-muted h-6 animate-pulse rounded' />}>
@@ -69,7 +66,7 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
 
         <SidebarSeparator />
 
-        <SidebarGroup className='z-600'>
+        <SidebarGroup className='!z-1100'>
           <SidebarGroupContent>
             <Suspense fallback={null}>
               <ActiveUsersLabel />
