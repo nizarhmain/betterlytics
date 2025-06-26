@@ -4,7 +4,7 @@ import { PricingComponent } from '@/components/pricing/PricingComponent';
 
 export function PricingSection() {
   return (
-    <section id='pricing' className='bg-card/20 py-20'>
+    <section id='pricing' className='bg-card/20 scroll-mt-20 py-20'>
       <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='mb-16 text-center'>
           <h2 className='mb-4 text-3xl font-bold sm:text-4xl'>
