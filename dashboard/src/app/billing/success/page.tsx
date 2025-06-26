@@ -27,6 +27,10 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
   const resolvedSearchParams = await searchParams;
   const sessionId = resolvedSearchParams.session_id;
 
+  if (!sessionId) {
+    redirect('/billing');
+  }
+
   return (
     <div className='bg-background flex pt-24'>
       <div className='container mx-auto max-w-2xl px-4 py-16'>
