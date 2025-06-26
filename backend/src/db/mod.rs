@@ -265,10 +265,6 @@ async fn run_inserter_worker(
                         break;
                     }
                     Err(_) => {
-                        println!(
-                            "Worker {}: Idle timeout reached. Committing potentially buffered data.",
-                            worker_id
-                        );
                         inserter.commit().await?;
                         continue;
                     }
