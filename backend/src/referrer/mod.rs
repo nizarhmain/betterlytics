@@ -2,6 +2,7 @@ use refparser::RefDb;
 use std::sync::OnceLock;
 use url::Url;
 use std::path::Path;
+use tracing::info;
 
 /// Referrer source categories
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -61,20 +62,22 @@ pub struct ReferrerInfo {
 
 static PARSER: OnceLock<RefDb> = OnceLock::new();
 
-fn get_parser() -> &'static RefDb {
+pub fn initialize(referrer_db_path: &Path) {
+    info!("Initializing referrer parser from: {:?}", referrer_db_path);
+
     PARSER.get_or_init(|| {
-        // Use the Snowplow referers database from assets
-        let json_path = Path::new("assets/snowplow_referers/referers-latest.json");
-        
-        // Load the RefDb from the JSON file
-        match RefDb::from_json(json_path.to_str().unwrap_or("")) {
+        match RefDb::from_json(referrer_db_path.to_str().unwrap_or("")) {
             Ok(db) => db,
             Err(e) => {
-                eprintln!("Warning: Could not load referer database: {}. Using empty database.", e);
+                eprintln!("Warning: Could not load referer database from {:?}: {}. Using empty database.", referrer_db_path, e);
                 RefDb::default()
             }
         }
-    })
+    });
+}
+
+fn get_parser() -> &'static RefDb {
+    PARSER.get().expect("Referrer parser not initialized. Call initialize() first.")
 }
 
 /// Sanitize a referrer URL for privacy compliance

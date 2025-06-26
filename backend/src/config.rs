@@ -16,6 +16,9 @@ pub struct Config {
     pub maxmind_license_key: Option<String>,
     pub geoip_db_path: PathBuf,
     pub geoip_update_interval: Duration,
+    // Referrer and User Agent parsing configuration
+    pub referrer_db_path: PathBuf,
+    pub ua_regexes_path: PathBuf,
     pub data_retention_days: i32,
     // Billing configuration
     pub enable_billing: bool,
@@ -57,6 +60,13 @@ impl Config {
                     .and_then(|val| val.parse().ok())
                     .unwrap_or(24 * 60 * 60)
             ),
+            // Referrer and User Agent parsing configuration
+            referrer_db_path: env::var("REFERRER_DB_PATH")
+                .map(PathBuf::from)
+                .unwrap_or_else(|_| PathBuf::from("assets/snowplow_referers/referers-latest.json")),
+            ua_regexes_path: env::var("UA_REGEXES_PATH")
+                .map(PathBuf::from)
+                .unwrap_or_else(|_| PathBuf::from("assets/user_agent_headers/regexes.yaml")),
             data_retention_days: env::var("DATA_RETENTION_DAYS")
                 .unwrap_or_else(|_| "365".to_string())
                 .parse()
