@@ -2,20 +2,10 @@ use uaparser::{UserAgentParser, Parser};
 use once_cell::sync::Lazy;
 use moka::sync::Cache;
 use tracing::{info, debug};
+use std::path::Path;
+use std::sync::OnceLock;
 
-static USER_AGENT_PARSER: Lazy<UserAgentParser> = Lazy::new(|| {
-    info!("Initializing user agent parser...");
-    
-    let regexes_path = concat!(env!("CARGO_MANIFEST_DIR"), "./assets/user_agent_headers/regexes.yaml");
-    
-    UserAgentParser::builder()
-        .with_unicode_support(false)  // Disable unicode since we don't expect any unicode in the user agent
-        .with_device(false)          // Disable device parsing since we detect device from screen resolution
-        .build_from_yaml(regexes_path)
-        .unwrap_or_else(|e| {
-            panic!("Failed to initialize user agent parser from {}: {}. Please ensure regexes.yaml is available.", regexes_path, e);
-        })
-});
+static USER_AGENT_PARSER: OnceLock<UserAgentParser> = OnceLock::new();
 
 static UA_CACHE: Lazy<Cache<String, (String, Option<String>, String)>> = Lazy::new(|| {
     Cache::builder()
@@ -31,9 +21,19 @@ pub struct ParsedUserAgent {
     pub os: String,
 }
 
-pub fn initialize() {
-    info!("Initializing user agent parser and cache...");
-    Lazy::force(&USER_AGENT_PARSER);
+pub fn initialize(ua_regexes_path: &Path) {
+    info!("Initializing user agent parser from: {:?}", ua_regexes_path);
+    
+    USER_AGENT_PARSER.get_or_init(|| {
+        UserAgentParser::builder()
+            .with_unicode_support(false)  // Disable unicode since we don't expect any unicode in the user agent
+            .with_device(false)          // Disable device parsing since we detect device from screen resolution
+            .build_from_yaml(ua_regexes_path.to_str().unwrap_or(""))
+            .unwrap_or_else(|e| {
+                panic!("Failed to initialize user agent parser from {:?}: {}. Please ensure regexes.yaml is available.", ua_regexes_path, e);
+            })
+    });
+    
     Lazy::force(&UA_CACHE);
     info!("User agent parser initialization complete");
 }
@@ -51,7 +51,8 @@ pub fn parse_user_agent(user_agent: &str) -> ParsedUserAgent {
         };
     }
     
-    let client = USER_AGENT_PARSER.parse(user_agent);
+    let parser = USER_AGENT_PARSER.get().expect("User agent parser not initialized. Call initialize() first.");
+    let client = parser.parse(user_agent);
     
     let browser = client.user_agent.family.to_string();
     let browser_version = client.user_agent.major.map(|v| v.to_string());

@@ -34,7 +34,9 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    ua_parser::initialize();
+    referrer::initialize(&config.referrer_db_path);
+
+    ua_parser::initialize(&config.ua_regexes_path);
 
     let ip_addr = config.server_host.parse::<std::net::IpAddr>()
         .map_err(|e| format!("Invalid server host IP address '{}': {}", config.server_host, e))
