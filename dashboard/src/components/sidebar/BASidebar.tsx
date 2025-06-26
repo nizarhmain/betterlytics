@@ -9,7 +9,6 @@ import {
   DollarSign,
   Route,
 } from 'lucide-react';
-import { BASidebarHeader } from './BASidebarHeader';
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +21,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import BASidebarCollapsibleSignOutButton from './BASidebarCollapsibleSignOutButton';
 import SettingsButton from '../SettingsButton';
 import { IntegrationButton } from '@/components/integration/IntegrationButton';
 import { FilterPreservingLink } from '@/components/ui/FilterPreservingLink';
@@ -45,12 +43,10 @@ type BASidebarProps = {
 
 export default async function BASidebar({ dashboardId }: BASidebarProps) {
   return (
-    <Sidebar variant='floating' collapsible='icon' className='top-14 z-600 h-[calc(100vh-3.5rem)]'>
-      <SidebarHeader>
-        <BASidebarHeader />
-      </SidebarHeader>
-      <SidebarContent className='bg-background z-600 pl-1'>
-        <SidebarGroup className='z-600'>
+    <Sidebar variant='floating' collapsible='icon' className='top-14 !z-1100 h-[calc(100vh-3.5rem)]'>
+      <SidebarHeader className='bg-background rounded-t-xl pt-2'></SidebarHeader>
+      <SidebarContent className='bg-background !z-1100 pl-1'>
+        <SidebarGroup className='!z-1100'>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -72,7 +68,6 @@ export default async function BASidebar({ dashboardId }: BASidebarProps) {
         <SidebarMenu>
           <SettingsButton />
           <IntegrationButton />
-          <BASidebarCollapsibleSignOutButton />
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
