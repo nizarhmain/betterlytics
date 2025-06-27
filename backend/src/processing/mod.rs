@@ -2,7 +2,6 @@ use anyhow::Result;
 use tokio::sync::mpsc;
 use tracing::{error, debug};
 use crate::analytics::{AnalyticsEvent, generate_fingerprint};
-use crate::db::SharedDatabase;
 use crate::geoip::GeoIpService;
 use crate::session;
 use crate::bot_detection;
@@ -46,15 +45,14 @@ pub struct ProcessedEvent {
 
 /// Event processor that handles real-time processing
 pub struct EventProcessor {
-    db: SharedDatabase,
     event_tx: mpsc::Sender<ProcessedEvent>,
     geoip_service: GeoIpService,
 }
 
 impl EventProcessor {
-    pub fn new(db: SharedDatabase, geoip_service: GeoIpService) -> (Self, mpsc::Receiver<ProcessedEvent>) {
+    pub fn new(geoip_service: GeoIpService) -> (Self, mpsc::Receiver<ProcessedEvent>) {
         let (event_tx, event_rx) = mpsc::channel(100_000);
-        (Self { db, event_tx, geoip_service }, event_rx)
+        (Self { event_tx, geoip_service }, event_rx)
     }
 
     pub async fn process_event(&self, event: AnalyticsEvent) -> Result<()> {
