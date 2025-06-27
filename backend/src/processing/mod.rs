@@ -111,10 +111,20 @@ impl EventProcessor {
             error!("Failed to get geolocation: {}", e);
         }
 
+        if let Err(e) = self.detect_device_type_from_resolution(&mut processed).await {
+            error!("Failed to detect device type from resolution: {}", e);
+        }
+        
+        if let Err(e) = self.parse_user_agent(&mut processed).await {
+            error!("Failed to parse user agent: {}", e);
+        }
+
         processed.visitor_fingerprint = generate_fingerprint(
             &processed.event.ip_address,
-            &processed.event.raw.screen_resolution,
-            &processed.event.raw.user_agent,
+            processed.device_type.as_deref(),
+            processed.browser.as_deref(),
+            processed.browser_version.as_deref(),
+            processed.os.as_deref(),
         );
 
         let session_id_result = session::get_or_create_session_id(
@@ -132,14 +142,6 @@ impl EventProcessor {
 
         debug!("Site ID: {}", processed.site_id);
         debug!("Session ID: {}", processed.session_id);
-
-        if let Err(e) = self.detect_device_type_from_resolution(&mut processed).await {
-            error!("Failed to detect device type from resolution: {}", e);
-        }
-        
-        if let Err(e) = self.parse_user_agent(&mut processed).await {
-            error!("Failed to parse user agent: {}", e);
-        }
 
         if let Err(e) = self.event_tx.send(processed).await {
             error!("Failed to send processed event: {}", e);
