@@ -34,7 +34,11 @@ export default function DevicesChartsSection({
       <div className='bg-card border-border rounded-lg border p-6 shadow'>
         <h2 className='text-foreground mb-1 text-lg font-bold'>Device Usage Trend</h2>
         <p className='text-muted-foreground mb-4 text-sm'>Visitor trends by device type</p>
-        <DeviceUsageTrendChart data={deviceUsageTrend} />
+        <DeviceUsageTrendChart
+          chartData={deviceUsageTrend.data}
+          categories={deviceUsageTrend.categories}
+          compareData={deviceUsageTrend.compareData}
+        />
       </div>
     </div>
   );

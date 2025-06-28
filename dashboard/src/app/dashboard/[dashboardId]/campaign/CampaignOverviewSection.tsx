@@ -20,7 +20,11 @@ export default function CampaignOverviewSection({
   return (
     <div className='space-y-6'>
       <CampaignPerformanceTable data={campaignPerformance} />
-      <CampaignVisitorTrendChart data={visitorTrend} />
+      <CampaignVisitorTrendChart
+        chartData={visitorTrend.data}
+        categories={visitorTrend.categories}
+        compareData={visitorTrend.compareData}
+      />
     </div>
   );
 }

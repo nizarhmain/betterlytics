@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { getTrendInfo, formatDifference } from '@/utils/chartUtils';
 
 interface ChartTooltipProps {
   payload?: {
@@ -25,34 +25,14 @@ export function ChartTooltip({ active, payload, label, formatter, labelFormatter
 
   const value = payload[0].value;
   const previousValue = (payload[1]?.value || payload[0].payload.value[1]) as number;
-  const difference = value - previousValue;
 
   const formattedLabel = name ? labelFormatter(name) : name;
 
-  const getTrendInfo = () => {
-    if (previousValue === undefined || difference === 0) {
-      return { icon: Minus, color: 'text-muted', bgColor: 'text-background/10' };
-    }
-    if (difference > 0) {
-      return { icon: TrendingUp, color: 'text-green-400', bgColor: 'bg-green-500/10' };
-    }
-    return { icon: TrendingDown, color: 'text-red-400', bgColor: 'bg-red-500/10' };
-  };
+  const hasComparison = previousValue !== undefined;
+  const trendInfo = getTrendInfo(value, previousValue || 0, hasComparison);
+  const { icon: TrendIcon, color: trendColor, bgColor: trendBgColor } = trendInfo;
 
-  const { icon: TrendIcon, color: trendColor, bgColor: trendBgColor } = getTrendInfo();
-
-  // Format difference for display
-  const formatDifference = (diff: number, prev: number | undefined) => {
-    if (prev === undefined || diff === 0) return null;
-    const sign = diff > 0 ? '+' : '';
-    if (prev !== 0) {
-      const percentage = ((diff / prev) * 100).toFixed(1);
-      return `${sign}${formatter ? formatter(diff) : diff} (${sign}${percentage}%)`;
-    }
-    return `${sign}${formatter ? formatter(diff) : diff}`;
-  };
-
-  const formattedDifference = formatDifference(difference, previousValue);
+  const formattedDifference = formatDifference(value, previousValue || 0, formatter, hasComparison);
   return (
     <div
       className={cn(

@@ -23,7 +23,6 @@ export default function ReferrersChartsSection({
   const trendResult = use(trendPromise);
 
   const distributionData = distributionResult.data;
-  const trendData = trendResult.data;
 
   return (
     <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
@@ -35,7 +34,11 @@ export default function ReferrersChartsSection({
       <div className='bg-card border-border rounded-lg border p-4 shadow'>
         <div className='text-foreground mb-2 font-medium'>Referral Traffic Trends</div>
         <p className='text-muted-foreground mb-4 text-xs'>Traffic by source over time</p>
-        <ReferrerTrafficTrendChart data={trendData} />
+        <ReferrerTrafficTrendChart
+          chartData={trendResult.data}
+          categories={trendResult.categories}
+          compareData={trendResult.compareData}
+        />
       </div>
     </div>
   );
