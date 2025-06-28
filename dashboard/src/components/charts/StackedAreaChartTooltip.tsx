@@ -62,25 +62,31 @@ export function StackedAreaChartTooltip({
       </div>
 
       <div className='mb-3'>
-        <div className='mb-1 text-xs text-gray-400'>Current Total</div>
-        <div className='text-lg font-semibold text-white'>{formatter(currentTotal)}</div>
+        <div className='flex items-start justify-between'>
+          <div>
+            <div className='mb-1 text-xs text-gray-400'>Current Total</div>
+            <div className='text-lg font-semibold text-white'>{formatter(currentTotal)}</div>
+          </div>
 
-        {hasComparison && (
-          <div className='mt-2 space-y-1'>
-            <div className='text-xs text-gray-400'>Previous Total</div>
-            <div className='text-sm text-gray-300'>{formatter(compareTotal)}</div>
+          {hasComparison && (
+            <div className='text-right'>
+              <div className='mb-1 text-xs text-gray-400'>Previous Total</div>
+              <div className='text-sm text-gray-300'>{formatter(compareTotal)}</div>
+            </div>
+          )}
+        </div>
 
-            {totalDifference && (
-              <div
-                className={cn(
-                  'flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium',
-                  totalTrend.bgColor,
-                )}
-              >
-                {React.createElement(totalTrend.icon, { className: cn('h-3 w-3', totalTrend.color) })}
-                <span className={totalTrend.color}>{totalDifference}</span>
-              </div>
-            )}
+        {hasComparison && totalDifference && (
+          <div className='mt-2'>
+            <div
+              className={cn(
+                'flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium',
+                totalTrend.bgColor,
+              )}
+            >
+              {React.createElement(totalTrend.icon, { className: cn('h-3 w-3', totalTrend.color) })}
+              <span className={totalTrend.color}>{totalDifference}</span>
+            </div>
           </div>
         )}
       </div>
@@ -104,12 +110,17 @@ export function StackedAreaChartTooltip({
                   <span className='text-sm font-medium text-white'>{formatter(currentValue)}</span>
                 </div>
 
-                {hasComparison && compareValue > 0 && (
+                {hasComparison && (
                   <div className='ml-4 flex items-center justify-between text-xs'>
                     <span className='text-gray-400'>vs {formatter(compareValue)}</span>
                     {difference && (
-                      <div className={cn('flex items-center gap-1 rounded px-1 py-0.5', trend.bgColor)}>
-                        {React.createElement(trend.icon, { className: cn('h-2.5 w-2.5', trend.color) })}
+                      <div
+                        className={cn(
+                          'flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium',
+                          trend.bgColor,
+                        )}
+                      >
+                        {React.createElement(trend.icon, { className: cn('h-3 w-3', trend.color) })}
                         <span className={trend.color}>{difference}</span>
                       </div>
                     )}
