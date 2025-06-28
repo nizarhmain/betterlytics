@@ -99,12 +99,7 @@ export function CreateDashboardDialog({ dashboardStatsPromise }: CreateDashboard
     createButton
   ) : (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <span className='inline-block'>
-          <Lock className='h-4 w-4' />
-          Create Dashboard
-        </span>
-      </TooltipTrigger>
+      <TooltipTrigger asChild>{createButton}</TooltipTrigger>
       <TooltipContent>
         <p>You've reached your dashboard limit. Upgrade your plan to create more dashboards.</p>
       </TooltipContent>
