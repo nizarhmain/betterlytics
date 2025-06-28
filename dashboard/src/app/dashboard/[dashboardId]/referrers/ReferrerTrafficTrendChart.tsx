@@ -14,17 +14,18 @@ import { getReferrerColor } from '@/utils/referrerColors';
 import { format } from 'date-fns';
 import ReferrerLegend from './ReferrerLegend';
 import { StackedAreaChartTooltip } from '@/components/charts/StackedAreaChartTooltip';
+import { type ComparisonMapping } from '@/types/charts';
 
 interface ReferrerTrafficTrendChartProps {
   chartData: Array<{ date: number } & Record<string, number>>;
   categories: string[];
-  compareData?: Array<{ date: number } & Record<string, number>>;
+  comparisonMap?: ComparisonMapping[];
 }
 
 export default function ReferrerTrafficTrendChart({
   chartData,
   categories,
-  compareData,
+  comparisonMap,
 }: ReferrerTrafficTrendChartProps) {
   if (!chartData || chartData.length === 0 || categories.length === 0) {
     return (
@@ -63,7 +64,7 @@ export default function ReferrerTrafficTrendChart({
                 active={props.active}
                 payload={props.payload}
                 label={props.label}
-                compareData={compareData}
+                comparisonMap={comparisonMap}
                 formatter={(value: number) => `${value.toLocaleString()} visitors`}
               />
             )}

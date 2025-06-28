@@ -4,17 +4,18 @@ import React from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { getCampaignSourceColor } from '@/utils/campaignColors';
 import { StackedAreaChartTooltip } from '@/components/charts/StackedAreaChartTooltip';
+import { type ComparisonMapping } from '@/types/charts';
 
 interface CampaignVisitorTrendChartProps {
   chartData: Array<{ date: number } & Record<string, number>>;
   categories: string[];
-  compareData?: Array<{ date: number } & Record<string, number>>;
+  comparisonMap?: ComparisonMapping[];
 }
 
 export default function CampaignVisitorTrendChart({
   chartData,
   categories,
-  compareData,
+  comparisonMap,
 }: CampaignVisitorTrendChartProps) {
   if (!chartData || chartData.length === 0 || categories.length === 0) {
     return (
@@ -40,7 +41,7 @@ export default function CampaignVisitorTrendChart({
                   active={props.active}
                   payload={props.payload}
                   label={props.label}
-                  compareData={compareData}
+                  comparisonMap={comparisonMap}
                   formatter={(value: number) => `${value.toLocaleString()} visitors`}
                 />
               )}

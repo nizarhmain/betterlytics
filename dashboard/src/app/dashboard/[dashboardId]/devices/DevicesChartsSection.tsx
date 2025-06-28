@@ -37,7 +37,7 @@ export default function DevicesChartsSection({
         <DeviceUsageTrendChart
           chartData={deviceUsageTrend.data}
           categories={deviceUsageTrend.categories}
-          compareData={deviceUsageTrend.compareData}
+          comparisonMap={deviceUsageTrend.comparisonMap}
         />
       </div>
     </div>

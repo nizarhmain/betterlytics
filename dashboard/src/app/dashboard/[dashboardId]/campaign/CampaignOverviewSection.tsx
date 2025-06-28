@@ -23,7 +23,7 @@ export default function CampaignOverviewSection({
       <CampaignVisitorTrendChart
         chartData={visitorTrend.data}
         categories={visitorTrend.categories}
-        compareData={visitorTrend.compareData}
+        comparisonMap={visitorTrend.comparisonMap}
       />
     </div>
   );

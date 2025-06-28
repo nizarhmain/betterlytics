@@ -1,6 +1,7 @@
 import { type GranularityRangeValues } from '@/utils/granularityRanges';
 import { utcDay, utcHour, utcMinute } from 'd3-time';
 import { getDateKey } from '@/utils/dateHelpers';
+import { type ComparisonMapping } from '@/types/charts';
 
 const IntervalFunctions = {
   day: utcDay,
@@ -36,7 +37,7 @@ type ChartDataPoint = {
 type StackedAreaChartResult = {
   data: ChartDataPoint[];
   categories: string[];
-  compareData?: ChartDataPoint[];
+  comparisonMap?: ComparisonMapping[];
 };
 
 function normalizeIterationRange(dateRange: { start: Date; end: Date }, granularity: GranularityRangeValues) {
@@ -139,11 +140,38 @@ export function toStackedAreaChart<CategoryKey extends string, ValueKey extends 
     return { data: chartData, categories };
   }
 
+  const comparisonMap = createComparisonMap(chartData, compareChartData, categories);
+
   return {
     data: chartData,
     categories,
-    compareData: compareChartData,
+    comparisonMap,
   };
+}
+
+function createComparisonMap(
+  chartData: ChartDataPoint[],
+  compareChartData: ChartDataPoint[],
+  categories: string[],
+): ComparisonMapping[] {
+  return chartData.map((currentPoint, index) => {
+    const comparePoint = compareChartData[index];
+
+    const currentValues: Record<string, number> = {};
+    const compareValues: Record<string, number> = {};
+
+    categories.forEach((category) => {
+      currentValues[category] = currentPoint[category] || 0;
+      compareValues[category] = comparePoint[category] || 0;
+    });
+
+    return {
+      currentDate: currentPoint.date,
+      compareDate: comparePoint.date,
+      currentValues,
+      compareValues,
+    };
+  });
 }
 
 function calculateCategoryTotals<CategoryKey extends string, ValueKey extends string>(

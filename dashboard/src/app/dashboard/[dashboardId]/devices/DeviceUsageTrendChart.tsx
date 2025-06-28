@@ -15,11 +15,12 @@ import { DeviceIcon } from '@/components/icons';
 import { capitalizeFirstLetter } from '@/utils/formatters';
 import { StackedAreaChartTooltip } from '@/components/charts/StackedAreaChartTooltip';
 import { format } from 'date-fns';
+import { type ComparisonMapping } from '@/types/charts';
 
 interface DeviceUsageTrendChartProps {
   chartData: Array<{ date: number } & Record<string, number>>;
   categories: string[];
-  compareData?: Array<{ date: number } & Record<string, number>>;
+  comparisonMap?: ComparisonMapping[];
 }
 
 const CustomLegend = React.memo(({ deviceTypes }: { deviceTypes: string[] }) => (
@@ -39,7 +40,11 @@ const CustomLegend = React.memo(({ deviceTypes }: { deviceTypes: string[] }) => 
 
 CustomLegend.displayName = 'CustomLegend';
 
-export default function DeviceUsageTrendChart({ chartData, categories, compareData }: DeviceUsageTrendChartProps) {
+export default function DeviceUsageTrendChart({
+  chartData,
+  categories,
+  comparisonMap,
+}: DeviceUsageTrendChartProps) {
   if (!chartData || chartData.length === 0 || categories.length === 0) {
     return (
       <div className='flex h-[300px] items-center justify-center'>
@@ -78,7 +83,7 @@ export default function DeviceUsageTrendChart({ chartData, categories, compareDa
                   active={props.active}
                   payload={props.payload}
                   label={props.label}
-                  compareData={compareData}
+                  comparisonMap={comparisonMap}
                   formatter={(value) => value.toLocaleString()}
                 />
               )}

@@ -36,26 +36,28 @@ export function ChartTooltip({ active, payload, label, formatter, labelFormatter
   return (
     <div
       className={cn(
-        'min-w-[200px] rounded-lg border border-gray-700/50 bg-gray-900/95 p-4 shadow-xl backdrop-blur-sm',
+        'border-border bg-popover/95 min-w-[200px] rounded-lg border p-4 shadow-xl backdrop-blur-sm',
         'animate-in fade-in-0 zoom-in-95 duration-200',
         className,
       )}
     >
-      <div className='mb-3 flex items-center gap-2 border-b border-gray-700/50 pb-2'>
-        <div className='h-2 w-2 rounded-full bg-blue-500' style={{ background: labelColor }}></div>
-        <span className='text-xs font-medium tracking-wide text-gray-300 uppercase'>{formattedLabel}</span>
+      <div className='border-border mb-3 flex items-center gap-2 border-b pb-2'>
+        <div className='bg-primary h-2 w-2 rounded-full' style={{ background: labelColor }}></div>
+        <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>{formattedLabel}</span>
       </div>
 
       <div className='mb-3'>
-        <div className='mb-1 text-xs text-gray-400'>Current Period</div>
-        <div className='text-lg font-semibold text-white'>{formatter ? formatter(value) : value}</div>
+        <div className='text-muted-foreground mb-1 text-xs'>Current Period</div>
+        <div className='text-popover-foreground text-lg font-semibold'>{formatter ? formatter(value) : value}</div>
       </div>
 
       {previousValue !== undefined && (
         <div className='space-y-2'>
-          <div className='text-xs text-gray-400'>Previous Period</div>
+          <div className='text-muted-foreground text-xs'>Previous Period</div>
           <div className='flex items-center justify-between'>
-            <span className='text-sm text-gray-300'>{formatter ? formatter(previousValue) : previousValue}</span>
+            <span className='text-popover-foreground/80 text-sm'>
+              {formatter ? formatter(previousValue) : previousValue}
+            </span>
           </div>
 
           {formattedDifference && (

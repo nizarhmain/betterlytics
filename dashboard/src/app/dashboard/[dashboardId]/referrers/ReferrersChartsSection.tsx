@@ -37,7 +37,7 @@ export default function ReferrersChartsSection({
         <ReferrerTrafficTrendChart
           chartData={trendResult.data}
           categories={trendResult.categories}
-          compareData={trendResult.compareData}
+          comparisonMap={trendResult.comparisonMap}
         />
       </div>
     </div>
