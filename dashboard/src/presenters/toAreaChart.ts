@@ -27,14 +27,11 @@ type ToAreaChartProps<K extends string> = DataToAreaChartProps<K> & {
 };
 
 function normalizeIterationRange(dateRange: { start: Date; end: Date }, granularity: GranularityRangeValues) {
-  if (granularity === 'day') {
-    const startUTC = utcDay(dateRange.start);
-    const endUTC = utcDay(dateRange.end);
+  const intervalFunc = IntervalFunctions[granularity];
+  const startUTC = intervalFunc(dateRange.start);
+  const endUTC = intervalFunc(dateRange.end);
 
-    return { start: startUTC, end: endUTC };
-  }
-
-  return dateRange;
+  return { start: startUTC, end: endUTC };
 }
 
 function dataToAreaChart<K extends string>({ dataKey, data, granularity, dateRange }: ToAreaChartProps<K>) {

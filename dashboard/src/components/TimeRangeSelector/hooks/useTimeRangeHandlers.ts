@@ -38,10 +38,18 @@ export function useTimeRangeHandlers({
       }
 
       const { startDate, endDate } = getDateRangeForTimePresets(value);
+
+      const duration = endDate.getTime() - startDate.getTime();
+      // Note: -1 & +1 are to ensure duration remains correct
+      const compareEnd = new Date(startDate.getTime() - 1);
+      const compareStart = new Date(compareEnd.getTime() - duration + 1);
+
       updateTempState({
         range: value,
         customStart: startDate,
         customEnd: endDate,
+        compareStart: compareStart,
+        compareEnd: compareEnd,
       });
     },
     [updateTempState],
