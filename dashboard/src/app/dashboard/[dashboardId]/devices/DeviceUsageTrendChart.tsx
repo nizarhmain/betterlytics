@@ -16,11 +16,13 @@ import { capitalizeFirstLetter } from '@/utils/formatters';
 import { StackedAreaChartTooltip } from '@/components/charts/StackedAreaChartTooltip';
 import { format } from 'date-fns';
 import { type ComparisonMapping } from '@/types/charts';
+import { type GranularityRangeValues } from '@/utils/granularityRanges';
 
 interface DeviceUsageTrendChartProps {
   chartData: Array<{ date: number } & Record<string, number>>;
   categories: string[];
   comparisonMap?: ComparisonMapping[];
+  granularity?: GranularityRangeValues;
 }
 
 const CustomLegend = React.memo(({ deviceTypes }: { deviceTypes: string[] }) => (
@@ -44,6 +46,7 @@ export default function DeviceUsageTrendChart({
   chartData,
   categories,
   comparisonMap,
+  granularity,
 }: DeviceUsageTrendChartProps) {
   if (!chartData || chartData.length === 0 || categories.length === 0) {
     return (
@@ -84,6 +87,7 @@ export default function DeviceUsageTrendChart({
                   payload={props.payload}
                   label={props.label}
                   comparisonMap={comparisonMap}
+                  granularity={granularity}
                   formatter={(value) => value.toLocaleString()}
                 />
               )}

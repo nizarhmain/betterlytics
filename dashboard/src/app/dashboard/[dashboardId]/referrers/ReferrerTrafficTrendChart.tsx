@@ -15,17 +15,20 @@ import { format } from 'date-fns';
 import ReferrerLegend from './ReferrerLegend';
 import { StackedAreaChartTooltip } from '@/components/charts/StackedAreaChartTooltip';
 import { type ComparisonMapping } from '@/types/charts';
+import { type GranularityRangeValues } from '@/utils/granularityRanges';
 
 interface ReferrerTrafficTrendChartProps {
   chartData: Array<{ date: number } & Record<string, number>>;
   categories: string[];
   comparisonMap?: ComparisonMapping[];
+  granularity?: GranularityRangeValues;
 }
 
 export default function ReferrerTrafficTrendChart({
   chartData,
   categories,
   comparisonMap,
+  granularity,
 }: ReferrerTrafficTrendChartProps) {
   if (!chartData || chartData.length === 0 || categories.length === 0) {
     return (
@@ -65,6 +68,7 @@ export default function ReferrerTrafficTrendChart({
                 payload={props.payload}
                 label={props.label}
                 comparisonMap={comparisonMap}
+                granularity={granularity}
                 formatter={(value: number) => `${value.toLocaleString()} visitors`}
               />
             )}

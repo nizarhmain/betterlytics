@@ -9,6 +9,7 @@ import {
 import BAPieChart from '@/components/BAPieChart';
 import { getReferrerColor } from '@/utils/referrerColors';
 import { capitalizeFirstLetter } from '@/utils/formatters';
+import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
 
 type ReferrersChartsSectionProps = {
   distributionPromise: ReturnType<typeof fetchReferrerSourceAggregationDataForSite>;
@@ -21,6 +22,7 @@ export default function ReferrersChartsSection({
 }: ReferrersChartsSectionProps) {
   const distributionResult = use(distributionPromise);
   const trendResult = use(trendPromise);
+  const { granularity } = useTimeRangeContext();
 
   const distributionData = distributionResult.data;
 
@@ -38,6 +40,7 @@ export default function ReferrersChartsSection({
           chartData={trendResult.data}
           categories={trendResult.categories}
           comparisonMap={trendResult.comparisonMap}
+          granularity={granularity}
         />
       </div>
     </div>

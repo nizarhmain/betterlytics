@@ -5,17 +5,21 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import { getCampaignSourceColor } from '@/utils/campaignColors';
 import { StackedAreaChartTooltip } from '@/components/charts/StackedAreaChartTooltip';
 import { type ComparisonMapping } from '@/types/charts';
+import { type GranularityRangeValues } from '@/utils/granularityRanges';
+import { format } from 'date-fns';
 
 interface CampaignVisitorTrendChartProps {
   chartData: Array<{ date: number } & Record<string, number>>;
   categories: string[];
   comparisonMap?: ComparisonMapping[];
+  granularity?: GranularityRangeValues;
 }
 
 export default function CampaignVisitorTrendChart({
   chartData,
   categories,
   comparisonMap,
+  granularity,
 }: CampaignVisitorTrendChartProps) {
   if (!chartData || chartData.length === 0 || categories.length === 0) {
     return (
@@ -33,7 +37,14 @@ export default function CampaignVisitorTrendChart({
         <ResponsiveContainer>
           <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='date' tick={{ fontSize: 12 }} />
+            <XAxis
+              dataKey='date'
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 12 }}
+              tickMargin={10}
+              tickFormatter={(value) => format(new Date(value), 'MMM dd')}
+            />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip
               content={(props) => (
@@ -42,6 +53,7 @@ export default function CampaignVisitorTrendChart({
                   payload={props.payload}
                   label={props.label}
                   comparisonMap={comparisonMap}
+                  granularity={granularity}
                   formatter={(value: number) => `${value.toLocaleString()} visitors`}
                 />
               )}

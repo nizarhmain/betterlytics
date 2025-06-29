@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { getTrendInfo, formatDifference } from '@/utils/chartUtils';
+import { type ComparisonMapping } from '@/types/charts';
 
 interface ChartTooltipProps {
   payload?: {
@@ -13,9 +14,18 @@ interface ChartTooltipProps {
   active?: boolean;
   label?: Date;
   className?: string;
+  comparisonMap?: ComparisonMapping[];
 }
 
-export function ChartTooltip({ active, payload, label, formatter, labelFormatter, className }: ChartTooltipProps) {
+export function ChartTooltip({
+  active,
+  payload,
+  label,
+  formatter,
+  labelFormatter,
+  className,
+  comparisonMap,
+}: ChartTooltipProps) {
   if (!active || !payload || !payload.length) {
     return null;
   }
@@ -24,7 +34,11 @@ export function ChartTooltip({ active, payload, label, formatter, labelFormatter
   const labelColor = payload[0].payload.color;
 
   const value = payload[0].value;
-  const previousValue = (payload[1]?.value || payload[0].payload.value[1]) as number;
+
+  const comparisonData = comparisonMap?.find((mapping) => mapping.currentDate === Number(name));
+  const previousValue = comparisonData
+    ? Object.values(comparisonData.compareValues)[0]
+    : ((payload[1]?.value || payload[0].payload.value[1]) as number);
 
   const formattedLabel = name ? labelFormatter(name) : name;
 
@@ -41,9 +55,16 @@ export function ChartTooltip({ active, payload, label, formatter, labelFormatter
         className,
       )}
     >
-      <div className='border-border mb-3 flex items-center gap-2 border-b pb-2'>
-        <div className='bg-primary h-2 w-2 rounded-full' style={{ background: labelColor }}></div>
-        <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>{formattedLabel}</span>
+      <div className='border-border mb-3 border-b pb-2'>
+        <div className='mb-1 flex items-center gap-2'>
+          <div className='bg-primary h-2 w-2 rounded-full' style={{ background: labelColor }}></div>
+          <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            {formattedLabel}
+          </span>
+        </div>
+        {hasComparison && comparisonData && (
+          <div className='text-muted-foreground text-xs'>vs {labelFormatter(comparisonData.compareDate)}</div>
+        )}
       </div>
 
       <div className='mb-3'>

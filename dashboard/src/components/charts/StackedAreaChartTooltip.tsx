@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import { format } from 'date-fns';
+import { timeFormat } from 'd3-time-format';
 import { cn } from '@/lib/utils';
 import { getTrendInfo, formatDifference } from '@/utils/chartUtils';
 import { type ComparisonMapping } from '@/types/charts';
+import { type GranularityRangeValues } from '@/utils/granularityRanges';
 
 interface PayloadEntry {
   value: number;
@@ -18,17 +19,27 @@ interface StackedAreaChartTooltipProps {
   payload?: any;
   label?: string | number;
   formatter?: (value: number) => string;
-  labelFormatter?: (date: string | number) => string;
+  labelFormatter?: (date: string | number, granularity?: GranularityRangeValues) => string;
   comparisonMap?: ComparisonMapping[];
+  granularity?: GranularityRangeValues;
 }
+
+const defaultLabelFormatter = (date: string | number, granularity?: GranularityRangeValues) => {
+  if (granularity === undefined || granularity === 'day') {
+    return timeFormat('%b %d')(new Date(date));
+  }
+
+  return timeFormat('%b %d - %H:%M')(new Date(date));
+};
 
 export function StackedAreaChartTooltip({
   active,
   payload,
   label,
   formatter = (value) => value.toLocaleString(),
-  labelFormatter = (date) => format(new Date(date), 'MMM dd, yyyy HH:mm'),
+  labelFormatter = defaultLabelFormatter,
   comparisonMap,
+  granularity,
 }: StackedAreaChartTooltipProps) {
   if (!active || !payload || !payload.length || !label) {
     return null;
@@ -66,10 +77,12 @@ export function StackedAreaChartTooltip({
       <div className='border-border mb-3 border-b pb-2'>
         <div className='space-y-1'>
           <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
-            {labelFormatter(label)}
+            {labelFormatter(label, granularity)}
           </span>
           {hasComparison && comparisonData && (
-            <div className='text-muted-foreground text-xs'>vs {labelFormatter(comparisonData.compareDate)}</div>
+            <div className='text-muted-foreground text-xs'>
+              vs {labelFormatter(comparisonData.compareDate, granularity)}
+            </div>
           )}
         </div>
       </div>
@@ -97,7 +110,7 @@ export function StackedAreaChartTooltip({
                 totalTrend.bgColor,
               )}
             >
-              {React.createElement(totalTrend.icon, { className: cn('h-3 w-3', totalTrend.color) })}
+              <totalTrend.icon className={cn('h-3 w-3', totalTrend.color)} />
               <span className={totalTrend.color}>{totalDifference}</span>
             </div>
           </div>
@@ -129,11 +142,11 @@ export function StackedAreaChartTooltip({
                     {difference && (
                       <div
                         className={cn(
-                          'flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium',
+                          'ml-1 flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium',
                           trend.bgColor,
                         )}
                       >
-                        {React.createElement(trend.icon, { className: cn('h-3 w-3', trend.color) })}
+                        <trend.icon className={cn('h-3 w-3', trend.color)} />
                         <span className={trend.color}>{difference}</span>
                       </div>
                     )}

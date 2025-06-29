@@ -6,6 +6,7 @@ import { fetchDeviceTypeBreakdownAction, fetchDeviceUsageTrendAction } from '@/a
 import BAPieChart from '@/components/BAPieChart';
 import { getDeviceColor, getDeviceLabel } from '@/constants/deviceTypes';
 import { DeviceIcon } from '@/components/icons';
+import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
 
 type DevicesChartsSectionProps = {
   deviceBreakdownPromise: ReturnType<typeof fetchDeviceTypeBreakdownAction>;
@@ -18,6 +19,7 @@ export default function DevicesChartsSection({
 }: DevicesChartsSectionProps) {
   const deviceBreakdown = use(deviceBreakdownPromise);
   const deviceUsageTrend = use(deviceUsageTrendPromise);
+  const { granularity } = useTimeRangeContext();
 
   return (
     <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
@@ -38,6 +40,7 @@ export default function DevicesChartsSection({
           chartData={deviceUsageTrend.data}
           categories={deviceUsageTrend.categories}
           comparisonMap={deviceUsageTrend.comparisonMap}
+          granularity={granularity}
         />
       </div>
     </div>
