@@ -8,6 +8,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { formatDateInUserTimezone } from '@/utils/timezoneHelpers';
 
 interface DatePickerProps {
   label: string;
@@ -15,9 +16,10 @@ interface DatePickerProps {
   onDateSelect: (date: Date | undefined) => void;
   disabled?: (date: Date) => boolean;
   id?: string;
+  userTimezone?: string;
 }
 
-export function DatePicker({ label, date, onDateSelect, disabled, id }: DatePickerProps) {
+export function DatePicker({ label, date, onDateSelect, disabled, id, userTimezone = 'UTC' }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
@@ -38,7 +40,7 @@ export function DatePicker({ label, date, onDateSelect, disabled, id }: DatePick
             )}
           >
             <CalendarIcon className='h-4 w-4' />
-            {date ? format(date, 'PPP') : <span>Pick a date</span>}
+            {date ? formatDateInUserTimezone(date, userTimezone, (d) => format(d, 'PPP')) : <span>Pick a date</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className='z-[1003] w-auto p-0' align='start'>

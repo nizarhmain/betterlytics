@@ -8,13 +8,15 @@ interface DateRangeSectionProps {
   endDate: Date | undefined;
   onStartDateSelect: (date: Date | undefined) => void;
   onEndDateSelect: (date: Date | undefined) => void;
+  userTimezone?: string;
 }
 
 export function DateRangeSection({ 
   startDate, 
   endDate, 
   onStartDateSelect, 
-  onEndDateSelect 
+  onEndDateSelect,
+  userTimezone
 }: DateRangeSectionProps) {
   return (
     <div>
@@ -31,6 +33,7 @@ export function DateRangeSection({
             return date > new Date();
           }}
           id='startDateInput'
+          userTimezone={userTimezone}
         />
         <DatePicker
           label='End date'
@@ -43,6 +46,7 @@ export function DateRangeSection({
             return date > new Date();
           }}
           id='endDateInput'
+          userTimezone={userTimezone}
         />
       </div>
     </div>

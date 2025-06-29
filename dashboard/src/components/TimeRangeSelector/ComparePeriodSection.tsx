@@ -13,6 +13,7 @@ interface ComparePeriodSectionProps {
   compareEndDate: Date | undefined;
   onCompareStartDateSelect: (date: Date | undefined) => void;
   onCompareEndDateSelect: (date: Date | undefined) => void;
+  userTimezone?: string;
 }
 
 export function ComparePeriodSection({
@@ -22,6 +23,7 @@ export function ComparePeriodSection({
   compareEndDate,
   onCompareStartDateSelect,
   onCompareEndDateSelect,
+  userTimezone,
 }: ComparePeriodSectionProps) {
   return (
     <>
@@ -53,6 +55,7 @@ export function ComparePeriodSection({
                   return date > new Date();
                 }}
                 id='compareStartDateInput'
+                userTimezone={userTimezone}
               />
               <DatePicker
                 label='End date'
@@ -65,6 +68,7 @@ export function ComparePeriodSection({
                   return date > new Date();
                 }}
                 id='compareEndDateInput'
+                userTimezone={userTimezone}
               />
             </div>
           </div>

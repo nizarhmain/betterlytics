@@ -5,15 +5,16 @@ import { differenceInCalendarDays } from 'date-fns';
 import { useTimeRangeContext } from '@/contexts/TimeRangeContextProvider';
 import { TIME_RANGE_PRESETS, TimeRangeValue, getDateRangeForTimePresets } from '@/utils/timeRanges';
 import { GranularityRangeValues, getAllowedGranularities } from '@/utils/granularityRanges';
+import { convertUTCDatesToUser, type UTCDate, type TZDate, createTimezoneHelper } from '@/utils/timezoneHelpers';
 
 interface TempState {
   range: TimeRangeValue;
   granularity: GranularityRangeValues;
-  customStart: Date | undefined;
-  customEnd: Date | undefined;
+  customStart: TZDate | undefined;
+  customEnd: TZDate | undefined;
   compareEnabled: boolean;
-  compareStart: Date | undefined;
-  compareEnd: Date | undefined;
+  compareStart: TZDate | undefined;
+  compareEnd: TZDate | undefined;
 }
 
 export function useTimeRangeState() {
@@ -27,6 +28,7 @@ export function useTimeRangeState() {
 
       const { startDate: presetStart, endDate: presetEnd } = getDateRangeForTimePresets(
         preset.value,
+        context.userTimezone,
       );
 
       if (
@@ -39,17 +41,22 @@ export function useTimeRangeState() {
       }
     }
     return 'custom';
-  }, [context.startDate, context.endDate]);
+  }, [context.startDate, context.endDate, context.userTimezone]);
 
   const createInitialTempState = useCallback((): TempState => {
-    let customStart = context.startDate;
-    let customEnd = context.endDate;
+    const helper = createTimezoneHelper(context.userTimezone);
+    let customStart = helper.toUserTimezone(context.startDate);
+    let customEnd = helper.toUserTimezone(context.endDate);
 
     if (currentActivePreset !== 'custom') {
-      const { startDate, endDate } = getDateRangeForTimePresets(currentActivePreset);
-      customStart = startDate;
-      customEnd = endDate;
+      // For presets, get UTC dates then convert to user timezone for display
+      const { startDate, endDate } = getDateRangeForTimePresets(currentActivePreset, context.userTimezone);
+      customStart = helper.toUserTimezone(startDate);
+      customEnd = helper.toUserTimezone(endDate);
     }
+
+    let compareStart = context.compareStartDate && helper.toUserTimezone(context.compareStartDate);
+    let compareEnd = context.compareEndDate && helper.toUserTimezone(context.compareEndDate);
 
     return {
       range: currentActivePreset,
@@ -57,8 +64,8 @@ export function useTimeRangeState() {
       customStart,
       customEnd,
       compareEnabled: context.compareEnabled,
-      compareStart: context.compareStartDate,
-      compareEnd: context.compareEndDate,
+      compareStart,
+      compareEnd,
     };
   }, [currentActivePreset, context]);
 
@@ -72,14 +79,14 @@ export function useTimeRangeState() {
       startDate = tempState.customStart;
       endDate = tempState.customEnd;
     } else {
-      const range = getDateRangeForTimePresets(tempState.range);
+      const range = getDateRangeForTimePresets(tempState.range, context.userTimezone);
       startDate = range.startDate;
       endDate = range.endDate;
     }
 
     if (!startDate || !endDate) return ['day'];
     return getAllowedGranularities(startDate, endDate);
-  }, [tempState.range, tempState.customStart, tempState.customEnd]);
+  }, [tempState.range, tempState.customStart, tempState.customEnd, context.userTimezone]);
 
   const periodDurationDays = useMemo(() => {
     let startDate: Date | undefined;
@@ -89,14 +96,14 @@ export function useTimeRangeState() {
       startDate = tempState.customStart;
       endDate = tempState.customEnd;
     } else {
-      const range = getDateRangeForTimePresets(tempState.range);
+      const range = getDateRangeForTimePresets(tempState.range, context.userTimezone);
       startDate = range.startDate;
       endDate = range.endDate;
     }
 
     if (!startDate || !endDate) return null;
-    return differenceInCalendarDays(endDate, startDate) + 1;
-  }, [tempState.range, tempState.customStart, tempState.customEnd]);
+    return differenceInCalendarDays(endDate, startDate);
+  }, [tempState.range, tempState.customStart, tempState.customEnd, context.userTimezone]);
 
   const updateTempState = useCallback((updates: Partial<TempState>) => {
     setTempState((prev) => ({ ...prev, ...updates }));

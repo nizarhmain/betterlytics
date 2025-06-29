@@ -5,18 +5,21 @@ import {
   getAllowedGranularities,
   getValidGranularityFallback,
 } from '@/utils/granularityRanges';
+import { useUserTimezone } from '@/hooks/use-user-timezone';
+import type { UTCDate } from '@/utils/timezoneHelpers';
 
 type TimeRangeContextProps = {
-  startDate: Date;
-  endDate: Date;
-  setPeriod: (startDate: Date, endDate: Date) => void;
+  startDate: UTCDate;
+  endDate: UTCDate;
+  setPeriod: (startDate: UTCDate, endDate: UTCDate) => void;
   granularity: GranularityRangeValues;
   setGranularity: Dispatch<SetStateAction<GranularityRangeValues>>;
   compareEnabled: boolean;
   setCompareEnabled: Dispatch<SetStateAction<boolean>>;
-  compareStartDate?: Date;
-  compareEndDate?: Date;
-  setCompareDateRange: (startDate: Date, endDate: Date) => void;
+  compareStartDate?: UTCDate;
+  compareEndDate?: UTCDate;
+  setCompareDateRange: (startDate: UTCDate, endDate: UTCDate) => void;
+  userTimezone: string;
 };
 
 const TimeRangeContext = React.createContext<TimeRangeContextProps>({} as TimeRangeContextProps);
@@ -26,30 +29,31 @@ type TimeRangeContextProviderProps = {
 };
 
 export function TimeRangeContextProvider({ children }: TimeRangeContextProviderProps) {
-  const initialRangeDetails = getDateRangeForTimePresets('7d');
-  const [startDate, setStartDate] = React.useState<Date>(initialRangeDetails.startDate);
-  const [endDate, setEndDate] = React.useState<Date>(initialRangeDetails.endDate);
+  const userTimezone = useUserTimezone();
+  const initialRangeDetails = getDateRangeForTimePresets('7d', userTimezone);
+  const [startDate, setStartDate] = React.useState<UTCDate>(initialRangeDetails.startDate);
+  const [endDate, setEndDate] = React.useState<UTCDate>(initialRangeDetails.endDate);
 
   const [granularity, setGranularity] = React.useState<GranularityRangeValues>('day');
   const [compareEnabled, setCompareEnabled] = React.useState<boolean>(false);
-  const [compareStartDate, setCompareStartDate] = React.useState<Date | undefined>(undefined);
-  const [compareEndDate, setCompareEndDate] = React.useState<Date | undefined>(undefined);
+  const [compareStartDate, setCompareStartDate] = React.useState<UTCDate | undefined>(undefined);
+  const [compareEndDate, setCompareEndDate] = React.useState<UTCDate | undefined>(undefined);
 
-  const setPeriod = useCallback(
-    (newStartDate: Date, newEndDate: Date) => {
-      setStartDate(newStartDate);
-      setEndDate(newEndDate);
-    },
-    [],
-  );
+  useEffect(() => {
+    const newRangeDetails = getDateRangeForTimePresets('7d', userTimezone);
+    setStartDate(newRangeDetails.startDate);
+    setEndDate(newRangeDetails.endDate);
+  }, [userTimezone]);
 
-  const handleSetCompareDateRange = useCallback(
-    (csDate: Date, ceDate: Date) => {
-      setCompareStartDate(csDate);
-      setCompareEndDate(ceDate);
-    },
-    [],
-  );
+  const setPeriod = useCallback((newStartDate: UTCDate, newEndDate: UTCDate) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+  }, []);
+
+  const handleSetCompareDateRange = useCallback((csDate: UTCDate, ceDate: UTCDate) => {
+    setCompareStartDate(csDate);
+    setCompareEndDate(ceDate);
+  }, []);
 
   useEffect(() => {
     const allowedGranularities = getAllowedGranularities(startDate, endDate);
@@ -72,6 +76,7 @@ export function TimeRangeContextProvider({ children }: TimeRangeContextProviderP
         compareStartDate,
         compareEndDate,
         setCompareDateRange: handleSetCompareDateRange,
+        userTimezone,
       }}
     >
       {children}
