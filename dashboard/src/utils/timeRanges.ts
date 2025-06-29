@@ -1,5 +1,4 @@
-import { subDays, subMonths } from 'date-fns';
-import { fromZonedTime, toZonedTime } from 'date-fns-tz';
+import { subDays, subMonths, startOfDay, endOfDay } from 'date-fns';
 
 export type TimeRangeValue = '24h' | '7d' | '28d' | '3mo' | 'custom';
 export type TimeGrouping = 'minute' | 'hour' | 'day';
@@ -7,59 +6,46 @@ export type TimeGrouping = 'minute' | 'hour' | 'day';
 export interface TimeRangePreset {
   label: string;
   value: TimeRangeValue;
-  getRange: (userTimezone?: string) => { startDate: Date; endDate: Date };
-}
-
-function startOfDayInTimezone(date: Date, timezone: string): Date {
-  const zonedDate = toZonedTime(date, timezone);
-  const startOfDay = new Date(zonedDate.getFullYear(), zonedDate.getMonth(), zonedDate.getDate(), 0, 0, 0, 0);
-  return fromZonedTime(startOfDay, timezone);
-}
-
-function endOfDayInTimezone(date: Date, timezone: string): Date {
-  const zonedDate = toZonedTime(date, timezone);
-  const endOfDay = new Date(zonedDate.getFullYear(), zonedDate.getMonth(), zonedDate.getDate(), 23, 59, 59, 999);
-  return fromZonedTime(endOfDay, timezone);
+  getRange: () => { startDate: Date; endDate: Date };
 }
 
 export const TIME_RANGE_PRESETS: TimeRangePreset[] = [
   {
     label: 'Last 24 hours',
     value: '24h',
-    getRange: (userTimezone = 'UTC') => {
+    getRange: () => {
       const now = new Date();
-      const end = endOfDayInTimezone(now, userTimezone);
-      const start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
-      return { startDate: start, endDate: end };
+      const start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      return { startDate: start, endDate: now };
     },
   },
   {
     label: 'Last 7 days',
     value: '7d',
-    getRange: (userTimezone = 'UTC') => {
-      const now = new Date();
-      const end = endOfDayInTimezone(now, userTimezone);
-      const start = startOfDayInTimezone(subDays(now, 6), userTimezone);
+    getRange: () => {
+      const yesterday = subDays(new Date(), 1);
+      const end = endOfDay(yesterday);
+      const start = startOfDay(subDays(yesterday, 6));
       return { startDate: start, endDate: end };
     },
   },
   {
     label: 'Last 28 days',
     value: '28d',
-    getRange: (userTimezone = 'UTC') => {
-      const now = new Date();
-      const end = endOfDayInTimezone(now, userTimezone);
-      const start = startOfDayInTimezone(subDays(now, 27), userTimezone);
+    getRange: () => {
+      const yesterday = subDays(new Date(), 1);
+      const end = endOfDay(yesterday);
+      const start = startOfDay(subDays(yesterday, 27));
       return { startDate: start, endDate: end };
     },
   },
   {
     label: 'Last 3 months',
     value: '3mo',
-    getRange: (userTimezone = 'UTC') => {
-      const now = new Date();
-      const end = endOfDayInTimezone(now, userTimezone);
-      const start = startOfDayInTimezone(subMonths(now, 3), userTimezone);
+    getRange: () => {
+      const yesterday = subDays(new Date(), 1);
+      const end = endOfDay(yesterday);
+      const start = startOfDay(subMonths(yesterday, 3));
       return { startDate: start, endDate: end };
     },
   },
@@ -67,16 +53,15 @@ export const TIME_RANGE_PRESETS: TimeRangePreset[] = [
 
 export function getDateRangeForTimePresets(
   value: Omit<TimeRangeValue, 'custom'>,
-  userTimezone?: string,
 ): {
   startDate: Date;
   endDate: Date;
 } {
   const preset = TIME_RANGE_PRESETS.find((p) => p.value === value);
   if (!preset) {
-    return TIME_RANGE_PRESETS.find((p) => p.value === '7d')!.getRange(userTimezone);
+    return TIME_RANGE_PRESETS.find((p) => p.value === '7d')!.getRange();
   }
-  return preset.getRange(userTimezone);
+  return preset.getRange();
 }
 
 export function getGroupingForRange(startDate: Date, endDate: Date): TimeGrouping {
@@ -86,4 +71,3 @@ export function getGroupingForRange(startDate: Date, endDate: Date): TimeGroupin
   return 'day';
 }
 
-export { startOfDayInTimezone, endOfDayInTimezone };
