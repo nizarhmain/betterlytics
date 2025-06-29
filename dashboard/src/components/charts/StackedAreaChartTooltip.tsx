@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { timeFormat } from 'd3-time-format';
 import { cn } from '@/lib/utils';
-import { getTrendInfo, formatDifference } from '@/utils/chartUtils';
+import { getTrendInfo, formatDifference, defaultDateLabelFormatter } from '@/utils/chartUtils';
 import { type ComparisonMapping } from '@/types/charts';
 import { type GranularityRangeValues } from '@/utils/granularityRanges';
 
@@ -24,20 +23,12 @@ interface StackedAreaChartTooltipProps {
   granularity?: GranularityRangeValues;
 }
 
-const defaultLabelFormatter = (date: string | number, granularity?: GranularityRangeValues) => {
-  if (granularity === undefined || granularity === 'day') {
-    return timeFormat('%b %d')(new Date(date));
-  }
-
-  return timeFormat('%b %d - %H:%M')(new Date(date));
-};
-
 export function StackedAreaChartTooltip({
   active,
   payload,
   label,
   formatter = (value) => value.toLocaleString(),
-  labelFormatter = defaultLabelFormatter,
+  labelFormatter = defaultDateLabelFormatter,
   comparisonMap,
   granularity,
 }: StackedAreaChartTooltipProps) {

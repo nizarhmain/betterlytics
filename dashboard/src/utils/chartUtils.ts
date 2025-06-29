@@ -1,4 +1,6 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { GranularityRangeValues } from './granularityRanges';
+import { timeFormat } from 'd3-time-format';
 
 export interface TrendInfo {
   icon: typeof TrendingUp | typeof TrendingDown | typeof Minus;
@@ -41,4 +43,15 @@ export function formatDifference(
   }
 
   return `${sign}${formattedDiff}`;
+}
+
+/*
+ * Formats the date based on the granularity
+ */
+export function defaultDateLabelFormatter(date: string | number, granularity?: GranularityRangeValues) {
+  if (granularity === undefined || granularity === 'day') {
+    return timeFormat('%b %d')(new Date(date));
+  }
+
+  return timeFormat('%b %d - %H:%M')(new Date(date));
 }

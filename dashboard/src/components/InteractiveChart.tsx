@@ -5,6 +5,7 @@ import { timeFormat } from 'd3-time-format';
 import { ChartTooltip } from './charts/ChartTooltip';
 import { GranularityRangeValues } from '@/utils/granularityRanges';
 import { type ComparisonMapping } from '@/types/charts';
+import { defaultDateLabelFormatter } from '@/utils/chartUtils';
 
 interface ChartDataPoint {
   date: string | number;
@@ -22,8 +23,6 @@ interface InteractiveChartProps {
 
 const InteractiveChart: React.FC<InteractiveChartProps> = React.memo(
   ({ title, data, color, formatValue, granularity, comparisonMap }) => {
-    const timeFormatter =
-      granularity === undefined || granularity === 'day' ? timeFormat('%b %d') : timeFormat('%b %d - %H:%M');
     return (
       <Card>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
@@ -61,7 +60,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = React.memo(
                 <Tooltip
                   content={
                     <ChartTooltip
-                      labelFormatter={timeFormatter}
+                      labelFormatter={(date) => defaultDateLabelFormatter(date, granularity)}
                       formatter={formatValue}
                       comparisonMap={comparisonMap}
                     />
