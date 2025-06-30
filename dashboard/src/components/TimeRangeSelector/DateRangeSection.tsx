@@ -2,21 +2,22 @@
 
 import React from 'react';
 import { DatePicker } from './DatePicker';
+import type { TZDate } from '@/utils/timezoneHelpers';
 
 interface DateRangeSectionProps {
-  startDate: Date | undefined;
-  endDate: Date | undefined;
-  onStartDateSelect: (date: Date | undefined) => void;
-  onEndDateSelect: (date: Date | undefined) => void;
+  startDate: TZDate | undefined;
+  endDate: TZDate | undefined;
+  onStartDateSelect: (date: TZDate | undefined) => void;
+  onEndDateSelect: (date: TZDate | undefined) => void;
   userTimezone?: string;
 }
 
-export function DateRangeSection({ 
-  startDate, 
-  endDate, 
-  onStartDateSelect, 
+export function DateRangeSection({
+  startDate,
+  endDate,
+  onStartDateSelect,
   onEndDateSelect,
-  userTimezone
+  userTimezone,
 }: DateRangeSectionProps) {
   return (
     <div>
@@ -25,7 +26,7 @@ export function DateRangeSection({
         <DatePicker
           label='Start date'
           date={startDate}
-          onDateSelect={onStartDateSelect}
+          onDateSelect={(date) => onStartDateSelect(date as TZDate)}
           disabled={(date) => {
             if (endDate && date > endDate) {
               return true;
@@ -38,7 +39,7 @@ export function DateRangeSection({
         <DatePicker
           label='End date'
           date={endDate}
-          onDateSelect={onEndDateSelect}
+          onDateSelect={(date) => onEndDateSelect(date as TZDate)}
           disabled={(date) => {
             if (startDate && date < startDate) {
               return true;

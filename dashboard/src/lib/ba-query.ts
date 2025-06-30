@@ -57,7 +57,7 @@ function getGranularitySQLFunctionFromGranularityRange(granularity: GranularityR
   return (column: z.infer<typeof DateColumnSchema>, date: DateTimeString) => {
     console.log(date);
     const validatedColumn = DateColumnSchema.parse(column);
-    return safeSql`toStartOfInterval(${SQL.Unsafe(validatedColumn)}, INTERVAL ${SQL.Unsafe(validatedInterval)}, ${SQL.DateTime({ granulairty_origin_date: date })} - INTERVAL 100 YEAR)`;
+    return safeSql`toStartOfInterval(${SQL.Unsafe(validatedColumn)}, INTERVAL ${SQL.Unsafe(validatedInterval)}, ${SQL.DateTime({ granulairty_origin_date: date })} - INTERVAL 10 YEAR)`;
   };
 }
 

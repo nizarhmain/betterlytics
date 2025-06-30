@@ -8,12 +8,12 @@ import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { formatDateInUserTimezone } from '@/utils/timezoneHelpers';
+import { formatDateInUserTimezone, TZDate } from '@/utils/timezoneHelpers';
 
 interface DatePickerProps {
   label: string;
-  date: Date | undefined;
-  onDateSelect: (date: Date | undefined) => void;
+  date: TZDate | undefined;
+  onDateSelect: (date: TZDate | undefined) => void;
   disabled?: (date: Date) => boolean;
   id?: string;
   userTimezone?: string;
@@ -23,7 +23,7 @@ export function DatePicker({ label, date, onDateSelect, disabled, id, userTimezo
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
-    onDateSelect(selectedDate);
+    onDateSelect(selectedDate as TZDate);
     setIsOpen(false);
   };
 
@@ -34,23 +34,14 @@ export function DatePicker({ label, date, onDateSelect, disabled, id, userTimezo
         <PopoverTrigger asChild>
           <Button
             variant={'outline'}
-            className={cn(
-              'w-full justify-start truncate text-left font-normal',
-              !date && 'text-muted-foreground',
-            )}
+            className={cn('w-full justify-start truncate text-left font-normal', !date && 'text-muted-foreground')}
           >
             <CalendarIcon className='h-4 w-4' />
-            {date ? formatDateInUserTimezone(date, userTimezone, (d) => format(d, 'PPP')) : <span>Pick a date</span>}
+            {date ? format(date, 'PPP') : <span>Pick a date</span>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className='z-[1003] w-auto p-0' align='start'>
-          <Calendar
-            mode='single'
-            selected={date}
-            onSelect={handleDateSelect}
-            disabled={disabled}
-            initialFocus
-          />
+          <Calendar mode='single' selected={date} onSelect={handleDateSelect} disabled={disabled} initialFocus />
         </PopoverContent>
       </Popover>
     </div>

@@ -1,4 +1,4 @@
-import { subDays, subMonths } from 'date-fns';
+import { subDays, subMonths, addSeconds } from 'date-fns';
 import { createTimezoneHelper, UTCDate } from './timezoneHelpers';
 
 export type TimeRangeValue = '24h' | '7d' | '28d' | '3mo' | 'custom';
@@ -27,7 +27,7 @@ export const TIME_RANGE_PRESETS: TimeRangePreset[] = [
       const helper = createTimezoneHelper(userTimezone);
       const yesterday = subDays(new Date(), 1) as UTCDate;
       const end = helper.endOfDayInUserTimezone(yesterday);
-      const start = helper.startOfDayInUserTimezone(subDays(yesterday, 6));
+      const start = helper.startOfDayInUserTimezone(addSeconds(subDays(yesterday, 6), 1));
       return { startDate: start, endDate: end };
     },
   },
@@ -38,7 +38,7 @@ export const TIME_RANGE_PRESETS: TimeRangePreset[] = [
       const helper = createTimezoneHelper(userTimezone);
       const yesterday = subDays(new Date(), 1) as UTCDate;
       const end = helper.endOfDayInUserTimezone(yesterday);
-      const start = helper.startOfDayInUserTimezone(subDays(yesterday, 27));
+      const start = helper.startOfDayInUserTimezone(addSeconds(subDays(yesterday, 27), 1));
       return { startDate: start, endDate: end };
     },
   },
@@ -49,7 +49,7 @@ export const TIME_RANGE_PRESETS: TimeRangePreset[] = [
       const helper = createTimezoneHelper(userTimezone);
       const yesterday = subDays(new Date(), 1) as UTCDate;
       const end = helper.endOfDayInUserTimezone(yesterday);
-      const start = helper.startOfDayInUserTimezone(subMonths(yesterday, 3));
+      const start = helper.startOfDayInUserTimezone(addSeconds(subMonths(yesterday, 3), 1));
       return { startDate: start, endDate: end };
     },
   },

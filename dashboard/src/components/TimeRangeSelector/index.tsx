@@ -37,19 +37,13 @@ export default function TimeRangeSelector({ className = '' }: { className?: stri
       context.setGranularity(granularity);
       context.setCompareEnabled(compareEnabled);
 
-      if (range === 'custom' && customStart && customEnd) {
+      if (customStart && customEnd) {
         const { startDate: utcStart, endDate: utcEnd } = convertUserDatesToUTC(
           customStart,
           customEnd,
           context.userTimezone,
         );
         context.setPeriod(utcStart, utcEnd);
-      } else if (range !== 'custom') {
-        // Preset ranges already return UTC dates
-        const { startDate, endDate } = getDateRangeForTimePresets(range, context.userTimezone);
-        if (startDate && endDate) {
-          context.setPeriod(startDate, endDate);
-        }
       }
 
       if (compareEnabled && compareStart && compareEnd) {

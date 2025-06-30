@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback } from 'react';
-import { addDays, differenceInCalendarDays } from 'date-fns';
 import { TimeRangeValue, getDateRangeForTimePresets } from '@/utils/timeRanges';
 import { GranularityRangeValues, getValidGranularityFallback } from '@/utils/granularityRanges';
 import { type TZDate, UTCDate, createTimezoneHelper } from '@/utils/timezoneHelpers';
@@ -40,31 +39,29 @@ export function useTimeRangeHandlers({
         return;
       }
 
-      if (periodDurationDays === null) {
-        return;
-      }
       // Get UTC dates from preset
       const { startDate, endDate } = getDateRangeForTimePresets(value, userTimezone);
-      console.log(startDate);
+
       // Convert to user timezone for display in temp state
       const helper = createTimezoneHelper(userTimezone);
       const startTZ = helper.toUserTimezone(startDate);
       const endTZ = helper.toUserTimezone(endDate);
 
-      const newDuration = Math.abs(differenceInCalendarDays(startTZ, endTZ));
+      const durationMs = endDate.getTime() - startDate.getTime();
 
-      console.log('Duration:', newDuration);
+      const compareEnd = new Date(startDate.getTime() - 1_000) as UTCDate;
+      const compareStart = new Date(compareEnd.getTime() - durationMs + 1_000) as UTCDate;
+      const compareStartTZ = helper.toUserTimezone(compareStart);
+      const compareEndTZ = helper.toUserTimezone(compareEnd);
 
-      // Note: -1 & +1 are to ensure duration remains correct
-      const compareEnd = addDays(startTZ, -1);
-      const compareStart = addDays(startTZ, -newDuration);
+      console.log(['', startDate, endDate, compareStart, compareEndTZ].join('\n'));
 
       updateTempState({
         range: value,
         customStart: startTZ,
         customEnd: endTZ,
-        compareStart: compareStart,
-        compareEnd: compareEnd,
+        compareStart: compareStartTZ,
+        compareEnd: compareEndTZ,
       });
     },
     [updateTempState, userTimezone, periodDurationDays],
@@ -111,7 +108,9 @@ export function useTimeRangeHandlers({
     (date: Date | undefined) => {
       if (!date || !periodDurationDays) return;
 
-      const compareEnd = addDays(date, periodDurationDays);
+      // Calculate exact duration in milliseconds to preserve time
+      const durationMs = periodDurationDays * 24 * 60 * 60 * 1000;
+      const compareEnd = new Date(date.getTime() + durationMs);
       updateTempState({
         compareStart: date as TZDate,
         compareEnd: compareEnd as TZDate,
@@ -124,7 +123,9 @@ export function useTimeRangeHandlers({
     (date: Date | undefined) => {
       if (!date || !periodDurationDays) return;
 
-      const compareStart = addDays(date, -periodDurationDays);
+      // Calculate exact duration in milliseconds to preserve time
+      const durationMs = periodDurationDays * 24 * 60 * 60 * 1000;
+      const compareStart = new Date(date.getTime() - durationMs);
       updateTempState({
         compareStart: compareStart as TZDate,
         compareEnd: date as TZDate,

@@ -5,14 +5,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { DatePicker } from './DatePicker';
+import type { TZDate } from '@/utils/timezoneHelpers';
 
 interface ComparePeriodSectionProps {
   compareEnabled: boolean;
   onCompareEnabledChange: (enabled: boolean) => void;
-  compareStartDate: Date | undefined;
-  compareEndDate: Date | undefined;
-  onCompareStartDateSelect: (date: Date | undefined) => void;
-  onCompareEndDateSelect: (date: Date | undefined) => void;
+  compareStartDate: TZDate | undefined;
+  compareEndDate: TZDate | undefined;
+  onCompareStartDateSelect: (date: TZDate | undefined) => void;
+  onCompareEndDateSelect: (date: TZDate | undefined) => void;
   userTimezone?: string;
 }
 
@@ -47,7 +48,7 @@ export function ComparePeriodSection({
               <DatePicker
                 label='Start date'
                 date={compareStartDate}
-                onDateSelect={onCompareStartDateSelect}
+                onDateSelect={(date) => onCompareStartDateSelect(date as TZDate)}
                 disabled={(date) => {
                   if (compareEndDate && date > compareEndDate) {
                     return true;
@@ -60,7 +61,7 @@ export function ComparePeriodSection({
               <DatePicker
                 label='End date'
                 date={compareEndDate}
-                onDateSelect={onCompareEndDateSelect}
+                onDateSelect={(date) => onCompareEndDateSelect(date as TZDate)}
                 disabled={(date) => {
                   if (compareStartDate && date < compareStartDate) {
                     return true;
