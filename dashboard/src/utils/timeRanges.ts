@@ -15,9 +15,11 @@ export const TIME_RANGE_PRESETS: TimeRangePreset[] = [
     label: 'Last 24 hours',
     value: '24h',
     getRange: (userTimezone = 'UTC') => {
+      const helper = createTimezoneHelper(userTimezone);
       const now = new Date() as UTCDate;
-      const start = new Date(now.getTime() - 24 * 60 * 60 * 1000) as UTCDate;
-      return { startDate: start, endDate: now };
+      const end = helper.endOfDayInUserTimezone(now);
+      const start = helper.startOfDayInUserTimezone(addSeconds(subDays(now, 1), 1));
+      return { startDate: start, endDate: end };
     },
   },
   {
