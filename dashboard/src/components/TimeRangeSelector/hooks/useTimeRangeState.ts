@@ -49,17 +49,14 @@ export function useTimeRangeState() {
       customEnd = endDate;
     }
 
-    let compareStart = context.compareStartDate;
-    let compareEnd = context.compareEndDate;
-
     return {
       range: currentActivePreset,
       granularity: context.granularity,
       customStart,
       customEnd,
       compareEnabled: context.compareEnabled,
-      compareStart,
-      compareEnd,
+      compareStart: context.compareStartDate,
+      compareEnd: context.compareEndDate,
     };
   }, [currentActivePreset, context]);
 
